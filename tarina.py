@@ -400,10 +400,14 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
 #-------------Update------------------
 
 def update(tarinaversion, tarinavername):
-    writemessage('Current version ' + tarinaversion + ' ' + tarinavername)
+    writemessage('Current version ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
     time.sleep(2)
     writemessage('Checking for updates...')
-    os.system('wget https://bitbucket.org/rbckman/tarina/raw/a23ea77fee134dc03da72a38c269a4d34317ce87/VERSION -P /tmp/')
+    try:
+        os.system('wget https://bitbucket.org/rbckman/tarina/raw/a23ea77fee134dc03da72a38c269a4d34317ce87/VERSION -P /tmp/')
+    except:
+        writemessage('Sorry buddy, no internet connection')
+        return tarinaversion, tarinavername
     f = open('/tmp/VERSION')
     versionnumber = f.readline()
     versionname = f.readline()
