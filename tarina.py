@@ -417,12 +417,13 @@ def update(tarinaversion, tarinavername):
         time.sleep(4)
         timeleft = 0
         while timeleft < 5:
-            writemessage('Updating in ' + str(timeleft) + ' seconds. Press middlebutton to cancel')
+            writemessage('Updating in ' + str(5 - timeleft) + ' seconds. Press middlebutton to cancel')
             time.sleep(1)
             timeleft = timeleft + 1
             middlebutton = GPIO.input(5)
             if middlebutton == False:
                 return tarinaversion, tarinavername
+        writemessage('Updating...')
         os.system('git pull')
         writemessage('Hold on rebooting Tarina...')
         time.sleep(3)
