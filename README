@@ -1,0 +1,61 @@
+The Librecam
+
+video + sound recorder for the Raspberry Pi using the Pi Camera and Adafruit Pitft screen and C-Media USB Audio VIA VT1620A.
+adafruit kernel with the 3.5 tft https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
+
+Lens I'm trying out now
+2.8-12mm M12 Manual Zoom Manual Focus
+
+
+----------------||3d printable files||-------------------
+
+Blender file and printable stls in 3d folder
+
+
+
+---------------||Installing||-----------------
+
+
+cd /home/pi && git clone https://bitbucket.org/rbckman/petpicam.git
+
+
+
+---------------||Configurations||---------------------
+
+
+Booting to Petpicam
+in Raspbian Wheezy
+
+Place this line in inittab...
+1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>&1
+
+and place this in /root/.bashrc:
+if [ $(tty) == /dev/tty1 ]; then
+   python /home/pi/petpicam/petpicam.py
+fi
+
+
+in Raspbian Sid
+edit line in /lib/systemd/system/getty@.service:
+ExecStart=-/sbin/agetty --noclear %I $TERM
+to:
+ExecStart=-/sbin/getty/ --noclear -a root %I $TERM
+
+
+
+----------------------||Thanks to||-----------------------
+
+Raspberry Pi
+http://raspberrypi.org
+
+Adafruit
+https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/overview
+
+Dave Jones, for the awesome picamera python module
+http://picamera.readthedocs.org
+
+Tasanakorn for fbcp so you can preview on the pitft
+https://github.com/tasanakorn/rpi-fbcp
+
+Texy
+https://www.raspberrypi.org/forums/viewtopic.php?t=48967

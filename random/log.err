@@ -1,0 +1,333 @@
+Recording WAVE '/mnt/tmp/scene01_shot003_take002.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+[wav @ 0xb7c380] max_analyze_duration reached
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot003_take002.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot003_take002.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=     343kB time=29.25 bitrate=  96.0kbits/s    size=     362kB time=30.89 bitrate=  96.0kbits/s    
+video:0kB audio:362kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot004_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+overrun!!! (at least 71.741 ms long)
+Status:
+  state       : XRUN
+  trigger_time: 123.686592007
+  tstamp      : 0.000000
+  delay       : 0
+  avail       : 22095
+  avail_max   : 22095
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+[wav @ 0xc0f380] max_analyze_duration reached
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot004_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot004_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=     221kB time=18.87 bitrate=  96.0kbits/s    
+video:0kB audio:221kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot004_take002.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot004_take002.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot004_take002.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=      36kB time=3.02 bitrate=  96.2kbits/s    
+video:0kB audio:36kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot005_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+[wav @ 0x16d3380] max_analyze_duration reached
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot005_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot005_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=     101kB time=8.63 bitrate=  96.1kbits/s    
+video:0kB audio:101kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot006_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+[wav @ 0xf76380] max_analyze_duration reached
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot006_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot006_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=      93kB time=7.90 bitrate=  96.1kbits/s    
+video:0kB audio:93kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot007_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot007_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot007_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=      37kB time=3.13 bitrate=  96.2kbits/s    
+video:0kB audio:37kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot008_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot008_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot008_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=      32kB time=2.75 bitrate=  96.2kbits/s    
+video:0kB audio:32kB global headers:0kB muxing overhead 0.000000%
+Recording WAVE '/mnt/tmp/scene01_shot009_take001.wav' : Signed 16 bit Little Endian, Rate 44100 Hz, Mono
+Plug PCM: Hardware PCM card 0 'C-Media USB Audio Device' device 0 subdevice 0
+Its setup is:
+  stream       : CAPTURE
+  access       : RW_INTERLEAVED
+  format       : S16_LE
+  subformat    : STD
+  channels     : 1
+  rate         : 44100
+  exact rate   : 44100 (44100/1)
+  msbits       : 16
+  buffer_size  : 22050
+  period_size  : 5513
+  period_time  : 125011
+  tstamp_mode  : NONE
+  period_step  : 1
+  avail_min    : 5513
+  period_event : 0
+  start_threshold  : 1
+  stop_threshold   : 22050
+  silence_threshold: 0
+  silence_size : 0
+  boundary     : 1445068800
+  appl_ptr     : 0
+  hw_ptr       : 0
+avconv version 9.14-6:9.14-1rpi1rpi1, Copyright (c) 2000-2014 the Libav developers
+  built on Jul 22 2014 15:08:12 with gcc 4.6 (Debian 4.6.3-14+rpi1)
+Guessed Channel Layout for  Input Stream #0.0 : mono
+Input #0, wav, from '/home/pi/Videos/fiace/scene01/scene01_shot009_take001.wav':
+  Duration: 06:45:47.88, bitrate: 0 kb/s
+    Stream #0.0: Audio: pcm_s16le, 44100 Hz, mono, s16, 705 kb/s
+Output #0, ac3, to '/home/pi/Videos/fiace/scene01/scene01_shot009_take001.ac3':
+  Metadata:
+    encoder         : Lavf54.20.4
+    Stream #0.0: Audio: ac3, 44100 Hz, mono, fltp, 96 kb/s
+Stream mapping:
+  Stream #0:0 -> #0:0 (pcm_s16le -> ac3)
+Press ctrl-c to stop encoding
+size=       2kB time=0.13 bitrate= 100.1kbits/s    
+video:0kB audio:2kB global headers:0kB muxing overhead 0.000000%
+tvservice-client: Failed to connect to TV service: -1

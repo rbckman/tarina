@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="sound", KERNEL=="controlC*", KERNELS=="card*", \
+        TEST=="@sbindir@/alsactl", RUN+="@sbindir@/alsactl restore $attr{number}"
