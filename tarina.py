@@ -409,7 +409,7 @@ def update(tarinaversion, tarinavername):
     versionname = f.readline()
     os.system('rm /tmp/VERSION*')
     if float(tarinaversion) < float(versionnumber):
-        writemessage('New version found ' + versionnumber + ' ' + versionname)
+        writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
         timeleft = 0
         while timeleft < 5:
@@ -959,7 +959,7 @@ def main():
                     t = 0
                     rectime = ''
                     showrec = ''
-                    vumetermessage('Tarina ' + tarinaversion + ' ' + tarinavername)
+                    vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                     thefile = foldername + filename 
                     writemessage('Copying video file...')
                     os.system('mv /mnt/tmp/' + filename + '.h264 ' + foldername)
