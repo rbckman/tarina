@@ -404,7 +404,7 @@ def update(tarinaversion, tarinavername):
     time.sleep(2)
     writemessage('Checking for updates...')
     try:
-        os.system('wget https://bitbucket.org/rbckman/tarina/raw/a23ea77fee134dc03da72a38c269a4d34317ce87/VERSION -P /tmp/')
+        os.system('wget http://tarina.org/src/VERSION -P /tmp/')
     except:
         writemessage('Sorry buddy, no internet connection')
         return tarinaversion, tarinavername
