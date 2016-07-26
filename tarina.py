@@ -403,7 +403,7 @@ def update(tarinaversion, tarinavername):
     writemessage('Current version ' + tarinaversion + ' ' + tarinavername)
     time.sleep(2)
     writemessage('Checking for updates...')
-    os.system('wget http://tarina.org/src/ninjacam/VERSION -P /tmp/')
+    os.system('wget https://bitbucket.org/rbckman/tarina/raw/a23ea77fee134dc03da72a38c269a4d34317ce87/VERSION -P /tmp/')
     f = open('/tmp/VERSION')
     versionnumber = f.readline()
     versionname = f.readline()
@@ -419,8 +419,11 @@ def update(tarinaversion, tarinavername):
             middlebutton = GPIO.input(5)
             if middlebutton == False:
                 return tarinaversion, tarinavername
-        #os.system('rsync -R www-data@tarina.org/src/ninjacam/')
-    writemessage('Version up-to-date!')
+        os.system('git pull')
+        writemessage('Hold on rebooting Tarina...')
+        time.sleep(3)
+        os.system('reboot')
+    writemessage('Version is up-to-date!')
     time.sleep(2)
     return tarinaversion, tarinavername
 
