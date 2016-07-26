@@ -1,4 +1,6 @@
-The Librecam
+Tarina
+
+DIY filmmaking device for Raspberry pi
 
 video + sound recorder for the Raspberry Pi using the Pi Camera and Adafruit Pitft screen and C-Media USB Audio VIA VT1620A.
 adafruit kernel with the 3.5 tft https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
@@ -15,35 +17,37 @@ Blender file and printable stls in 3d folder
 
 ---------------||Installing||-----------------
 
+cd /home/pi && git clone https://bitbucket.org/rbckman/tarina.git
 
-cd /home/pi && git clone https://bitbucket.org/rbckman/petpicam.git
-
+sudo apt-get update && sudo apt-get install python-pip 
 
 
 ---------------||Configurations||---------------------
 
 
-Booting to Petpicam
-in Raspbian Wheezy
+Booting to Tarina
 
-Place this line in inittab...
+Raspbian Wheezy (with init)
+
+1. nano /etc/inittab
+2. comment out line 54
+#1:2345:respawn:/sbin/getty --noclear 38400 tty1
+
+3. add this line instead
 1:2345:respawn:/bin/login -f root tty1 </dev/tty1 >/dev/tty1 2>&1
 
-and place this in /root/.bashrc:
+4. place this to the end of /root/.bashrc:
 if [ $(tty) == /dev/tty1 ]; then
-   python /home/pi/petpicam/petpicam.py
+   cd /home/pi/tarina
+   echo -e '\033[?17;0;0c' > /dev/tty1
+   python tarina.py > /dev/tty2 2>err.log
 fi
 
-
-in Raspbian Sid
-edit line in /lib/systemd/system/getty@.service:
-ExecStart=-/sbin/agetty --noclear %I $TERM
-to:
-ExecStart=-/sbin/getty/ --noclear -a root %I $TERM
+Raspbian Sid instructions (with systemd) soon...
 
 
-
-----------------------||Thanks to||-----------------------
+---------------||Couldn't have been done without these||-----------------------
+---------------||Sending <3 to all||-------------------------------------------
 
 Raspberry Pi
 http://raspberrypi.org
@@ -51,11 +55,25 @@ http://raspberrypi.org
 Adafruit
 https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/overview
 
+Picamera python module
 Dave Jones, for the awesome picamera python module
 http://picamera.readthedocs.org
 
 Tasanakorn for fbcp so you can preview on the pitft
 https://github.com/tasanakorn/rpi-fbcp
 
+Aplay
+The awesome wav player/recorder with VU meter
+http://alsa.opensrc.org/Aplay
+
+Omxplayer
+Video player on the Raspberry pi
+https://github.com/huceke/omxplayer
+
 Texy
 https://www.raspberrypi.org/forums/viewtopic.php?t=48967
+
+The Dispmanx library
+https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi
+
+
