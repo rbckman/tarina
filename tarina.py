@@ -831,7 +831,9 @@ def main():
         
         #STANDARD VALUES
         selectedaction = 0
+        lastselectedaction = 0
         selected = 0
+        lastselected = 0
         camera.framerate = 26
         awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         awbx = 0
@@ -905,7 +907,6 @@ def main():
 
         #MAIN LOOP
         while True:
-            time.sleep(0.1)
             GPIO.output(18,backlight)
             middlebutton = GPIO.input(5)
             upbutton = GPIO.input(12)
@@ -932,7 +933,7 @@ def main():
                 quit()
 
             #SCREEN ON/OFF
-            if upbutton == False and downbutton == False:
+            elif upbutton == False and downbutton == False:
                 time.sleep(0.1)
                 if backlight == True:
                     backlight = False
@@ -1070,7 +1071,7 @@ def main():
                     selectedaction = 0
 
             #LOAD FILM
-            if event == 27 or middlebutton == False and selectedaction == 8:
+            elif event == 27 or middlebutton == False and selectedaction == 8:
                 buttonpressed = time.time()
                 camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = loadfilm(filmname,filmfolder)
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
@@ -1125,19 +1126,19 @@ def main():
                     else:
                         selectedaction = 0
                         time.sleep(0.1)
-                if selected == 5:
+                elif selected == 5:
                     camera.brightness = min(camera.brightness + 1, 99)
-                if selected == 6:
+                elif selected == 6:
                     camera.contrast = min(camera.contrast + 1, 99)
-                if selected == 7:
+                elif selected == 7:
                     camera.saturation = min(camera.saturation + 1, 99)
-                if selected == 1:
+                elif selected == 1:
                     camera.shutter_speed = min(camera.shutter_speed + 510, 50000)
-                if selected == 2:
+                elif selected == 2:
                     camera.iso = min(camera.iso + 100, 1600)
-                if selected == 9:
+                elif selected == 9:
                     beeps = beeps + 1
-                if selected == 8:
+                elif selected == 8:
                     if flip == 'yes':
                         camera.hflip = False
                         camera.vflip = False
@@ -1148,37 +1149,37 @@ def main():
                         camera.vflip = True
                         flip = 'yes'
                         time.sleep(0.2)
-                if selected == 10:
+                elif selected == 10:
                     reclenght = reclenght + 1
                     time.sleep(0.1)
-                if selected == 11:
+                elif selected == 11:
                     if miclevel < 100:
                         miclevel = miclevel + 2
                         os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                if selected == 12:
+                elif selected == 12:
                     if headphoneslevel < 100:
                         headphoneslevel = headphoneslevel + 2
                         os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                if selected == 15:
+                elif selected == 15:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 16:
+                elif selected == 16:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 17:
+                elif selected == 17:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 3:
+                elif selected == 3:
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[0]) < 7.98:
                         camera.awb_gains = (float(camera.awb_gains[0]) + 0.02, float(camera.awb_gains[1]))
-                if selected == 4:
+                elif selected == 4:
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) < 7.98:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
@@ -1200,20 +1201,20 @@ def main():
                     else:
                         selectedaction = len(actionmenu) - 1
                         time.sleep(0.1)
-                if selected == 5:
+                elif selected == 5:
                     camera.brightness = max(camera.brightness - 1, 0)
-                if selected == 6:
+                elif selected == 6:
                     camera.contrast = max(camera.contrast - 1, -100)
-                if selected == 7:
+                elif selected == 7:
                     camera.saturation = max(camera.saturation - 1, -100)
-                if selected == 1:
+                elif selected == 1:
                     camera.shutter_speed = max(camera.shutter_speed - 510, 200)
-                if selected == 2:
+                elif selected == 2:
                     camera.iso = max(camera.iso - 100, 100)
-                if selected == 9:
+                elif selected == 9:
                     if beeps > 0:
                         beeps = beeps - 1
-                if selected == 8:
+                elif selected == 8:
                     if flip == 'yes':
                         camera.hflip = False
                         camera.vflip = False
@@ -1224,38 +1225,38 @@ def main():
                         camera.vflip = True
                         flip = 'yes'
                         time.sleep(0.2)
-                if selected == 10:
+                elif selected == 10:
                     if reclenght > 0:
                         reclenght = reclenght - 1
                         time.sleep(0.1)
-                if selected == 11:
+                elif selected == 11:
                     if miclevel > 0:
                         miclevel = miclevel - 2
                         os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                if selected == 12:
+                elif selected == 12:
                     if headphoneslevel > 0:
                         headphoneslevel = headphoneslevel - 2
                         os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                if selected == 15:
+                elif selected == 15:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 16:
+                elif selected == 16:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 17:
+                elif selected == 17:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
                     removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
-                if selected == 3:
+                elif selected == 3:
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[0]) > 0.02:
                         camera.awb_gains = (float(camera.awb_gains[0]) - 0.02, float(camera.awb_gains[1]))
-                if selected == 4:
+                elif selected == 4:
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) > 0.02:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
@@ -1275,7 +1276,10 @@ def main():
                 rectime = time.strftime("%H:%M:%S", time.gmtime(t))
             settings = actionmenu[selectedaction], str(camera.shutter_speed).zfill(5), str(camera.iso), str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, filmname, str(scene), str(shot), str(take), showrec, rectime
             header=''
-            writemenu(menu,settings,selected,header)
+            #Check if menu is changed
+            if middlebutton or upbutton or rightbutton or leftbutton or recording:
+                writemenu(menu,settings,selected,header)
+                time.sleep(0.08)
 if __name__ == '__main__':
     import sys
     try:
