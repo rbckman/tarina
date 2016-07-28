@@ -878,6 +878,8 @@ def empty(filename):
 def main():
     filmfolder = "/home/pi/Videos/"
     filename = "ninjacam"
+    if os.path.isdir(filmfolder) == False:
+        os.system('mkdir ' + filmfolder)
     tarinafolder = os.getcwd()
     #COUNT FILM FILES
     files = os.listdir(filmfolder)
