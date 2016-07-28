@@ -658,11 +658,9 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
         if rightbutton == False:
             if selected < (len(settings) - 1):
                 selected = selected + 1
-                time.sleep(0.1)
         elif leftbutton == False:
             if selected > 0:
                 selected = selected - 1
-                time.sleep(0.1)
         elif middlebutton == False:
             if selected == 0:
                 compileshot(foldername + filename)
@@ -708,7 +706,7 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
                 renderfilename = filmfolder + filmname + '/' + filmname
                 renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename)
                 playthis(playfile, camera)
-        time.sleep(0.1)
+        time.sleep(0.08)
                 
 #-------------Compile Shot--------------
 
@@ -779,18 +777,18 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
 
 def playthis(filename, camera):
     camera.stop_preview()
-    writemessage('Playing scene')
+    writemessage('Starting omxplayer')
     omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
     #time.sleep(2)
     omx.previous_chapter()
-    #time.sleep(0.75)
+    time.sleep(0.75)
     os.system('aplay ' + filename + '.wav &')
-    menu = 'STOP', 'PLAY FROM START'
+    menu = 'BACK', 'PLAY FROM START'
     settings = '', ''
     selected = 0
     while True:
-        header = 'Playing'
+        header = 'Player menu'
         time.sleep(0.1)
         writemenu(menu,settings,selected,header)
         middlebutton = GPIO.input(5)
@@ -818,6 +816,8 @@ def playthis(filename, camera):
             time.sleep(1)
             if selected == 1:
                 os.system('pkill aplay')
+                os.system('pkill omxplayer')
+                omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
                 omx.previous_chapter()
                 time.sleep(0.75)
                 os.system('aplay ' + filename + '.wav &')
@@ -862,6 +862,16 @@ def buzzer(beeps):
             GPIO.output(1, value)
             buzzerdelay = buzzerdelay - 0.00000004
             time.sleep(buzzerdelay)
+
+#-------------Check if file empty----------
+
+def empty(filename):
+    if os.path.isfile(filename + '.h264') == False:
+        return False
+    if os.path.isfile(filename + '.h264') == True:
+        writemessage('Take already exists')
+        time.sleep(2)
+        return True
 
 #-------------Start main--------------
 
@@ -910,6 +920,7 @@ def main():
         miclevel = 50
         recording = False
         retake = False
+        rendermenu = True
         overlay = None
         reclenght = 0
         t = 0
@@ -1011,19 +1022,19 @@ def main():
             #RECORD AND PAUSE
             elif middlebutton == False and selectedaction == 0 and float(time.time() - buttonpressed) > 0.2 or reclenght != 0 and t > reclenght:
                 buttonpressed = time.time()
-                if recording == False:
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+                filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                if recording == False and empty(foldername + filename) == False: 
                     if beeps > 0:
                         buzzer(beeps)
                         time.sleep(0.1)
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                     recording = True
                     camera.led = True
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D plughw:0,0 -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
                     camera.start_recording('/mnt/tmp/' + filename + '.h264', format='h264', quality=21)
                     starttime = time.time()
                     #camera.wait_recording(10)
-                else:
+                elif recording == True:
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                     recording = False
@@ -1204,10 +1215,9 @@ def main():
                 if selected == 0:
                     if selectedaction < (len(actionmenu) - 1):
                         selectedaction = selectedaction + 1
-                        time.sleep(0.1)
                     else:
                         selectedaction = 0
-                        time.sleep(0.1)
+                    time.sleep(0.05)
                 elif selected == 5:
                     camera.brightness = min(camera.brightness + 1, 99)
                 elif selected == 6:
@@ -1279,10 +1289,9 @@ def main():
                 if selected == 0:
                     if selectedaction > 0:
                         selectedaction = selectedaction - 1
-                        time.sleep(0.1)
                     else:
                         selectedaction = len(actionmenu) - 1
-                        time.sleep(0.1)
+                    time.sleep(0.05)
                 elif selected == 5:
                     camera.brightness = max(camera.brightness - 1, 0)
                 elif selected == 6:
@@ -1359,9 +1368,11 @@ def main():
             settings = actionmenu[selectedaction], str(camera.shutter_speed).zfill(5), str(camera.iso), str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, filmname, str(scene), str(shot), str(take), showrec, rectime
             header=''
             #Check if menu is changed
-            if middlebutton or upbutton or rightbutton or leftbutton or recording:
+            if middlebutton == False or upbutton == False or downbutton == False or rightbutton == False or leftbutton == False or recording == True or rendermenu == True:
                 writemenu(menu,settings,selected,header)
-                time.sleep(0.08)
+                time.sleep(0.05)
+                rendermenu = False
+            time.sleep(0.05)
 if __name__ == '__main__':
     import sys
     try:
