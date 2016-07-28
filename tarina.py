@@ -1,6 +1,22 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#Tarina - Adafruit, Raspberry pi, Picamera filmmaking interface.
+#Copyright (C) 2016  Robin J Bäckman
+
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import picamera
 import os
 import time
@@ -13,7 +29,6 @@ import curses
 import RPi.GPIO as GPIO
 from PIL import Image
 
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(1, GPIO.OUT)
 GPIO.setup(18, GPIO.OUT)
@@ -23,6 +38,8 @@ GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 os.system('clear')
+
+print "Tarina  Copyright (C) 2016  Robin Bäckman\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; type `show c' for details."
 
 #--------------Save settings-----------------
 
@@ -107,29 +124,6 @@ def vumetermessage(message):
     f.write(message + clear * ' ')
     f.close()
 
-#------------Count scenes, takes and shots OLD-----
-
-def countlastold(filmname, filmfolder): 
-    takes = 0
-    try:
-        scenes = len(os.walk(filmfolder + filmname).next()[1])
-    except:
-        scenes = 1
-    try:
-        shots = len(os.walk(filmfolder + filmname + '/scene' + str(scenes).zfill(3)).next()[1])
-    except:
-        shots = 1
-    try:
-        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3) + '/shot' + str(shots).zfill(3))
-    except:
-        allfiles = []
-        takes = 0
-    for a in allfiles:
-        if '.h264' in a:
-            takes = takes + 1
-    return scenes, shots, takes
-
-
 #------------Count scenes, takes and shots-----
 
 def countlast(filmname, filmfolder): 
@@ -161,15 +155,6 @@ def countlast(filmname, filmfolder):
         if '.h264' in a:
             takes = takes + 1
     return scenes, shots, takes
-
-#------------Count shots old--------
-
-def countshotsold(filmname, filmfolder, scene):
-    try:
-        shots = len(os.walk(filmfolder + filmname + '/scene' + str(scene).zfill(3)).next()[1])
-    except:
-        shots = 0
-    return shots
 
 #------------Count shots--------
 
