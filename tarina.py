@@ -710,13 +710,14 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files ' + str(renderedshots) + str(renderfullscene))
     time.sleep(2)
+    render = 0
     #CHECK IF THERE IS A RENDERED VIDEO
-    if renderfullscene == True:
-        renderfullscene = False
-        render = 0
-    else:
-        render = renderedshots
-        renderedshots = shot
+    #if renderfullscene == True:
+        #renderfullscene = False
+        #render = 0
+    #else:
+        #render = renderedshots
+        #renderedshots = shot
     ##PASTE VIDEO TOGETHER
     videomerge = ['MP4Box']
     videomerge.append('-force-cat')
@@ -740,12 +741,16 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
         audiomerge.append(f + '.wav')
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
-    ##CONVERT AUDIO
-    call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
-    ##MERGE AUDIO & VIDEO
-    writemessage('Merging audio & video')
-    call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
-    #call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
+    ##CONVERT AUDIO IF WAV FILES FOUND
+    if os.path.isfile(filename + '.wav'):
+        call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
+        ##MERGE AUDIO & VIDEO
+        writemessage('Merging audio & video')
+        call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
+    else:
+        writemessage('No audio files found! View INSTALL file for instructions.')
+        call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
+        #call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     #shotsrendered = shot
     return renderedshots, renderfullscene, filename
     #play = True
