@@ -1331,7 +1331,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
                         #Jessie
-                        if debianversion == 's':
+                        if debianversion == '8':
                             os.system('amixer sset Mic ' + str(miclevel) + '%')
                 elif selected == 12:
                     if headphoneslevel > 0:
@@ -1340,7 +1340,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
                         #Jessie
-                        if debianversion == 's':
+                        if debianversion == '8':
                             os.system('amixer sset Playback ' + str(headphoneslevel) + '%')
                 elif selected == 15:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
