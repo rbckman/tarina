@@ -789,11 +789,9 @@ def playthis(filename, camera):
         if rightbutton == False:
             if selected < (len(settings) - 1):
                 selected = selected + 1
-                time.sleep(0.1)
         if leftbutton == False:
             if selected > 0:
                 selected = selected - 1
-                time.sleep(0.1)
         if middlebutton == False:
             time.sleep(0.2)
             if selected == 0:
@@ -1166,6 +1164,7 @@ def main():
                     selectedaction = 0
                     filmname = nameyourfilm()
                     os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+                    os.system('mkdir ' + filmfolder + filmname + '/.thumbnails')
                     writemessage('Good luck with your film ' + filmname + '!')
                     time.sleep(2)
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)

@@ -1,0 +1,46 @@
+Installing Tarina on Raspbian Jessie
+
+1.Installing Adafruit pitft35
+curl -SLs https://apt.adafruit.com/add-pin | sudo bash
+sudo apt-get install raspberrypi-bootloader
+sudo apt-get install adafruit-pitft-helper
+sudo adafruit-pitft-helper -t 35r
+
+2.change line in /boot/config.txt
+dtoverlay=pitft35r,rotate=90,speed=42000000,fps=20
+to
+dtoverlay=pitft35r,rotate=90,speed=62000000,fps=50
+
+
+Configure Raspberry pi
+
+1. raspi-config
+enable camera, extend filesystem and reboot
+
+2. sudo apt-get update
+3. sudo apt-get upgrade
+
+4. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils
+
+5. git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
+
+6. put this line in the end of /etc/fstab
+tmpfs   /mnt/tmp    tmpfs   defaults    0 0
+
+7. change cpu to performance. open /etc/default/cpufrequtils and paste in this:
+GOVERNOR="performance"
+
+
+if USB soundcard
+
+1. place this in /etc/asound.conf
+
+pcm.!default {
+    type hw
+    card 1
+}
+
+ctl.!default {
+    type hw           
+    card 1
+}
