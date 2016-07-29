@@ -1022,7 +1022,7 @@ def main():
                         time.sleep(0.1)
                     recording = True
                     camera.led = True
-                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D plughw:0,0 -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
+                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
                     camera.start_recording('/mnt/tmp/' + filename + '.h264', format='h264', quality=21)
                     starttime = time.time()
                     #camera.wait_recording(10)
@@ -1315,11 +1315,17 @@ def main():
                 elif selected == 11:
                     if miclevel > 0:
                         miclevel = miclevel - 2
-                        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
+                        #Wheezy
+                        #os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
+                        #Jessie
+                        os.system('amixer sset Mic ' + str(miclevel) + '%')
                 elif selected == 12:
                     if headphoneslevel > 0:
                         headphoneslevel = headphoneslevel - 2
-                        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+                        #Wheezy
+                        #os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+                        #Jessie
+                        os.system('amixer sset Playback ' + str(headphoneslevel) + '%')
                 elif selected == 15:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                     removeimage(camera, overlay)
