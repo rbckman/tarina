@@ -422,6 +422,10 @@ def update(tarinaversion, tarinavername):
 #-------------Load film---------------
 
 def loadfilm(filmname, filmfolder):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     films = os.walk(filmfolder).next()[1]
     films.sort()
     settings = [''] * len(films)
@@ -431,30 +435,23 @@ def loadfilm(filmname, filmfolder):
     header = 'Select and load film'
     while True:
         writemenu(films[firstslice:secondslice],settings,selected,header)
-        time.sleep(0.2)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if downbutton == False:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'down':
             firstslice = firstslice + 14
             secondslice = secondslice + 14
             selected = 0
-        elif upbutton == False:
+        elif pressed == 'up':
             if firstslice > 0:
                 firstslice = firstslice - 14
                 secondslice = secondslice - 14
                 selected = 0
-        elif rightbutton == False:
+        elif pressed == 'right':
             if selected < 13:
                 selected = selected + 1
-                time.sleep(0.1)
-        elif leftbutton == False:
+        elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-                time.sleep(0.1)
-        elif middlebutton == False:
+        elif pressed == 'middle':
             filmname = (films[firstslice + selected])
             #scene = len(os.walk(filmfolder + filmname).next()[1])
             scene, shot, take = countlast(filmname, filmfolder)
@@ -469,11 +466,16 @@ def loadfilm(filmname, filmfolder):
                 time.sleep(2)
             else:
                 return scenesettings
+        time.sleep(0.02)
 
 
 #-------------New film----------------
 
 def nameyourfilm():
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     abc = 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
     abcx = 0
     name = ''
@@ -482,35 +484,35 @@ def nameyourfilm():
         message = 'Name Your Film: ' + name + abc[abcx]
         spaces = 55 - len(message)
         writemessage(message + (spaces * ' ') + thefuck)
-        time.sleep(0.2)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if upbutton == False:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'up':
             if abcx < (len(abc) - 1):
                 abcx = abcx + 1
-        elif downbutton == False:
+        elif pressed == 'down':
             if abcx > 0:
                 abcx = abcx - 1
-        elif rightbutton == False:
+        elif pressed == 'right':
             if len(name) < 6:
                 name = name + abc[abcx]
             else:
                 thefuck = 'Yo, maximum characters reached bro!'
-        elif leftbutton == False:
+        elif pressed == 'left':
             if len(name) > 0:
                 name = name[:-1]
                 thefuck = ''
-        elif middlebutton == False:
+        elif pressed == 'middle':
             if name > 0:
                 name = name + abc[abcx]
                 return(name)
+        time.sleep(0.02)
 
 #------------Timelapse--------------------------
 
 def timelapse(beeps,camera,timelapsefolder,thefile):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     seconds = 1
     selected = 0
     header = 'Adjust how many seconds between frames'
@@ -518,27 +520,19 @@ def timelapse(beeps,camera,timelapsefolder,thefile):
     while True:
         settings = str(seconds), 'START', 'BACK'
         writemenu(menu,settings,selected,header)
-        time.sleep(0.1)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if upbutton == False and selected == 0:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'up' and selected == 0:
             seconds = seconds + 0.1
-        if downbutton == False and selected == 0:
+        if pressed == 'down' and selected == 0:
             if seconds > 0.2:
                 seconds = seconds - 0.1
-        if rightbutton == False:
+        if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-                time.sleep(0.1)
-        if leftbutton == False:
+        if pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-                time.sleep(0.1)
-        if middlebutton == False:
-            time.sleep(0.2)
+        if pressed == 'middle':
             if selected == 1:
                 writemessage('Recording timelapse, middlebutton to stop')
                 os.system('mkdir ' + timelapsefolder)
@@ -559,10 +553,15 @@ def timelapse(beeps,camera,timelapsefolder,thefile):
                 return thefile
             if selected == 2:
                 return ''
+        time.sleep(0.02)
 
 #------------Remove-----------------------
 
 def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     time.sleep(0.1)
     header = 'Are you sure you want to remove ' + sceneshotortake + '?'
     menu = '', ''
@@ -570,19 +569,14 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     selected = 0
     while True:
         writemenu(menu,settings,selected,header)
-        time.sleep(0.1)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if rightbutton == False:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-        elif leftbutton == False:
+        elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif middlebutton == False:
+        elif pressed == 'middle':
             if selected == 0:
                 if sceneshotortake == 'take':
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
@@ -621,13 +615,18 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 return scene, shot, take
             elif selected == 1:
                 return scene, shot, take
+        time.sleep(0.02)
 
 #------------Happy with take or not?------------
 
 def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     header = 'Are You Happy with Your Take? Retake if not!'
     menu = '', '', '', '', ''
-    settings = 'VIEW', 'NEXT', 'RETAKE', 'REMOVE', 'VIEWSCENE', 'VIEWFILM'
+    settings = 'VIEW', 'NEXT', 'RETAKE', 'REMOVE', 'VIEWSCENE'
     selected = 1
     play = False
     writemessage('Converting video, hold your horses...')
@@ -635,18 +634,14 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
     #call(['MP4Box', '-add', thefile + '.h264', '-add', thefile + '.mp3', '-new', thefile + '.mp4'], shell=False)
     while True:
         writemenu(menu,settings,selected,header)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if rightbutton == False:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-        elif leftbutton == False:
+        if pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif middlebutton == False:
+        if pressed == 'middle':
             if selected == 0:
                 compileshot(foldername + filename)
                 playthis(foldername + filename, camera)
@@ -691,7 +686,7 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
                 renderfilename = filmfolder + filmname + '/' + filmname
                 renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename)
                 playthis(playfile, camera)
-        time.sleep(0.08)
+        time.sleep(0.02)
                 
 #-------------Compile Shot--------------
 
@@ -766,6 +761,10 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
 #---------------Play------------------------
 
 def playthis(filename, camera):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
     camera.stop_preview()
     writemessage('Starting omxplayer')
     omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
@@ -779,20 +778,15 @@ def playthis(filename, camera):
     selected = 0
     while True:
         header = 'Player menu'
-        time.sleep(0.1)
         writemenu(menu,settings,selected,header)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if rightbutton == False:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-        if leftbutton == False:
+        if pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        if middlebutton == False:
+        if pressed == 'middle':
             time.sleep(0.2)
             if selected == 0:
                 omx.stop()
@@ -800,8 +794,6 @@ def playthis(filename, camera):
                 os.system('pkill omxplayer')
                 camera.start_preview()
                 break
-        if middlebutton == False:
-            time.sleep(1)
             if selected == 1:
                 os.system('pkill aplay')
                 os.system('pkill omxplayer')
@@ -809,6 +801,7 @@ def playthis(filename, camera):
                 omx.previous_chapter()
                 time.sleep(0.75)
                 os.system('aplay ' + filename + '.wav &')
+        time.sleep(0.02)
 
 #---------------View Film--------------------
 
@@ -860,6 +853,36 @@ def empty(filename):
         writemessage('Take already exists')
         time.sleep(2)
         return True
+
+#------------Check if button pressed and if hold-----------
+
+def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
+    #event = screen.getch()
+    pressed = ''
+    middlebutton = GPIO.input(5)
+    upbutton = GPIO.input(12)
+    downbutton = GPIO.input(13)
+    leftbutton = GPIO.input(16)
+    rightbutton = GPIO.input(26)
+    if buttonpressed == False:
+        if middlebutton == False:
+            pressed = 'middle'
+        if upbutton == False:
+            pressed = 'up'
+        if downbutton == False:
+            pressed = 'down'
+        if leftbutton == False:
+            pressed = 'left'
+        if rightbutton == False:
+            pressed = 'right'
+        buttonpressed = True
+        buttontime = time.time()
+        holdbutton = pressed
+    if middlebutton and upbutton and downbutton and leftbutton and rightbutton:
+        buttonpressed = False
+    if float(time.time() - buttontime) > 1.0 and buttonpressed == True:
+        pressed = holdbutton
+    return pressed, buttonpressed, buttontime, holdbutton
 
 #-------------Start main--------------
 
@@ -927,7 +950,10 @@ def main():
         renderfullscene = False
         backlight = True
         filmnames = os.listdir(filmfolder)
-        buttonpressed = time.time()
+        buttontime = time.time()
+        pressed = ''
+        buttonpressed = False
+        holdbutton = ''
 
         #VERSION
         f = open(tarinafolder + '/VERSION')
@@ -980,15 +1006,11 @@ def main():
         #MAIN LOOP
         while True:
             GPIO.output(18,backlight)
-            middlebutton = GPIO.input(5)
-            upbutton = GPIO.input(12)
-            downbutton = GPIO.input(13)
-            leftbutton = GPIO.input(16)
-            rightbutton = GPIO.input(26)
+            pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
             event = screen.getch()
 
             #QUIT
-            if event == 27 or middlebutton == False and selectedaction == 71:
+            if event == 27 or pressed == 'middle' and selectedaction == 71:
                 writemessage('Happy hacking!')
                 time.sleep(1)
                 camera.stop_preview()
@@ -1005,7 +1027,7 @@ def main():
                 quit()
 
             #SCREEN ON/OFF
-            elif upbutton == False and downbutton == False:
+            elif pressed == 'up' and pressed == 'down':
                 time.sleep(0.1)
                 if backlight == True:
                     backlight = False
@@ -1013,8 +1035,7 @@ def main():
                     backlight = True
 
             #RECORD AND PAUSE
-            elif middlebutton == False and selectedaction == 0 and float(time.time() - buttonpressed) > 0.2 or reclenght != 0 and t > reclenght:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 0 or reclenght != 0 and t > reclenght:
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                 filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                 if recording == False and empty(foldername + filename) == False: 
@@ -1055,8 +1076,7 @@ def main():
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #TIMELAPSE
-            elif middlebutton == False and selectedaction == 7 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 7:
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = timelapse(beeps,camera,timelapsefolder,thefile)
@@ -1065,8 +1085,7 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PLAY
-            elif middlebutton == False and selectedaction == 1 and float(time.time() - buttonpressed) > 0.2 and selected == 16:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 1 and selected == 16:
                 if recording == False:
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
@@ -1083,8 +1102,7 @@ def main():
                         time.sleep(3)
 
             #VIEW SCENE
-            elif middlebutton == False and selectedaction == 1 and selected == 15 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 1 and selected == 15:
                 if recording == False:
                     filmfiles = renderlist(filmname, filmfolder, scene)
                     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
@@ -1092,8 +1110,7 @@ def main():
                     playthis(playfile, camera)
 
             #VIEW FILM
-            elif middlebutton == False and selectedaction == 1 and selected == 14 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 1 and selected == 14:
                 if recording == False:
                     renderfullscene = True
                     filmfiles = viewfilm(filmfolder, filmname)
@@ -1102,8 +1119,7 @@ def main():
                     playthis(playfile, camera)
 
             #NEW SCENE
-            elif middlebutton == False and selectedaction == 2 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 2:
                 if recording == False:
                     scene = scene + 1
                     take = 1
@@ -1116,8 +1132,7 @@ def main():
                     selectedaction = 0
 
             #NEW SHOT
-            elif middlebutton == False and selectedaction == 27 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 27:
                 if recording == False:
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
@@ -1130,7 +1145,7 @@ def main():
                         time.sleep(2)
 
             #UPLOAD
-            elif middlebutton == False and selectedaction == 3 and float(time.time() - buttonpressed) > 0.2:
+            elif pressed == 'middle' and selectedaction == 3:
                 buttonpressed = time.time()
                 if recording == False:
                     renderfullscene = True
@@ -1141,21 +1156,18 @@ def main():
                     selectedaction = 0
 
             #LOAD FILM
-            elif event == 27 or middlebutton == False and selectedaction == 6:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 6:
                 camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = loadfilm(filmname,filmfolder)
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 selectedaction = 0
 
             #UPDATE
-            elif middlebutton == False and selectedaction == 4 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 4:
                 tarinaversion, tarinavername = update(tarinaversion, tarinavername)
                 selectedaction = 0
 
             #NEW FILM
-            elif middlebutton == False and selectedaction == 5 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 5:
                 if recording == False:
                     scene = 1
                     shot = 1
@@ -1171,8 +1183,7 @@ def main():
                     selectedaction = 0
 
             #REMOVE old shite
-            elif middlebutton == False and selectedaction == 28 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selectedaction == 28:
                 if shot > 1:
                     writemessage('Removing shot: ' + str(shot))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
@@ -1186,26 +1197,23 @@ def main():
 
             #REMOVE
             #take
-            elif middlebutton == False and selected == 17 and selectedaction == 8 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selected == 17 and selectedaction == 8:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
             #shot
-            elif middlebutton == False and selected == 16 and selectedaction == 8 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selected == 16 and selectedaction == 8:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
             #scene
-            elif middlebutton == False and selected == 15 and selectedaction == 8 and float(time.time() - buttonpressed) > 0.2:
-                buttonpressed = time.time()
+            elif pressed == 'middle' and selected == 15 and selectedaction == 8:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
 
             #UP
-            elif event == ord('w') or upbutton == False:
+            elif event == ord('w') or pressed == 'up':
                 if selected == 0:
                     if selectedaction < (len(actionmenu) - 1):
                         selectedaction = selectedaction + 1
@@ -1219,7 +1227,7 @@ def main():
                 elif selected == 7:
                     camera.saturation = min(camera.saturation + 1, 99)
                 elif selected == 1:
-                    camera.shutter_speed = min(camera.shutter_speed + 510, 50000)
+                    camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
                 elif selected == 2:
                     camera.iso = min(camera.iso + 100, 1600)
                 elif selected == 9:
@@ -1281,15 +1289,14 @@ def main():
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
 
             #LEFT
-            elif event == ord('a') or leftbutton == False and buttonrelease == True:
-                buttonrelease = False
+            elif event == ord('a') or pressed == 'left':
                 if selected > 0:
                     selected = selected - 1
                 else:
                     selected = len(menu) - 3
 
             #DOWN
-            elif event == ord('s') or downbutton == False:
+            elif event == ord('s') or pressed == 'down':
                 if selected == 0:
                     if selectedaction > 0:
                         selectedaction = selectedaction - 1
@@ -1303,7 +1310,7 @@ def main():
                 elif selected == 7:
                     camera.saturation = max(camera.saturation - 1, -100)
                 elif selected == 1:
-                    camera.shutter_speed = max(camera.shutter_speed - 510, 200)
+                    camera.shutter_speed = max(camera.shutter_speed - 210, 200)
                 elif selected == 2:
                     camera.iso = max(camera.iso - 100, 100)
                 elif selected == 9:
@@ -1367,14 +1374,11 @@ def main():
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
 
             #RIGHT
-            elif event == ord('d') or rightbutton == False and buttonrelease == True:
-                buttonrelease = False
+            elif event == ord('d') or pressed == 'right':
                 if selected < len(menu) - 3:
                     selected = selected + 1
                 else:
                     selected = 0
-            elif leftbutton == True or rightbutton == True:
-                buttonrelease = True
             if recording == True:
                 showrec = 'RECLENGTH:'
                 t = time.time() - starttime
@@ -1382,11 +1386,11 @@ def main():
             settings = actionmenu[selectedaction], str(camera.shutter_speed).zfill(5), str(camera.iso), str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, filmname, str(scene), str(shot), str(take), showrec, rectime
             header=''
             #Check if menu is changed
-            if middlebutton == False or upbutton == False or downbutton == False or rightbutton == False or leftbutton == False or recording == True or rendermenu == True:
+            if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
                 writemenu(menu,settings,selected,header)
-                time.sleep(0.05)
+                #writemessage(pressed)
                 rendermenu = False
-            time.sleep(0.05)
+            time.sleep(0.02)
 if __name__ == '__main__':
     import sys
     try:
