@@ -37,6 +37,7 @@ GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
 os.system('clear')
 
 print "Tarina  Copyright (C) 2016  Robin Bäckman\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; type `show c' for details."
@@ -46,7 +47,10 @@ print "Tarina  Copyright (C) 2016  Robin Bäckman\nThis program comes with ABSOL
 def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots):
     settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots
     pickle.dump(settings, open(filmfolder + "settings.p", "wb"))
-    pickle.dump(settings, open(filmfolder + filmname + "/scene" + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + "/settings.p", "wb"))
+    try:
+        pickle.dump(settings, open(filmfolder + filmname + "/scene" + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + "/settings.p", "wb"))
+    except:
+        return
 
 #--------------Load film settings-----------------
 
@@ -343,20 +347,20 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
     #time.sleep(4)
     selected = n
     if selected == 0 and b == 1:
-        if scene < scenes:
-            scene = scene + 1
-            shots = countshots(filmname, filmfolder, scene)
-            takes = counttakes(filmname, filmfolder, scene, shots)
-            shot = shots 
-            take = takes
-            if take == 0:
-                shot = shot - 1
-                take = counttakes(filmname, filmfolder, scene, shot - 1)
+        #if scene < scenes:
+        scene = scene + 1
+        shots = countshots(filmname, filmfolder, scene)
+        takes = counttakes(filmname, filmfolder, scene, shots)
+        shot = shots 
+        take = takes
+        #if take == 0:
+        #    shot = shot - 1
+        #    take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == 1:
-        if shot < shots:
-            shot = shot + 1 
-            takes = counttakes(filmname, filmfolder, scene, shot)
-            take = takes
+        #if shot < shots:
+        shot = shot + 1 
+        takes = counttakes(filmname, filmfolder, scene, shot)
+        take = takes
     elif selected == 2 and b == 1:
         if take < takes + 1:
             take = take + 1 
@@ -769,7 +773,7 @@ def playthis(filename, camera):
     writemessage('Starting omxplayer')
     omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
-    #time.sleep(2)
+    time.sleep(0.5)
     omx.previous_chapter()
     time.sleep(0.75)
     os.system('aplay ' + filename + '.wav &')
@@ -798,6 +802,7 @@ def playthis(filename, camera):
                 os.system('pkill aplay')
                 os.system('pkill omxplayer')
                 omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
+                time.sleep(0.5)
                 omx.previous_chapter()
                 time.sleep(0.75)
                 os.system('aplay ' + filename + '.wav &')
@@ -857,7 +862,7 @@ def empty(filename):
 #------------Check if button pressed and if hold-----------
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    #event = screen.getch()
+    event = screen.getch()
     pressed = ''
     middlebutton = GPIO.input(5)
     upbutton = GPIO.input(12)
@@ -865,15 +870,17 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     leftbutton = GPIO.input(16)
     rightbutton = GPIO.input(26)
     if buttonpressed == False:
-        if middlebutton == False:
+        if event == 27:
+            pressed = 'quit'
+        if middlebutton == False or event == curses.KEY_ENTER or event == 10 or event == 13:
             pressed = 'middle'
-        if upbutton == False:
+        if upbutton == False or event == ord('w') or event == curses.KEY_UP: 
             pressed = 'up'
-        if downbutton == False:
+        if downbutton == False or event == ord('s') or event == curses.KEY_DOWN:
             pressed = 'down'
-        if leftbutton == False:
+        if leftbutton == False or event == ord('a') or event == curses.KEY_LEFT:
             pressed = 'left'
-        if rightbutton == False:
+        if rightbutton == False or event == ord('d') or event == curses.KEY_RIGHT:
             pressed = 'right'
         buttonpressed = True
         buttontime = time.time()
@@ -897,6 +904,7 @@ def main():
     filename_count = len(files)
 
     #START CURSES
+    global screen
     screen = curses.initscr()
     curses.cbreak(1)
     screen.keypad(1)
@@ -920,7 +928,7 @@ def main():
 
         #MENUS
         menu = 'MIDDLEBUTTON: ','SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', '', 'SCENE:', 'SHOT:', 'TAKE', '', ''
-        actionmenu = 'Record', 'Play', 'New Scene', 'Upload', 'Update', 'New Film', 'Load Film', 'Timelapse', 'Remove'
+        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove'
         
         #STANDARD VALUES
         selectedaction = 0
@@ -1007,10 +1015,10 @@ def main():
         while True:
             GPIO.output(18,backlight)
             pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-            event = screen.getch()
+            #event = screen.getch()
 
             #QUIT
-            if event == 27 or pressed == 'middle' and selectedaction == 71:
+            if pressed == 'quit':
                 writemessage('Happy hacking!')
                 time.sleep(1)
                 camera.stop_preview()
@@ -1038,6 +1046,7 @@ def main():
             elif pressed == 'middle' and selectedaction == 0 or reclenght != 0 and t > reclenght:
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                 filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                os.system('mkdir -p ' + foldername)
                 if recording == False and empty(foldername + filename) == False: 
                     if beeps > 0:
                         buzzer(beeps)
@@ -1076,7 +1085,7 @@ def main():
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #TIMELAPSE
-            elif pressed == 'middle' and selectedaction == 7:
+            elif pressed == 'middle' and selectedaction == 77:
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = timelapse(beeps,camera,timelapsefolder,thefile)
@@ -1085,7 +1094,7 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PLAY
-            elif pressed == 'middle' and selectedaction == 1 and selected == 16:
+            elif pressed == 'middle' and selectedaction == 1 and selected == 16 or pressed == 'middle' and selectedaction == 1 and selected == 17:
                 if recording == False:
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
@@ -1119,7 +1128,7 @@ def main():
                     playthis(playfile, camera)
 
             #NEW SCENE
-            elif pressed == 'middle' and selectedaction == 2:
+            elif pressed == 'middle' and selectedaction == 22:
                 if recording == False:
                     scene = scene + 1
                     take = 1
@@ -1182,38 +1191,25 @@ def main():
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                     selectedaction = 0
 
-            #REMOVE old shite
-            elif pressed == 'middle' and selectedaction == 28:
-                if shot > 1:
-                    writemessage('Removing shot: ' + str(shot))
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    os.system('rm -r ' + foldername)
-                    shot = shot - 1
-                    take = counttakes(filmname, filmfolder, scene, shot)
-                    time.sleep(3)
-                    renderfullscene = True
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
-                    selectedaction = 0
-
             #REMOVE
             #take
-            elif pressed == 'middle' and selected == 17 and selectedaction == 8:
+            elif pressed == 'middle' and selected == 17 and selectedaction == 7:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
             #shot
-            elif pressed == 'middle' and selected == 16 and selectedaction == 8:
+            elif pressed == 'middle' and selected == 16 and selectedaction == 7:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
             #scene
-            elif pressed == 'middle' and selected == 15 and selectedaction == 8:
+            elif pressed == 'middle' and selected == 15 and selectedaction == 7:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                 time.sleep(0.2)
 
             #UP
-            elif event == ord('w') or pressed == 'up':
+            elif pressed == 'up':
                 if selected == 0:
                     if selectedaction < (len(actionmenu) - 1):
                         selectedaction = selectedaction + 1
@@ -1289,14 +1285,14 @@ def main():
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
 
             #LEFT
-            elif event == ord('a') or pressed == 'left':
+            elif pressed == 'left':
                 if selected > 0:
                     selected = selected - 1
                 else:
                     selected = len(menu) - 3
 
             #DOWN
-            elif event == ord('s') or pressed == 'down':
+            elif pressed == 'down':
                 if selected == 0:
                     if selectedaction > 0:
                         selectedaction = selectedaction - 1
@@ -1374,7 +1370,7 @@ def main():
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
 
             #RIGHT
-            elif event == ord('d') or pressed == 'right':
+            elif pressed == 'right':
                 if selected < len(menu) - 3:
                     selected = selected + 1
                 else:
