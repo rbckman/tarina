@@ -559,6 +559,62 @@ def timelapse(beeps,camera,timelapsefolder,thefile):
                 return ''
         time.sleep(0.02)
 
+#------------Photobooth--------------------------
+
+def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename):
+    scene, shot, take = countlast(filmname, filmfolder)
+    shot = shot + 1
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    seconds = 0.5
+    selected = 0
+    header = 'Press enter to start!! :)'
+    menu = ''
+    while True:
+        settings = 'START'
+        writemenu(menu,settings,selected,header)
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+        filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+        #if pressed == 'up' and selected == 0:
+        #    seconds = seconds + 0.1
+        #if pressed == 'down' and selected == 0:
+        #    if seconds > 0.2:
+        #        seconds = seconds - 0.1
+        #if pressed == 'right':
+        #    if selected < (len(settings) - 1):
+        #        selected = selected + 1
+        #if pressed == 'left':
+        #    if selected > 0:
+        #        selected = selected - 1
+        if pressed == 'middle':
+            if selected == 0:
+                os.system('mkdir ' + foldername)
+                p = 0
+                for filename in camera.capture_continuous(foldername + '/img{counter:03d}.jpg'):
+                    p = p + 1
+                    camera.led = True
+                    i = 0
+                    while i < seconds:
+                        writemessage('Taking picture ' + str(p))
+                        i = i + 0.1
+                        time.sleep(0.1)
+                        middlebutton = GPIO.input(5)
+                        if middlebutton == False or p > 9:
+                            break
+                    if middlebutton == False or p > 9:
+                        shot = shot + 1
+                        break
+                    camera.led = False
+                #writemessage('Compiling timelapse')
+                #os.system('avconv -y -framerate 25 -i ' + timelapsefolder + '/img%03d.jpg -c:v libx264 -level 40 -crf 24 ' + thefile + '.h264')
+                #return thefile
+            #if selected == 2:
+            #    return ''
+        time.sleep(0.02)
+
 #------------Remove-----------------------
 
 def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
@@ -928,7 +984,7 @@ def main():
 
         #MENUS
         menu = 'MIDDLEBUTTON: ','SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', '', 'SCENE:', 'SHOT:', 'TAKE', '', ''
-        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove'
+        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
         
         #STANDARD VALUES
         selectedaction = 0
@@ -1089,6 +1145,15 @@ def main():
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = timelapse(beeps,camera,timelapsefolder,thefile)
+                if thefile != '':
+                    scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
+                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+
+            #PHOTOBOOTH
+            elif pressed == 'middle' and selectedaction == 8:
+                thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
+                timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
+                thefile = photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
                 if thefile != '':
                     scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
