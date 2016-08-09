@@ -1288,7 +1288,10 @@ def main():
                 elif selected == 7:
                     camera.saturation = min(camera.saturation + 1, 99)
                 elif selected == 1:
-                    camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
+                    if camera.shutter_speed < 5000:
+                        camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
+                    else:
+                        camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
                 elif selected == 2:
                     camera.iso = min(camera.iso + 100, 1600)
                 elif selected == 9:
@@ -1371,7 +1374,10 @@ def main():
                 elif selected == 7:
                     camera.saturation = max(camera.saturation - 1, -100)
                 elif selected == 1:
-                    camera.shutter_speed = max(camera.shutter_speed - 210, 200)
+                    if camera.shutter_speed < 5000:
+                        camera.shutter_speed = max(camera.shutter_speed - 50, 20)
+                    else:
+                        camera.shutter_speed = max(camera.shutter_speed - 200, 200)
                 elif selected == 2:
                     camera.iso = max(camera.iso - 100, 100)
                 elif selected == 9:
