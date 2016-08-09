@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - Adafruit, Raspberry pi, Picamera filmmaking interface.
+#Tarina - Raspberry pi filmmaking interface.
 #Copyright (C) 2016  Robin J Bäckman
 
 #This program is free software: you can redistribute it and/or modify
@@ -371,9 +371,9 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
             takes = counttakes(filmname, filmfolder, scene, shots)
             shot = shots
             take = takes
-            if take == 0:
-                shot = shot - 1
-                take = counttakes(filmname, filmfolder, scene, shot - 1)
+            #if take == 0:
+            #    shot = shot - 1
+            #    take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == -1:
         if shot > 1:
             shot = shot - 1
@@ -984,7 +984,7 @@ def main():
 
         #MENUS
         menu = 'MIDDLEBUTTON: ','SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', '', 'SCENE:', 'SHOT:', 'TAKE', '', ''
-        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
+        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove'
         
         #STANDARD VALUES
         selectedaction = 0
@@ -1150,7 +1150,7 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PHOTOBOOTH
-            elif pressed == 'middle' and selectedaction == 8:
+            elif pressed == 'middle' and selectedaction == 81:
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
