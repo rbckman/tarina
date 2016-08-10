@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - Adafruit, Raspberry pi, Picamera filmmaking interface.
+#Tarina - Raspberry pi filmmaking interface.
 #Copyright (C) 2016  Robin J Bäckman
 
 #This program is free software: you can redistribute it and/or modify
@@ -217,8 +217,8 @@ def renderlist(filmname, filmfolder, scene):
             filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(takes).zfill(3)
             scenefiles.append(folder + filename)
         shot = shot + 1
-    writemessage(str(len(scenefiles)))
-    time.sleep(2)
+    #writemessage(str(len(scenefiles)))
+    #time.sleep(2)
     return scenefiles
 
 #-------------Render thumbnails------------
@@ -285,58 +285,6 @@ def removeimage(camera, overlay):
         overlay = None
         camera.start_preview()
 
-#-------------Browse------------------
-
-def browse(filmname, filmfolder):
-    header = 'Select scene & shot'
-    scenes, shots, takes = countlast(filmname, filmfolder)
-    menu = 'SCENE', 'SHOT', 'TAKES'
-    selected = 0
-    scene = scenes
-    shot = shots
-    take = takes
-    while True:
-        settings = str(scene), str(shot), str(takes)
-        writemenu(menu,settings,selected,header)
-        time.sleep(0.2)
-        middlebutton = GPIO.input(5)
-        upbutton = GPIO.input(12)
-        downbutton = GPIO.input(13)
-        leftbutton = GPIO.input(16)
-        rightbutton = GPIO.input(26)
-        if upbutton == False:
-            if selected == 0:
-                if scene < scenes:
-                    scene = scene + 1
-                    shots = countshots(filmname, filmfolder, scene)
-                    shot = shots
-            else:
-                if shot < shots:
-                    shot = shot + 1 
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    take = takes
-        elif downbutton == False:
-            if selected == 0:
-                if scene > 1:
-                    scene = scene - 1
-                    shots = countshots(filmname, filmfolder, scene)
-                    shot = shots
-            else:
-                if shot > 1:
-                    shot = shot - 1
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    take = takes
-        elif rightbutton == False:
-            if selected == 0:
-                selected = 1
-        elif leftbutton == False:
-            if selected == 1:
-                selected = 0
-        elif middlebutton == False:
-            writemessage('Now recording to scene ' + str(scene) + ' shot ' + str(shot) + ' take ' + str(take + 1))
-            time.sleep(2)
-            return scene, shot, take + 1
-
 #-------------Browse2.0------------------
 
 def browse2(filmname, filmfolder, scene, shot, take, n, b):
@@ -371,9 +319,9 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
             takes = counttakes(filmname, filmfolder, scene, shots)
             shot = shots
             take = takes
-            if take == 0:
-                shot = shot - 1
-                take = counttakes(filmname, filmfolder, scene, shot - 1)
+            #if take == 0:
+            #    shot = shot - 1
+            #    take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == -1:
         if shot > 1:
             shot = shot - 1
@@ -765,7 +713,7 @@ def compileshot(filename):
 
 def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, filename, tarinafolder):
     #print filmfiles
-    writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files ' + str(renderedshots) + str(renderfullscene))
+    writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     time.sleep(2)
     render = 0
     #CHECK IF THERE IS A RENDERED VIDEO
@@ -786,7 +734,8 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
         videomerge.append('-cat')
         videomerge.append(f + '.h264')
     videomerge.append('-new')
-    videomerge.append(filename + '.h264')
+    videomerge.append(filename + '.mp4')
+    #videomerge.append(filename + '.h264')
     call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
     ##PASTE AUDIO TOGETHER
     writemessage('Rendering sound')
@@ -799,26 +748,15 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
     ##CONVERT AUDIO IF WAV FILES FOUND
-    if os.path.isfile(filename + '.wav'):
-        call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
-        ##MERGE AUDIO & VIDEO
-        writemessage('Merging audio & video')
-        call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
-    else:
-        writemessage('No audio files found! View INSTALL file for instructions.')
-        call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
-        #call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
-    #shotsrendered = shot
+    #if os.path.isfile(filename + '.wav'):
+    #    call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
+    #    ##MERGE AUDIO & VIDEO
+    #    writemessage('Merging audio & video')
+    #    call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
+    #else:
+    #    writemessage('No audio files found! View INSTALL file for instructions.')
+    #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     return renderedshots, renderfullscene, filename
-    #play = True
-    #time.sleep(1)
-    #while play == True:
-    #    middlebutton = GPIO.input(5)
-    #    if middlebutton == False:
-    #        os.system('pkill -9 omxplayer')
-    #        play = False
-    #        time.sleep(0.2)
-    #        break
 
 #---------------Play------------------------
 
@@ -878,6 +816,43 @@ def viewfilm(filmfolder, filmname):
             filmfiles.extend(renderlist(filmname, filmfolder, scene))
         scene = scene + 1
     return filmfiles
+
+#--------------Copy to USB-------------------
+
+def copytousb(filmfolder, filmname):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    writemessage('Searching for usb storage device, middlebutton to cancel')
+    while True:
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        usbconnected = os.path.ismount('/media/usb0')
+        if pressed == 'middle':
+            break
+        time.sleep(0.02)
+        if usbconnected == True:
+            writemessage('USB device found, copying files...')
+            #COUNT FILES
+            scenes, shots, takes = countlast(filmname, filmfolder)
+            scene = 1
+            filmfiles = []
+            while scene <= scenes:
+                shots = countshots(filmname, filmfolder, scene)
+                if shots > 0:
+                    filmfiles.extend(renderlist(filmname, filmfolder, scene))
+                scene = scene + 1
+            #RENDER FILES TO MP4 ON USB STICK
+            os.system('mkdir -p /media/usb0/' + filmname)
+            for f in filmfiles[:]:
+                os.system('MP4Box -add ' + f + '.h264 -new /media/usb0/' + filmname + '/' + f[-24:] + '.mp4')
+                os.system('cp ' + f + '.wav /media/usb0/' + filmname + '/' + f[-24:] + '.wav')
+            os.system('sync')
+            writemessage('all files copied successfully!')
+            time.sleep(1)
+            writemessage('You can safely unplug the usb device now')
+            time.sleep(2)
+            return
 
 #-------------Upload Scene------------
 
@@ -986,7 +961,7 @@ def main():
 
         #MENUS
         menu = 'MIDDLEBUTTON: ','SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', '', 'SCENE:', 'SHOT:', 'TAKE', '', ''
-        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
+        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove'
         
         #STANDARD VALUES
         selectedaction = 0
@@ -1152,7 +1127,7 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PHOTOBOOTH
-            elif pressed == 'middle' and selectedaction == 8:
+            elif pressed == 'middle' and selectedaction == 81:
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
@@ -1193,6 +1168,11 @@ def main():
                     renderfilename = filmfolder + filmname + '/' + filmname
                     renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
                     playthis(playfile, camera)
+
+            #COPY TO USB
+            elif pressed == 'middle' and selectedaction == 2:
+                if recording == False:
+                    copytousb(filmfolder, filmname)
 
             #NEW SCENE
             elif pressed == 'middle' and selectedaction == 22:
@@ -1290,7 +1270,10 @@ def main():
                 elif selected == 7:
                     camera.saturation = min(camera.saturation + 1, 99)
                 elif selected == 1:
-                    camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
+                    if camera.shutter_speed < 5000:
+                        camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
+                    else:
+                        camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
                 elif selected == 2:
                     camera.iso = min(camera.iso + 100, 1600)
                 elif selected == 9:
@@ -1373,7 +1356,10 @@ def main():
                 elif selected == 7:
                     camera.saturation = max(camera.saturation - 1, -100)
                 elif selected == 1:
-                    camera.shutter_speed = max(camera.shutter_speed - 210, 200)
+                    if camera.shutter_speed < 5000:
+                        camera.shutter_speed = max(camera.shutter_speed - 50, 20)
+                    else:
+                        camera.shutter_speed = max(camera.shutter_speed - 200, 200)
                 elif selected == 2:
                     camera.iso = max(camera.iso - 100, 100)
                 elif selected == 9:

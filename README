@@ -1,6 +1,4 @@
-Tarina
-
-DIY filmmaking device for Raspberry pi
+Tarina - filmmaking interface for Raspberry pi
 
 video + sound recorder for the Raspberry Pi using the Pi Camera and Adafruit Pitft screen and C-Media USB Audio VIA VT1620A.
 adafruit kernel with the 3.5 tft https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
@@ -14,20 +12,28 @@ Lens I'm trying out now
 Blender file and printable stls in 3d folder
 
 
-
 ---------------||Installing||-----------------
 
-cd /home/pi && git clone https://bitbucket.org/rbckman/tarina.git
+1. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount
 
-sudo apt-get update && sudo apt-get install python-pip 
+2. git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
 
+3. put this line in the end of /etc/fstab
+tmpfs   /mnt/tmp    tmpfs   defaults    0 0
+
+4. reboot
+
+5. cd /home/pi/tarina/
+
+6. python tarina.py
+
+more install instructions in INSTALL file
 
 ---------------||Configurations||---------------------
 
-
 Booting to Tarina
 
-Raspbian Wheezy (with init)
+Raspbian Wheezy (init)
 
 1. nano /etc/inittab
 2. comment out line 54
@@ -43,7 +49,7 @@ if [ $(tty) == /dev/tty1 ]; then
    python tarina.py > /dev/tty2 2>err.log
 fi
 
-Raspbian Sid instructions (with systemd) soon...
+Raspbian Jessie instructions (systemd)
 
 
 ---------------||Couldn't have been done without these||-----------------------
@@ -59,8 +65,14 @@ Picamera python module
 Dave Jones, for the awesome picamera python module
 http://picamera.readthedocs.org
 
+Python programming language
+
 Tasanakorn for fbcp so you can preview on the pitft
 https://github.com/tasanakorn/rpi-fbcp
+
+Libav-tools (ffmpeg)
+
+GPac library with MP4Box
 
 Aplay
 The awesome wav player/recorder with VU meter
@@ -69,6 +81,8 @@ http://alsa.opensrc.org/Aplay
 Omxplayer
 Video player on the Raspberry pi
 https://github.com/huceke/omxplayer
+
+Sox
 
 Texy
 https://www.raspberrypi.org/forums/viewtopic.php?t=48967
