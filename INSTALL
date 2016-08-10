@@ -20,7 +20,7 @@ enable camera, extend filesystem and reboot
 2. sudo apt-get update
 3. sudo apt-get upgrade
 
-4. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils
+4. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount
 
 5. git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
 

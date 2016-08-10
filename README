@@ -14,7 +14,7 @@ Blender file and printable stls in 3d folder
 
 ---------------||Installing||-----------------
 
-1. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils
+1. sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount
 
 2. git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
 
