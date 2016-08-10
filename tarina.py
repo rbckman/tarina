@@ -591,6 +591,8 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
         #        selected = selected - 1
         if pressed == 'middle':
             if selected == 0:
+                writemessage('SMILE!!!!')
+                time.sleep(2)
                 os.system('mkdir ' + foldername)
                 p = 0
                 for filename in camera.capture_continuous(foldername + '/img{counter:03d}.jpg'):
