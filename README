@@ -1,4 +1,4 @@
-Tarina - filmmaking interface for Raspberry pi
+------------||Tarina - DIY filmmaking device for Raspberry pi||----------------------
 
 video + sound recorder for the Raspberry Pi using the Pi Camera and Adafruit Pitft screen and C-Media USB Audio VIA VT1620A.
 adafruit kernel with the 3.5 tft https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
@@ -7,9 +7,14 @@ Lens I'm trying out now
 2.8-12mm M12 Manual Zoom Manual Focus
 
 
+
+
 ----------------||3d printable files||-------------------
 
 Blender file and printable stls in 3d folder
+
+
+
 
 
 ---------------||Installing||-----------------
@@ -29,11 +34,12 @@ tmpfs   /mnt/tmp    tmpfs   defaults    0 0
 
 more install instructions in INSTALL file
 
----------------||Configurations||---------------------
 
-Booting to Tarina
 
-Raspbian Wheezy (init)
+
+----------------||Configurations Rasbian Wheezy||---------------------
+
+Booting to Tarina on Raspbian Wheezy (init)
 
 1. nano /etc/inittab
 2. comment out line 54
@@ -49,7 +55,53 @@ if [ $(tty) == /dev/tty1 ]; then
    python tarina.py > /dev/tty2 2>err.log
 fi
 
-Raspbian Jessie instructions (systemd)
+
+
+----------------||Configurations Rasbian Jessie||---------------------
+
+1.open new file /etc/systemd/system/tarina.service
+and put this in it:
+
+#Tarina unit file
+[Unit]
+Description=Starts Tarina
+DefaultDependencies=false            # Very important! Without this line, the service 
+                                     # would wait until networking.service
+                                     # has finished initialization. This could add 10 
+                                     # more seconds because of DHCP, IP attribution, etc.
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python /home/pi/tarina/tarina.py
+WorkingDirectory=/home/pi/tarina/
+StandardInput=tty
+#StandardOutput=tty
+TTYPath=/dev/tty5
+TTYReset=yes
+TTYVHangup=yes
+
+[Install]
+WantedBy=local-fs.target
+#Tarina unit file end
+
+2. Then run these
+sudo chmod 664 /etc/systemd/system/tarina.service
+sudo systemctl daemon-reload
+
+
+
+
+
+---------------||Known problems||----------------------------------------------
+
+1. Seems like the whole thing runs better on Wheezy, even if it's the pi 2. I don't know why?
+Systemd issue? or something else...
+
+2. thumbnails is wierd looking on pi 3 with Jessie. Possible bug in python-picamera??
+
+
+
+
 
 
 ---------------||Couldn't have been done without these||-----------------------
