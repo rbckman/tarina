@@ -592,6 +592,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                     filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                     os.system('rm ' + foldername + filename + '.h264')
+                    os.system('rm ' + foldername + filename + '.mp4')
                     os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
                     take = take - 1
                     if take == 0:
@@ -701,13 +702,17 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
 #-------------Compile Shot--------------
 
 def compileshot(filename):
-    writemessage('Converting to playable video')
-    os.system('MP4Box -add ' + filename + '.h264 -new ' + filename + '.mp4')
-    writemessage('Playing video')
-
-    #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
-    #time.sleep(0.8)
-    #os.system('aplay ' + foldername + filename + '.wav')
+    #Check if file already converted
+    if os.path.isfile(filename + '.mp4'):
+        writemessage('Playing video')
+        return
+    else:
+        writemessage('Converting to playable video')
+        os.system('MP4Box -add ' + filename + '.h264 -new ' + filename + '.mp4')
+        writemessage('Playing video')
+        #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
+        #time.sleep(0.8)
+        #os.system('aplay ' + foldername + filename + '.wav')
 
 #-------------Render-------(rename to compile or render)-----
 
