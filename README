@@ -1,4 +1,4 @@
-------------||Tarina - DIY filmmaking device for Raspberry pi||----------------------
+# Tarina - DIY filmmaking device for Raspberry pi
 
 video + sound recorder for the Raspberry Pi using the Pi Camera and Adafruit Pitft screen and C-Media USB Audio VIA VT1620A.
 adafruit kernel with the 3.5 tft https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
