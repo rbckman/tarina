@@ -27,20 +27,20 @@ The device wouldn't function without nice brains. Tarinas’ brains are the Rasp
 Blender file and printable stls in 3d folder
 
 ## Installing Tarina ##
+1. Install dependencies
 ```
 sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount
-
 ```
-
-2. git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
-
+2. git clone tarina
+```
+git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
+```
 3. put this line in the end of /etc/fstab
+```
 tmpfs   /mnt/tmp    tmpfs   defaults    0 0
-
+```
 4. reboot
-
 5. cd /home/pi/tarina/
-
 6. python tarina.py
 
 more install instructions in INSTALL file
