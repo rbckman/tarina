@@ -21,7 +21,7 @@ import picamera
 import os
 import time
 from subprocess import call
-from pyomxplayer import OMXPlayer
+from omxplayer import OMXPlayer
 import subprocess
 import sys
 import cPickle as pickle
@@ -29,14 +29,14 @@ import curses
 import RPi.GPIO as GPIO
 from PIL import Image
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(1, GPIO.OUT)
-GPIO.setup(18, GPIO.OUT)
-GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setmode(GPIO.BCM)
+#GPIO.setup(1, GPIO.OUT)
+#GPIO.setup(18, GPIO.OUT)
+#GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 os.system('clear')
 
@@ -766,48 +766,55 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
 #---------------Play------------------------
 
 def playthis(filename, camera):
+    t = 0
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     camera.stop_preview()
     writemessage('Starting omxplayer')
-    omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
+    player = OMXPlayer(filename + '.mp4', args=['--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
-    time.sleep(0.5)
-    omx.previous_chapter()
-    time.sleep(0.75)
+    time.sleep(1)
+    player.play()
     os.system('aplay ' + filename + '.wav &')
     menu = 'BACK', 'PLAY FROM START'
     settings = '', ''
     selected = 0
-    while True:
-        header = 'Player menu'
+    clipduration = player.duration()
+    starttime = time.time()
+    while clipduration > t:
+        header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-        if pressed == 'left':
+        elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        if pressed == 'middle':
+        elif pressed == 'middle':
             time.sleep(0.2)
-            if selected == 0:
-                omx.stop()
+            if selected == 0 or player.playback_status() == "Stopped":
+                player.stop()
+                player.quit()
                 os.system('pkill aplay')
-                os.system('pkill omxplayer')
+                os.system('pkill dbus-daemon')
+                #os.system('pkill omxplayer')
                 camera.start_preview()
                 break
-            if selected == 1:
+            elif selected == 1:
+                player.stop()
                 os.system('pkill aplay')
-                os.system('pkill omxplayer')
-                omx = OMXPlayer('--layer 3 ' + filename + '.mp4')
+                #os.system('pkill omxplayer')
                 time.sleep(0.5)
-                omx.previous_chapter()
-                time.sleep(0.75)
+                player.play()
                 os.system('aplay ' + filename + '.wav &')
         time.sleep(0.02)
+        t = time.time() - starttime
+    player.quit()
+    os.system('pkill dbus-daemon')
+    camera.start_preview()
 
 #---------------View Film--------------------
 
@@ -902,29 +909,25 @@ def empty(filename):
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
     pressed = ''
-    middlebutton = GPIO.input(5)
-    upbutton = GPIO.input(12)
-    downbutton = GPIO.input(13)
-    leftbutton = GPIO.input(16)
-    rightbutton = GPIO.input(26)
-    if buttonpressed == False:
-        if event == 27:
-            pressed = 'quit'
-        if middlebutton == False or event == curses.KEY_ENTER or event == 10 or event == 13:
-            pressed = 'middle'
-        if upbutton == False or event == ord('w') or event == curses.KEY_UP: 
-            pressed = 'up'
-        if downbutton == False or event == ord('s') or event == curses.KEY_DOWN:
-            pressed = 'down'
-        if leftbutton == False or event == ord('a') or event == curses.KEY_LEFT:
-            pressed = 'left'
-        if rightbutton == False or event == ord('d') or event == curses.KEY_RIGHT:
-            pressed = 'right'
-        buttonpressed = True
-        buttontime = time.time()
-        holdbutton = pressed
-    if middlebutton and upbutton and downbutton and leftbutton and rightbutton:
-        buttonpressed = False
+    #middlebutton = GPIO.input(5)
+    #upbutton = GPIO.input(12)
+    #downbutton = GPIO.input(13)
+    #leftbutton = GPIO.input(16)
+    #rightbutton = GPIO.input(26)
+    if event == 27:
+        pressed = 'quit'
+    if event == curses.KEY_ENTER or event == 10 or event == 13:
+        pressed = 'middle'
+    if event == ord('w') or event == curses.KEY_UP: 
+        pressed = 'up'
+    if event == ord('s') or event == curses.KEY_DOWN:
+        pressed = 'down'
+    if event == ord('a') or event == curses.KEY_LEFT:
+        pressed = 'left'
+    if event == ord('d') or event == curses.KEY_RIGHT:
+        pressed = 'right'
+    buttontime = time.time()
+    holdbutton = pressed
     if float(time.time() - buttontime) > 1.0 and buttonpressed == True:
         pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
@@ -1029,6 +1032,7 @@ def main():
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
         filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
 
+        filmname='spede'
         #NEW FILM (IF NOTHING TO LOAD)
         if filmname == '':
             filmname = nameyourfilm()
@@ -1042,8 +1046,7 @@ def main():
 
         #TESTING SPACE
         alltakes = renderthumbnails(filmname, filmfolder)
-        writemessage('This film has ' + str(alltakes) + ' takes')
-        time.sleep(2)
+        #writemessage('This film has ' + str(alltakes) + ' takes')
         #writemessage(tarinafolder)
         #time.sleep(3)
         #overlay = displayimage(camera, '/home/pi/Videos/.rendered/scene001_shot001_take001.png')
@@ -1051,7 +1054,7 @@ def main():
 
         #MAIN LOOP
         while True:
-            GPIO.output(18,backlight)
+            #GPIO.output(18,backlight)
             pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
             #event = screen.getch()
 
@@ -1070,7 +1073,7 @@ def main():
                 curses.endwin()
                 os.system('clear')
                 os.system('echo "Have a nice hacking time!"')
-                quit()
+                break
 
             #SCREEN ON/OFF
             elif pressed == 'up' and pressed == 'down':
