@@ -1,12 +1,8 @@
 # Tarina #
 ### DIY filmmaking device for Raspberry pi ###
-You film, Tarina puts the pieces together and, voilÃ¡!, you have a movie! Shoot your films as takes, shots and scenes, and see how they fit together on the go. If you're not happy, retake it. Once you get it thereâ€™s no need for editing later.
+You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot your films as takes, shots and scenes, and see how they fit together on the go. If you're not happy, retake it. Once you get it there’s no need for editing later.
 
 Tarina has been tested and is working with Raspberry pi 1, 2 and 3, Pi camera module 1.3 and v. 2.1 Sony IMX219 8-megapixel sensor, CS lenses or M12 lenses, USB via vt1620a Sound card, Electrec in-built front mic with preamp, 7700mAh li-ion Battery (6 hours filming), U-geek 3.5" screen (800x480 pixels), Adafruit 3.5" screen (480x 320 pixels), in-built speakers, Bluetooth keyboard, 3d printed body
-
-![20160811_011.jpg](https://bitbucket.org/repo/rBz7ep/images/1585674534-20160811_011.jpg)
-![20160811_004.jpg](https://bitbucket.org/repo/rBz7ep/images/3780887106-20160811_004.jpg)
-![20160811_014.jpg](https://bitbucket.org/repo/rBz7ep/images/2499796340-20160811_014.jpg)
 
 more info at http://tarina.org
 
