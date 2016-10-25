@@ -11,10 +11,15 @@ more info at http://tarina.org
 Blender file and printable stls in 3d folder
 
 ## Installing Tarina ##
-Install dependencies
+You can try the simpel install bash script after you've git cloned tarina
+```
+git clone https://rbckman@bitbucket.org/rbckman/tarina.git
+cd tarina
+sudo install.sh
+```
+Or install dependencies manually:
 ```
 sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
-git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
 git clone https://github.com/willprice/python-omxplayer-wrapper.git
 cd python-omxplayer-wrapper
 python setup.py install
@@ -22,9 +27,7 @@ reboot
 cd /home/pi/tarina/ && sudo su
 python tarina.py
 ```
-
 more install instructions in INSTALL file
-
 
 ## Installing Adafruit 3.5 pitft screen ##
 https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
