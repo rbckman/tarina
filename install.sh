@@ -37,4 +37,11 @@ display_rotate=3
 dtoverlay=vga666 
 dtoverlay=pi3-disable-bt-overlay
 EOF
+
+echo "Robs special l33t configurations"
+cp /extras/.vimrc /root/.vimrc
+cp /extras/.vimrc /home/pi/.vimrc
+
 echo "Congratz everything done! reboot and run sudo tarina.py"
+
+
