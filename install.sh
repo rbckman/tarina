@@ -20,8 +20,9 @@ cat >> /etc/default/cpufrequtils << EOF
 GOVERNOR="performance"
 EOF
 echo "Installing rpi hd tft screen..."
-cp rpihdtft/dt-blob.bin /boot
+cp rpihdtft/dt-blob.bin /boot/
 cat >> /boot/config.txt << EOF
+#Rpi-hd-tft
 framebuffer_width=800
 framebuffer_height=480
 dtparam=spi=off
@@ -33,5 +34,7 @@ dpi_group=2
 dpi_mode=87
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3
+dtoverlay=vga666 
+dtoverlay=pi3-disable-bt-overlay
 EOF
 echo "Congratz everything done! reboot and run sudo tarina.py"
