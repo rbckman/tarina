@@ -14,24 +14,12 @@ Blender file and printable stls in 3d folder
 Install dependencies
 ```
 sudo apt-get install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
-```
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git 
-```
 git clone https://github.com/willprice/python-omxplayer-wrapper.git
-```
 cd python-omxplayer-wrapper
-```
 python setup.py install
-```
-put this line in the end of /etc/fstab
-```
-tmpfs   /mnt/tmp    tmpfs   defaults    0 0
-```
 reboot
-```
 cd /home/pi/tarina/ && sudo su
-```
-```
 python tarina.py
 ```
 
