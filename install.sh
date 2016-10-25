@@ -9,7 +9,7 @@ fi
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
+apt-get -y install git vim python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
 git clone https://github.com/willprice/python-omxplayer-wrapper.git
 echo "setting up python-omxplayer-wrapper..."
 cd python-omxplayer-wrapper
