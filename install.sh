@@ -1,10 +1,15 @@
 #!/bin/bash
-# My first script
+# Install Tarina dependencies
+
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root, use sudo "$0" instead" 1>&2
+    exit 1
+fi
 
 echo "Installing all dependencies..."
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install -y git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
+apt-get update
+apt-get upgrade -y
+apt-get -y install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
 git clone https://github.com/willprice/python-omxplayer-wrapper.git
 echo "setting up python-omxplayer-wrapper..."
 cd python-omxplayer-wrapper
@@ -29,4 +34,4 @@ dpi_mode=87
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3
 EOF
-echo "Congratz everything done! run sudo tarina.py"
+echo "Congratz everything done! reboot and run sudo tarina.py"
