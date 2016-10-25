@@ -138,10 +138,10 @@ int main(void)
       //const char *text = "Never give up on your dreams";
       uint32_t y_offset = 460;
       uint32_t y_offset2 = 0;
-      uint32_t y_offset3 = 25;
-      uint32_t y_offset4 = 50;
-      uint32_t y_offset5 = 410;
-      uint32_t y_offset6 = 435;
+      uint32_t y_offset3 = 20;
+      uint32_t y_offset4 = 40;
+      uint32_t y_offset5 = 420;
+      uint32_t y_offset6 = 440;
       // graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0x00));
       // blue, at the top (y=40)
 

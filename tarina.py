@@ -37,6 +37,7 @@ from PIL import Image
 #GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+#GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 os.system('clear')
 
@@ -518,7 +519,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
     holdbutton = ''
     seconds = 0.5
     selected = 0
-    header = 'Press enter to start!! :)'
+    header = 'Janica 30 kamera. Paina nappia!! :)'
     menu = ''
     while True:
         settings = 'START'
@@ -551,7 +552,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
                         writemessage('Taking picture ' + str(p))
                         i = i + 0.1
                         time.sleep(0.1)
-                        middlebutton = GPIO.input(5)
+                        middlebutton = GPIO.input(22)
                         if middlebutton == False or p > 9:
                             break
                     if middlebutton == False or p > 9:
@@ -748,7 +749,7 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
     for f in filmfiles:
-        audiomerge.append(tarinafolder + '/delay0138m.wav')
+        audiomerge.append(tarinafolder + '/delay0414m.wav')
         audiomerge.append(f + '.wav')
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
@@ -909,23 +910,25 @@ def empty(filename):
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
     pressed = ''
-    #middlebutton = GPIO.input(5)
+    #middlebutton = GPIO.input(22)
     #upbutton = GPIO.input(12)
     #downbutton = GPIO.input(13)
     #leftbutton = GPIO.input(16)
     #rightbutton = GPIO.input(26)
     if event == 27:
         pressed = 'quit'
-    if event == curses.KEY_ENTER or event == 10 or event == 13:
+    elif event == curses.KEY_ENTER or event == 10 or event == 13:
         pressed = 'middle'
-    if event == ord('w') or event == curses.KEY_UP: 
+    elif event == ord('w') or event == curses.KEY_UP: 
         pressed = 'up'
-    if event == ord('s') or event == curses.KEY_DOWN:
+    elif event == ord('s') or event == curses.KEY_DOWN:
         pressed = 'down'
-    if event == ord('a') or event == curses.KEY_LEFT:
+    elif event == ord('a') or event == curses.KEY_LEFT:
         pressed = 'left'
-    if event == ord('d') or event == curses.KEY_RIGHT:
+    elif event == ord('d') or event == curses.KEY_RIGHT:
         pressed = 'right'
+    #elif middlebutton == False:
+    #    pressed = 'middle'
     buttontime = time.time()
     holdbutton = pressed
     if float(time.time() - buttontime) > 1.0 and buttonpressed == True:
@@ -956,7 +959,7 @@ def main():
     with picamera.PiCamera() as camera:
 
         #START PREVIEW
-        camera.resolution = (1920, 816) #tested modes 1920x816, 1296x552
+        camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698
         camera.crop       = (0, 0, 1.0, 1.0)
         camera.led = False
         time.sleep(1)
@@ -964,12 +967,12 @@ def main():
         camera.start_preview()
 
         #START fbcp AND dispmax hello interface hack
-        call ([tarinafolder + '/fbcp &'], shell = True)
+        #call ([tarinafolder + '/fbcp &'], shell = True)
         call (['./startinterface.sh &'], shell = True)
 
         #MENUS
         menu = 'MIDDLEBUTTON: ','SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', '', 'SCENE:', 'SHOT:', 'TAKE', '', ''
-        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove'
+        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
         
         #STANDARD VALUES
         selectedaction = 0
@@ -1032,7 +1035,6 @@ def main():
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
         filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
 
-        filmname='spede'
         #NEW FILM (IF NOTHING TO LOAD)
         if filmname == '':
             filmname = nameyourfilm()
@@ -1094,8 +1096,9 @@ def main():
                         time.sleep(0.1)
                     recording = True
                     camera.led = True
-                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
-                    camera.start_recording('/mnt/tmp/' + filename + '.h264', format='h264', quality=21)
+                    #os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
+                    os.system('arecord -f S16_LE -c 1 -r 44100 -vv' + foldername + filename + '.wav &') 
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=10)
                     starttime = time.time()
                     #camera.wait_recording(10)
                 elif recording == True:
@@ -1103,22 +1106,22 @@ def main():
                     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                     recording = False
                     camera.led = False
-                    os.system('pkill -9 arecord')
+                    os.system('pkill arecord')
                     camera.stop_recording()
                     t = 0
                     rectime = ''
                     showrec = ''
                     vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                     thefile = foldername + filename 
-                    writemessage('Copying video file...')
-                    os.system('mv /mnt/tmp/' + filename + '.h264 ' + foldername)
-                    try:
-                        writemessage('Copying audio file...')
-                        os.system('mv /mnt/tmp/' + filename + '.wav ' +  foldername + ' &')
-                    except:
-                        writemessage('no audio file')
-                        time.sleep(0.5)
-                    os.system('cp err.log lasterr.log')
+                    #writemessage('Copying video file...')
+                    #os.system('mv /mnt/tmp/' + filename + '.h264 ' + foldername)
+                    #try:
+                    #    writemessage('Copying audio file...')
+                    #    os.system('mv /mnt/tmp/' + filename + '.wav ' +  foldername + ' &')
+                    #except:
+                    #    writemessage('no audio file')
+                    #    time.sleep(0.5)
+                    #os.system('cp err.log lasterr.log')
                     #render thumbnail
                     os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
@@ -1135,7 +1138,7 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PHOTOBOOTH
-            elif pressed == 'middle' and selectedaction == 81:
+            elif pressed == 'middle' and selectedaction == 8:
                 thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
                 timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
                 thefile = photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
