@@ -6,7 +6,7 @@ Tarina has been developed with the [Raspberry Pi 3](https://www.raspberrypi.org/
 
 It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other Raspberry Pi compatible screens.
 
-Build info and part list at http://tarina.org
+Build wiki and part list at http://tarina.org
 
 ### 3d printable files ###
 
