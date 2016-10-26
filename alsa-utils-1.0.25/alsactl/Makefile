@@ -166,15 +166,15 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-ACLOCAL = ${SHELL} /home/pi/alsa-utils-1.0.25/missing --run aclocal-1.11
+ACLOCAL = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/missing --run aclocal-1.11
 ALSA_CFLAGS = 
 ALSA_LIBS =  -lasound -lm -ldl -lpthread
 AMTAR = $${TAR-tar}
 ASOUND_STATE_DIR = /var/lib/alsa
-AUTOCONF = ${SHELL} /home/pi/alsa-utils-1.0.25/missing --run autoconf
-AUTOHEADER = ${SHELL} /home/pi/alsa-utils-1.0.25/missing --run autoheader
-AUTOMAKE = ${SHELL} /home/pi/alsa-utils-1.0.25/missing --run automake-1.11
-AWK = gawk
+AUTOCONF = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/missing --run automake-1.11
+AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -192,8 +192,8 @@ ECHO_T =
 EGREP = /bin/grep -E
 EXEEXT = 
 GETTEXT_MACRO_VERSION = 0.18
-GMSGFMT = /usr/bin/msgfmt
-GMSGFMT_015 = /usr/bin/msgfmt
+GMSGFMT = :
+GMSGFMT_015 = :
 GREP = /bin/grep
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
@@ -212,11 +212,11 @@ LN_S = ln -s
 LTLIBICONV = -liconv
 LTLIBINTL = 
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/pi/alsa-utils-1.0.25/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
-MSGFMT = /usr/bin/msgfmt
-MSGFMT_015 = /usr/bin/msgfmt
-MSGMERGE = /usr/bin/msgmerge
+MSGFMT = :
+MSGFMT_015 = :
+MSGMERGE = :
 OBJEXT = o
 PACKAGE = alsa-utils
 PACKAGE_BUGREPORT = 
@@ -241,13 +241,13 @@ STRIP =
 TESTSOUND = /usr/share/test.wav
 USE_NLS = yes
 VERSION = 1.0.25
-XGETTEXT = /usr/bin/xgettext
-XGETTEXT_015 = /usr/bin/xgettext
+XGETTEXT = :
+XGETTEXT_015 = :
 XGETTEXT_EXTRA_OPTIONS = 
-abs_builddir = /home/pi/alsa-utils-1.0.25/alsactl
-abs_srcdir = /home/pi/alsa-utils-1.0.25/alsactl
-abs_top_builddir = /home/pi/alsa-utils-1.0.25
-abs_top_srcdir = /home/pi/alsa-utils-1.0.25
+abs_builddir = /home/pi/tarina/alsa-utils-1.0.25/alsactl
+abs_srcdir = /home/pi/tarina/alsa-utils-1.0.25/alsactl
+abs_top_builddir = /home/pi/tarina/alsa-utils-1.0.25
+abs_top_srcdir = /home/pi/tarina/alsa-utils-1.0.25
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -274,7 +274,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/pi/alsa-utils-1.0.25/install-sh
+install_sh = ${SHELL} /home/pi/tarina/alsa-utils-1.0.25/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -292,7 +292,7 @@ sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 srcdir = .
 sysconfdir = ${prefix}/etc
-systemdsystemunitdir = 
+systemdsystemunitdir = /lib/systemd/system
 target_alias = 
 top_build_prefix = ../
 top_builddir = ..
@@ -309,9 +309,9 @@ noinst_HEADERS = alsactl.h list.h init_sysdeps.c init_utils_string.c init_utils_
 dist_udevrules_DATA = \
 	90-alsa-restore.rules
 
-#systemdsystemunit_DATA = \
-#	alsa-store.service \
-#	alsa-restore.service
+systemdsystemunit_DATA = \
+	alsa-store.service \
+	alsa-restore.service
 
 edit = \
 	$(SED) -r 's,@sbindir\@,$(sbindir),g' < $< > $@ || rm $@
@@ -850,7 +850,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-install-data-hook:
+#install-data-hook:
 clean: clean-recursive
 
 clean-am: clean-generic clean-sbinPROGRAMS mostlyclean-am
@@ -948,16 +948,16 @@ uninstall-man: uninstall-man1 uninstall-man7
 	uninstall-sbinPROGRAMS uninstall-systemdsystemunitDATA
 
 
-#install-data-hook:
-#	$(MKDIR_P) -m 0755 \
-#		$(DESTDIR)$(systemdsystemunitdir)/basic.target.wants \
-#		$(DESTDIR)$(systemdsystemunitdir)/shutdown.target.wants
-#	( cd $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants && \
-#	        rm -f alsa-restore.service && \
-#		$(LN_S) ../alsa-restore.service alsa-restore.service )
-#	( cd $(DESTDIR)$(systemdsystemunitdir)/shutdown.target.wants && \
-#	        rm -f alsa-store.service && \
-#		$(LN_S) ../alsa-store.service alsa-store.service )
+install-data-hook:
+	$(MKDIR_P) -m 0755 \
+		$(DESTDIR)$(systemdsystemunitdir)/basic.target.wants \
+		$(DESTDIR)$(systemdsystemunitdir)/shutdown.target.wants
+	( cd $(DESTDIR)$(systemdsystemunitdir)/basic.target.wants && \
+	        rm -f alsa-restore.service && \
+		$(LN_S) ../alsa-restore.service alsa-restore.service )
+	( cd $(DESTDIR)$(systemdsystemunitdir)/shutdown.target.wants && \
+	        rm -f alsa-store.service && \
+		$(LN_S) ../alsa-store.service alsa-store.service )
 
 alsa-store.service: alsa-store.service.in
 	$(edit)

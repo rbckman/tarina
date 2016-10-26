@@ -18,11 +18,11 @@ INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 # mkdir_p = /bin/mkdir -p
 mkdir_p = mkdir -p --
-XGETTEXT = /usr/bin/xgettext
-MSGFMT = /usr/bin/msgfmt
-GMSGFMT = /usr/bin/msgfmt
-MSGMERGE = /usr/bin/msgmerge
-MSGMERGE_UPDATE = /usr/bin/msgmerge --update
+XGETTEXT = :
+MSGFMT = :
+GMSGFMT = :
+MSGMERGE = :
+MSGMERGE_UPDATE = : --update
 
 DISTFILES = $(POFILES) Makefile.in
 CATALOGS = $(POFILES:.po=.gmo)

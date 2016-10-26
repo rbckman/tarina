@@ -106,7 +106,7 @@ def writemenu(menu,settings,selected,header):
         if len(menudone) > 208:
             spaces = 244 - len(menudone)
             menudone = menudone + spaces * ' '
-    f = open('/mnt/tmp/interface', 'w')
+    f = open('/dev/shm/interface', 'w')
     clear = clear - len(menudone)
     f.write(header + menudone + clear * ' ')
     f.close()
@@ -116,7 +116,7 @@ def writemenu(menu,settings,selected,header):
 def writemessage(message):
     clear = 305
     clear = clear - len(message)
-    f = open('/mnt/tmp/interface', 'w')
+    f = open('/dev/shm/interface', 'w')
     f.write(' ' + message + clear * ' ')
     f.close()
 
@@ -125,7 +125,7 @@ def writemessage(message):
 def vumetermessage(message):
     clear = 61
     clear = clear - len(message)
-    f = open('/mnt/tmp/vumeter', 'w')
+    f = open('/dev/shm/vumeter', 'w')
     f.write(message + clear * ' ')
     f.close()
 
@@ -1095,17 +1095,17 @@ def main():
                         buzzer(beeps)
                         time.sleep(0.1)
                     recording = True
-                    camera.led = True
+                    #camera.led = True
                     #os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
-                    os.system('arecord -f S16_LE -c 1 -r 44100 -vv' + foldername + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=10)
+                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=15)
                     starttime = time.time()
                     #camera.wait_recording(10)
                 elif recording == True:
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                     recording = False
-                    camera.led = False
+                    #camera.led = False
                     os.system('pkill arecord')
                     camera.stop_recording()
                     t = 0
@@ -1115,12 +1115,12 @@ def main():
                     thefile = foldername + filename 
                     #writemessage('Copying video file...')
                     #os.system('mv /mnt/tmp/' + filename + '.h264 ' + foldername)
-                    #try:
-                    #    writemessage('Copying audio file...')
-                    #    os.system('mv /mnt/tmp/' + filename + '.wav ' +  foldername + ' &')
-                    #except:
-                    #    writemessage('no audio file')
-                    #    time.sleep(0.5)
+                    try:
+                        writemessage('Copying audio file...')
+                        os.system('mv /dev/shm/' + filename + '.wav ' +  foldername + ' &')
+                    except:
+                        writemessage('no audio file')
+                        time.sleep(0.5)
                     #os.system('cp err.log lasterr.log')
                     #render thumbnail
                     os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')

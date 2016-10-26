@@ -1,19 +1,23 @@
-proc_files.o: proc_files.c ../include/aconfig.h /usr/include/assert.h \
- /usr/include/features.h /usr/include/arm-linux-gnueabihf/bits/predefs.h \
+proc_files.o: proc_files.c /usr/include/stdc-predef.h \
+ ../include/aconfig.h /usr/include/assert.h /usr/include/features.h \
  /usr/include/arm-linux-gnueabihf/sys/cdefs.h \
  /usr/include/arm-linux-gnueabihf/bits/wordsize.h \
  /usr/include/arm-linux-gnueabihf/gnu/stubs.h \
+ /usr/include/arm-linux-gnueabihf/gnu/stubs-hard.h \
  /usr/include/ncursesw/menu.h /usr/include/ncursesw/curses.h \
- /usr/include/ncursesw/ncurses_dll.h /usr/include/stdio.h \
- /usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stddef.h \
+ /usr/include/ncursesw/ncurses_dll.h \
+ /usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdint.h \
+ /usr/include/stdint.h /usr/include/arm-linux-gnueabihf/bits/wchar.h \
+ /usr/include/stdio.h \
+ /usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stddef.h \
  /usr/include/arm-linux-gnueabihf/bits/types.h \
  /usr/include/arm-linux-gnueabihf/bits/typesizes.h /usr/include/libio.h \
  /usr/include/_G_config.h /usr/include/wchar.h \
- /usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stdarg.h \
+ /usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdarg.h \
  /usr/include/arm-linux-gnueabihf/bits/stdio_lim.h \
  /usr/include/arm-linux-gnueabihf/bits/sys_errlist.h \
  /usr/include/arm-linux-gnueabihf/bits/stdio.h \
- /usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stdbool.h \
+ /usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdbool.h \
  /usr/include/ncursesw/unctrl.h /usr/include/ncursesw/eti.h \
  /usr/include/unistd.h /usr/include/arm-linux-gnueabihf/bits/posix_opt.h \
  /usr/include/arm-linux-gnueabihf/bits/environments.h \
@@ -23,13 +27,13 @@ proc_files.o: proc_files.c ../include/aconfig.h /usr/include/assert.h \
  /usr/include/xlocale.h utils.h die.h mem.h colors.h widget.h \
  /usr/include/ncursesw/panel.h textbox.h proc_files.h
 
+/usr/include/stdc-predef.h:
+
 ../include/aconfig.h:
 
 /usr/include/assert.h:
 
 /usr/include/features.h:
-
-/usr/include/arm-linux-gnueabihf/bits/predefs.h:
 
 /usr/include/arm-linux-gnueabihf/sys/cdefs.h:
 
@@ -37,15 +41,23 @@ proc_files.o: proc_files.c ../include/aconfig.h /usr/include/assert.h \
 
 /usr/include/arm-linux-gnueabihf/gnu/stubs.h:
 
+/usr/include/arm-linux-gnueabihf/gnu/stubs-hard.h:
+
 /usr/include/ncursesw/menu.h:
 
 /usr/include/ncursesw/curses.h:
 
 /usr/include/ncursesw/ncurses_dll.h:
 
+/usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/arm-linux-gnueabihf/bits/wchar.h:
+
 /usr/include/stdio.h:
 
-/usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stddef.h:
+/usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stddef.h:
 
 /usr/include/arm-linux-gnueabihf/bits/types.h:
 
@@ -57,7 +69,7 @@ proc_files.o: proc_files.c ../include/aconfig.h /usr/include/assert.h \
 
 /usr/include/wchar.h:
 
-/usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stdarg.h:
+/usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdarg.h:
 
 /usr/include/arm-linux-gnueabihf/bits/stdio_lim.h:
 
@@ -65,7 +77,7 @@ proc_files.o: proc_files.c ../include/aconfig.h /usr/include/assert.h \
 
 /usr/include/arm-linux-gnueabihf/bits/stdio.h:
 
-/usr/lib/gcc/arm-linux-gnueabihf/4.6/include/stdbool.h:
+/usr/lib/gcc/arm-linux-gnueabihf/4.9/include/stdbool.h:
 
 /usr/include/ncursesw/unctrl.h:
 

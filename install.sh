@@ -9,7 +9,7 @@ fi
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git vim python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
+apt-get -y install git python-picamera python-imaging python-pexpect libav-tools gpac omxplayer sox cpufrequtils usbmount python-dbus
 git clone https://github.com/willprice/python-omxplayer-wrapper.git
 echo "setting up python-omxplayer-wrapper..."
 cd python-omxplayer-wrapper
@@ -38,9 +38,37 @@ dtoverlay=vga666
 dtoverlay=pi3-disable-bt-overlay
 EOF
 
-echo "Robs special l33t configurations"
-cp /extras/.vimrc /root/.vimrc
-cp /extras/.vimrc /home/pi/.vimrc
+while true; do
+    read -p "Do you have a USB sound card? Make it default (y)es or (n)o?" yn
+    case $yn in
+        [Yy]* ) echo "USB sound card to default"; break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+cat >> /etc/modprobe.d/alsa-base.conf << EOF
+#set index value
+options snd_usb_audio index=0
+options snd_bcm2835 index=1
+
+#reorder
+options snd slots=snd_usb_audio, snd_bcm2835
+EOF
+
+while true; do
+    read -p "Do you wish to add Robs special hacking tools & configurations (y)es or (n)o?" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) echo "Congrats everything done! reboot and run sudo tarina.py";exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+echo "Configuring Robs special l33t configurations"
+apt-get -y install vim htop screen mediainfo
+cp extras/.vimrc /root/.vimrc
+cp extras/.vimrc /home/pi/.vimrc
 
 echo "Congratz everything done! reboot and run sudo tarina.py"
 

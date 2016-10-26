@@ -1427,7 +1427,7 @@ static void print_vu_meter_mono(int perc, int maxperc)
 	else
 		sprintf(line + val, "| %02i%%", maxperc);
         FILE *vumeter;
-        vumeter = fopen("/mnt/tmp/vumeter","w");
+        vumeter = fopen("/dev/shm/vumeter","w");
         fputs(line, vumeter);
         fclose(vumeter);
 	if (perc > 100)
@@ -1470,7 +1470,7 @@ static void print_vu_meter_stereo(int *perc, int *maxperc)
 	}
 	line[bar_length * 2 + 6 + 2] = 0;
         FILE *vumeter;
-        vumeter = fopen("/mnt/tmp/vumeter","w");
+        vumeter = fopen("/dev/shm/vumeter","w");
         fputs(line, vumeter);
         fclose(vumeter);
 }

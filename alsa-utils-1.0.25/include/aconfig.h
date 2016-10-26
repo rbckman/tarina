@@ -69,7 +69,7 @@
 #define HAVE_PANEL_H 1
 
 /* Define to 1 if you have the <samplerate.h> header file. */
-#define HAVE_SAMPLERATE_H 1
+/* #undef HAVE_SAMPLERATE_H */
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1

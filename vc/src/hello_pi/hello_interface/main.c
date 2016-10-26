@@ -120,11 +120,11 @@ int main(void)
    while (1) {
       // char ch;
       FILE *fp;
-      fp = fopen("/mnt/tmp/vumeter","r");
+      fp = fopen("/dev/shm/vumeter","r");
       while(fgets(text, 63, fp) != NULL);
       fclose(fp);
       FILE *fp2;
-      fp2 = fopen("/mnt/tmp/interface","r");
+      fp2 = fopen("/dev/shm/interface","r");
       fgets(text2, 62, fp2);
       fgets(text3, 62, fp2);
       fgets(text4, 62, fp2);
