@@ -4,7 +4,7 @@ You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot 
 
 Tarina has been developed with the [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) and a [Pi Camera module v2.1 Sony IMX219 8-megapixel sensor](https://www.raspberrypi.org/products/camera-module-v2/), & [U-Geek Raspberry Pi 3.5 inch 800*480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html) & [USB via vt1620a Sound card](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB) & [9000mAh li-ion Battery](https://www.aliexpress.com/item/3-7v-9000mAh-capacity-18650-Rechargeable-lithium-battery-pack-18650-jump-starter/32619902319.html?spm=2114.13010608.0.0.XcKleV) (10 hours filming) & [USB Mobile Power Charger Board Module 3.7V to 5V 1A/2A Booster Converter](http://www.ebay.com/itm/321977677010?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT)
 
-It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other tft screen hats. But has not been tested.
+It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other Raspberry Pi compatible screens.
 
 Build info and part list at http://tarina.org
 
