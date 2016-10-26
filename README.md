@@ -1,10 +1,12 @@
-# Tarina PROTO 3#
+# Tarina #
 ### DIY filmmaking device for Raspberry pi ###
-You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot your films as takes, shots and scenes, and see how they fit together on the go. If you're not happy, retake it. Once you get it there’s no need for editing later.
+You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot your films as takes, shots and scenes, and see them your film come together on the go. If you're not happy, retake it. Once you get it there’s no need for editing later.
 
-Tarina has been tested and is working with Raspberry pi 1, 2 and 3, Pi camera module 1.3 and v. 2.1 Sony IMX219 8-megapixel sensor, CS lenses or M12 lenses, USB via vt1620a Sound card, Electrec in-built front mic with preamp, 7700mAh li-ion Battery (6 hours filming), U-geek 3.5" screen (800x480 pixels), Adafruit 3.5" screen (480x 320 pixels), in-built speakers, Bluetooth keyboard, 3d printed body
+Tarina has been developed with [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) and [Pi Camera module v2.1 Sony IMX219](https://www.raspberrypi.org/products/camera-module-v2/) 8-megapixel sensor and [U-Geek Raspberry Pi 3.5 inch 800*480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html) and [USB via vt1620a Sound card](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB) and a [9000mAh li-ion Battery](https://www.aliexpress.com/item/3-7v-9000mAh-capacity-18650-Rechargeable-lithium-battery-pack-18650-jump-starter/32619902319.html?spm=2114.13010608.0.0.XcKleV) (10 hours filming) and a [USB Mobile Power Charger Board Module 3.7V to 5V 1A/2A Booster Converter](http://www.ebay.com/itm/321977677010?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT)
 
-more info at http://tarina.org
+It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other tft screen hats. But has not been tested.
+
+Build info and part list at http://tarina.org
 
 ### 3d printable files ###
 
