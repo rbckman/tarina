@@ -709,7 +709,7 @@ def compileshot(filename):
         return
     else:
         writemessage('Converting to playable video')
-        os.system('MP4Box -add ' + filename + '.h264 -new ' + filename + '.mp4')
+        os.system('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
         writemessage('Playing video')
         #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
@@ -774,11 +774,11 @@ def playthis(filename, camera):
     holdbutton = ''
     camera.stop_preview()
     writemessage('Starting omxplayer')
-    player = OMXPlayer(filename + '.mp4', args=['--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
     time.sleep(1)
-    player.play()
     os.system('aplay ' + filename + '.wav &')
+    player.play()
     menu = 'BACK', 'PLAY FROM START'
     settings = '', ''
     selected = 0
@@ -800,11 +800,11 @@ def playthis(filename, camera):
                 player.stop()
                 player.quit()
                 os.system('pkill aplay')
-                os.system('pkill dbus-daemon')
+                #os.system('pkill dbus-daemon')
                 #os.system('pkill omxplayer')
                 camera.start_preview()
-                break
-            elif selected == 1:
+                return
+            elif selected == 12:
                 player.stop()
                 os.system('pkill aplay')
                 #os.system('pkill omxplayer')
@@ -814,7 +814,7 @@ def playthis(filename, camera):
         time.sleep(0.02)
         t = time.time() - starttime
     player.quit()
-    os.system('pkill dbus-daemon')
+    #os.system('pkill dbus-daemon')
     camera.start_preview()
 
 #---------------View Film--------------------
@@ -977,7 +977,7 @@ def main():
         #STANDARD VALUES
         selectedaction = 0
         selected = 0
-        camera.framerate = 26
+        camera.framerate = 24.999
         awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
         awbx = 0
         awb_lock = 'no'
@@ -1086,7 +1086,7 @@ def main():
                     backlight = True
 
             #RECORD AND PAUSE
-            elif pressed == 'middle' and selectedaction == 0 or reclenght != 0 and t > reclenght:
+            elif pressed == 'middle' and selectedaction == 0 or reclenght != 0 and t > reclenght or t > 800:
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                 filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                 os.system('mkdir -p ' + foldername)
@@ -1096,9 +1096,9 @@ def main():
                         time.sleep(0.1)
                     recording = True
                     #camera.led = True
-                    #os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c1 -r44100 -vv /mnt/tmp/' + filename + '.wav &') 
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=15)
+                    #camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
+                    camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=20)
                     starttime = time.time()
                     #camera.wait_recording(10)
                 elif recording == True:
@@ -1113,11 +1113,11 @@ def main():
                     showrec = ''
                     vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                     thefile = foldername + filename 
-                    #writemessage('Copying video file...')
-                    #os.system('mv /mnt/tmp/' + filename + '.h264 ' + foldername)
+                    writemessage('Copying video file...')
+                    os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
                     try:
                         writemessage('Copying audio file...')
-                        os.system('mv /dev/shm/' + filename + '.wav ' +  foldername + ' &')
+                        os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
                     except:
                         writemessage('no audio file')
                         time.sleep(0.5)
