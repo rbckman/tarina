@@ -13,8 +13,18 @@ Build wiki and part list at http://tarina.org
 
 ## Software ##
 You can try the simpel install bash script after you've git cloned tarina
+1. Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+2. [ssh into raspberry](https://www.raspberrypi.org/documentation/remote-access/ssh/) pi and run
 ```
-download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+sudo raspi-config
+```
+3. Expand file system, enable camera and then reboot
+4. Install git
+```
+sudo apt-get install git
+```
+5. Git clone tarina
+```
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
