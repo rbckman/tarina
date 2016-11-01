@@ -14,6 +14,7 @@ Build wiki and part list at http://tarina.org
 ## Software ##
 You can try the simpel install bash script after you've git cloned tarina
 ```
+download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
