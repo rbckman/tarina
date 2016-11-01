@@ -12,18 +12,17 @@ Build wiki and part list at http://tarina.org
 3d printable stls in [3d folder](https://bitbucket.org/rbckman/tarina)
 
 ## Software ##
-You can try the simpel install bash script after you've git cloned tarina
-1. Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
-2. [ssh into raspberry](https://www.raspberrypi.org/documentation/remote-access/ssh/) pi and run
+Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+[ssh into raspberry](https://www.raspberrypi.org/documentation/remote-access/ssh/) pi and run
 ```
 sudo raspi-config
 ```
-3. Expand file system, enable camera and then reboot
-4. Install git
+Expand file system, enable camera and then reboot
+Install git
 ```
 sudo apt-get install git
 ```
-5. Git clone tarina
+Git clone tarina
 ```
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
