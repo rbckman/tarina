@@ -13,7 +13,7 @@ Build wiki and part list at http://tarina.org
 
 ## Software ##
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
-[ssh into raspberry](https://www.raspberrypi.org/documentation/remote-access/ssh/) pi and run
+[Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
 ```
 sudo raspi-config
 ```
