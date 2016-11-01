@@ -1,5 +1,5 @@
-# Tarina #
-### Video camera that knows filmmaking ###
+# Tarina ♥ filmmaking #
+### The ultimate filmmaking, vlogger, traveller, hacker camcorder ###
 You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot your films as takes, shots and scenes, and see your film come together on the go. Once you get it there’s no need for editing later. Tarina is built upon hardware easily changeable and is designed to be 3D printed. A broken part? Don't worry: 3D print it or let your friend/school print it. Running on a Gnu/Linux Raspbian distribution and with easy python coded interface. You can go crazy and customize this geek camera to the max.
 
 ## Tarina Hardware ##
