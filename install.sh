@@ -41,12 +41,7 @@ EOF
 while true; do
     read -p "Do you have a USB sound card? Make it default (y)es or (n)o?" yn
     case $yn in
-        [Yy]* ) echo "USB sound card to default"; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
+        [Yy]* ) echo "writing to /etc/modprobe.d/alsa-base.conf";
 cat >> /etc/modprobe.d/alsa-base.conf << EOF
 #set index value
 options snd_usb_audio index=0
@@ -54,7 +49,12 @@ options snd_bcm2835 index=1
 
 #reorder
 options snd slots=snd_usb_audio, snd_bcm2835
-EOF
+EOF                    
+            break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
 
 while true; do
     read -p "Do you wish to add Robs special hacking tools & configurations (y)es or (n)o?" yn
