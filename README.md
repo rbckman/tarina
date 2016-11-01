@@ -9,9 +9,7 @@ It should also work with Raspberry pi 2 and the pi camera module v1.3 and any ot
 
 Build wiki and part list at http://tarina.org
 
-### 3d printable files ###
-
-Blender file and printable stls in 3d folder
+3d printable stls in [3d folder](https://bitbucket.org/rbckman/tarina)
 
 ## Software ##
 You can try the simpel install bash script after you've git cloned tarina
