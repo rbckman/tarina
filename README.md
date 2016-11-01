@@ -18,17 +18,16 @@ Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and 
 sudo raspi-config
 ```
 Expand file system, enable camera and then reboot.
-Run this to install git
+Run this to install git:
 ```
 sudo apt-get install git
 ```
-Git clone tarina
+Git clone tarina and then run install script:
 ```
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
 ```
-more install instructions in INSTALL file
 
 ## Installing Adafruit 3.5 pitft screen ##
 https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/easy-install
