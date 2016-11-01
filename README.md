@@ -12,6 +12,7 @@ Build wiki and part list at http://tarina.org
 3d printable stls in [3d folder](https://bitbucket.org/rbckman/tarina)
 
 ## Software ##
+### Installing ###
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
 ```
