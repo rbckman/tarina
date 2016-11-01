@@ -17,8 +17,8 @@ Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and 
 ```
 sudo raspi-config
 ```
-Expand file system, enable camera and then reboot
-Install git
+Expand file system, enable camera and then reboot.
+Run this to install git
 ```
 sudo apt-get install git
 ```
