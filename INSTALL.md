@@ -54,6 +54,18 @@ Then run this
 sudo chmod 664 /etc/systemd/system/tarina.service && sudo systemctl daemon-reload
 ```
 
+if USB soundcard
+
+add this to /etc/modprobe.d/alsa-base.conf
+```
+#set index value
+options snd_usb_audio index=0
+options snd_bcm2835 index=1
+
+#reorder
+options snd slots=snd_usb_audio, snd_bcm2835
+```
+
 ## Known problems ##
 
 * Seems like the whole thing runs better on Wheezy, even if it's the pi 2. I don't know why?
