@@ -32,6 +32,9 @@ sudo ./install.sh
 ## Couldn't have been done without these ##
 Sending <3 to all
 
+Debian
+http://debian.org
+
 Raspberry Pi
 http://raspberrypi.org
 
@@ -51,13 +54,17 @@ Libav-tools (ffmpeg)
 
 GPac library with MP4Box
 
-Aplay
+aplay
 The awesome wav player/recorder with VU meter
 http://alsa.opensrc.org/Aplay
 
 Omxplayer
 Video player on the Raspberry pi
 https://github.com/huceke/omxplayer
+
+python-omxplayer-wrapper
+Will Price
+https://github.com/willprice/python-omxplayer-wrapper
 
 Sox
 
@@ -66,3 +73,5 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=48967
 
 The Dispmanx library
 https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi
+
+## & many, many more projekts! open source / free software forever  ## 
