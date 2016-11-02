@@ -1,8 +1,6 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
-
 import picamera
 import os
 import time
@@ -1440,6 +1438,8 @@ if __name__ == '__main__':
     except:
         print 'Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1]
 
+#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
+#by rbckman
 #This program is free software: you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
 #the Free Software Foundation, version 2
