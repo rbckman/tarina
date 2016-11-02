@@ -38,8 +38,6 @@ from PIL import Image
 #GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 #GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-os.system('clear')
-
 #--------------Save settings-----------------
 
 def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots):
