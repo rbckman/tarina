@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - Raspberry pi filmmaking interface.
+#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
 #Copyright (C) 2016  Robin Bäckman
 
 #This program is free software: you can redistribute it and/or modify
@@ -39,8 +39,6 @@ from PIL import Image
 #GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 os.system('clear')
-
-print "Tarina  Copyright (C) 2016  Robin Bäckman\nThis program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; type `show c' for details."
 
 #--------------Save settings-----------------
 
