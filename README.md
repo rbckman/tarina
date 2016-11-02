@@ -7,9 +7,7 @@ You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot 
 
 It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other Raspberry Pi compatible screens.
 
-Build wiki and part list at http://tarina.org
-
-Ready to print stls in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
+Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
 ## Software ##
 ### Installing ###
