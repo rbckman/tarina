@@ -38,14 +38,12 @@ http://debian.org
 Raspberry Pi
 http://raspberrypi.org
 
-Adafruit
-https://learn.adafruit.com/adafruit-pitft-3-dot-5-touch-screen-for-raspberry-pi/overview
+Python programming language
+http://python.org
 
 Picamera python module
 Dave Jones, for the awesome picamera python module
 http://picamera.readthedocs.org
-
-Python programming language
 
 Tasanakorn for fbcp so you can preview on the pitft
 https://github.com/tasanakorn/rpi-fbcp
