@@ -62,7 +62,7 @@ Omxplayer
 Video player on the Raspberry pi
 https://github.com/huceke/omxplayer
 
-python-omxplayer-wrapper
+Python-omxplayer-wrapper
 Will Price
 https://github.com/willprice/python-omxplayer-wrapper
 
@@ -74,4 +74,4 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=48967
 The Dispmanx library
 https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi
 
-## & many, many more projekts! open source / free software forever  ## 
+### & many, many more projects! peace out... ### 
