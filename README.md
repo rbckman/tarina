@@ -9,7 +9,7 @@ It should also work with Raspberry pi 2 and the pi camera module v1.3 and any ot
 
 Build wiki and part list at http://tarina.org
 
-3d printable stls in [3d folder](https://bitbucket.org/rbckman/tarina)
+Ready to print stls in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
 ## Software ##
 ### Installing ###
