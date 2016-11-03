@@ -1,4 +1,4 @@
-# Tarina ♥ filmmaking #
+# Tarina #
 ### DIY camera for filmmakers, vloggers, travellers & hackers ###
 You film, Tarina puts the pieces together and, voilá!, you have a movie! Shoot your films as takes, shots and scenes, and see your film come together on the go. Once you get it there’s no need for editing later. Tarina is designed to be taken apart & easily modded with allbody parts 3d printable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an easy python coded interface.
 
