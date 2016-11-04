@@ -38,9 +38,6 @@ sudo ./install.sh
 ```
 ## Couldn't have been done without##
 
-Debian
-http://debian.org
-
 Raspberry Pi
 http://raspberrypi.org
 
