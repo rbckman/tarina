@@ -36,6 +36,11 @@ git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
 ```
+You'r ready to rumble (run as sudo):
+```
+cd tarina
+sudo python tarina.py
+```
 ## Couldn't have been done without##
 
 Raspberry Pi
