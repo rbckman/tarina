@@ -36,8 +36,7 @@ git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
 ```
-## Couldn't have been done without these ##
-Sending <3 to all
+## Couldn't have been done without##
 
 Debian
 http://debian.org
