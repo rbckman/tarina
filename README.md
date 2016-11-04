@@ -14,6 +14,8 @@ It should also work with Raspberry pi 2 and the pi camera module v1.3 and any ot
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
+<img src="https://raw.githubusercontent.com/rbckman/tarina/master/tarina-proto3.png" width="80%">
+
 ## Software ##
 ### Installing ###
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
