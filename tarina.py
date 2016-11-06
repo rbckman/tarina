@@ -700,12 +700,11 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
 def compileshot(filename):
     #Check if file already converted
     if os.path.isfile(filename + '.mp4'):
-        writemessage('Playing video')
+        writemessage('Compiling to playable')
         return
     else:
         writemessage('Converting to playable video')
         os.system('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
-        writemessage('Playing video')
         #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
         #os.system('aplay ' + foldername + filename + '.wav')
@@ -744,7 +743,6 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
     for f in filmfiles:
-        audiomerge.append(tarinafolder + '/delay0414m.wav')
         audiomerge.append(f + '.wav')
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
@@ -824,6 +822,36 @@ def viewfilm(filmfolder, filmname):
             filmfiles.extend(renderlist(filmname, filmfolder, scene))
         scene = scene + 1
     return filmfiles
+
+#--------------Audiodelay--------------------
+# make audio file same lenght as video file
+
+def audiodelay(foldername, filename):
+    writemessage('Audio syncing..')
+    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
+    videolenght = pipe.read()
+    pipe = subprocess.Popen('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True, stdout=subprocess.PIPE).stdout
+    audiolenght = pipe.read() 
+    #separate seconds and milliseconds
+    videoms = int(videolenght) % 1000
+    audioms = int(audiolenght) % 1000
+    videos = int(videolenght) / 1000
+    audios = int(audiolenght) / 1000
+    #calculate difference
+    audiosyncs = videos - audios
+    audiosyncms = videoms - audioms
+    if audiosyncms < 0:
+        if audiosyncs > 0:
+            audiosyncms = audiosyncms - 1
+        audiosyncms = 1000 + audiosyncms
+    print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
+    #make the delay file
+    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
+    os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
+    os.system('rm /dev/shm/' + filename + '.wav'
+    #os.system('mv audiosynced.wav ' + filename + '.wav')
+    #os.system('rm silence.wav')
+
 
 #--------------Copy to USB-------------------
 
@@ -1091,9 +1119,9 @@ def main():
                         time.sleep(0.1)
                     recording = True
                     #camera.led = True
-                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
                     #camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
-                    camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=20)
+                    camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=16)
+                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
                     starttime = time.time()
                     #camera.wait_recording(10)
                 elif recording == True:
@@ -1110,9 +1138,11 @@ def main():
                     thefile = foldername + filename 
                     writemessage('Copying video file...')
                     os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
+                    compileshot(foldername + filename)
+                    audiodelay(foldername,filename)
                     try:
-                        writemessage('Copying audio file...')
-                        os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
+                        writemessage('Copying and syncing audio file...')
+                        #os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
                     except:
                         writemessage('no audio file')
                         time.sleep(0.5)
