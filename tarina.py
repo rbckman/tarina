@@ -822,20 +822,26 @@ def audiodelay(foldername, filename):
     audioms = int(audiolenght) % 1000
     videos = int(videolenght) / 1000
     audios = int(audiolenght) / 1000
-    #calculate difference
-    audiosyncs = videos - audios
-    audiosyncms = videoms - audioms
-    if audiosyncms < 0:
-        if audiosyncs > 0:
-            audiosyncms = audiosyncms - 1
-        audiosyncms = 1000 + audiosyncms
-    print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
-    #make the delay file
-    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
-    os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
-    os.system('rm /dev/shm/' + filename + '.wav'
-    #os.system('mv audiosynced.wav ' + filename + '.wav')
-    #os.system('rm silence.wav')
+    if int(audiolenght) > int(videolenght):
+        #calculate difference
+        audiosync = int(audiolenght) - int(videolenght)
+        print('Audiofile is: ' + str(audiosync) + 'ms longer')
+        os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav trim 0 -0.' + str(audiosync).zfill(3))
+    else:
+        #calculate difference
+        audiosyncs = videos - audios
+        audiosyncms = videoms - audioms
+        if audiosyncms < 0:
+            if audiosyncs > 0:
+                audiosyncs = audiosyncs - 1
+            audiosyncms = 1000 + audiosyncms
+        print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
+        #make the delay file
+        os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
+        os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
+        #os.system('rm /dev/shm/' + filename + '.wav')
+        #os.system('mv audiosynced.wav ' + filename + '.wav')
+        #os.system('rm silence.wav')
 
 
 #--------------Copy to USB-------------------
