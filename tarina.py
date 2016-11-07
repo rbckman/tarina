@@ -839,9 +839,9 @@ def audiodelay(foldername, filename):
         #make the delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
-        #os.system('rm /dev/shm/' + filename + '.wav')
-        #os.system('mv audiosynced.wav ' + filename + '.wav')
-        #os.system('rm silence.wav')
+    os.system('rm /dev/shm/' + filename + '.wav')
+    #os.system('mv audiosynced.wav ' + filename + '.wav')
+    #os.system('rm silence.wav')
 
 
 #--------------Copy to USB-------------------
