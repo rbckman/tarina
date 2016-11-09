@@ -719,7 +719,7 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
         videomerge.append('-cat')
         videomerge.append(f + '.h264')
     videomerge.append('-new')
-    videomerge.append(filename + '.mp4')
+    videomerge.append(filename + '.h264')
     #videomerge.append(filename + '.h264')
     call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
     ##PASTE AUDIO TOGETHER
@@ -732,13 +732,13 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
     ##CONVERT AUDIO IF WAV FILES FOUND
-    #if os.path.isfile(filename + '.wav'):
-    #    call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
-    #    ##MERGE AUDIO & VIDEO
-    #    writemessage('Merging audio & video')
-    #    call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
-    #else:
-    #    writemessage('No audio files found! View INSTALL file for instructions.')
+    if os.path.isfile(filename + '.wav'):
+        call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
+        ##MERGE AUDIO & VIDEO
+        writemessage('Merging audio & video')
+        call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
+    else:
+        writemessage('No audio files found! View INSTALL file for instructions.')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     return renderedshots, renderfullscene, filename
 
@@ -886,8 +886,9 @@ def copytousb(filmfolder, filmname):
 def uploadfilm(filename, filmname):
     ##SEND TO SERVER
     writemessage('Hold on, video uploading. middle button to cancel')
-    os.system('scp ' + filename + '.mp4 rob@lulzcam.org:/srv/www/lulzcam.org/public_html/videos/' + filmname + '.mp4')
-    os.system('ssh -t rob@lulzcam.org "python /srv/www/lulzcam.org/newfilm.py"')
+    os.system('scp ' + filename + '.mp4 rob@tarina.org:/srv/www/tarina.org/public_html/videos/' + filmname + '.mp4')
+    #os.system('ssh -t rob@lulzcam.org "python /srv/www/lulzcam.org/newfilm.py"')
+    
 
 #-------------Beeps-------------------
 
@@ -1234,7 +1235,7 @@ def main():
                     renderfullscene = True
                     filmfiles = viewfilm(filmfolder, filmname)
                     renderfilename = filmfolder + filmname + '/' + filmname
-                    renderedshots, renderfullscene, uploadfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename)
+                    renderedshots, renderfullscene, uploadfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
                     uploadfilm(uploadfile, filmname)
                     selectedaction = 0
 
@@ -1473,6 +1474,12 @@ if __name__ == '__main__':
         main()
     except:
         print 'Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1]
+        os.system('pkill arecord')
+        os.system('pkill startinterface')
+        os.system('pkill camerainterface')
+        curses.nocbreak()
+        curses.echo()
+        curses.endwin()
 
 #Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
 #by rbckman
