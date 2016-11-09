@@ -59,6 +59,9 @@ Libav-tools (ffmpeg)
 
 GPac library with MP4Box
 
+Blender
+http://blender.org
+
 aplay
 The awesome wav player/recorder with VU meter
 http://alsa.opensrc.org/Aplay
