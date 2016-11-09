@@ -21,3 +21,5 @@ set nowb
 set noswapfile
 colorscheme desert
 set background=dark
+set breakindent
+
