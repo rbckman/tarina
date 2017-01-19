@@ -12,6 +12,13 @@ import cPickle as pickle
 import curses
 import RPi.GPIO as GPIO
 from PIL import Image
+import smbus
+
+bus = smbus.SMBus(3) # Rev 2 Pi uses 1
+DEVICE = 0x20 # Device address (A0-A2)
+IODIRB = 0x0d # Pin direction register
+GPIOB  = 0x13 # Register for inputs
+bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
 
 #GPIO.setmode(GPIO.BCM)
 #GPIO.setup(1, GPIO.OUT)
@@ -924,28 +931,31 @@ def empty(filename):
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
+    readbus = bus.read_byte_data(DEVICE,GPIOB)
     pressed = ''
     #middlebutton = GPIO.input(22)
     #upbutton = GPIO.input(12)
     #downbutton = GPIO.input(13)
     #leftbutton = GPIO.input(16)
     #rightbutton = GPIO.input(26)
-    if event == 27:
-        pressed = 'quit'
-    elif event == curses.KEY_ENTER or event == 10 or event == 13:
-        pressed = 'middle'
-    elif event == ord('w') or event == curses.KEY_UP: 
-        pressed = 'up'
-    elif event == ord('s') or event == curses.KEY_DOWN:
-        pressed = 'down'
-    elif event == ord('a') or event == curses.KEY_LEFT:
-        pressed = 'left'
-    elif event == ord('d') or event == curses.KEY_RIGHT:
-        pressed = 'right'
-    #elif middlebutton == False:
-    #    pressed = 'middle'
-    buttontime = time.time()
-    holdbutton = pressed
+    if buttonpressed == False:
+        if event == 27:
+            pressed = 'quit'
+        elif event == curses.KEY_ENTER or event == 10 or event == 13 or readbus == 247:
+            pressed = 'middle'
+        elif event == ord('w') or event == curses.KEY_UP or readbus == 191: 
+            pressed = 'up'
+        elif event == ord('s') or event == curses.KEY_DOWN or readbus == 254:
+            pressed = 'down'
+        elif event == ord('a') or event == curses.KEY_LEFT or readbus == 239:
+            pressed = 'left'
+        elif event == ord('d') or event == curses.KEY_RIGHT or readbus == 251:
+            pressed = 'right'
+        buttonpressed = True
+        buttontime = time.time()
+        holdbutton = pressed
+    if readbus == 255:
+        buttonpressed = False
     if float(time.time() - buttontime) > 1.0 and buttonpressed == True:
         pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
@@ -1111,8 +1121,8 @@ def main():
                         time.sleep(0.1)
                     recording = True
                     #camera.led = True
-                    #camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
-                    camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=16)
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
+                    #camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=16)
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
                     starttime = time.time()
                     #camera.wait_recording(10)
@@ -1128,8 +1138,8 @@ def main():
                     showrec = ''
                     vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                     thefile = foldername + filename 
-                    writemessage('Copying video file...')
-                    os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
+                    #writemessage('Copying video file...')
+                    #os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
                     compileshot(foldername + filename)
                     audiodelay(foldername,filename)
                     try:
@@ -1467,7 +1477,7 @@ def main():
                 writemenu(menu,settings,selected,header)
                 #writemessage(pressed)
                 rendermenu = False
-            time.sleep(0.02)
+            time.sleep(0.05)
 if __name__ == '__main__':
     import sys
     try:

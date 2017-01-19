@@ -109,7 +109,7 @@ int main(void)
 
    graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 1);
 
-   uint32_t text_size = 22;
+   uint32_t text_size = 20;
    char text[63];
    char text2[63];
    char text3[63];
