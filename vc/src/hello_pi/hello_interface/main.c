@@ -72,7 +72,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(60,60,100,0xff), /* fg */
+                                     GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 74, text_size);
       }
@@ -136,6 +136,8 @@ int main(void)
    int len_string_more4;
    int len_string_more5;
    int len_string_more6;
+   int count = 120;
+   char seleold;
    char text[80];
    char text2[4];
    char header[100];
@@ -269,8 +271,6 @@ int main(void)
           int space = 10;
           int morespace = 15;
           int color;
-          int count;
-          char seleold;
           if (seleold != selected){
               count = 0;
               }
@@ -288,10 +288,42 @@ int main(void)
           render_subtitle(img, text, text_size, 0, y_offset, 4);
           if(strlen(header) != 0) {
           render_subtitle(img, header, text_size, 0, y_offset2, 5);
-          render_subtitle(img, film, text_size, 0, y_offset3, 5);
-          render_subtitle(img, scene, text_size, len_string_film * 12, y_offset3, 5);
-          render_subtitle(img, shot, text_size, len_string_film * 12 + len_string_scene * 12, y_offset3, 5);
-          render_subtitle(img, take, text_size, len_string_film * 12 + len_string_scene * 12 + len_string_shot * 12, y_offset3, 5);
+          if(selected == 0){
+          render_subtitle(img, film, text_size, 0, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, film, text_size, 0, y_offset3, color);
+          }
+          if(selected == 1){
+          render_subtitle(img, scene, text_size, len_string_film * space + morespace, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, scene, text_size, len_string_film * space + morespace, y_offset3, color);
+          }
+          if(selected == 2){
+          render_subtitle(img, shot, text_size, len_string_film * space + len_string_scene * space + morespace * 2, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, shot, text_size, len_string_film * space + len_string_scene * space + morespace * 2, y_offset3, color);
+          }
+          if(selected == 3){
+          render_subtitle(img, take, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + morespace * 3, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, take, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + morespace * 3, y_offset3, color);
+          }
+          if(selected == 5){
+          render_subtitle(img, shutter, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + len_string_take * space + morespace * 4, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, shutter, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + len_string_take * space + morespace * 4, y_offset3, color);
+          }
+          if(selected == 6){
+          render_subtitle(img, iso, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + len_string_take * space + len_string_shutter * space + morespace * 5, y_offset3, 1);
+          }
+          else{
+          render_subtitle(img, iso, text_size, len_string_film * space + len_string_scene * space + len_string_shot * space + len_string_take * space + len_string_shutter * space + morespace * 5, y_offset3, color);
+          }
           }
           if(strlen(header) == 0) {
           render_subtitle(img, rec, text_size, 700, y_offset5, 2);
@@ -436,7 +468,7 @@ int main(void)
       }
       graphics_update_displayed_resource(img, 0, 0, 0, 0);
       }
-      usleep(50000);
+      usleep(100000);
    }
 
    graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 0);

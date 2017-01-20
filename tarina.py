@@ -115,10 +115,14 @@ def writemenu(menu,settings,selected,header):
 #------------Write to screen----------------
 
 def writemessage(message):
-    clear = 360
-    clear = clear - len(message)
+    menudone = ""
+    menudone += '000'
+    menudone += str(len(message)).zfill(3) + message
+    menudone += 'EOF'
+    #clear = 500
+    #clear = clear - len(message)
     f = open('/dev/shm/interface', 'w')
-    f.write(' ' + message + clear * ' ')
+    f.write(menudone)
     f.close()
 
 #------------Write to vumeter (last line)-----
@@ -258,7 +262,7 @@ def displayimage(camera, filename):
     try:
         img = Image.open(filename)
     except:
-        writemessage('Seems like an empty shot. Hit record!')
+        #writemessage('Seems like an empty shot. Hit record!')
         return
     camera.stop_preview()
     # Create an image padded to the required size with
