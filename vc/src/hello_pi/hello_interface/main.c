@@ -137,6 +137,9 @@ int main(void)
    int len_string_more5;
    int len_string_more6;
    int count = 120;
+   int sleeptime = 100000;
+   char check[500];
+   char oldcheck[500];
    char seleold;
    char text[80];
    char text2[4];
@@ -173,6 +176,11 @@ int main(void)
       while(fgets(text, 74, fp) != NULL);
       fclose(fp);
       FILE *fp2;
+      fp2 = fopen("/dev/shm/interface","r");
+      fgets(check, 500, fp2);
+      fclose(fp2);
+      if (strcmp(check, oldcheck) != 0){
+      strcpy(oldcheck, check);
       fp2 = fopen("/dev/shm/interface","r");
       fgets(text2, 4, fp2);
       selected = atoi(text2);
@@ -468,7 +476,10 @@ int main(void)
       }
       graphics_update_displayed_resource(img, 0, 0, 0, 0);
       }
-      usleep(100000);
+      sleeptime = 10000;
+      }
+      usleep(sleeptime);
+      sleeptime = 100000;
    }
 
    graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 0);
