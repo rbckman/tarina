@@ -1358,7 +1358,7 @@ def main():
                             os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
                         #Jessie
                         if debianversion == '8':
-                            os.system('amixer sset Mic ' + str(miclevel) + '%')
+                            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
                 elif menu[selected] == 'PHONES:':
                     if headphoneslevel < 100:
                         headphoneslevel = headphoneslevel + 2
@@ -1367,7 +1367,7 @@ def main():
                             os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
                         #Jessie
                         if debianversion == '8':
-                            os.system('amixer sset Playback ' + str(headphoneslevel) + '%')
+                            os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                     removeimage(camera, overlay)
@@ -1442,7 +1442,7 @@ def main():
                             os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
                         #Jessie
                         if debianversion == '8':
-                            os.system('amixer sset Mic ' + str(miclevel) + '%')
+                            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
                 elif menu[selected] == 'PHONES:':
                     if headphoneslevel > 0:
                         headphoneslevel = headphoneslevel - 2
@@ -1451,7 +1451,7 @@ def main():
                             os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
                         #Jessie
                         if debianversion == '8':
-                            os.system('amixer sset Playback ' + str(headphoneslevel) + '%')
+                            os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                     removeimage(camera, overlay)
