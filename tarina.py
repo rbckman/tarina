@@ -16,10 +16,14 @@ import smbus
 
 bus = smbus.SMBus(3) # Rev 2 Pi uses 1
 DEVICE = 0x20 # Device address (A0-A2)
-IODIRB = 0x0d # Pin direction register
+IODIRB = 0x0d # Pin direction register, pull-up enabled
+IODIRA = 0x0c # Pin direction register, pull-up enabled
 GPIOB  = 0x13 # Register for inputs
-bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-
+GPIOA  = 0x12 # Register for inputs 
+OLATA  = 0x14 # Register for outputs
+bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input with intern pull-up enabled
+bus.write_byte_data(DEVICE,IODIRA,0xCF) # set  gpioa to input with intern pull-up enabled
+bus.write_byte_data(DEVICE,OLATA,0x20)
 #GPIO.setmode(GPIO.BCM)
 #GPIO.setup(1, GPIO.OUT)
 #GPIO.setup(18, GPIO.OUT)
@@ -157,7 +161,7 @@ def countlast(filmname, filmfolder):
         if 'shot' in a:
             shots = shots + 1
     try:
-        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3) + '/shot' + str(shots).zfill(3))
+        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3) + '/shot' + str(shot).zfill(3))
     except:
         allfiles = []
         takes = 0
@@ -249,7 +253,7 @@ def renderthumbnails(filmname, filmfolder):
             for s in xrange(shots):
                 takes = counttakes(filmname, filmfolder, n + 1, s + 1)
                 for p in xrange(takes):
-                    folder = filmfolder + filmname + '/' + 'scene' + str(n + 1).zfill(3) + '/shot' + str(s + 1).zfill(3) + '/'
+                    folder = filmfolder + filmname + '/' + 'scene' + str(n + 1).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                     filename = 'scene' + str(n + 1).zfill(3) + '_shot' + str(s + 1).zfill(3) + '_take' + str(p + 1).zfill(3)
                     os.system('avconv -i ' + folder + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
                     #os.system('avconv -i ' + folder + filename  + '.h264 -ss 00:00:01 -vframe 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
@@ -290,6 +294,7 @@ def removeimage(camera, overlay):
         camera.remove_overlay(overlay)
         overlay = None
         camera.start_preview()
+        return overlay
 
 #-------------Browse2.0------------------
 
@@ -624,8 +629,8 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                         os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                         scene = scene - 1
                     if scene == 1:
-                        os.system('rm -r ' + foldername + '/shot*')
-                        os.system('mkdir ' + foldername + '/shot001')
+                        os.system('rm -r ' + foldername)
+                        os.system('mkdir ' + foldername)
                         os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                     shot = countshots(filmname, filmfolder, scene)
                     take = counttakes(filmname, filmfolder, scene, shot)
@@ -671,12 +676,12 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
                 #time.sleep(2)
                 #if takes > 0:
                     #shots = shots + 1
-                    #os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shots).zfill(3))
+                    #os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
                 shot = shot + 1
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes == 0:
                     takes = 1
-                os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+                os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/')
                 writemessage('Congratz!')
                 time.sleep(0.2)
                 return scene, shot, takes, thefile, renderedshots, renderfullscene
@@ -927,17 +932,20 @@ def buzzer(beeps):
     while beeps > 1:
         buzzerdelay = 0.0001
         for _ in xrange(buzzerrepetitions):
-            for value in [True, False]:
-                GPIO.output(1, value)
+            for value in [0x20, 0x30]:
+                #GPIO.output(1, value)
+                bus.write_byte_data(DEVICE,OLATA,value)
                 time.sleep(buzzerdelay)
         time.sleep(pausetime)
         beeps = beeps - 1
     buzzerdelay = 0.0001
     for _ in xrange(buzzerrepetitions * 10):
-        for value in [True, False]:
-            GPIO.output(1, value)
+        for value in [0x20, 0x30]:
+            #GPIO.output(1, value)
+            bus.write_byte_data(DEVICE,OLATA,value)
             buzzerdelay = buzzerdelay - 0.00000004
             time.sleep(buzzerdelay)
+    bus.write_byte_data(DEVICE,OLATA,0x20)
 
 #-------------Check if file empty----------
 
@@ -954,6 +962,7 @@ def empty(filename):
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
     readbus = bus.read_byte_data(DEVICE,GPIOB)
+    readbus2 = bus.read_byte_data(DEVICE,GPIOA)
     pressed = ''
     #middlebutton = GPIO.input(22)
     #upbutton = GPIO.input(12)
@@ -976,8 +985,10 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         elif event == ord('e') or readbus == 127:
             pressed = 'record'
         elif event == ord('c') or readbus == 253:
-            pressed = 'view'
+            pressed = 'retake'
         elif event == ord('q') or readbus == 223:
+            pressed = 'view'
+        elif event == ord('z') or readbus2 == 206:
             pressed = 'delete'
         buttonpressed = True
         buttontime = time.time()
@@ -992,16 +1003,63 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
 
 def main():
     filmfolder = "/home/pi/Videos/"
-    filename = "ninjacam"
     if os.path.isdir(filmfolder) == False:
         os.system('mkdir ' + filmfolder)
     tarinafolder = os.getcwd()
+
+    #MENUS
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'MODE'
+    actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
+
+    #STANDARD VALUES
+    global screen
+    selectedaction = 0
+    selected = 0
+    awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
+    awbx = 0
+    awb_lock = 'no'
+    headphoneslevel = 50
+    miclevel = 50
+    recording = False
+    retake = False
+    rendermenu = True
+    overlay = None
+    reclenght = 0
+    t = 0
+    rectime = ''
+    scene = 1
+    shot = 1
+    take = 1
+    filmname = ''
+    thefile = ''
+    beeps = 0
+    flip = 'no'
+    renderedshots = 0
+    renderfullscene = False
+    backlight = True
+    filmnames = os.listdir(filmfolder)
+    buttontime = time.time()
+    pressed = ''
+    buttonpressed = False
+    holdbutton = ''
+
+    #VERSION
+    f = open(tarinafolder + '/VERSION')
+    tarinaversion = f.readline()
+    tarinavername = f.readline()
+
+    f = open('/etc/debian_version')
+    debianversion = f.readlines()[0][0]
+
+    #COUNT DISKSPACE
+    disk = os.statvfs(filmfolder)
+    diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
+
     #COUNT FILM FILES
     files = os.listdir(filmfolder)
     filename_count = len(files)
 
     #START CURSES
-    global screen
     screen = curses.initscr()
     curses.cbreak(1)
     screen.keypad(1)
@@ -1013,6 +1071,7 @@ def main():
 
         #START PREVIEW
         camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698
+        camera.framerate = 24.999
         camera.crop       = (0, 0, 1.0, 1.0)
         camera.led = False
         time.sleep(1)
@@ -1022,54 +1081,6 @@ def main():
         #START fbcp AND dispmax hello interface hack
         #call ([tarinafolder + '/fbcp &'], shell = True)
         call (['./startinterface.sh &'], shell = True)
-
-        #MENUS
-        menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'MODE'
-        actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
-        
-        #STANDARD VALUES
-        selectedaction = 0
-        selected = 0
-        camera.framerate = 24.999
-        awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
-        awbx = 0
-        awb_lock = 'no'
-        headphoneslevel = 50
-        miclevel = 50
-        recording = False
-        retake = False
-        rendermenu = True
-        overlay = None
-        reclenght = 0
-        t = 0
-        rectime = ''
-        scene = 1
-        shot = 1
-        take = 1
-        filmname = ''
-        thefile = ''
-        beeps = 0
-        flip = 'no'
-        renderedshots = 0
-        renderfullscene = False
-        backlight = True
-        filmnames = os.listdir(filmfolder)
-        buttontime = time.time()
-        pressed = ''
-        buttonpressed = False
-        holdbutton = ''
-
-        #VERSION
-        f = open(tarinafolder + '/VERSION')
-        tarinaversion = f.readline()
-        tarinavername = f.readline()
-
-        f = open('/etc/debian_version')
-        debianversion = f.readlines()[0][0]
-
-        #COUNT DISKSPACE
-        disk = os.statvfs(filmfolder)
-        diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
 
         #LOAD FILM AND SCENE SETTINGS
         try:
@@ -1138,14 +1149,23 @@ def main():
                     backlight = True
 
             #RECORD AND PAUSE
-            elif pressed == 'record' or reclenght != 0 and t > reclenght or t > 800:
-                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
-                os.system('mkdir -p ' + foldername)
-                if recording == False and empty(foldername + filename) == False: 
+            elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
+                overlay = removeimage(camera, overlay)
+                if recording == False: 
                     if beeps > 0:
                         buzzer(beeps)
                         time.sleep(0.1)
+                    if pressed == 'record':
+                        takes = counttakes(filmname, filmfolder, scene, shot)
+                        if takes > 0:
+                            shot = countshots(filmname, filmfolder, scene) + 1
+                            take = 1
+                    if pressed == 'retake':
+                        take = counttakes(filmname, filmfolder, scene, shot)
+                        take = take + 1
+                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                    os.system('mkdir -p ' + foldername)
                     recording = True
                     #camera.led = True
                     camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
@@ -1178,7 +1198,7 @@ def main():
                     #render thumbnail
                     os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
-                    scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
+                    #scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #TIMELAPSE
@@ -1205,7 +1225,7 @@ def main():
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
                         removeimage(camera, overlay)
-                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                         filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                         #viewshot(filmfolder, filmname, foldername, filename)
                         compileshot(foldername + filename)
@@ -1370,17 +1390,17 @@ def main():
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':
@@ -1430,7 +1450,7 @@ def main():
                         camera.vflip = True
                         flip = 'yes'
                         time.sleep(0.2)
-                elif menu[selected] == 'LENGHT:':
+                elif menu[selected] == 'LENGTH:':
                     if reclenght > 0:
                         reclenght = reclenght - 1
                         time.sleep(0.1)
@@ -1454,17 +1474,17 @@ def main():
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
-                    removeimage(camera, overlay)
+                    overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':

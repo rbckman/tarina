@@ -36,6 +36,7 @@ hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3
 dtoverlay=vga666 
 dtoverlay=pi3-disable-bt-overlay
+dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 EOF
 
 while true; do
