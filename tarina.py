@@ -1000,7 +1000,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         holdbutton = pressed
     if readbus == 255:
         buttonpressed = False
-    if float(time.time() - buttontime) > 0.5 and buttonpressed == True:
+    if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
         pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
 
@@ -1526,7 +1526,7 @@ def main():
                 writemenu(menu,settings,selected,header)
                 #writemessage(pressed)
                 rendermenu = False
-            time.sleep(0.05)
+            time.sleep(0.0555)
 if __name__ == '__main__':
     import sys
     try:
