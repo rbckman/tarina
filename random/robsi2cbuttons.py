@@ -10,14 +10,16 @@ bus = smbus.SMBus(3) # Rev 2 Pi uses 1
 
 DEVICE = 0x20 # Device address (A0-A2)
 IODIRB = 0x0d # Pin pullups B-side
-IODIRA = 0x0c # Pin pullups B-side
+IODIRA = 0x00 # Pin pullups A-side 0x0c
+IODIRApullup = 0x0c # Pin pullups A-side 0x0c
 GPIOB  = 0x13 # Register B-side for inputs
 GPIOA  = 0x12 # Register A-side for inputs
 OLATA  = 0x14 # Register for outputs
 
 bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-bus.write_byte_data(DEVICE,IODIRA,0xCF) # set two inputs and two outputs 
-bus.write_byte_data(DEVICE,OLATA,0x20)
+bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
+bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
+bus.write_byte_data(DEVICE,OLATA,0x4)
 
 # Loop until user presses CTRL-C
 while True:
@@ -40,16 +42,17 @@ while True:
         print "leftdown"
     elif readbus == 127:
         print "rightdown"
-    elif readbus2 == 236:
+    elif readbus2 == 244:
         print "remove"
-    elif readbus2 == 231:
+    elif readbus2 == 247:
         print "shutdown"
-        bus.write_byte_data(DEVICE,OLATA,0x0)
+        bus.write_byte_data(DEVICE,OLATA,0)
         os.system('sudo shutdown -h now')
         time.sleep(15)
     print readbus
     print readbus2
-    bus.write_byte_data(DEVICE,OLATA,0x30)
-    time.sleep(0.001)
+    bus.write_byte_data(DEVICE,OLATA,0xC)
+    time.sleep(1)
     os.system('clear')
-    bus.write_byte_data(DEVICE,OLATA,0x20)
+    bus.write_byte_data(DEVICE,OLATA,0x4)
+    time.sleep(1)
