@@ -1000,7 +1000,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         holdbutton = pressed
     if readbus == 255:
         buttonpressed = False
-    if float(time.time() - buttontime) > 1.0 and buttonpressed == True:
+    if float(time.time() - buttontime) > 0.5 and buttonpressed == True:
         pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
 
