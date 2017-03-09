@@ -1151,11 +1151,12 @@ def main():
                     backlight = True
 
             #SHUTDOWN
-            elif pressed == 'shutdown':
-                time.sleep(0.1)
-                if recording == False and holdbutton == 'shutdown':
-                    writemessage('Hold down 2s to shutdown')
-                    if buttontime > 2.1:
+            elif pressed == 'shutdown' and recording == False:
+                shutdownbutton = time.time()
+                while pressed == 'shutdown':
+                    pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    writemessage('Hold down 3 seconds to shutdown')
+                    if float(time.time() - shutdownbutton) > 3.15:
                         bus.write_byte_data(DEVICE,OLATA,0)
                         os.system('shutdown -h now')
 
