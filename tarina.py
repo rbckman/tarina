@@ -1153,7 +1153,7 @@ def main():
             #SHUTDOWN
             elif pressed == 'shutdown':
                 time.sleep(0.1)
-                if recording == False:
+                if recording == False and holdbutton == 'shutdown':
                     writemessage('Hold down 2s to shutdown')
                     if buttontime > 2.1:
                         bus.write_byte_data(DEVICE,OLATA,0)
