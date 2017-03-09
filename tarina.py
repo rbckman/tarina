@@ -995,7 +995,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         buttonpressed = True
         buttontime = time.time()
         holdbutton = pressed
-    if readbus == 255:
+    if readbus == 255 and readbus2 == 245:
         buttonpressed = False
     if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
         pressed = holdbutton
@@ -1154,8 +1154,10 @@ def main():
             elif pressed == 'shutdown':
                 time.sleep(0.1)
                 if recording == False:
-                    bus.write_byte_data(DEVICE,OLATA,0)
-                    os.system('shutdown -h now')
+                    writemessage('Hold down 2s to shutdown')
+                    if buttontime > 2.1:
+                        bus.write_byte_data(DEVICE,OLATA,0)
+                        os.system('shutdown -h now')
 
             #RECORD AND PAUSE
             elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
