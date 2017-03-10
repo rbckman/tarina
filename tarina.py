@@ -357,14 +357,15 @@ def update(tarinaversion, tarinavername):
     time.sleep(2)
     writemessage('Checking for updates...')
     try:
-        os.system('wget http://tarina.org/src/tarina/VERSION -P /tmp/VERSION')
-        f = open('/tmp/VERSION')
-        versionnumber = f.readline()
-        versionname = f.readline()
-        os.system('rm /tmp/VERSION*')
+        os.system('wget http://tarina.org/src/VERSION -P /tmp/VERSION')
     except:
         writemessage('Sorry buddy, no internet connection')
+        time.sleep(2)
         return tarinaversion, tarinavername
+    f = open('/tmp/VERSION')
+    versionnumber = f.readline()
+    versionname = f.readline()
+    os.system('rm /tmp/VERSION*')
     if float(tarinaversion) < float(versionnumber):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
