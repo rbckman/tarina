@@ -1152,7 +1152,9 @@ def main():
 
             #SHUTDOWN
             elif pressed == 'shutdown' and recording == False:
+                writemessage('Hold down 3 seconds to shutdown')
                 shutdownbutton = time.time()
+                time.sleep(1)
                 while pressed == 'shutdown':
                     pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     writemessage('Hold down 3 seconds to shutdown')
