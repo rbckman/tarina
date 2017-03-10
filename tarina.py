@@ -1234,7 +1234,8 @@ def main():
                 savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PLAY
-            elif pressed == 'view' and menu[selected] == 'SHOT:' or pressed == 'view' and menu[selected] == 'TAKE:':
+            #elif pressed == 'view' and menu[selected] == 'SHOT:' or pressed == 'view' and menu[selected] == 'TAKE:':
+            elif pressed == 'view' and menu[selected] != 'SCENE:' or pressed == 'view' and menu[selected] == 'FILM:':
                 if recording == False:
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
