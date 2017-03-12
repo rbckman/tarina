@@ -993,13 +993,14 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'delete'
         elif readbus2 == 247:
             pressed = 'shutdown'
-        buttonpressed = True
         buttontime = time.time()
         holdbutton = pressed
+        buttonpressed = True
     if readbus == 255 and readbus2 == 245:
         buttonpressed = False
     if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
-        pressed = holdbutton
+        if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left':
+            pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
 
 #-------------Start main--------------
@@ -1181,14 +1182,14 @@ def main():
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
                     os.system('mkdir -p ' + foldername)
-                    recording = True
                     #camera.led = True
                     camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
                     #camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=16)
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
                     starttime = time.time()
+                    recording = True
                     #camera.wait_recording(10)
-                elif recording == True:
+                elif recording == True and float(time.time() - starttime) > 0.2:
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                     recording = False
