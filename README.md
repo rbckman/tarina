@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/rbckman/tarina/master/tarina-proto3.png" width="30%">
+<img src="https://raw.githubusercontent.com/rbckman/tarina/master/tarina-proto3.png" width="100%">
 # Tarina #
 ### DIY camera for filmmakers, vloggers, travellers & hackers ###
 Shoot your films as takes, shots and scenes, and see your film come together in-camera. Once you get it there’s no need for editing later. Tarina is designed to be taken apart & is easily modded with all body parts 3d printable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an easy python coded interface.
