@@ -39,7 +39,7 @@ You'r ready to rumble (run as sudo):
 ```
 sudo python tarina.py
 ```
-## Couldn't have been done without##
+## Couldn't have been done without ##
 
 Raspberry Pi
 http://raspberrypi.org
