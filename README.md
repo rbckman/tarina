@@ -41,6 +41,8 @@ sudo python tarina.py
 ```
 ## Couldn't have been done without ##
 
+Gnu/Linux/Debian 
+
 Raspberry Pi
 http://raspberrypi.org
 
