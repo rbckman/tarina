@@ -472,24 +472,30 @@ def nameyourfilm():
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,timelapsefolder,thefile):
+def timelapse(beeps,camera,foldername,filename,tarinafolder):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
-    seconds = 1
+    between = 1
+    duration = 1
     selected = 0
-    header = 'Adjust how many seconds between frames'
-    menu = 'TIME:', '', ''
+    header = 'Adjust how many seconds between and filming'
+    menu = 'BETWEEN:', 'DURATION:', 'START', 'BACK'
     while True:
-        settings = str(seconds), 'START', 'BACK'
+        settings = str(between), str(duration), '', ''
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'up' and selected == 0:
-            seconds = seconds + 0.1
-        if pressed == 'down' and selected == 0:
-            if seconds > 0.2:
-                seconds = seconds - 0.1
+        if pressed == 'up' and menu[selected] == 'BETWEEN:':
+            between = between + 0.1
+        if pressed == 'down' and menu[selected] == 'BETWEEN:':
+            if between > 0.2:
+                between = between - 0.1
+        if pressed == 'up' and menu[selected] == 'DURATION:':
+            duration = duration + 0.1
+        if pressed == 'down' and menu[selected] == 'DURATION:':
+            if duration > 0.2:
+                duration = duration - 0.1
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -497,25 +503,53 @@ def timelapse(beeps,camera,timelapsefolder,thefile):
             if selected > 0:
                 selected = selected - 1
         if pressed == 'middle':
-            if selected == 1:
+            if menu[selected] == 'START':
+                os.system('mkdir -p ' + foldername + 'timelapse')
+                time.sleep(0.02)
                 writemessage('Recording timelapse, middlebutton to stop')
-                os.system('mkdir ' + timelapsefolder)
-                for filename in camera.capture_continuous(timelapsefolder + '/img{counter:03d}.jpg'):
-                    camera.led = False
-                    i = 0
-                    while i < seconds:
-                        i = i + 0.1
-                        time.sleep(0.1)
-                        middlebutton = GPIO.input(5)
-                        if middlebutton == False:
-                            break
-                    if middlebutton == False:
-                        break
-                    camera.led = True
-                writemessage('Compiling timelapse')
-                os.system('avconv -y -framerate 25 -i ' + timelapsefolder + '/img%03d.jpg -c:v libx264 -level 40 -crf 24 ' + thefile + '.h264')
-                return thefile
-            if selected == 2:
+                n = 1
+                recording = False
+                starttime = time.time()
+                t = 0
+                files = []
+                while True:
+                    t = time.time() - starttime
+                    pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    if recording == False and t > between:
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=20)
+                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
+                        files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
+                        starttime = time.time()
+                        recording = True
+                        n = n + 1
+                        t = 0
+                    if recording == True:
+                        writemessage('Recording timelapse ' + str(n) + ' ' + 'time:' + str(round(t,2)))
+                    if recording == False:
+                        writemessage('Between timelapse ' + str(n) + ' ' + 'time:' + str(round(t,2)))
+                    if t > duration and recording == True:
+                        os.system('pkill arecord')
+                        camera.stop_recording()
+                        recording = False
+                        starttime = time.time()
+                        t = 0
+                    if pressed == 'middle':
+                        if recording == True:
+                            os.system('pkill arecord')
+                            camera.stop_recording()
+                        writemessage('Compiling timelapse')
+                        n = 1
+                        for f in files:
+                            compileshot(f)
+                            audiodelay(foldername + 'timelapse/', filename + '_' + str(n).zfill(3))
+                            n = n + 1
+                        renderfilename = foldername + filename
+                        timelapsedone = render(files,renderfilename)
+                        #cleanup
+                        os.system('rm -r ' + foldername + 'timelapse')
+                        return timelapsedone
+                    time.sleep(0.0555)
+            if menu[selected] == 'BACK':
                 return ''
         time.sleep(0.02)
 
@@ -702,14 +736,14 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
             elif selected == 4:
                 filmfiles = renderlist(filmname, filmfolder, scene)
                 renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
+                playfile = render(filmfiles, renderfilename)
                 playthis(playfile, camera)
             #VIEWFILM
             elif selected == 5:
                 renderfullscene = True
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
-                renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename)
+                playfile = render(filmfiles, renderfilename)
                 playthis(playfile, camera)
         time.sleep(0.02)
                 
@@ -718,7 +752,7 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
 def compileshot(filename):
     #Check if file already converted
     if os.path.isfile(filename + '.mp4'):
-        writemessage('Compiling to playable')
+        writemessage('Already playable')
         return
     else:
         writemessage('Converting to playable video')
@@ -729,7 +763,7 @@ def compileshot(filename):
 
 #-------------Render-------(rename to compile or render)-----
 
-def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, filename, tarinafolder):
+def render(filmfiles, filename):
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     time.sleep(2)
@@ -773,7 +807,7 @@ def render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, fi
     else:
         writemessage('No audio files found! View INSTALL file for instructions.')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
-    return renderedshots, renderfullscene, filename
+    return filename
 
 #---------------Play------------------------
 
@@ -849,7 +883,11 @@ def audiodelay(foldername, filename):
     pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
     videolenght = pipe.read()
     pipe = subprocess.Popen('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True, stdout=subprocess.PIPE).stdout
-    audiolenght = pipe.read() 
+    audiolenght = pipe.read()
+    print('audio is:' + audiolenght)
+    if not audiolenght.strip():
+        print('jep jep')
+        audiolenght = 0
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
     audioms = int(audiolenght) % 1000
@@ -1012,7 +1050,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'MODE'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'TIMELAPSE'
     actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
 
     #STANDARD VALUES
@@ -1218,13 +1256,21 @@ def main():
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #TIMELAPSE
-            elif pressed == 'middle' and selectedaction == 77:
-                thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
-                timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
-                thefile = timelapse(beeps,camera,timelapsefolder,thefile)
-                if thefile != '':
-                    scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+            elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
+                overlay = removeimage(camera, overlay)
+                if recording == False: 
+                    takes = counttakes(filmname, filmfolder, scene, shot)
+                    if takes > 0:
+                        shot = countshots(filmname, filmfolder, scene) + 1
+                        take = 1
+                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                    thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
+                    if thefile != '':
+                        scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
+                        #render thumbnail
+                        os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')
+                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PHOTOBOOTH
             elif pressed == 'middle' and selectedaction == 8:
@@ -1258,7 +1304,7 @@ def main():
                 if recording == False:
                     filmfiles = renderlist(filmname, filmfolder, scene)
                     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                    renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
+                    playfile = render(filmfiles, renderfilename)
                     playthis(playfile, camera)
 
             #VIEW FILM
@@ -1267,7 +1313,7 @@ def main():
                     renderfullscene = True
                     filmfiles = viewfilm(filmfolder, filmname)
                     renderfilename = filmfolder + filmname + '/' + filmname
-                    renderedshots, renderfullscene, playfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
+                    playfile = render(filmfiles, renderfilename)
                     playthis(playfile, camera)
 
             #COPY TO USB
@@ -1308,7 +1354,7 @@ def main():
                     renderfullscene = True
                     filmfiles = viewfilm(filmfolder, filmname)
                     renderfilename = filmfolder + filmname + '/' + filmname
-                    renderedshots, renderfullscene, uploadfile = render(scene, shot, filmfolder, filmname, renderedshots, renderfullscene, filmfiles, renderfilename, tarinafolder)
+                    uploadfile = render(filmfiles, renderfilename)
                     uploadfilm(uploadfile, filmname)
                     selectedaction = 0
 
