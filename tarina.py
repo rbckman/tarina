@@ -477,6 +477,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
+    sound = False
     between = 1
     duration = 1
     selected = 0
@@ -488,21 +489,26 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'up' and menu[selected] == 'BETWEEN:':
             between = between + 0.1
-        if pressed == 'down' and menu[selected] == 'BETWEEN:':
+        elif pressed == 'down' and menu[selected] == 'BETWEEN:':
             if between > 0.2:
                 between = between - 0.1
-        if pressed == 'up' and menu[selected] == 'DURATION:':
+        elif pressed == 'up' and menu[selected] == 'DURATION:':
             duration = duration + 0.1
-        if pressed == 'down' and menu[selected] == 'DURATION:':
+        elif pressed == 'down' and menu[selected] == 'DURATION:':
             if duration > 0.2:
                 duration = duration - 0.1
-        if pressed == 'right':
+        elif pressed == 'up' or pressed == 'down' and menu[selected] == 'SOUND:':
+            if sound == False:
+                sound == True
+            if sound == True:
+                sound == False
+        elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
-        if pressed == 'left':
+        elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        if pressed == 'middle':
+        elif pressed == 'middle':
             if menu[selected] == 'START':
                 os.system('mkdir -p ' + foldername + 'timelapse')
                 time.sleep(0.02)
@@ -517,7 +523,8 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                     pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     if recording == False and t > between:
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=20)
-                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
+                        if sound == True:
+                            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
                         starttime = time.time()
                         recording = True
@@ -538,16 +545,47 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                             os.system('pkill arecord')
                             camera.stop_recording()
                         writemessage('Compiling timelapse')
-                        n = 1
-                        for f in files:
-                            compileshot(f)
-                            audiodelay(foldername + 'timelapse/', filename + '_' + str(n).zfill(3))
-                            n = n + 1
+                        print('Hold on, rendering ' + str(len(files)) + ' files')
+                        #RENDER VIDEO
                         renderfilename = foldername + filename
-                        timelapsedone = render(files,renderfilename)
+                        n = 1
+                        videomerge = ['MP4Box']
+                        videomerge.append('-force-cat')
+                        for f in files:
+                            if sound == True:
+                                compileshot(f)
+                                audiodelay(foldername + 'timelapse/', filename + '_' + str(n).zfill(3))
+                            else:
+                                videomerge.append('-cat')
+                                videomerge.append(f + '.h264')
+                            n = n + 1                            
+                        videomerge.append('-new')
+                        videomerge.append(renderfilename + '.h264')
+                        call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
+                        ##RENDER AUDIO
+                        if sound == True:
+                            writemessage('Rendering sound')
+                            audiomerge = ['sox']
+                            #if render > 2:
+                            #    audiomerge.append(filename + '.wav')
+                            for f in files:
+                                audiomerge.append(f + '.wav')
+                            audiomerge.append(renderfilename + '.wav')
+                            call(audiomerge, shell=False)
+                        ##CONVERT AUDIO IF WAV FILES FOUND
+                        if sound == False:
+                            audiosilence(foldername,filename)
+                        if os.path.isfile(renderfilename + '.wav'):
+                            call(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', renderfilename + '.mp3'], shell=False)
+                            ##MERGE AUDIO & VIDEO
+                            writemessage('Merging audio & video')
+                            call(['MP4Box', '-add', renderfilename + '.h264', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+                        else:
+                            writemessage('No audio files found! View INSTALL file for instructions.')
+                        #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
                         #cleanup
                         os.system('rm -r ' + foldername + 'timelapse')
-                        return timelapsedone
+                        return renderfilename
                     time.sleep(0.0555)
             if menu[selected] == 'BACK':
                 return ''
@@ -884,6 +922,7 @@ def audiodelay(foldername, filename):
     videolenght = pipe.read()
     pipe = subprocess.Popen('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True, stdout=subprocess.PIPE).stdout
     audiolenght = pipe.read()
+    #if there is no audio lenght
     print('audio is:' + audiolenght)
     if not audiolenght.strip():
         print('jep jep')
@@ -914,6 +953,20 @@ def audiodelay(foldername, filename):
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
 
+#--------------Audiosilence--------------------
+# make an empty audio file as long as a video file
+
+def audiosilence(foldername,filename):
+    writemessage('Creating audiosilence..')
+    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.h264', shell=True, stdout=subprocess.PIPE).stdout
+    videolenght = pipe.read()
+    #separate seconds and milliseconds
+    videoms = int(videolenght) % 1000
+    videos = int(videolenght) / 1000
+    print('Videofile is: ' + str(videos) + 's ' + str(videoms))
+    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos) + '.' + str(videoms).zfill(3))
+    os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav')
+    os.system('rm /dev/shm/' + filename + '.wav')
 
 #--------------Copy to USB-------------------
 
