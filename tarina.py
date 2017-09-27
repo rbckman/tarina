@@ -392,31 +392,29 @@ def loadfilm(filmname, filmfolder):
     holdbutton = ''
     films = os.walk(filmfolder).next()[1]
     films.sort()
-    settings = [''] * len(films)
-    firstslice = 0
-    secondslice = 14
+    filmstotal = len(films[1:])
+    selectedfilm = 0
     selected = 0
-    header = 'Select and load film'
+    header = 'Up and down to select and load film'
+    menu = 'FILM:', 'BACK'
     while True:
-        writemenu(films[firstslice:secondslice],settings,selected,header)
+        settings = films[selectedfilm], ''
+        writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
-            firstslice = firstslice + 14
-            secondslice = secondslice + 14
-            selected = 0
+            if selectedfilm < filmstotal:
+                selectedfilm = selectedfilm + 1
         elif pressed == 'up':
-            if firstslice > 0:
-                firstslice = firstslice - 14
-                secondslice = secondslice - 14
-                selected = 0
+            if selectedfilm > 0:
+                selectedfilm = selectedfilm - 1
         elif pressed == 'right':
-            if selected < 13:
+            if selected < (len(settings) - 1):
                 selected = selected + 1
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif pressed == 'middle':
-            filmname = (films[firstslice + selected])
+        elif pressed == 'middle' and menu[selected] == 'FILM:':
+            filmname = films[selectedfilm]
             #scene = len(os.walk(filmfolder + filmname).next()[1])
             scene, shot, take = countlast(filmname, filmfolder)
             #writemessage(filmfolder + filmname + ' scenes ' + str(scene))
@@ -430,6 +428,10 @@ def loadfilm(filmname, filmfolder):
                 time.sleep(2)
             else:
                 return scenesettings
+        elif pressed == 'middle' and menu[selected] == 'BACK':
+            writemessage('Returning')
+            time.sleep(1)
+            return
         time.sleep(0.02)
 
 
@@ -1165,7 +1167,7 @@ def main():
     with picamera.PiCamera() as camera:
 
         #START PREVIEW
-        camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698
+        camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
         camera.framerate = 24.999
         camera.crop       = (0, 0, 1.0, 1.0)
         camera.led = False
@@ -1527,6 +1529,11 @@ def main():
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) < 7.98:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
+                elif menu[selected] == 'FILM:':
+                    newfilmsettings = loadfilm(filename,filmfolder)
+                    if newfilmsettings != None:
+                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
+                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #LEFT
             elif pressed == 'left':
@@ -1611,6 +1618,11 @@ def main():
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) > 0.02:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
+                elif menu[selected] == 'FILM:':
+                    newfilmsettings = loadfilm(filename,filmfolder)
+                    if newfilmsettings != None:
+                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
+                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #RIGHT
             elif pressed == 'right':
