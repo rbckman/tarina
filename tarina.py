@@ -442,23 +442,23 @@ def nameyourfilm():
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
-    abc = 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
+    abc = 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z', '_'
     abcx = 0
     name = ''
     thefuck = ''
     while True:
-        message = 'Name Your Film: ' + name + abc[abcx]
-        spaces = 55 - len(message)
+        message = 'Film name: ' + name + abc[abcx]
+        spaces = 27 - len(message)
         writemessage(message + (spaces * ' ') + thefuck)
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'up':
+        if pressed == 'down':
             if abcx < (len(abc) - 1):
                 abcx = abcx + 1
-        elif pressed == 'down':
+        elif pressed == 'up':
             if abcx > 0:
                 abcx = abcx - 1
         elif pressed == 'right':
-            if len(name) < 6:
+            if len(name) < 10:
                 name = name + abc[abcx]
             else:
                 thefuck = 'Yo, maximum characters reached bro!'
@@ -471,6 +471,28 @@ def nameyourfilm():
                 name = name + abc[abcx]
                 return(name)
         time.sleep(0.02)
+
+def nameyourfilmnew():
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    menu = 'New film nickname:', 'a', 'b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x'
+    selected = 1
+    name = ''
+    while True:
+        settings = name,'','','','','','','','','','','','','','','','','','','','','','','',''
+        writemenu(menu,settings,selected,'')
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
+            if selected < len(menu):
+                selected = selected + 1
+        elif pressed == 'left':
+            if selected > 1:
+                selected = selected - 1
+        elif pressed == 'middle':
+            name = name + menu[selected]
+        time.sleep(0.05)
 
 #------------Timelapse--------------------------
 
@@ -1415,9 +1437,10 @@ def main():
 
             #LOAD FILM
             elif pressed == 'middle' and menu[selected] == 'LOAD':
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = loadfilm(filmname,filmfolder)
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
-                selectedaction = 0
+                newfilmsettings = loadfilm(filename,filmfolder)
+                if newfilmsettings != None:
+                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
+                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #UPDATE
             elif pressed == 'middle' and menu[selected] == 'UPDATE':
@@ -1469,7 +1492,7 @@ def main():
                     if camera.shutter_speed < 5000:
                         camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
                     else:
-                        camera.shutter_speed = min(camera.shutter_speed + 210, 50000)
+                        camera.shutter_speed = min(camera.shutter_speed + 200, 50000)
                 elif menu[selected] == 'ISO:':
                     camera.iso = min(camera.iso + 100, 1600)
                 elif menu[selected] == 'BEEP:':
