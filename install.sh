@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install Tarina dependencies
+# Install Tarina
 
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root, use sudo "$0" instead" 1>&2

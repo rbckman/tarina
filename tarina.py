@@ -227,7 +227,7 @@ def renderlist(filmname, filmfolder, scene):
         takes = counttakes(filmname,filmfolder,scene,shot)
         if takes > 0:
             folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-            filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(takes).zfill(3)
+            filename = 'take' + str(takes).zfill(3)
             scenefiles.append(folder + filename)
         shot = shot + 1
     #writemessage(str(len(scenefiles)))
@@ -419,7 +419,7 @@ def loadfilm(filmname, filmfolder):
             scene, shot, take = countlast(filmname, filmfolder)
             #writemessage(filmfolder + filmname + ' scenes ' + str(scene))
             #time.sleep(5)
-            alltakes = renderthumbnails(filmname, filmfolder)
+            #alltakes = renderthumbnails(filmname, filmfolder)
             writemessage('This film has ' + str(alltakes) + ' takes')
             time.sleep(2)
             scenesettings = loadscenesettings(filmfolder, filmname, scene, shot)
@@ -633,7 +633,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-        filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+        filename = 'take' + str(take).zfill(3)
         #if pressed == 'up' and selected == 0:
         #    seconds = seconds + 0.1
         #if pressed == 'down' and selected == 0:
@@ -677,7 +677,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
 
 def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+    filename = 'take' + str(take).zfill(3)
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -703,14 +703,14 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 if sceneshotortake == 'take':
                     os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
-                    os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
+                    os.system('rm ' + foldername + filename + '.png')
                     take = take - 1
                     if take == 0:
                         take = take + 1
                 elif sceneshotortake == 'shot' and shot > 1:
                     writemessage('Removing shot ' + str(shot))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '*'
+                    filename = 'shot' + str(shot).zfill(3) + '*'
                     os.system('rm -r ' + foldername)
                     os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                     shot = shot - 1
@@ -1215,7 +1215,7 @@ def main():
 
         #FILE & FOLDER NAMES
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-        filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+        filename = 'take' + str(take).zfill(3)
 
         #NEW FILM (IF NOTHING TO LOAD)
         if filmname == '':
@@ -1295,7 +1295,7 @@ def main():
                         take = counttakes(filmname, filmfolder, scene, shot)
                         take = take + 1
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                    filename = 'take' + str(take).zfill(3)
                     os.system('mkdir -p ' + foldername)
                     #camera.led = True
                     camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
@@ -1327,7 +1327,7 @@ def main():
                         time.sleep(0.5)
                     #os.system('cp err.log lasterr.log')
                     #render thumbnail
-                    os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')
+                    os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                     #scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
@@ -1341,12 +1341,12 @@ def main():
                         shot = countshots(filmname, filmfolder, scene) + 1
                         take = 1
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                    filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                    filename = 'take' + str(take).zfill(3)
                     thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
                     if thefile != '':
                         scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
                         #render thumbnail
-                        os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png &')
+                        os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
                     savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
 
             #PHOTOBOOTH
@@ -1366,11 +1366,11 @@ def main():
                     if takes > 0:
                         removeimage(camera, overlay)
                         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                        filename = 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3)
+                        filename = 'take' + str(take).zfill(3)
                         #viewshot(filmfolder, filmname, foldername, filename)
                         compileshot(foldername + filename)
                         playthis(foldername + filename, camera)
-                        imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                        imagename = foldername + filename + '.png'
                         overlay = displayimage(camera, imagename)
                     else:
                         writemessage('Sorry, no last shot to view buddy!')
@@ -1532,17 +1532,17 @@ def main():
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
@@ -1621,17 +1621,17 @@ def main():
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
                     overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/.thumbnails/' + 'scene' + str(scene).zfill(3) + '_shot' + str(shot).zfill(3) + '_take' + str(take).zfill(3) + '.png'
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
