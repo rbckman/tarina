@@ -17,7 +17,7 @@ echo "changing cpu governor to performance..."
 cat <<'EOF' >> /etc/default/cpufrequtils
 GOVERNOR="performance"
 EOF
-echo "Installing rpi hd tft screen..."
+echo "Adding to /boot/config.txt"
 cp rpihdtft/dt-blob.bin /boot/
 cat <<'EOF' >> /boot/config.txt
 #Rpi-hd-tft
@@ -35,7 +35,14 @@ display_rotate=3
 dtoverlay=vga666 
 #dtoverlay=pi3-disable-bt-overlay
 dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
+disable_splash=1
 EOF
+
+echo "Adding to /boot/cmdline.txt"
+printf " consoleblank=0 logo.nologo loglevel=0 vt.global_cursor_default=0" >> /boot/cmdline.txt
+
+echo "Changing splash png"
+cp splash.png /usr/share/plymouth/themes/pix/splash.png
 
 while true; do
     read -p "do you have a usb sound card? make it default (y)es or (n)o?" yn

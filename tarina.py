@@ -1229,7 +1229,7 @@ def main():
         os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
 
         #TESTING SPACE
-        alltakes = renderthumbnails(filmname, filmfolder)
+        #alltakes = renderthumbnails(filmname, filmfolder)
         #writemessage('This film has ' + str(alltakes) + ' takes')
         #writemessage(tarinafolder)
         #time.sleep(3)
