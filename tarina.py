@@ -5,6 +5,7 @@ import picamera
 import os
 import time
 from subprocess import call
+from subprocess import Popen
 from omxplayer import OMXPlayer
 import subprocess
 import sys
@@ -39,8 +40,8 @@ bus.write_byte_data(DEVICE,OLATA,0x4)
 
 #--------------Save settings-----------------
 
-def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots
+def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm
     pickle.dump(settings, open(filmfolder + "settings.p", "wb"))
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/scene" + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + "/settings.p", "wb"))
@@ -141,6 +142,24 @@ def vumetermessage(message):
     f.write(message + clear * ' ')
     f.close()
 
+#------------Count file size-----
+
+def countvideosize(filename):
+    size = 0
+    if type(filename) is list:
+        size = 0
+        for i in filename[:]:
+            size = size + os.stat(i + '.mp4').st_size
+    if type(filename) is str:
+        size = os.stat(filename + '.mp4').st_size
+    return size
+
+def countaudiosize(filename):
+    size = 0
+    if type(filename) is str:
+        size = os.stat(filename + '.mp3').st_size
+    return size
+
 #------------Count scenes, takes and shots-----
 
 def countlast(filmname, filmfolder): 
@@ -169,7 +188,7 @@ def countlast(filmname, filmfolder):
         allfiles = []
         takes = 0
     for a in allfiles:
-        if '.h264' in a:
+        if '.mp4' in a:
             takes = takes + 1
     return scenes, shots, takes
 
@@ -197,7 +216,7 @@ def counttakes(filmname, filmfolder, scene, shot):
         allfiles = []
         return takes
     for a in allfiles:
-        if '.h264' in a:
+        if '.mp4' in a:
             takes = takes + 1
     return takes
 
@@ -258,7 +277,7 @@ def renderthumbnails(filmname, filmfolder):
                 for p in xrange(takes):
                     folder = filmfolder + filmname + '/' + 'scene' + str(n + 1).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                     filename = 'scene' + str(n + 1).zfill(3) + '_shot' + str(s + 1).zfill(3) + '_take' + str(p + 1).zfill(3)
-                    os.system('avconv -i ' + folder + filename  + '.h264 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
+                    os.system('avconv -i ' + folder + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
                     #os.system('avconv -i ' + folder + filename  + '.h264 -ss 00:00:01 -vframe 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
     return alltakes 
 
@@ -420,8 +439,8 @@ def loadfilm(filmname, filmfolder):
             #writemessage(filmfolder + filmname + ' scenes ' + str(scene))
             #time.sleep(5)
             #alltakes = renderthumbnails(filmname, filmfolder)
-            writemessage('This film has ' + str(alltakes) + ' takes')
-            time.sleep(2)
+            #writemessage('This film has ' + str(alltakes) + ' takes')
+            #time.sleep(2)
             scenesettings = loadscenesettings(filmfolder, filmname, scene, shot)
             if scenesettings == '':
                 writemessage('Could not find settings file, sorry buddy')
@@ -584,7 +603,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                                 videomerge.append(f + '.h264')
                             n = n + 1                            
                         videomerge.append('-new')
-                        videomerge.append(renderfilename + '.h264')
+                        videomerge.append(renderfilename + '.mp4')
                         call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
                         ##RENDER AUDIO
                         if sound == True:
@@ -600,10 +619,12 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                         if sound == False:
                             audiosilence(foldername,filename)
                         if os.path.isfile(renderfilename + '.wav'):
+                            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
                             call(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', renderfilename + '.mp3'], shell=False)
                             ##MERGE AUDIO & VIDEO
                             writemessage('Merging audio & video')
-                            call(['MP4Box', '-add', renderfilename + '.h264', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+                            call(['MP4Box', '-add', renderfilename + '_tmp.h264', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+                            os.system('rm ' +  renderfilename + '_tmp.mp4')
                         else:
                             writemessage('No audio files found! View INSTALL file for instructions.')
                         #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
@@ -687,7 +708,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     menu = '', ''
     settings = 'YES', 'NO'
     selected = 0
-    if os.path.exists(foldername + filename + '.h264') == False:
+    if os.path.exists(foldername + filename + '.mp4') == False:
         return scene, shot, take
     while True:
         writemenu(menu,settings,selected,header)
@@ -701,21 +722,22 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
         elif pressed == 'middle':
             if selected == 0:
                 if sceneshotortake == 'take':
-                    os.system('rm ' + foldername + filename + '.h264')
+                    #os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
                     os.system('rm ' + foldername + filename + '.png')
                     take = take - 1
                     if take == 0:
-                        take = take + 1
-                elif sceneshotortake == 'shot' and shot > 1:
+                        take = 1
+                elif sceneshotortake == 'shot' and shot > 0:
                     writemessage('Removing shot ' + str(shot))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                     filename = 'shot' + str(shot).zfill(3) + '*'
                     os.system('rm -r ' + foldername)
                     os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
-                    shot = shot - 1
                     take = counttakes(filmname, filmfolder, scene, shot)
-                    take = take + 1
+                    take = 1
+                    if shot == 0:
+                        shot = 1
                     time.sleep(1)
                 elif sceneshotortake == 'scene':
                     writemessage('Removing scene ' + str(scene))
@@ -729,9 +751,11 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                         os.system('rm -r ' + foldername)
                         os.system('mkdir ' + foldername)
                         os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
-                    shot = countshots(filmname, filmfolder, scene)
-                    take = counttakes(filmname, filmfolder, scene, shot)
-                    take = take + 1
+                    #shot = countshots(filmname, filmfolder, scene)
+                    #take = counttakes(filmname, filmfolder, scene, shot)
+                    #take = take + 1
+                    take = 1
+                    shot = 1
                     time.sleep(1)
                 return scene, shot, take
             elif selected == 1:
@@ -740,16 +764,15 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 
 #------------Happy with take or not?------------
 
-def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder):
+def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     header = 'Are You Happy with Your Take? Retake if not!'
     menu = '', '', '', '', ''
-    settings = 'VIEW', 'NEXT', 'RETAKE', 'REMOVE', 'VIEWSCENE'
+    settings = 'VIEW', 'NEXT', 'RETAKE', 'REMOVE'
     selected = 1
-    play = False
     writemessage('Converting video, hold your horses...')
     #call(['avconv', '-y', '-i', thefile + '.wav', '-acodec', 'libmp3lame', thefile + '.mp3'], shell=False)
     #call(['MP4Box', '-add', thefile + '.h264', '-add', thefile + '.mp3', '-new', thefile + '.mp4'], shell=False)
@@ -781,32 +804,18 @@ def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, fo
                 os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/')
                 writemessage('Congratz!')
                 time.sleep(0.2)
-                return scene, shot, takes, thefile, renderedshots, renderfullscene
+                return scene, shot, takes, thefile
             #RETAKE
             elif selected == 2:
                 take = take + 1
                 writemessage('You made a shitty shot!')
                 time.sleep(0.2)
                 thefile = ''
-                renderfullscene = True
-                return scene, shot, take, thefile, renderedshots, renderfullscene
+                return scene, shot, take, thefile
             #REMOVE
             elif selected == 3:
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-                return scene, shot, take, thefile, renderedshots, renderfullscene
-            #VIEWSCENE
-            elif selected == 4:
-                filmfiles = renderlist(filmname, filmfolder, scene)
-                renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                playfile = render(filmfiles, renderfilename)
-                playthis(playfile, camera)
-            #VIEWFILM
-            elif selected == 5:
-                renderfullscene = True
-                filmfiles = viewfilm(filmfolder, filmname)
-                renderfilename = filmfolder + filmname + '/' + filmname
-                playfile = render(filmfiles, renderfilename)
-                playthis(playfile, camera)
+                return scene, shot, take, thefile
         time.sleep(0.02)
                 
 #-------------Compile Shot--------------
@@ -819,6 +828,7 @@ def compileshot(filename):
     else:
         writemessage('Converting to playable video')
         os.system('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
+        os.system('rm ' + filename + '.h264')
         #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
         #os.system('aplay ' + foldername + filename + '.wav')
@@ -829,26 +839,13 @@ def render(filmfiles, filename):
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     time.sleep(2)
-    render = 0
-    #CHECK IF THERE IS A RENDERED VIDEO
-    #if renderfullscene == True:
-        #renderfullscene = False
-        #render = 0
-    #else:
-        #render = renderedshots
-        #renderedshots = shot
-    ##PASTE VIDEO TOGETHER
     videomerge = ['MP4Box']
     videomerge.append('-force-cat')
-    #if renderedshots < shot:
-    if render > 0:
+    for f in filmfiles[:]:
         videomerge.append('-cat')
-        videomerge.append(filename + '.h264')
-    for f in filmfiles[render:]:
-        videomerge.append('-cat')
-        videomerge.append(f + '.h264')
+        videomerge.append(f + '.mp4')
     videomerge.append('-new')
-    videomerge.append(filename + '.h264')
+    videomerge.append(filename + '.mp4')
     #videomerge.append(filename + '.h264')
     call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
     ##PASTE AUDIO TOGETHER
@@ -862,10 +859,12 @@ def render(filmfiles, filename):
     call(audiomerge, shell=False)
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
+        os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
         call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
-        call(['MP4Box', '-add', filename + '.h264', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
+        call(['MP4Box', '-add', filename + '_tmp.mp4', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
+        os.system('rm ' + filename + '_tmp.mp4')
     else:
         writemessage('No audio files found! View INSTALL file for instructions.')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
@@ -982,7 +981,7 @@ def audiodelay(foldername, filename):
 
 def audiosilence(foldername,filename):
     writemessage('Creating audiosilence..')
-    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.h264', shell=True, stdout=subprocess.PIPE).stdout
+    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
     videolenght = pipe.read()
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
@@ -1022,7 +1021,7 @@ def copytousb(filmfolder, filmname):
             #RENDER FILES TO MP4 ON USB STICK
             os.system('mkdir -p /media/usb0/' + filmname)
             for f in filmfiles[:]:
-                os.system('MP4Box -add ' + f + '.h264 -new /media/usb0/' + filmname + '/' + f[-24:] + '.mp4')
+                os.system('MP4Box -add ' + f + '.mp4 -new /media/usb0/' + filmname + '/' + f[-24:] + '.mp4')
                 os.system('cp ' + f + '.wav /media/usb0/' + filmname + '/' + f[-24:] + '.wav')
             os.system('sync')
             writemessage('all files copied successfully!')
@@ -1066,9 +1065,9 @@ def buzzer(beeps):
 #-------------Check if file empty----------
 
 def empty(filename):
-    if os.path.isfile(filename + '.h264') == False:
+    if os.path.isfile(filename + '.mp4') == False:
         return False
-    if os.path.isfile(filename + '.h264') == True:
+    if os.path.isfile(filename + '.mp4') == True:
         writemessage('Take already exists')
         time.sleep(2)
         return True
@@ -1153,14 +1152,18 @@ def main():
     thefile = ''
     beeps = 0
     flip = 'no'
-    renderedshots = 0
-    renderfullscene = False
+    renderscene = True
+    renderfilm = True
     backlight = True
     filmnames = os.listdir(filmfolder)
     buttontime = time.time()
     pressed = ''
     buttonpressed = False
     holdbutton = ''
+
+    #Save settings every 3 seconds
+    pausetime = time.time()
+    savesettingsevery = 3
 
     #VERSION
     f = open(tarinafolder + '/VERSION')
@@ -1203,12 +1206,12 @@ def main():
 
         #LOAD FILM AND SCENE SETTINGS
         try:
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = loadfilmsettings(filmfolder)
+            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder)
         except:
             writemessage("no film settings found")
             time.sleep(2)
         try:
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = loadscenesettings(filmfolder, filmname, scene, shot)
+            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadscenesettings(filmfolder, filmname, scene, shot)
         except:
             writemessage("no scene settings found")
             time.sleep(2)
@@ -1317,6 +1320,8 @@ def main():
                     thefile = foldername + filename 
                     #writemessage('Copying video file...')
                     #os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
+                    renderscene = True
+                    renderfilm = True
                     compileshot(foldername + filename)
                     audiodelay(foldername,filename)
                     try:
@@ -1325,12 +1330,8 @@ def main():
                     except:
                         writemessage('no audio file')
                         time.sleep(0.5)
-                    #os.system('cp err.log lasterr.log')
                     #render thumbnail
-                    os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
-                    #scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
 
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
@@ -1344,23 +1345,34 @@ def main():
                     filename = 'take' + str(take).zfill(3)
                     thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
                     if thefile != '':
-                        scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
+                        scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
                         #render thumbnail
-                        os.system('avconv -i ' + foldername + filename  + '.h264 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                        os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
 
-            #PHOTOBOOTH
-            elif pressed == 'middle' and selectedaction == 8:
-                thefile = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + filename 
-                timelapsefolder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/' + 'timelapse' + str(shot).zfill(2) + str(take).zfill(2)
-                thefile = photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
-                if thefile != '':
-                    scene, shot, take, thefile, renderedshots, renderfullscene = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, renderedshots, renderfullscene, tarinafolder)
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+            #VIEW SCENE
+            elif pressed == 'view' and menu[selected] == 'SCENE:':
+                if recording == False:
+                    filmfiles = renderlist(filmname, filmfolder, scene)
+                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
+                    #Check if rendered video exist
+                    if renderscene == True:
+                        render(filmfiles, renderfilename)
+                        renderscene = False
+                    #writemessage(str(countvideosize(renderfilename)) + ' / ' + str(countvideosize(filmfiles) + countaudiosize(filmfiles)))
+                    playthis(renderfilename, camera)
 
-            #PLAY
-            #elif pressed == 'view' and menu[selected] == 'SHOT:' or pressed == 'view' and menu[selected] == 'TAKE:':
-            elif pressed == 'view' and menu[selected] != 'SCENE:' or pressed == 'view' and menu[selected] == 'FILM:':
+            #VIEW FILM
+            elif pressed == 'view' and menu[selected] == 'FILM:':
+                if recording == False:
+                    filmfiles = viewfilm(filmfolder, filmname)
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename)
+                        renderfilm = False
+                    playthis(renderfilename, camera)
+
+            #VIEW SHOT OR TAKE
+            elif pressed == 'view':
                 if recording == False:
                     takes = counttakes(filmname, filmfolder, scene, shot)
                     if takes > 0:
@@ -1368,30 +1380,14 @@ def main():
                         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                         filename = 'take' + str(take).zfill(3)
                         #viewshot(filmfolder, filmname, foldername, filename)
-                        compileshot(foldername + filename)
+                        #if filesize !
+                        #compileshot(foldername + filename)
                         playthis(foldername + filename, camera)
                         imagename = foldername + filename + '.png'
                         overlay = displayimage(camera, imagename)
                     else:
-                        writemessage('Sorry, no last shot to view buddy!')
-                        time.sleep(3)
-
-            #VIEW SCENE
-            elif pressed == 'view' and menu[selected] == 'SCENE:':
-                if recording == False:
-                    filmfiles = renderlist(filmname, filmfolder, scene)
-                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                    playfile = render(filmfiles, renderfilename)
-                    playthis(playfile, camera)
-
-            #VIEW FILM
-            elif pressed == 'view' and menu[selected] == 'FILM:':
-                if recording == False:
-                    renderfullscene = True
-                    filmfiles = viewfilm(filmfolder, filmname)
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    playfile = render(filmfiles, renderfilename)
-                    playthis(playfile, camera)
+                        writemessage('no video')
+                        time.sleep(1)
 
             #COPY TO USB
             elif pressed == 'middle' and menu[selected] == 'COPY':
@@ -1404,11 +1400,9 @@ def main():
                     scene = scene + 1
                     take = 1
                     shot = 1
-                    renderedshots = 0
                     os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
                     writemessage('New scene!')
                     time.sleep(2)
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                     selectedaction = 0
 
             #NEW SHOT
@@ -1428,7 +1422,6 @@ def main():
             elif pressed == 'middle' and menu[selected] == 'UPLOAD':
                 buttonpressed = time.time()
                 if recording == False:
-                    renderfullscene = True
                     filmfiles = viewfilm(filmfolder, filmname)
                     renderfilename = filmfolder + filmname + '/' + filmname
                     uploadfile = render(filmfiles, renderfilename)
@@ -1439,8 +1432,7 @@ def main():
             elif pressed == 'middle' and menu[selected] == 'LOAD':
                 newfilmsettings = loadfilm(filename,filmfolder)
                 if newfilmsettings != None:
-                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
 
             #UPDATE
             elif pressed == 'middle' and menu[selected] == 'UPDATE':
@@ -1453,31 +1445,35 @@ def main():
                     scene = 1
                     shot = 1
                     take = 1
-                    renderedshots = 0
                     selectedaction = 0
                     filmname = nameyourfilm()
                     os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
                     os.system('mkdir ' + filmfolder + filmname + '/.thumbnails')
                     writemessage('Good luck with your film ' + filmname + '!')
                     time.sleep(2)
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
                     selectedaction = 0
 
             #REMOVE
             #take
             elif pressed == 'delete' and menu[selected] == 'TAKE:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                overlay = removeimage(camera, overlay)
+                renderscene = True
+                renderfilm = True
                 time.sleep(0.2)
             #shot
             elif pressed == 'delete' and menu[selected] == 'SHOT:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                overlay = removeimage(camera, overlay)
+                renderscene = True
+                renderfilm = True
                 time.sleep(0.2)
             #scene
             elif pressed == 'delete' and menu[selected] == 'SCENE:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
-                savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                overlay = removeimage(camera, overlay)
+                renderscene = True
+                renderfilm = True
                 time.sleep(0.2)
 
             #UP
@@ -1534,6 +1530,7 @@ def main():
                     overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
+                    renderscene = True
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
                     overlay = removeimage(camera, overlay)
@@ -1555,8 +1552,7 @@ def main():
                 elif menu[selected] == 'FILM:':
                     newfilmsettings = loadfilm(filename,filmfolder)
                     if newfilmsettings != None:
-                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
-                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
 
             #LEFT
             elif pressed == 'left':
@@ -1623,6 +1619,7 @@ def main():
                     overlay = removeimage(camera, overlay)
                     imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                     overlay = displayimage(camera, imagename)
+                    renderscene = True
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
                     overlay = removeimage(camera, overlay)
@@ -1644,8 +1641,7 @@ def main():
                 elif menu[selected] == 'FILM:':
                     newfilmsettings = loadfilm(filename,filmfolder)
                     if newfilmsettings != None:
-                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots = newfilmsettings
-                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderedshots)
+                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
 
             #RIGHT
             elif pressed == 'right':
@@ -1660,9 +1656,14 @@ def main():
                 rectime = time.strftime("%H:%M:%S", time.gmtime(t))
             settings = filmname, str(scene), str(shot), str(take), rectime, str(camera.shutter_speed).zfill(5), str(camera.iso), str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
             header=''
-            #Check if menu is changed
+            #Check if menu is changed and save settings
             if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
                 writemenu(menu,settings,selected,header)
+                #save settings if menu has been updated every 3 seconds passed
+                if recording == False:
+                    if time.time() - pausetime > savesettingsevery: 
+                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm)
+                        pausetime = time.time()
                 #writemessage(pressed)
                 rendermenu = False
             time.sleep(0.0555)
