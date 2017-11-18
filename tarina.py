@@ -623,7 +623,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                             call(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', renderfilename + '.mp3'], shell=False)
                             ##MERGE AUDIO & VIDEO
                             writemessage('Merging audio & video')
-                            call(['MP4Box', '-add', renderfilename + '_tmp.h264', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+                            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
                             os.system('rm ' +  renderfilename + '_tmp.mp4')
                         else:
                             writemessage('No audio files found! View INSTALL file for instructions.')
