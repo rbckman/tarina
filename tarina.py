@@ -44,24 +44,16 @@ def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, 
     settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm
     pickle.dump(settings, open(filmfolder + "settings.p", "wb"))
     try:
-        pickle.dump(settings, open(filmfolder + filmname + "/scene" + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + "/settings.p", "wb"))
+        pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
     except:
         return
 
-#--------------Load film settings-----------------
+#--------------Load film settings--------------
 
-def loadfilmsettings(filmfolder):
-    try:    
-        settings = pickle.load(open(filmfolder + "settings.p", "rb"))
-        return settings
-    except:
-        return ''
-
-#--------------Load scene settings--------------
-
-def loadscenesettings(filmfolder, filmname, scene, shot):
+def loadfilmsettings(filmfolder, filmname):
+    settings = pickle.load(open(filmfolder + "settings.p", "rb"))
     try:
-        settings = pickle.load(open(filmfolder + filmname + "/scene" + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + "/settings.p", "rb"))
+        settings = pickle.load(open(filmfolder + filmname + "/settings.p", "rb"))
         return settings
     except:
         return ''
@@ -441,12 +433,7 @@ def loadfilm(filmname, filmfolder):
             #alltakes = renderthumbnails(filmname, filmfolder)
             #writemessage('This film has ' + str(alltakes) + ' takes')
             #time.sleep(2)
-            scenesettings = loadscenesettings(filmfolder, filmname, scene, shot)
-            if scenesettings == '':
-                writemessage('Could not find settings file, sorry buddy')
-                time.sleep(2)
-            else:
-                return scenesettings
+            return filmname
         elif pressed == 'middle' and menu[selected] == 'BACK':
             writemessage('Returning')
             time.sleep(1)
@@ -1163,7 +1150,7 @@ def main():
 
     #Save settings every 3 seconds
     pausetime = time.time()
-    savesettingsevery = 3
+    savesettingsevery = 5
 
     #VERSION
     f = open(tarinafolder + '/VERSION')
@@ -1196,9 +1183,9 @@ def main():
         camera.framerate = 24.999
         camera.crop       = (0, 0, 1.0, 1.0)
         camera.led = False
-        time.sleep(1)
-        camera.awb_mode = 'off'
         camera.start_preview()
+        camera.awb_mode = 'auto'
+
 
         #START fbcp AND dispmax hello interface hack
         #call ([tarinafolder + '/fbcp &'], shell = True)
@@ -1206,14 +1193,9 @@ def main():
 
         #LOAD FILM AND SCENE SETTINGS
         try:
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder)
+            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
         except:
             writemessage("no film settings found")
-            time.sleep(2)
-        try:
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadscenesettings(filmfolder, filmname, scene, shot)
-        except:
-            writemessage("no scene settings found")
             time.sleep(2)
 
         #FILE & FOLDER NAMES
@@ -1430,9 +1412,13 @@ def main():
 
             #LOAD FILM
             elif pressed == 'middle' and menu[selected] == 'LOAD':
-                newfilmsettings = loadfilm(filename,filmfolder)
-                if newfilmsettings != None:
-                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
+                filmname = loadfilm(filmname,filmfolder)
+                try:
+                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+                except:
+                    writemessage("no film settings found")
+                    time.sleep(2)
+
 
             #UPDATE
             elif pressed == 'middle' and menu[selected] == 'UPDATE':
@@ -1476,6 +1462,16 @@ def main():
                 renderfilm = True
                 time.sleep(0.2)
 
+            #Middle button auto mode
+            elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
+                camera.shutter_speed = 0
+            elif pressed == 'middle' and menu[selected] == 'ISO:':
+                camera.iso = 0
+            elif pressed == 'middle' and menu[selected] == 'RED:':
+                camera.awb_mode = 'auto'
+            elif pressed == 'middle' and menu[selected] == 'BLUE:':
+                camera.awb_mode = 'auto'
+
             #UP
             elif pressed == 'up':
                 if menu[selected] == 'BRIGHT:':
@@ -1485,6 +1481,8 @@ def main():
                 elif menu[selected] == 'SAT:':
                     camera.saturation = min(camera.saturation + 1, 99)
                 elif menu[selected] == 'SHUTTER:':
+                    if camera.shutter_speed == 0:
+                        camera.shutter_speed = camera.exposure_speed
                     if camera.shutter_speed < 5000:
                         camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
                     else:
@@ -1549,10 +1547,6 @@ def main():
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) < 7.98:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
-                elif menu[selected] == 'FILM:':
-                    newfilmsettings = loadfilm(filename,filmfolder)
-                    if newfilmsettings != None:
-                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
 
             #LEFT
             elif pressed == 'left':
@@ -1572,6 +1566,8 @@ def main():
                 elif menu[selected] == 'SAT:':
                     camera.saturation = max(camera.saturation - 1, -100)
                 elif menu[selected] == 'SHUTTER:':
+                    if camera.shutter_speed == 0:
+                        camera.shutter_speed = camera.exposure_speed
                     if camera.shutter_speed < 5000:
                         camera.shutter_speed = max(camera.shutter_speed - 50, 20)
                     else:
@@ -1638,10 +1634,6 @@ def main():
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[1]) > 0.02:
                         camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
-                elif menu[selected] == 'FILM:':
-                    newfilmsettings = loadfilm(filename,filmfolder)
-                    if newfilmsettings != None:
-                        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = newfilmsettings
 
             #RIGHT
             elif pressed == 'right':
@@ -1654,7 +1646,11 @@ def main():
             if recording == True:
                 t = time.time() - starttime
                 rectime = time.strftime("%H:%M:%S", time.gmtime(t))
-            settings = filmname, str(scene), str(shot), str(take), rectime, str(camera.shutter_speed).zfill(5), str(camera.iso), str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
+            if camera.iso == 0:
+                cameraiso = 'auto'
+            if camera.iso > 0:
+                cameraiso = str(camera.iso)
+            settings = filmname, str(scene), str(shot), str(take), rectime, str(camera.exposure_speed).zfill(5), cameraiso, str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
             header=''
             #Check if menu is changed and save settings
             if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
