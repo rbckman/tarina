@@ -1247,19 +1247,17 @@ def main():
                     filename = 'take' + str(take).zfill(3)
                     os.system('mkdir -p ' + foldername)
                     #camera.led = True
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
-                    #camera.start_recording('/dev/shm/' + filename + '.h264', format='h264', quality=16)
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
                     starttime = time.time()
                     recording = True
-                    #camera.wait_recording(10)
                 elif recording == True and float(time.time() - starttime) > 0.2:
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                     recording = False
                     #camera.led = False
-                    os.system('pkill arecord')
                     camera.stop_recording()
+                    os.system('pkill arecord')
                     t = 0
                     rectime = ''
                     vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -1488,7 +1486,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
                         #Jessie
-                        if debianversion == '8':
+                        if debianversion > '7':
                             os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
                 elif menu[selected] == 'PHONES:':
                     if headphoneslevel < 100:
@@ -1575,7 +1573,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
                         #Jessie
-                        if debianversion == '8':
+                        if debianversion > '7':
                             os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
                 elif menu[selected] == 'PHONES:':
                     if headphoneslevel > 0:
