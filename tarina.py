@@ -58,45 +58,7 @@ def loadfilmsettings(filmfolder, filmname):
     except:
         return ''
 
-#--------------Write the menu layer to dispmax--------------
-
-def writemenuold(menu,settings,selected,header):
-    c = 0
-    clear = 360
-    menudone = ''
-    firstline = 45
-    if header != '':
-        header = ' ' + header
-        spaces = 72 - len(header)
-        header = header + (spaces * ' ')
-        firstline = 45
-    for a in menu:
-        if c == selected:
-            menudone = menudone + '<'
-        else:
-            menudone = menudone + ' '
-        menudone = menudone + menu[c] + settings[c]
-        if c == selected:
-            menudone = menudone + '>'
-        else:
-            menudone = menudone + ' '
-        c = c + 1
-        if len(menudone) > firstline:
-            spaces = 72 - len(menudone)
-            menudone = menudone + spaces * ' '
-        if len(menudone) > 113:
-            spaces = 144 - len(menudone)
-            menudone = menudone + spaces * ' '
-        if len(menudone) > 192:
-            spaces = 216 - len(menudone)
-            menudone = menudone + spaces * ' '
-        if len(menudone) > 241:
-            spaces = 288 - len(menudone)
-            menudone = menudone + spaces * ' '
-    f = open('/dev/shm/interface', 'w')
-    clear = clear - len(menudone)
-    f.write(header + menudone + clear * ' ')
-    f.close()
+#--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header):
     menudone = ''
@@ -144,13 +106,13 @@ def countvideosize(filename):
             size = size + os.stat(i + '.mp4').st_size
     if type(filename) is str:
         size = os.stat(filename + '.mp4').st_size
-    return size
+    return size/1024
 
-def countaudiosize(filename):
+def countsize(filename):
     size = 0
     if type(filename) is str:
-        size = os.stat(filename + '.mp3').st_size
-    return size
+        size = os.stat(filename).st_size
+    return size/1024
 
 #------------Count scenes, takes and shots-----
 
@@ -478,28 +440,6 @@ def nameyourfilm():
                 return(name)
         time.sleep(0.02)
 
-def nameyourfilmnew():
-    pressed = ''
-    buttonpressed = ''
-    buttontime = time.time()
-    holdbutton = ''
-    menu = 'New film nickname:', 'a', 'b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x'
-    selected = 1
-    name = ''
-    while True:
-        settings = name,'','','','','','','','','','','','','','','','','','','','','','','',''
-        writemenu(menu,settings,selected,'')
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'right':
-            if selected < len(menu):
-                selected = selected + 1
-        elif pressed == 'left':
-            if selected > 1:
-                selected = selected - 1
-        elif pressed == 'middle':
-            name = name + menu[selected]
-        time.sleep(0.05)
-
 #------------Timelapse--------------------------
 
 def timelapse(beeps,camera,foldername,filename,tarinafolder):
@@ -825,18 +765,31 @@ def compileshot(filename):
 def render(filmfiles, filename):
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
-    time.sleep(2)
+    videosize = 0
+    rendersize = 0
     videomerge = ['MP4Box']
     videomerge.append('-force-cat')
     for f in filmfiles[:]:
+        videosize = videosize + countsize(f + '.mp4')
         videomerge.append('-cat')
         videomerge.append(f + '.mp4')
     videomerge.append('-new')
     videomerge.append(filename + '.mp4')
     #videomerge.append(filename + '.h264')
-    call(videomerge, shell=False) #how to insert somekind of estimated time while it does this?
+    #call(videomerge, shell=True) #how to insert somekind of estimated time while it does this?
+    p = Popen(videomerge)
+    #show progress
+    print str(videosize)
+    while p.poll() is None:
+        time.sleep(0.2)
+        try:
+            rendersize = countsize(filename + '.mp4')
+        except:
+            continue
+        rendersize
+        writemessage('video rendering ' + str(rendersize) + ' of ' + str(videosize) + ' kb done')
     ##PASTE AUDIO TOGETHER
-    writemessage('Rendering sound')
+    writemessage('Hold on, rendering audio...')
     audiomerge = ['sox']
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
@@ -844,14 +797,25 @@ def render(filmfiles, filename):
         audiomerge.append(f + '.wav')
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
+    #count estimated audio filesize with a bitrate of 320 kb/s
+    audiosize = countsize(filename + '.wav') * 0.453
+    rendersize = 0
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
-        call(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', filename + '.mp3'], shell=False)
+        p = Popen(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
+        while p.poll() is None:
+            time.sleep(0.2)
+            try:
+                rendersize = countsize(filename + '.mp3')
+            except:
+                continue
+            writemessage('audio rendering ' + str(rendersize) + ' of ' + str(int(audiosize)) + ' kb done')
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
         call(['MP4Box', '-add', filename + '_tmp.mp4', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
         os.system('rm ' + filename + '_tmp.mp4')
+        os.system('rm ' + filename + '.mp3')
     else:
         writemessage('No audio files found! View INSTALL file for instructions.')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
@@ -1462,15 +1426,27 @@ def main():
                 renderfilm = True
                 time.sleep(0.2)
 
-            #Middle button auto mode
+            #Middle button auto mode on/off
             elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
-                camera.shutter_speed = 0
+                if camera.shutter_speed == 0:
+                    camera.shutter_speed = camera.exposure_speed
+                else:
+                    camera.shutter_speed = 0
             elif pressed == 'middle' and menu[selected] == 'ISO:':
-                camera.iso = 0
+                if camera.iso == 0:
+                    camera.iso = 100
+                else:
+                    camera.iso = 0
             elif pressed == 'middle' and menu[selected] == 'RED:':
-                camera.awb_mode = 'auto'
+                if camera.awb_mode == 'auto':
+                    camera.awb_mode = 'off'
+                else:
+                    camera.awb_mode = 'auto'
             elif pressed == 'middle' and menu[selected] == 'BLUE:':
-                camera.awb_mode = 'auto'
+                if camera.awb_mode == 'auto':
+                    camera.awb_mode = 'off'
+                else:
+                    camera.awb_mode = 'auto'
 
             #UP
             elif pressed == 'up':
@@ -1641,21 +1617,36 @@ def main():
                     selected = selected + 1
                 else:
                     selected = 0
-                if selected == 4:
+                if selected == 4: #jump over recording time
                     selected = 5
+
+            #Start Recording Time
             if recording == True:
                 t = time.time() - starttime
                 rectime = time.strftime("%H:%M:%S", time.gmtime(t))
+
+            #If auto dont show value show auto
             if camera.iso == 0:
                 cameraiso = 'auto'
-            if camera.iso > 0:
+            else:
                 cameraiso = str(camera.iso)
-            settings = filmname, str(scene), str(shot), str(take), rectime, str(camera.exposure_speed).zfill(5), cameraiso, str(float(camera.awb_gains[0]))[:4], str(float(camera.awb_gains[1]))[:4], str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
+            if camera.shutter_speed == 0:
+                camerashutter = 'auto'
+            else:
+                camerashutter = str(camera.exposure_speed).zfill(5)
+            if camera.awb_mode == 'auto':
+                camerared = 'auto'
+                camerablue = 'auto'
+            else:
+                camerared = str(float(camera.awb_gains[0]))[:4]
+                camerablue = str(float(camera.awb_gains[1]))[:4]
+
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
             header=''
             #Check if menu is changed and save settings
             if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
                 writemenu(menu,settings,selected,header)
-                #save settings if menu has been updated every 3 seconds passed
+                #save settings if menu has been updated every 5 seconds passed
                 if recording == False:
                     if time.time() - pausetime > savesettingsevery: 
                         savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm)
