@@ -909,8 +909,12 @@ def audiodelay(foldername, filename):
     if int(audiolenght) > int(videolenght):
         #calculate difference
         audiosync = int(audiolenght) - int(videolenght)
+        newaudiolenght = int(audiolenght) - audiosync
         print('Audiofile is: ' + str(audiosync) + 'ms longer')
-        os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav trim 0 -0.' + str(audiosync).zfill(3))
+        #trim from end and put a 0.005 in- and outfade
+        os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
+        os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
+        os.system('rm ' + foldername + filename + '_temp.wav ')
     else:
         #calculate difference
         audiosyncs = videos - audios
