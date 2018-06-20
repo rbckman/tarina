@@ -68,22 +68,26 @@ while true; do
 echo <<'EOF' >> /etc/systemd/system/tarina.service
 [Unit]
 Description=tarina
-DefaultDependencies=false
+After=getty.target
+Conflicts=getty@tty1.service
+#DefaultDependencies=false
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/screen /usr/bin/python /home/pi/tarina/tarina.py
+RemainAfterExit=yes
+ExecStart=/usr/bin/python /home/pi/tarina/tarina.py
 User=root
 WorkingDirectory=/home/pi/tarina
 Restart=on-failure
-StandardInput=tty
-TTYPath=/dev/tty5
+StandardInput=tty-force
+StandardOutput=inherit
+StandardError=inherit
+TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
 
 [Install]
-WantedBy=local-fs.target
-EOF
+WantedBy=local-fs.targetEOF
 chmod +x /home/pi/tarina/tarina.py
 systemctl enable tarina.service
 systemctl daemon-reload
