@@ -1058,14 +1058,14 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'retake'
         elif event == ord('q') or readbus == 223:
             pressed = 'view'
-        elif event == ord('z') or readbus2 == 244:
+        elif event == ord('z') or readbus2 == 246:
             pressed = 'delete'
-        elif readbus2 == 247:
-            pressed = 'shutdown'
+        #elif readbus2 == 247:
+        #    pressed = 'shutdown'
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
-    if readbus == 255 and readbus2 == 245:
+    if readbus == 255 and readbus2 == 247:
         buttonpressed = False
     if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
@@ -1221,7 +1221,7 @@ def main():
                     backlight = True
 
             #SHUTDOWN
-            elif pressed == 'shutdown' and recording == False:
+            elif pressed == 'shutdown_nono' and recording == False:
                 writemessage('Hold down 3 seconds to shutdown')
                 shutdownbutton = time.time()
                 time.sleep(1)

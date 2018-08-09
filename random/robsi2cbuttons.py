@@ -44,11 +44,11 @@ while True:
         print "rightdown"
     elif readbus2 == 244:
         print "remove"
-    elif readbus2 == 247:
-        print "shutdown"
-        bus.write_byte_data(DEVICE,OLATA,0)
-        os.system('sudo shutdown -h now')
-        time.sleep(15)
+    #elif readbus2 == 247:
+    #    print "shutdown"
+        #bus.write_byte_data(DEVICE,OLATA,0)
+        #os.system('sudo shutdown -h now')
+        #time.sleep(15)
     print readbus
     print readbus2
     bus.write_byte_data(DEVICE,OLATA,0xC)
