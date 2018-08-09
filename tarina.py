@@ -1278,8 +1278,11 @@ def main():
                     except:
                         writemessage('no audio file')
                         time.sleep(0.5)
-                    #render thumbnail
-                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
+                    #render thumbnail tenth last frame
+                    #mediainfo --Inform='Video;%FrameCount%' $the_file 
+                    pipe = subprocess.Popen('mediainfo --Inform="Video;%FrameCount%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
+                    lastframe = int(pipe.read()) - 1
+                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames ' + str(lastframe) + ' -vf scale=800:340 ' + foldername + filename + '.png &')
 
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
