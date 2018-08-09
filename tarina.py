@@ -1262,6 +1262,7 @@ def main():
                     #camera.led = False
                     camera.stop_recording()
                     os.system('pkill arecord')
+                    camera.capture(foldername + filename + '.png', resize=(800,340))
                     t = 0
                     rectime = ''
                     vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -1280,9 +1281,9 @@ def main():
                         time.sleep(0.5)
                     #render thumbnail tenth last frame
                     #mediainfo --Inform='Video;%FrameCount%' $the_file 
-                    pipe = subprocess.Popen('mediainfo --Inform="Video;%FrameCount%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
-                    lastframe = int(pipe.read()) - 1
-                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames ' + str(lastframe) + ' -vf scale=800:340 ' + foldername + filename + '.png &')
+                    #pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
+                    #videolenght = int(pipe.read()) / 1000
+                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -ss ' + str(videolenght) + ' -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
 
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
