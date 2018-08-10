@@ -9,7 +9,7 @@ fi
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus
+apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus python-webpy
 rpi-update
 echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
@@ -38,6 +38,19 @@ dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
 EOF
 
+echo "Changing hostname to tarina"
+cat <<'EOF' >> /etc/hostname
+tarina
+EOF
+cat <<'EOF' >> /etc/hosts
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+
+127.0.1.1	tarina
+EOF
+
 echo "Adding to /boot/cmdline.txt"
 printf " consoleblank=0 logo.nologo loglevel=0 vt.global_cursor_default=0" >> /boot/cmdline.txt
 
@@ -48,13 +61,13 @@ while true; do
     read -p "do you have a usb sound card? make it default (y)es or (n)o?" yn
     case $yn in
         [yy]* ) echo "writing to /etc/modprobe.d/alsa-base.conf";
-cat <<'eof' >> /etc/modprobe.d/alsa-base.conf
+cat <<'EOF' >> /etc/modprobe.d/alsa-base.conf
 #set index value
 options snd_usb_audio index=0
 options snd_bcm2835 index=1
 #reorder
 options snd slots=snd_usb_audio, snd_bcm2835
-eof
+EOF
             break;;
         [nn]* ) break;;
         * ) echo "please answer yes or no.";;
@@ -87,7 +100,8 @@ TTYReset=yes
 TTYVHangup=yes
 
 [Install]
-WantedBy=local-fs.targetEOF
+WantedBy=local-fs.target
+EOF
 chmod +x /home/pi/tarina/tarina.py
 systemctl enable tarina.service
 systemctl daemon-reload
@@ -109,9 +123,3 @@ cp extras/.vimrc /home/pi/.vimrc
         * ) echo "Please answer yes or no.";;
     esac
 done
-
-
-
-
-
-
