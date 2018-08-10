@@ -1,6 +1,8 @@
 import web
 import os
 
+os.system("ln -s /home/pi/Videos static/Videos")
+
 films = []
 
 urls = (
