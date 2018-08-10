@@ -1,0 +1,16 @@
+$def with (renderedfilms, unrenderedfilms)
+$var renderedfilms = renderedfilms
+$var unrenderedfilms = unrenderedfilms
+
+<h1>Films</h1>
+
+$for i in renderedfilms:
+    <p>--------------------------------------------------------------</p>
+    <h3>$i</h3>
+    <a href="static/Videos/$i/${i}.mp4"><img width="300px" src="static/Videos/$i/scene001/shot001/take001.png"/></a><br>
+
+<h1>Films unrendered</h1>
+
+$for i in unrenderedfilms:
+    <h3>$i </h3>
+
