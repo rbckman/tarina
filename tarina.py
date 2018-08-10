@@ -1172,6 +1172,9 @@ def main():
         #call ([tarinafolder + '/fbcp &'], shell = True)
         call (['./startinterface.sh &'], shell = True)
 
+        #Start tarinaserver on port 80
+        call (['./srv/tarinaserver.py 80 &'], shell = True)
+
         #LOAD FILM AND SCENE SETTINGS
         try:
             camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)

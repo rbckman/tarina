@@ -1,6 +1,14 @@
+#!/usr/bin/python
+
 import web
 import os
 
+# Get path of the current dir, then use it as working directory:
+rundir = os.path.dirname(__file__)
+if rundir != '':
+    os.chdir(rundir)
+
+# Link video directory to static dir
 os.system("ln -s /home/pi/Videos static/Videos")
 
 films = []
