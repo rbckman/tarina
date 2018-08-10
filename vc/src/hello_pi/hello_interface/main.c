@@ -136,6 +136,7 @@ int main(void)
    int len_string_more4;
    int len_string_more5;
    int len_string_more6;
+   int len_string_more7;
    char check[500];
    char oldcheck[500];
    char vumeter[80];
@@ -165,6 +166,7 @@ int main(void)
    char more4[20];
    char more5[20];
    char more6[20];
+   char more7[20];
    //graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0xff));
    while (1) {
       // char ch;
@@ -257,6 +259,9 @@ int main(void)
           fgets(menu, 4, fp2);
           len_string_more6 = atoi(menu) + 1;
           fgets(more6, len_string_more6, fp2);
+          fgets(menu, 4, fp2);
+          len_string_more7 = atoi(menu) + 1;
+          fgets(more7, len_string_more7, fp2);
           fgets(menu, 3, fp2);
           fclose(fp2);
           if (menu[0] == 'E' && menu[1] == 'O'){
@@ -455,6 +460,12 @@ int main(void)
               }
               else{
               render_subtitle(img, more6, text_size, len_string_more1 * space + len_string_more2 * space + len_string_more3 * space + len_string_more4 * space + len_string_more5 * space + morespace * 5, y_offset6, color);      
+              }
+              if(selected == 24){
+              render_subtitle(img, more7, text_size, len_string_more1 * space + len_string_more2 * space + len_string_more3 * space + len_string_more4 * space + len_string_more5 * space + len_string_more6 * space + morespace * 6, y_offset6, 1);
+              }
+              else{
+              render_subtitle(img, more7, text_size, len_string_more1 * space + len_string_more2 * space + len_string_more3 * space + len_string_more4 * space + len_string_more5 * space + len_string_more6 * space + morespace * 6, y_offset6, color);      
               }
           }
           //graphics_update_displayed_resource(img, 0, 0, 0, 0);

@@ -1,6 +1,20 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
+#by rbckman
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, version 2
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import picamera
 import os
 import time
@@ -872,7 +886,6 @@ def playthis(filename, camera):
         t = time.time() - starttime
     player.quit()
     #os.system('pkill dbus-daemon')
-    camera.start_preview()
 
 #---------------View Film--------------------
 
@@ -1081,7 +1094,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'TIMELAPSE'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'TIMELAPSE', 'SHUTDOWN'
     actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
 
     #STANDARD VALUES
@@ -1221,16 +1234,10 @@ def main():
                     backlight = True
 
             #SHUTDOWN
-            elif pressed == 'shutdown_nono' and recording == False:
-                writemessage('Hold down 3 seconds to shutdown')
-                shutdownbutton = time.time()
+            elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
+                writemessage('Hold on shutting down...')
                 time.sleep(1)
-                while pressed == 'shutdown':
-                    pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-                    writemessage('Hold down 3 seconds to shutdown')
-                    if float(time.time() - shutdownbutton) > 3.15:
-                        bus.write_byte_data(DEVICE,OLATA,0)
-                        os.system('shutdown -h now')
+                os.system('shutdown -h now')
 
             #RECORD AND PAUSE
             elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
@@ -1279,11 +1286,6 @@ def main():
                     except:
                         writemessage('no audio file')
                         time.sleep(0.5)
-                    #render thumbnail tenth last frame
-                    #mediainfo --Inform='Video;%FrameCount%' $the_file 
-                    #pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
-                    #videolenght = int(pipe.read()) / 1000
-                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -ss ' + str(videolenght) + ' -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
 
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
@@ -1304,6 +1306,7 @@ def main():
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
                 if recording == False:
+                    camera.stop_preview()
                     filmfiles = renderlist(filmname, filmfolder, scene)
                     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                     #Check if rendered video exist
@@ -1312,16 +1315,19 @@ def main():
                         renderscene = False
                     #writemessage(str(countvideosize(renderfilename)) + ' / ' + str(countvideosize(filmfiles) + countaudiosize(filmfiles)))
                     playthis(renderfilename, camera)
+                    camera.start_preview()
 
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 if recording == False:
+                    camera.stop_preview()
                     filmfiles = viewfilm(filmfolder, filmname)
                     renderfilename = filmfolder + filmname + '/' + filmname
                     if renderfilm == True:
                         render(filmfiles, renderfilename)
                         renderfilm = False
                     playthis(renderfilename, camera)
+                    camera.start_preview()
 
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -1647,7 +1653,7 @@ def main():
                 camerared = str(float(camera.awb_gains[0]))[:4]
                 camerablue = str(float(camera.awb_gains[1]))[:4]
 
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', '', ''
             header=''
             #Check if menu is changed and save settings
             if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
@@ -1673,17 +1679,4 @@ if __name__ == '__main__':
         curses.echo()
         curses.endwin()
 
-#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
-#by rbckman
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, version 2
-
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
-
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
