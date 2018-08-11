@@ -1,19 +1,20 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - The DIY camera for filmmakers, vloggers, travellers & hackers.
-#by rbckman
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU General Public License as published by
-#the Free Software Foundation, version 2
+#Tarina - the DIY filmmaking device
+#Copyright 2018 Robin Bäckman
 
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#GNU General Public License for more details.
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
 
-#You should have received a copy of the GNU General Public License
-#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#http://www.apache.org/licenses/LICENSE-2.0
+
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 
 import picamera
 import os
@@ -46,16 +47,6 @@ bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
 bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
 bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
 bus.write_byte_data(DEVICE,OLATA,0x4)
-
-#GPIO.setmode(GPIO.BCM)
-#GPIO.setup(1, GPIO.OUT)
-#GPIO.setup(18, GPIO.OUT)
-#GPIO.setup(5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(12, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(13, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(26, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-#GPIO.setup(22, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 #--------------Save settings-----------------
 
@@ -301,20 +292,20 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
     #time.sleep(4)
     selected = n
     if selected == 0 and b == 1:
-        #if scene < scenes:
-        scene = scene + 1
-        shots = countshots(filmname, filmfolder, scene)
-        takes = counttakes(filmname, filmfolder, scene, shots)
-        shot = shots 
-        take = takes
-        #if take == 0:
-        #    shot = shot - 1
-        #    take = counttakes(filmname, filmfolder, scene, shot - 1)
+        if scene < scenes + 1: #remove this if u want to select any scene
+            scene = scene + 1
+            shots = countshots(filmname, filmfolder, scene)
+            takes = counttakes(filmname, filmfolder, scene, shots)
+            shot = shots 
+            take = takes
+            #if take == 0:
+                #shot = shot - 1
+                #take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == 1:
-        #if shot < shots:
-        shot = shot + 1 
-        takes = counttakes(filmname, filmfolder, scene, shot)
-        take = takes
+        if shot < shots + 1: #remove this if u want to select any shot
+            shot = shot + 1 
+            takes = counttakes(filmname, filmfolder, scene, shot)
+            take = takes
     elif selected == 2 and b == 1:
         if take < takes + 1:
             take = take + 1 
@@ -1052,11 +1043,6 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     readbus = bus.read_byte_data(DEVICE,GPIOB)
     readbus2 = bus.read_byte_data(DEVICE,GPIOA)
     pressed = ''
-    #middlebutton = GPIO.input(22)
-    #upbutton = GPIO.input(12)
-    #downbutton = GPIO.input(13)
-    #leftbutton = GPIO.input(16)
-    #rightbutton = GPIO.input(26)
     if buttonpressed == False:
         if event == 27:
             pressed = 'quit'
@@ -1521,7 +1507,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
                         #Jessie
-                        if debianversion == '8':
+                        if debianversion > '8':
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
@@ -1608,7 +1594,7 @@ def main():
                         if debianversion == '7':
                             os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
                         #Jessie
-                        if debianversion == '8':
+                        if debianversion > '8':
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
