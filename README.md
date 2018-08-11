@@ -29,15 +29,15 @@ Run this to install git:
 ```
 sudo apt-get install git
 ```
-Git clone tarina and then run install script:
+Git clone tarina and then run install script with sudo:
 ```
 git clone https://rbckman@bitbucket.org/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
 ```
-You'r ready to rumble (run as sudo):
+You'r ready to rumble:
 ```
-sudo python tarina.py
+python tarina.py
 ```
 ## Couldn't have been done without ##
 
