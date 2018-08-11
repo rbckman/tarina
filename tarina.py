@@ -29,6 +29,11 @@ import RPi.GPIO as GPIO
 from PIL import Image
 import smbus
 
+# Get path of the current dir, then use it as working directory:
+rundir = os.path.dirname(__file__)
+if rundir != '':
+    os.chdir(rundir)
+
 bus = smbus.SMBus(3) # Rev 2 Pi uses 1
 DEVICE = 0x20 # Device address (A0-A2)
 IODIRB = 0x0d # Pin pullups B-side
@@ -1172,8 +1177,12 @@ def main():
         #call ([tarinafolder + '/fbcp &'], shell = True)
         call (['./startinterface.sh &'], shell = True)
 
-        #Start tarinaserver on port 80
-        call (['./srv/tarinaserver.py 80 &'], shell = True)
+        #Try to run tarinaserver on port 8080
+        try:
+            call (['./srv/tarinaserver.py 8080 &'], shell = True)
+        except:
+            writemessage("could not run tarina server")
+            time.sleep(2)
 
         #LOAD FILM AND SCENE SETTINGS
         try:
