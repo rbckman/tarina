@@ -1,6 +1,6 @@
 # Tarina #
 ### The DIY Filmmaking device ###
-Do-it-yourself video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated retake button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
+Do it yourself video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated retake button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
 
 ## Hardware ##
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
@@ -11,7 +11,7 @@ Do-it-yourself video camera with the ability to assemble your film, keeping trac
 [Adafruit Powerboost 1000C](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)<br>
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
-It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other Raspberry Pi compatible screens.
+With some hacking skills you should be able to get it to work with Raspberry pi 2 and all the Raspberry Pi compatible screens and cameras.
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
