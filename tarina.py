@@ -670,7 +670,6 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                     filename = 'shot' + str(shot).zfill(3) + '*'
                     os.system('rm -r ' + foldername)
-                    os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                     take = counttakes(filmname, filmfolder, scene, shot)
                     take = 1
                     if shot == 0:
@@ -682,12 +681,10 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     filename = 'scene' + str(scene).zfill(3) + '*'
                     if scene > 1:
                         os.system('rm -r ' + foldername)
-                        os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                         scene = scene - 1
                     if scene == 1:
                         os.system('rm -r ' + foldername)
                         os.system('mkdir ' + foldername)
-                        os.system('rm ' + filmfolder + filmname + '/.thumbnails/' + filename)
                     #shot = countshots(filmname, filmfolder, scene)
                     #take = counttakes(filmname, filmfolder, scene, shot)
                     #take = take + 1
