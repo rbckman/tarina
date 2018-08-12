@@ -1,15 +1,14 @@
 # Tarina #
-### DIY Filmmaking device ###
-A Video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated retake button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
+### The DIY Filmmaking device ###
+Do-it-yourself video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated retake button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
 
 ## Hardware ##
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
-[Sony IMX219 8-megapixel sensor](https://www.raspberrypi.org/products/camera-module-v2/)<br>
+[Arducam 8 MP Sony IMX219 camera module with CS lens 2718](http://www.uctronics.com/arducam-8-mp-sony-imx219-camera-module-with-cs-lens-2717-for-raspberry-pi.html)<br>
 [3.5 inch 800x480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)<br>
 [USB via vt1620a Sound card](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB)<br>
 [9000mAh li-ion Battery](https://www.aliexpress.com/item/3-7v-9000mAh-capacity-18650-Rechargeable-lithium-battery-pack-18650-jump-starter/32619902319.html?spm=2114.13010608.0.0.XcKleV) (10 hours filming)<br>
-[USB Mobile Power Charger Board Module 3.7V to 5V 1A/2A Booster Converter](http://www.ebay.com/itm/321977677010?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT)<br>
-[ATXRaspi by lowpowerlab](https://lowpowerlab.com/shop/product/91)<br>
+[Adafruit Powerboost 1000C](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)<br>
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
 It should also work with Raspberry pi 2 and the pi camera module v1.3 and any other Raspberry Pi compatible screens.
