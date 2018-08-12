@@ -2,7 +2,7 @@
 ### The DIY Filmmaking device ###
 Do it yourself video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated retake button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
 
-## Hardware ##
+### Hardware ###
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
 [Arducam 8 MP Sony IMX219 camera module with CS lens 2718](http://www.uctronics.com/arducam-8-mp-sony-imx219-camera-module-with-cs-lens-2717-for-raspberry-pi.html)<br>
 [3.5 inch 800x480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)<br>
@@ -15,8 +15,7 @@ With some hacking skills you should be able to get it to work with any Raspberry
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
-## Software ##
-### Installing ###
+### Software ###
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
 ```
@@ -37,7 +36,11 @@ You'r ready to rumble:
 ```
 python tarina.py
 ```
-## Couldn't have been done without ##
+### Connect ###
+
+[Telegram](https://t.me/tarinadiy)
+
+### Couldn't have been done without ###
 
 Gnu/Linux/Debian 
 
