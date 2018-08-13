@@ -184,21 +184,6 @@ def counttakes(filmname, filmfolder, scene, shot):
             takes = takes + 1
     return takes
 
-#------------Count thumbnails----
-
-def countthumbs(filmname, filmfolder):
-    thumbs = 0
-    try:
-        allfiles = os.listdir(filmfolder + filmname + '/.thumbnails')
-    except:
-        os.system('mkdir ' + filmfolder + filmname + '/.thumbnails')
-        allfiles = []
-        return thumbs
-    for a in allfiles:
-        if '.png' in a:
-            thumbs = thumbs + 1
-    return thumbs
-
 #-------------Render scene list--------------
 
 def renderlist(filmname, filmfolder, scene):
@@ -216,34 +201,6 @@ def renderlist(filmname, filmfolder, scene):
     #writemessage(str(len(scenefiles)))
     #time.sleep(2)
     return scenefiles
-
-#-------------Render thumbnails------------
-
-def renderthumbnails(filmname, filmfolder):
-    #count how many takes in whole film
-    thumbs = countthumbs(filmname, filmfolder)
-    writemessage(str(thumbs) + ' thumbnails found')
-    alltakes = 0
-    scenes = countlast(filmname, filmfolder)
-    for n in xrange(scenes[0]):
-        shots = countshots(filmname, filmfolder, n + 1)
-        for s in xrange(shots):
-            takes = counttakes(filmname, filmfolder, n + 1, s + 1)
-            alltakes = alltakes + takes
-    if thumbs == 0:
-        writemessage('No thumbnails found. Rendering ' + str(alltakes) + ' thumbnails...')
-        time.sleep(2)
-        scenes = countlast(filmname, filmfolder)
-        for n in xrange(scenes[0]):
-            shots = countshots(filmname, filmfolder, n + 1)
-            for s in xrange(shots):
-                takes = counttakes(filmname, filmfolder, n + 1, s + 1)
-                for p in xrange(takes):
-                    folder = filmfolder + filmname + '/' + 'scene' + str(n + 1).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    filename = 'scene' + str(n + 1).zfill(3) + '_shot' + str(s + 1).zfill(3) + '_take' + str(p + 1).zfill(3)
-                    os.system('avconv -i ' + folder + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
-                    #os.system('avconv -i ' + folder + filename  + '.h264 -ss 00:00:01 -vframe 1 -vf scale=800:340 ' + filmfolder + filmname + '/.thumbnails/' + filename + '.png')
-    return alltakes 
 
 #-------------Display png-------------------
 
@@ -696,6 +653,63 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 return scene, shot, take
         time.sleep(0.02)
 
+#------------Organize----------------
+
+def organize(filmfolder, filmname):
+    scenes = os.walk(filmfolder + filmname).next()[1]
+
+    # Takes
+    for i in sorted(scenes):
+        shots = os.walk(filmfolder + filmname + '/' + i).next()[1]
+        for p in sorted(shots):
+            takes = os.walk(filmfolder + filmname + '/' + i + '/' + p).next()[2]
+            if len(takes) == 0:
+                print 'no takes in this shot, removing shot..'
+                os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
+            organized_nr = 1
+            for s in sorted(takes):
+                if '.mp4' in s:
+                    print s
+                    unorganized_nr = int(s[4:-4])
+                    if organized_nr == unorganized_nr:
+                        print 'correct'
+                    if organized_nr != unorganized_nr:
+                        print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                        os.system('mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3) + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
+                    organized_nr = organized_nr + 1
+    # Shots
+    for i in sorted(scenes):
+        shots = os.walk(filmfolder + filmname + '/' + i).next()[1]
+        if len(shots) == 0:
+            print 'no shots in this scene, removing scene..'
+            os.system('rm -r ' + filmfolder + filmname + '/' + i)
+        organized_nr = 1
+        for p in sorted(shots):
+            if 'shot' in p:
+                print p
+                unorganized_nr = int(p[-3:])
+                if organized_nr == unorganized_nr:
+                    print 'correct'
+                if organized_nr != unorganized_nr:
+                    print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                    os.system('mv ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
+                organized_nr = organized_nr + 1
+
+    # Scenes
+    organized_nr = 1
+    for i in sorted(scenes):
+        if 'scene' in i:
+            print i
+            unorganized_nr = int(i[-3:])
+            if organized_nr == unorganized_nr:
+                print 'correct'
+            if organized_nr != unorganized_nr:
+                print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                os.system('mv ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
+            organized_nr = organized_nr + 1
+
+    print 'Organizer done! Everything is tidy'
+
 #------------Happy with take or not?------------
 
 def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder):
@@ -1116,8 +1130,9 @@ def main():
     pressed = ''
     buttonpressed = False
     holdbutton = ''
+    updatethumb = False
 
-    #Save settings every 3 seconds
+    #Save settings every 5 seconds
     pausetime = time.time()
     savesettingsevery = 5
 
@@ -1161,11 +1176,11 @@ def main():
         call (['./startinterface.sh &'], shell = True)
 
         #Try to run tarinaserver on port 8080
-        try:
-            call (['./srv/tarinaserver.py 8080 &'], shell = True)
-        except:
-            writemessage("could not run tarina server")
-            time.sleep(2)
+        #try:
+        #    call (['./srv/tarinaserver.py 8080 &'], shell = True)
+        #except:
+        #    writemessage("could not run tarina server")
+        #    time.sleep(2)
 
         #LOAD FILM AND SCENE SETTINGS
         try:
@@ -1188,6 +1203,14 @@ def main():
         os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
         os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
         os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+
+        #ORGANIZE
+        organize(filmfolder, filmname)
+
+        #THUMBNAILCHECKER
+        oldscene = scene
+        oldshot = shot
+        oldtake = take 
 
         #TESTING SPACE
         #alltakes = renderthumbnails(filmname, filmfolder)
@@ -1232,7 +1255,7 @@ def main():
             elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
-                os.system('shutdown -h now')
+                os.system('sudo shutdown -h now')
 
             #RECORD AND PAUSE
             elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
@@ -1405,7 +1428,6 @@ def main():
                     selectedaction = 0
                     filmname = nameyourfilm()
                     os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                    os.system('mkdir ' + filmfolder + filmname + '/.thumbnails')
                     writemessage('Good luck with your film ' + filmname + '!')
                     time.sleep(2)
                     selectedaction = 0
@@ -1414,23 +1436,26 @@ def main():
             #take
             elif pressed == 'delete' and menu[selected] == 'TAKE:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-                overlay = removeimage(camera, overlay)
+                organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
+                updatethumb = True
                 time.sleep(0.2)
             #shot
             elif pressed == 'delete' and menu[selected] == 'SHOT:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
-                overlay = removeimage(camera, overlay)
+                organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
+                updatethumb = True
                 time.sleep(0.2)
             #scene
             elif pressed == 'delete' and menu[selected] == 'SCENE:':
                 scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
-                overlay = removeimage(camera, overlay)
+                organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
+                updatethumb = True
                 time.sleep(0.2)
 
             #Middle button auto mode on/off
@@ -1508,20 +1533,11 @@ def main():
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                     renderscene = True
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[0]) < 7.98:
@@ -1595,20 +1611,11 @@ def main():
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
                 elif menu[selected] == 'SCENE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                     renderscene = True
                 elif menu[selected] == 'SHOT:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'TAKE:':
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
                     if float(camera.awb_gains[0]) > 0.02:
@@ -1626,6 +1633,17 @@ def main():
                     selected = 0
                 if selected == 4: #jump over recording time
                     selected = 5
+
+            #Check if scene, shot, or take changed and update thumbnail
+            if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
+                print 'okey something has changed'
+                overlay = removeimage(camera, overlay)
+                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
+                overlay = displayimage(camera, imagename)
+                oldscene = scene
+                oldshot = shot
+                oldtake = take
+                updatethumb = False
 
             #Start Recording Time
             if recording == True:
