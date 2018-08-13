@@ -1636,14 +1636,15 @@ def main():
 
             #Check if scene, shot, or take changed and update thumbnail
             if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
-                print 'okey something has changed'
-                overlay = removeimage(camera, overlay)
-                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                overlay = displayimage(camera, imagename)
-                oldscene = scene
-                oldshot = shot
-                oldtake = take
-                updatethumb = False
+                if recording == False:
+                    print 'okey something has changed'
+                    overlay = removeimage(camera, overlay)
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
+                    overlay = displayimage(camera, imagename)
+                    oldscene = scene
+                    oldshot = shot
+                    oldtake = take
+                    updatethumb = False
 
             #Start Recording Time
             if recording == True:
