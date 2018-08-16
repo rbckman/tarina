@@ -33,9 +33,11 @@ dpi_mode=87
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3
 dtoverlay=vga666 
-#dtoverlay=pi3-disable-bt-overlay
+dtoverlay=pi3-disable-bt-overlay
 dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
+#force_turbo=1
+#boot_delay=1
 EOF
 
 echo "Change hostname to tarina"
