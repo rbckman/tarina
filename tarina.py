@@ -935,6 +935,7 @@ def audiodelay(foldername, filename):
         os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.system('rm ' + foldername + filename + '_temp.wav ')
+        delayerr = 'A' + str(audiosync)
     else:
         #calculate difference
         audiosyncs = videos - audios
@@ -947,7 +948,9 @@ def audiodelay(foldername, filename):
         #make the delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
+        delayerr = 'V' + str(audiosyncms)
     os.system('rm /dev/shm/' + filename + '.wav')
+    return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
 
@@ -1131,6 +1134,7 @@ def main():
     buttonpressed = False
     holdbutton = ''
     updatethumb = False
+    delayerr = ''
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1277,7 +1281,7 @@ def main():
                     os.system('mkdir -p ' + foldername)
                     #camera.led = True
                     os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
                     starttime = time.time()
                     recording = True
                 elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1297,7 +1301,7 @@ def main():
                     renderscene = True
                     renderfilm = True
                     compileshot(foldername + filename)
-                    audiodelay(foldername,filename)
+                    delayerr = audiodelay(foldername,filename)
                     try:
                         writemessage('Copying and syncing audio file...')
                         #os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
@@ -1531,12 +1535,12 @@ def main():
                         #Jessie
                         if debianversion > '8':
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
-                elif menu[selected] == 'SCENE:':
+                elif menu[selected] == 'SCENE:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                     renderscene = True
-                elif menu[selected] == 'SHOT:':
+                elif menu[selected] == 'SHOT:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
-                elif menu[selected] == 'TAKE:':
+                elif menu[selected] == 'TAKE:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
@@ -1609,12 +1613,12 @@ def main():
                         #Jessie
                         if debianversion > '8':
                             os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
-                elif menu[selected] == 'SCENE:':
+                elif menu[selected] == 'SCENE:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                     renderscene = True
-                elif menu[selected] == 'SHOT:':
+                elif menu[selected] == 'SHOT:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
-                elif menu[selected] == 'TAKE:':
+                elif menu[selected] == 'TAKE:' and recording == False:
                     scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
                 elif menu[selected] == 'RED:':
                     camera.awb_mode = 'off'
@@ -1667,7 +1671,7 @@ def main():
                 camerared = str(float(camera.awb_gains[0]))[:4]
                 camerablue = str(float(camera.awb_gains[1]))[:4]
 
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft, '', '', '', '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', '', '', '', ''
             header=''
             #Check if menu is changed and save settings
             if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
