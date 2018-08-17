@@ -880,7 +880,6 @@ def playthis(filename, camera):
                 os.system('pkill aplay')
                 #os.system('pkill dbus-daemon')
                 #os.system('pkill omxplayer')
-                camera.start_preview()
                 return
             elif selected == 12:
                 player.stop()
@@ -1039,6 +1038,8 @@ def buzzer(beeps):
             buzzerdelay = buzzerdelay - 0.00000004
             time.sleep(buzzerdelay)
     bus.write_byte_data(DEVICE,OLATA,0x4)
+    time.sleep(0.1)
+    return
 
 #-------------Check if file empty----------
 
@@ -1090,6 +1091,36 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = holdbutton
     return pressed, buttonpressed, buttontime, holdbutton
 
+def startinterface():
+    call (['./startinterface.sh &'], shell = True)
+    screen = curses.initscr()
+    curses.cbreak(1)
+    screen.keypad(1)
+    curses.noecho()
+    screen.nodelay(1)
+    curses.curs_set(0)
+    return screen
+
+def stopinterface(camera):
+    camera.stop_preview()
+    camera.close()
+    os.system('pkill -9 arecord')
+    os.system('pkill -9 startinterface')
+    os.system('pkill -9 camerainterface')
+    curses.nocbreak()
+    curses.echo()
+    curses.endwin()
+
+def startcamera():
+    camera = picamera.PiCamera()
+    camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
+    camera.framerate = 24.999
+    camera.crop       = (0, 0, 1.0, 1.0)
+    camera.led = False
+    camera.start_preview()
+    camera.awb_mode = 'auto'
+    return camera
+
 #-------------Start main--------------
 
 def main():
@@ -1099,7 +1130,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'COPY', 'UPLOAD', 'NEW', 'LOAD', 'UPDATE', 'TIMELAPSE', 'SHUTDOWN'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'TIMELAPSE', 'UPLOAD', 'UPDATE', 'SHUTDOWN', 'WIFI', 'LOAD', 'NEW'
     actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
 
     #STANDARD VALUES
@@ -1156,534 +1187,501 @@ def main():
     files = os.listdir(filmfolder)
     filename_count = len(files)
 
-    #START CURSES
-    screen = curses.initscr()
-    curses.cbreak(1)
-    screen.keypad(1)
-    curses.noecho()
-    screen.nodelay(1)
-    curses.curs_set(0)
-    time.sleep(1)
-    with picamera.PiCamera() as camera:
+    screen = startinterface()
+    camera = startcamera()
 
-        #START PREVIEW
-        camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
-        camera.framerate = 24.999
-        camera.crop       = (0, 0, 1.0, 1.0)
-        camera.led = False
-        camera.start_preview()
-        camera.awb_mode = 'auto'
+    #Try to run tarinaserver on port 8080
+    #try:
+    #    call (['./srv/tarinaserver.py 8080 &'], shell = True)
+    #except:
+    #    writemessage("could not run tarina server")
+    #    time.sleep(2)
 
+    #LOAD FILM AND SCENE SETTINGS
+    try:
+        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+    except:
+        writemessage("no film settings found")
+        time.sleep(2)
 
-        #START fbcp AND dispmax hello interface hack
-        #call ([tarinafolder + '/fbcp &'], shell = True)
-        call (['./startinterface.sh &'], shell = True)
+    #FILE & FOLDER NAMES
+    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+    filename = 'take' + str(take).zfill(3)
 
-        #Try to run tarinaserver on port 8080
-        #try:
-        #    call (['./srv/tarinaserver.py 8080 &'], shell = True)
-        #except:
-        #    writemessage("could not run tarina server")
-        #    time.sleep(2)
+    #NEW FILM (IF NOTHING TO LOAD)
+    if filmname == '':
+        filmname = nameyourfilm()
 
-        #LOAD FILM AND SCENE SETTINGS
-        try:
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
-        except:
-            writemessage("no film settings found")
-            time.sleep(2)
+    if flip == "yes":
+        camera.vflip = True
+        camera.hflip = True
+    os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+    os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
+    os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
 
-        #FILE & FOLDER NAMES
-        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-        filename = 'take' + str(take).zfill(3)
+    #ORGANIZE
+    organize(filmfolder, filmname)
 
-        #NEW FILM (IF NOTHING TO LOAD)
-        if filmname == '':
-            filmname = nameyourfilm()
+    #THUMBNAILCHECKER
+    oldscene = scene
+    oldshot = shot
+    oldtake = take 
 
-        if flip == "yes":
-            camera.vflip = True
-            camera.hflip = True
-        os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+    #MAIN LOOP
+    while True:
+        #GPIO.output(18,backlight)
+        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        #event = screen.getch()
 
-        #ORGANIZE
-        organize(filmfolder, filmname)
+        #QUIT
+        if pressed == 'quit':
+            stopinterface(camera)
+            os.system('clear')
+            os.system('echo "Have a nice hacking time!"')
+            break
 
-        #THUMBNAILCHECKER
-        oldscene = scene
-        oldshot = shot
-        oldtake = take 
+        #SCREEN ON/OFF
+        elif pressed == 'up' and pressed == 'down':
+            time.sleep(0.1)
+            if backlight == True:
+                backlight = False
+            else:
+                backlight = True
 
-        #TESTING SPACE
-        #alltakes = renderthumbnails(filmname, filmfolder)
-        #writemessage('This film has ' + str(alltakes) + ' takes')
-        #writemessage(tarinafolder)
-        #time.sleep(3)
-        #overlay = displayimage(camera, '/home/pi/Videos/.rendered/scene001_shot001_take001.png')
-        #removeimage(camera, overlay)
+        #SHUTDOWN
+        elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
+            writemessage('Hold on shutting down...')
+            time.sleep(1)
+            os.system('sudo shutdown -h now')
 
-        #MAIN LOOP
-        while True:
-            #GPIO.output(18,backlight)
-            pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-            #event = screen.getch()
-
-            #QUIT
-            if pressed == 'quit':
-                writemessage('Happy hacking!')
-                time.sleep(1)
-                camera.stop_preview()
-                camera.close()
-                os.system('pkill -9 fbcp')
-                os.system('pkill -9 arecord')
-                os.system('pkill -9 startinterface')
-                os.system('pkill -9 camerainterface')
-                curses.nocbreak()
-                curses.echo()
-                curses.endwin()
-                os.system('clear')
-                os.system('echo "Have a nice hacking time!"')
-                break
-
-            #SCREEN ON/OFF
-            elif pressed == 'up' and pressed == 'down':
-                time.sleep(0.1)
-                if backlight == True:
-                    backlight = False
-                else:
-                    backlight = True
-
-            #SHUTDOWN
-            elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
-                writemessage('Hold on shutting down...')
-                time.sleep(1)
-                os.system('sudo shutdown -h now')
-
-            #RECORD AND PAUSE
-            elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
-                overlay = removeimage(camera, overlay)
-                if recording == False: 
-                    if beeps > 0:
-                        buzzer(beeps)
-                        time.sleep(0.1)
-                    if pressed == 'record':
-                        takes = counttakes(filmname, filmfolder, scene, shot)
-                        if takes > 0:
-                            shot = countshots(filmname, filmfolder, scene) + 1
-                            take = 1
-                    if pressed == 'retake':
-                        take = counttakes(filmname, filmfolder, scene, shot)
-                        take = take + 1
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                    filename = 'take' + str(take).zfill(3)
-                    os.system('mkdir -p ' + foldername)
-                    #camera.led = True
-                    os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
-                    starttime = time.time()
-                    recording = True
-                elif recording == True and float(time.time() - starttime) > 0.2:
-                    disk = os.statvfs(tarinafolder + '/')
-                    diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
-                    recording = False
-                    #camera.led = False
-                    camera.stop_recording()
-                    os.system('pkill arecord')
-                    camera.capture(foldername + filename + '.png', resize=(800,340))
-                    t = 0
-                    rectime = ''
-                    vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
-                    thefile = foldername + filename 
-                    #writemessage('Copying video file...')
-                    #os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
-                    renderscene = True
-                    renderfilm = True
-                    compileshot(foldername + filename)
-                    delayerr = audiodelay(foldername,filename)
-                    try:
-                        writemessage('Copying and syncing audio file...')
-                        #os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
-                    except:
-                        writemessage('no audio file')
-                        time.sleep(0.5)
-
-            #TIMELAPSE
-            elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
-                overlay = removeimage(camera, overlay)
-                if recording == False: 
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    if takes > 0:
-                        shot = countshots(filmname, filmfolder, scene) + 1
-                        take = 1
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                    filename = 'take' + str(take).zfill(3)
-                    thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
-                    if thefile != '':
-                        scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
-                        #render thumbnail
-                        os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
-
-            #VIEW SCENE
-            elif pressed == 'view' and menu[selected] == 'SCENE:':
-                if recording == False:
-                    camera.stop_preview()
-                    filmfiles = renderlist(filmname, filmfolder, scene)
-                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                    #Check if rendered video exist
-                    if renderscene == True:
-                        render(filmfiles, renderfilename)
-                        renderscene = False
-                    #writemessage(str(countvideosize(renderfilename)) + ' / ' + str(countvideosize(filmfiles) + countaudiosize(filmfiles)))
-                    playthis(renderfilename, camera)
-                    camera.start_preview()
-
-            #VIEW FILM
-            elif pressed == 'view' and menu[selected] == 'FILM:':
-                if recording == False:
-                    camera.stop_preview()
-                    filmfiles = viewfilm(filmfolder, filmname)
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename)
-                        renderfilm = False
-                    playthis(renderfilename, camera)
-                    camera.start_preview()
-
-            #VIEW SHOT OR TAKE
-            elif pressed == 'view':
-                if recording == False:
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    if takes > 0:
-                        removeimage(camera, overlay)
-                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                        filename = 'take' + str(take).zfill(3)
-                        #viewshot(filmfolder, filmname, foldername, filename)
-                        #if filesize !
-                        #compileshot(foldername + filename)
-                        playthis(foldername + filename, camera)
-                        imagename = foldername + filename + '.png'
-                        overlay = displayimage(camera, imagename)
-                    else:
-                        writemessage('no video')
-                        time.sleep(1)
-
-            #COPY TO USB
-            elif pressed == 'middle' and menu[selected] == 'COPY':
-                if recording == False:
-                    copytousb(filmfolder, filmname)
-
-            #NEW SCENE
-            elif pressed == 'middle' and selectedaction == 22:
-                if recording == False:
-                    scene = scene + 1
-                    take = 1
-                    shot = 1
-                    os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                    writemessage('New scene!')
-                    time.sleep(2)
-                    selectedaction = 0
-
-            #NEW SHOT
-            elif pressed == 'middle' and selectedaction == 27:
-                if recording == False:
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    if takes > 0:
-                        shot = shot + 1
-                        takes = counttakes(filmname, filmfolder, scene, shot)
-                        take = takes + 1
-                        os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                    else:
-                        writemessage('This is it maan')
-                        time.sleep(2)
-
-            #UPLOAD
-            elif pressed == 'middle' and menu[selected] == 'UPLOAD':
-                buttonpressed = time.time()
-                if recording == False:
-                    filmfiles = viewfilm(filmfolder, filmname)
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    uploadfile = render(filmfiles, renderfilename)
-                    uploadfilm(uploadfile, filmname)
-                    selectedaction = 0
-
-            #LOAD FILM
-            elif pressed == 'middle' and menu[selected] == 'LOAD':
-                filmname = loadfilm(filmname,filmfolder)
+        #RECORD AND PAUSE
+        elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800 and recordable == True:
+            overlay = removeimage(camera, overlay)
+            foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+            filename = 'take' + str(take).zfill(3)
+            recordable = not os.path.isfile(foldername + filename + '.mp4')
+            if recording == False and recordable == True:
+                if beeps > 0:
+                    buzzer(beeps)
+                os.system('mkdir -p ' + foldername)
+                #camera.led = True
+                os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
+                starttime = time.time()
+                recording = True
+            elif recording == True and float(time.time() - starttime) > 0.2:
+                disk = os.statvfs(tarinafolder + '/')
+                diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
+                recording = False
+                #camera.led = False
+                camera.stop_recording()
+                os.system('pkill arecord')
+                camera.capture(foldername + filename + '.png', resize=(800,340))
+                t = 0
+                rectime = ''
+                vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
+                thefile = foldername + filename 
+                #writemessage('Copying video file...')
+                #os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
+                renderscene = True
+                renderfilm = True
+                updatethumb = True
+                compileshot(foldername + filename)
+                delayerr = audiodelay(foldername,filename)
                 try:
-                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+                    writemessage('Copying and syncing audio file...')
+                    #os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
                 except:
-                    writemessage("no film settings found")
-                    time.sleep(2)
+                    writemessage('no audio file')
+                    time.sleep(0.5)
+            if pressed == 'record' and recordable == False:
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    shot = countshots(filmname, filmfolder, scene) + 1
+                    take = 1
+            if pressed == 'retake' and recordable == False:
+                take = counttakes(filmname, filmfolder, scene, shot)
+                take = take + 1
 
+        #TIMELAPSE
+        elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
+            overlay = removeimage(camera, overlay)
+            if recording == False: 
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    shot = countshots(filmname, filmfolder, scene) + 1
+                    take = 1
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                filename = 'take' + str(take).zfill(3)
+                thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
+                if thefile != '':
+                    scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
+                    #render thumbnail
+                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
 
-            #UPDATE
-            elif pressed == 'middle' and menu[selected] == 'UPDATE':
-                tarinaversion, tarinavername = update(tarinaversion, tarinavername)
+        #VIEW SCENE
+        elif pressed == 'view' and menu[selected] == 'SCENE:':
+            if recording == False:
+                camera.stop_preview()
+                filmfiles = renderlist(filmname, filmfolder, scene)
+                renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
+                #Check if rendered video exist
+                if renderscene == True:
+                    render(filmfiles, renderfilename)
+                    renderscene = False
+                #writemessage(str(countvideosize(renderfilename)) + ' / ' + str(countvideosize(filmfiles) + countaudiosize(filmfiles)))
+                playthis(renderfilename, camera)
+
+        #VIEW FILM
+        elif pressed == 'view' and menu[selected] == 'FILM:':
+            if recording == False:
+                camera.stop_preview()
+                filmfiles = viewfilm(filmfolder, filmname)
+                renderfilename = filmfolder + filmname + '/' + filmname
+                if renderfilm == True:
+                    render(filmfiles, renderfilename)
+                    renderfilm = False
+                playthis(renderfilename, camera)
+
+        #VIEW SHOT OR TAKE
+        elif pressed == 'view':
+            if recording == False:
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    removeimage(camera, overlay)
+                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    filename = 'take' + str(take).zfill(3)
+                    #viewshot(filmfolder, filmname, foldername, filename)
+                    #if filesize !
+                    #compileshot(foldername + filename)
+                    playthis(foldername + filename, camera)
+                    imagename = foldername + filename + '.png'
+                    overlay = displayimage(camera, imagename)
+                else:
+                    writemessage('no video')
+                    time.sleep(1)
+
+        #COPY TO USB
+        elif pressed == 'middle' and menu[selected] == 'COPY':
+            if recording == False:
+                copytousb(filmfolder, filmname)
+
+        #NEW SCENE
+        elif pressed == 'middle' and selectedaction == 22:
+            if recording == False:
+                scene = scene + 1
+                take = 1
+                shot = 1
+                os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+                writemessage('New scene!')
+                time.sleep(2)
                 selectedaction = 0
 
-            #NEW FILM
-            elif pressed == 'middle' and menu[selected] == 'NEW':
-                if recording == False:
-                    scene = 1
-                    shot = 1
-                    take = 1
-                    selectedaction = 0
-                    filmname = nameyourfilm()
-                    os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                    writemessage('Good luck with your film ' + filmname + '!')
+        #NEW SHOT
+        elif pressed == 'middle' and selectedaction == 27:
+            if recording == False:
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    shot = shot + 1
+                    takes = counttakes(filmname, filmfolder, scene, shot)
+                    take = takes + 1
+                    os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+                else:
+                    writemessage('This is it maan')
                     time.sleep(2)
-                    selectedaction = 0
 
-            #REMOVE
-            #take
-            elif pressed == 'delete' and menu[selected] == 'TAKE:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-                organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
-                updatethumb = True
-                time.sleep(0.2)
-            #shot
-            elif pressed == 'delete' and menu[selected] == 'SHOT:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
-                organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
-                updatethumb = True
-                time.sleep(0.2)
-            #scene
-            elif pressed == 'delete' and menu[selected] == 'SCENE:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
-                organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
-                updatethumb = True
-                time.sleep(0.2)
+        #UPLOAD
+        elif pressed == 'middle' and menu[selected] == 'UPLOAD':
+            buttonpressed = time.time()
+            if recording == False:
+                filmfiles = viewfilm(filmfolder, filmname)
+                renderfilename = filmfolder + filmname + '/' + filmname
+                uploadfile = render(filmfiles, renderfilename)
+                uploadfilm(uploadfile, filmname)
+                selectedaction = 0
 
-            #Middle button auto mode on/off
-            elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
+        #LOAD FILM
+        elif pressed == 'middle' and menu[selected] == 'LOAD':
+            filmname = loadfilm(filmname,filmfolder)
+            try:
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+            except:
+                writemessage("no film settings found")
+                time.sleep(2)
+
+        #UPDATE
+        elif pressed == 'middle' and menu[selected] == 'UPDATE':
+            tarinaversion, tarinavername = update(tarinaversion, tarinavername)
+            selectedaction = 0
+
+        #WIFI
+        elif pressed == 'middle' and menu[selected] == 'WIFI':
+            stopinterface(camera)
+            os.system('wicd-curses')
+            screen = startinterface()
+            camera = startcamera()
+
+        #NEW FILM
+        elif pressed == 'middle' and menu[selected] == 'NEW':
+            if recording == False:
+                scene = 1
+                shot = 1
+                take = 1
+                selectedaction = 0
+                filmname = nameyourfilm()
+                os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+                writemessage('Good luck with your film ' + filmname + '!')
+                time.sleep(2)
+                selectedaction = 0
+
+        #REMOVE
+        #take
+        elif pressed == 'delete' and menu[selected] == 'TAKE:':
+            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
+            organize(filmfolder, filmname)
+            renderscene = True
+            renderfilm = True
+            updatethumb = True
+            time.sleep(0.2)
+        #shot
+        elif pressed == 'delete' and menu[selected] == 'SHOT:':
+            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
+            organize(filmfolder, filmname)
+            renderscene = True
+            renderfilm = True
+            updatethumb = True
+            time.sleep(0.2)
+        #scene
+        elif pressed == 'delete' and menu[selected] == 'SCENE:':
+            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
+            organize(filmfolder, filmname)
+            renderscene = True
+            renderfilm = True
+            updatethumb = True
+            time.sleep(0.2)
+
+        #Middle button auto mode on/off
+        elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
+            if camera.shutter_speed == 0:
+                camera.shutter_speed = camera.exposure_speed
+            else:
+                camera.shutter_speed = 0
+        elif pressed == 'middle' and menu[selected] == 'ISO:':
+            if camera.iso == 0:
+                camera.iso = 100
+            else:
+                camera.iso = 0
+        elif pressed == 'middle' and menu[selected] == 'RED:':
+            if camera.awb_mode == 'auto':
+                camera.awb_mode = 'off'
+            else:
+                camera.awb_mode = 'auto'
+        elif pressed == 'middle' and menu[selected] == 'BLUE:':
+            if camera.awb_mode == 'auto':
+                camera.awb_mode = 'off'
+            else:
+                camera.awb_mode = 'auto'
+
+        #UP
+        elif pressed == 'up':
+            if menu[selected] == 'BRIGHT:':
+                camera.brightness = min(camera.brightness + 1, 99)
+            elif menu[selected] == 'CONT:':
+                camera.contrast = min(camera.contrast + 1, 99)
+            elif menu[selected] == 'SAT:':
+                camera.saturation = min(camera.saturation + 1, 99)
+            elif menu[selected] == 'SHUTTER:':
                 if camera.shutter_speed == 0:
                     camera.shutter_speed = camera.exposure_speed
+                if camera.shutter_speed < 5000:
+                    camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
                 else:
-                    camera.shutter_speed = 0
-            elif pressed == 'middle' and menu[selected] == 'ISO:':
-                if camera.iso == 0:
-                    camera.iso = 100
+                    camera.shutter_speed = min(camera.shutter_speed + 200, 50000)
+            elif menu[selected] == 'ISO:':
+                camera.iso = min(camera.iso + 100, 1600)
+            elif menu[selected] == 'BEEP:':
+                beeps = beeps + 1
+            elif menu[selected] == 'FLIP:':
+                if flip == 'yes':
+                    camera.hflip = False
+                    camera.vflip = False
+                    flip = 'no'
+                    time.sleep(0.2)
                 else:
-                    camera.iso = 0
-            elif pressed == 'middle' and menu[selected] == 'RED:':
-                if camera.awb_mode == 'auto':
-                    camera.awb_mode = 'off'
-                else:
-                    camera.awb_mode = 'auto'
-            elif pressed == 'middle' and menu[selected] == 'BLUE:':
-                if camera.awb_mode == 'auto':
-                    camera.awb_mode = 'off'
-                else:
-                    camera.awb_mode = 'auto'
+                    camera.hflip = True
+                    camera.vflip = True
+                    flip = 'yes'
+                    time.sleep(0.2)
+            elif menu[selected] == 'LENGTH:':
+                reclenght = reclenght + 1
+                time.sleep(0.1)
+            elif menu[selected] == 'MIC:':
+                if miclevel < 100:
+                    miclevel = miclevel + 2
+                    #Wheezy
+                    if debianversion == '7':
+                        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
+                    #Jessie
+                    if debianversion > '7':
+                        os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+            elif menu[selected] == 'PHONES:':
+                if headphoneslevel < 100:
+                    headphoneslevel = headphoneslevel + 2
+                    #Wheezy
+                    if debianversion == '7':
+                        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+                    #Jessie
+                    if debianversion > '8':
+                        os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
+            elif menu[selected] == 'SCENE:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
+                renderscene = True
+            elif menu[selected] == 'SHOT:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
+            elif menu[selected] == 'TAKE:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
+            elif menu[selected] == 'RED:':
+                camera.awb_mode = 'off'
+                if float(camera.awb_gains[0]) < 7.98:
+                    camera.awb_gains = (float(camera.awb_gains[0]) + 0.02, float(camera.awb_gains[1]))
+            elif menu[selected] == 'BLUE:':
+                camera.awb_mode = 'off'
+                if float(camera.awb_gains[1]) < 7.98:
+                    camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
 
-            #UP
-            elif pressed == 'up':
-                if menu[selected] == 'BRIGHT:':
-                    camera.brightness = min(camera.brightness + 1, 99)
-                elif menu[selected] == 'CONT:':
-                    camera.contrast = min(camera.contrast + 1, 99)
-                elif menu[selected] == 'SAT:':
-                    camera.saturation = min(camera.saturation + 1, 99)
-                elif menu[selected] == 'SHUTTER:':
-                    if camera.shutter_speed == 0:
-                        camera.shutter_speed = camera.exposure_speed
-                    if camera.shutter_speed < 5000:
-                        camera.shutter_speed = min(camera.shutter_speed + 50, 50000)
-                    else:
-                        camera.shutter_speed = min(camera.shutter_speed + 200, 50000)
-                elif menu[selected] == 'ISO:':
-                    camera.iso = min(camera.iso + 100, 1600)
-                elif menu[selected] == 'BEEP:':
-                    beeps = beeps + 1
-                elif menu[selected] == 'FLIP:':
-                    if flip == 'yes':
-                        camera.hflip = False
-                        camera.vflip = False
-                        flip = 'no'
-                        time.sleep(0.2)
-                    else:
-                        camera.hflip = True
-                        camera.vflip = True
-                        flip = 'yes'
-                        time.sleep(0.2)
-                elif menu[selected] == 'LENGTH:':
-                    reclenght = reclenght + 1
+        #LEFT
+        elif pressed == 'left':
+            if selected > 0:
+                selected = selected - 1
+            else:
+                selected = len(menu) - 1
+            if selected == 4:
+                selected = 3
+
+        #DOWN
+        elif pressed == 'down':
+            if menu[selected] == 'BRIGHT:':
+                camera.brightness = max(camera.brightness - 1, 0)
+            elif menu[selected] == 'CONT:':
+                camera.contrast = max(camera.contrast - 1, -100)
+            elif menu[selected] == 'SAT:':
+                camera.saturation = max(camera.saturation - 1, -100)
+            elif menu[selected] == 'SHUTTER:':
+                if camera.shutter_speed == 0:
+                    camera.shutter_speed = camera.exposure_speed
+                if camera.shutter_speed < 5000:
+                    camera.shutter_speed = max(camera.shutter_speed - 50, 20)
+                else:
+                    camera.shutter_speed = max(camera.shutter_speed - 200, 200)
+            elif menu[selected] == 'ISO:':
+                camera.iso = max(camera.iso - 100, 100)
+            elif menu[selected] == 'BEEP:':
+                if beeps > 0:
+                    beeps = beeps - 1
+            elif menu[selected] == 'FLIP:':
+                if flip == 'yes':
+                    camera.hflip = False
+                    camera.vflip = False
+                    flip = 'no'
+                    time.sleep(0.2)
+                else:
+                    camera.hflip = True
+                    camera.vflip = True
+                    flip = 'yes'
+                    time.sleep(0.2)
+            elif menu[selected] == 'LENGTH:':
+                if reclenght > 0:
+                    reclenght = reclenght - 1
                     time.sleep(0.1)
-                elif menu[selected] == 'MIC:':
-                    if miclevel < 100:
-                        miclevel = miclevel + 2
-                        #Wheezy
-                        if debianversion == '7':
-                            os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                        #Jessie
-                        if debianversion > '7':
-                            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
-                elif menu[selected] == 'PHONES:':
-                    if headphoneslevel < 100:
-                        headphoneslevel = headphoneslevel + 2
-                        #Wheezy
-                        if debianversion == '7':
-                            os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                        #Jessie
-                        if debianversion > '8':
-                            os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
-                elif menu[selected] == 'SCENE:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
-                    renderscene = True
-                elif menu[selected] == 'SHOT:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
-                elif menu[selected] == 'TAKE:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
-                elif menu[selected] == 'RED:':
-                    camera.awb_mode = 'off'
-                    if float(camera.awb_gains[0]) < 7.98:
-                        camera.awb_gains = (float(camera.awb_gains[0]) + 0.02, float(camera.awb_gains[1]))
-                elif menu[selected] == 'BLUE:':
-                    camera.awb_mode = 'off'
-                    if float(camera.awb_gains[1]) < 7.98:
-                        camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
+            elif menu[selected] == 'MIC:':
+                if miclevel > 0:
+                    miclevel = miclevel - 2
+                    #Wheezy
+                    if debianversion == '7':
+                        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
+                    #Jessie
+                    if debianversion > '7':
+                        os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+            elif menu[selected] == 'PHONES:':
+                if headphoneslevel > 0:
+                    headphoneslevel = headphoneslevel - 2
+                    #Wheezy
+                    if debianversion == '7':
+                        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+                    #Jessie
+                    if debianversion > '8':
+                        os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
+            elif menu[selected] == 'SCENE:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
+                renderscene = True
+            elif menu[selected] == 'SHOT:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
+            elif menu[selected] == 'TAKE:' and recording == False:
+                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
+            elif menu[selected] == 'RED:':
+                camera.awb_mode = 'off'
+                if float(camera.awb_gains[0]) > 0.02:
+                    camera.awb_gains = (float(camera.awb_gains[0]) - 0.02, float(camera.awb_gains[1]))
+            elif menu[selected] == 'BLUE:':
+                camera.awb_mode = 'off'
+                if float(camera.awb_gains[1]) > 0.02:
+                    camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
 
-            #LEFT
-            elif pressed == 'left':
-                if selected > 0:
-                    selected = selected - 1
-                else:
-                    selected = len(menu) - 1
-                if selected == 4:
-                    selected = 3
-
-            #DOWN
-            elif pressed == 'down':
-                if menu[selected] == 'BRIGHT:':
-                    camera.brightness = max(camera.brightness - 1, 0)
-                elif menu[selected] == 'CONT:':
-                    camera.contrast = max(camera.contrast - 1, -100)
-                elif menu[selected] == 'SAT:':
-                    camera.saturation = max(camera.saturation - 1, -100)
-                elif menu[selected] == 'SHUTTER:':
-                    if camera.shutter_speed == 0:
-                        camera.shutter_speed = camera.exposure_speed
-                    if camera.shutter_speed < 5000:
-                        camera.shutter_speed = max(camera.shutter_speed - 50, 20)
-                    else:
-                        camera.shutter_speed = max(camera.shutter_speed - 200, 200)
-                elif menu[selected] == 'ISO:':
-                    camera.iso = max(camera.iso - 100, 100)
-                elif menu[selected] == 'BEEP:':
-                    if beeps > 0:
-                        beeps = beeps - 1
-                elif menu[selected] == 'FLIP:':
-                    if flip == 'yes':
-                        camera.hflip = False
-                        camera.vflip = False
-                        flip = 'no'
-                        time.sleep(0.2)
-                    else:
-                        camera.hflip = True
-                        camera.vflip = True
-                        flip = 'yes'
-                        time.sleep(0.2)
-                elif menu[selected] == 'LENGTH:':
-                    if reclenght > 0:
-                        reclenght = reclenght - 1
-                        time.sleep(0.1)
-                elif menu[selected] == 'MIC:':
-                    if miclevel > 0:
-                        miclevel = miclevel - 2
-                        #Wheezy
-                        if debianversion == '7':
-                            os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                        #Jessie
-                        if debianversion > '7':
-                            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
-                elif menu[selected] == 'PHONES:':
-                    if headphoneslevel > 0:
-                        headphoneslevel = headphoneslevel - 2
-                        #Wheezy
-                        if debianversion == '7':
-                            os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                        #Jessie
-                        if debianversion > '8':
-                            os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
-                elif menu[selected] == 'SCENE:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
-                    renderscene = True
-                elif menu[selected] == 'SHOT:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
-                elif menu[selected] == 'TAKE:' and recording == False:
-                    scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
-                elif menu[selected] == 'RED:':
-                    camera.awb_mode = 'off'
-                    if float(camera.awb_gains[0]) > 0.02:
-                        camera.awb_gains = (float(camera.awb_gains[0]) - 0.02, float(camera.awb_gains[1]))
-                elif menu[selected] == 'BLUE:':
-                    camera.awb_mode = 'off'
-                    if float(camera.awb_gains[1]) > 0.02:
-                        camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
-
-            #RIGHT
-            elif pressed == 'right':
-                if selected < len(menu) - 1:
-                    selected = selected + 1
-                else:
-                    selected = 0
-                if selected == 4: #jump over recording time
-                    selected = 5
-
-            #Check if scene, shot, or take changed and update thumbnail
-            if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
-                if recording == False:
-                    print 'okey something has changed'
-                    overlay = removeimage(camera, overlay)
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
-                    overlay = displayimage(camera, imagename)
-                    oldscene = scene
-                    oldshot = shot
-                    oldtake = take
-                    updatethumb = False
-
-            #Start Recording Time
-            if recording == True:
-                t = time.time() - starttime
-                rectime = time.strftime("%H:%M:%S", time.gmtime(t))
-
-            #If auto dont show value show auto
-            if camera.iso == 0:
-                cameraiso = 'auto'
+        #RIGHT
+        elif pressed == 'right':
+            if selected < len(menu) - 1:
+                selected = selected + 1
             else:
-                cameraiso = str(camera.iso)
-            if camera.shutter_speed == 0:
-                camerashutter = 'auto'
-            else:
-                camerashutter = str(camera.exposure_speed).zfill(5)
-            if camera.awb_mode == 'auto':
-                camerared = 'auto'
-                camerablue = 'auto'
-            else:
-                camerared = str(float(camera.awb_gains[0]))[:4]
-                camerablue = str(float(camera.awb_gains[1]))[:4]
+                selected = 0
+            if selected == 4: #jump over recording time
+                selected = 5
 
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', '', '', '', ''
-            header=''
-            #Check if menu is changed and save settings
-            if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
-                writemenu(menu,settings,selected,header)
-                #save settings if menu has been updated every 5 seconds passed
-                if recording == False:
-                    if time.time() - pausetime > savesettingsevery: 
-                        savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm)
-                        pausetime = time.time()
-                #writemessage(pressed)
-                rendermenu = False
-            time.sleep(0.0555)
+        #Check if scene, shot, or take changed and update thumbnail
+        if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
+            if recording == False:
+                print 'okey something has changed'
+                overlay = removeimage(camera, overlay)
+                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
+                overlay = displayimage(camera, imagename)
+                oldscene = scene
+                oldshot = shot
+                oldtake = take
+                updatethumb = False
+
+        #Start Recording Time
+        if recording == True:
+            t = time.time() - starttime
+            rectime = time.strftime("%H:%M:%S", time.gmtime(t))
+
+        #If auto dont show value show auto
+        if camera.iso == 0:
+            cameraiso = 'auto'
+        else:
+            cameraiso = str(camera.iso)
+        if camera.shutter_speed == 0:
+            camerashutter = 'auto'
+        else:
+            camerashutter = str(camera.exposure_speed).zfill(5)
+        if camera.awb_mode == 'auto':
+            camerared = 'auto'
+            camerablue = 'auto'
+        else:
+            camerared = str(float(camera.awb_gains[0]))[:4]
+            camerablue = str(float(camera.awb_gains[1]))[:4]
+
+        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', '', '', '', ''
+        header=''
+        #Check if menu is changed and save settings
+        if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
+            writemenu(menu,settings,selected,header)
+            #save settings if menu has been updated every 5 seconds passed
+            if recording == False:
+                if time.time() - pausetime > savesettingsevery: 
+                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm)
+                    pausetime = time.time()
+            #writemessage(pressed)
+            rendermenu = False
+        time.sleep(0.0555)
 if __name__ == '__main__':
     import sys
     try:
