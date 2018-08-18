@@ -323,6 +323,12 @@ def update(tarinaversion, tarinavername):
     time.sleep(2)
     return tarinaversion, tarinavername
 
+#-------------Get films---------------
+
+def getfilms():
+    #create a film dictionary
+    return
+
 #-------------Load film---------------
 
 def loadfilm(filmname, filmfolder):
