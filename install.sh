@@ -58,7 +58,7 @@ ff02::2		ip6-allrouters
 EOF
 
 echo "Adding to /boot/cmdline.txt"
-printf " consoleblank=0 logo.nologo loglevel=0 vt.global_cursor_default=0" >> /boot/cmdline.txt
+printf " consoleblank=0 logo.nologo loglevel=0" >> /boot/cmdline.txt
 
 echo "USB soundcard to default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"

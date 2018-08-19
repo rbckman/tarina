@@ -360,7 +360,7 @@ def loadfilm(filmname, filmfolder):
     while True:
         settings = films[selectedfilm][0], ''
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
             if selectedfilm < filmstotal:
                 selectedfilm = selectedfilm + 1
@@ -400,7 +400,7 @@ def nameyourfilm(filmfolder, filmname):
         message = 'Film name: ' + filmname
         writemessage(message + cursor)
         vumetermessage(thefuck)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if str(event) != '-1':
             print str(event)
         if pressed == 'down':
@@ -459,7 +459,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     while True:
         settings = str(between), str(duration), '', ''
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'up' and menu[selected] == 'BETWEEN:':
             between = between + 0.1
         elif pressed == 'down' and menu[selected] == 'BETWEEN:':
@@ -493,7 +493,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                 files = []
                 while True:
                     t = time.time() - starttime
-                    pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     if recording == False and t > between:
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=20)
                         if sound == True:
@@ -582,7 +582,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
     while True:
         settings = 'START'
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
         filename = 'take' + str(take).zfill(3)
         #if pressed == 'up' and selected == 0:
@@ -640,7 +640,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     selected = 0
     while True:
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -830,7 +830,7 @@ def playthis(filename, camera):
     while clipduration > t:
         header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -942,7 +942,7 @@ def copytousb(filmfolder, filmname):
     holdbutton = ''
     writemessage('Searching for usb storage device, middlebutton to cancel')
     while True:
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         usbconnected = os.path.ismount('/media/usb0')
         if pressed == 'middle':
             writemessage('canceling..')
@@ -1020,6 +1020,7 @@ def empty(filename):
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
+    keydelay = 0.08
     readbus = bus.read_byte_data(DEVICE,GPIOB)
     readbus2 = bus.read_byte_data(DEVICE,GPIOA)
     pressed = ''
@@ -1051,10 +1052,15 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         buttonpressed = True
     if readbus == 255 and readbus2 == 247:
         buttonpressed = False
-    if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
+    if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
             pressed = holdbutton
-    return pressed, buttonpressed, buttontime, holdbutton, event
+            keydelay = 0.06
+    if time.time() - buttontime > 2 and buttonpressed == True:
+        keydelay = 0.02
+    if time.time() - buttontime > 4 and buttonpressed == True:
+        keydelay = 0.01
+    return pressed, buttonpressed, buttontime, holdbutton, event, keydelay
 
 def startinterface():
     call (['./startinterface.sh &'], shell = True)
@@ -1100,6 +1106,7 @@ def main():
 
     #STANDARD VALUES
     global screen
+    keydelay = 0.0555
     selectedaction = 0
     selected = 0
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
@@ -1190,7 +1197,7 @@ def main():
     #MAIN LOOP
     while True:
         #GPIO.output(18,backlight)
-        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
 
         #QUIT
@@ -1430,11 +1437,13 @@ def main():
                 camera.iso = 0
         elif pressed == 'middle' and menu[selected] == 'RED:':
             if camera.awb_mode == 'auto':
+                camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]))
                 camera.awb_mode = 'off'
             else:
                 camera.awb_mode = 'auto'
         elif pressed == 'middle' and menu[selected] == 'BLUE:':
             if camera.awb_mode == 'auto':
+                camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]))
                 camera.awb_mode = 'off'
             else:
                 camera.awb_mode = 'auto'
@@ -1645,7 +1654,7 @@ def main():
                     savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm)
                     pausetime = time.time()
             #writemessage(pressed)
-        time.sleep(0.0555)
+        time.sleep(keydelay)
 if __name__ == '__main__':
     import sys
     try:
