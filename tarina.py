@@ -267,7 +267,7 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
         if scene < scenes + 1: #remove this if u want to select any scene
             scene = scene + 1
             shot = countshots(filmname, filmfolder, scene)
-            take = counttakes(filmname, filmfolder, scene, shots)
+            take = counttakes(filmname, filmfolder, scene, shot)
             #if take == 0:
                 #shot = shot - 1
                 #take = counttakes(filmname, filmfolder, scene, shot - 1)
@@ -282,7 +282,7 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
         if scene > 1:
             scene = scene - 1
             shot = countshots(filmname, filmfolder, scene)
-            take = counttakes(filmname, filmfolder, scene, shots)
+            take = counttakes(filmname, filmfolder, scene, shot)
             #if take == 0:
             #    shot = shot - 1
             #    take = counttakes(filmname, filmfolder, scene, shot - 1)
@@ -912,7 +912,9 @@ def audiodelay(foldername, filename):
         #make the delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
-        delayerr = 'V' + str(audiosyncms)
+        os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
+        os.remove(foldername + filename + '_temp.wav')
+        delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
     os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
@@ -1078,6 +1080,7 @@ def stopinterface(camera):
     os.system('pkill -9 arecord')
     os.system('pkill -9 startinterface')
     os.system('pkill -9 camerainterface')
+    os.system('pkill -9 tarinaserver.py')
     curses.nocbreak()
     curses.echo()
     curses.endwin()
@@ -1092,6 +1095,22 @@ def startcamera():
     camera.awb_mode = 'auto'
     return camera
 
+def tarinaserver(state):
+    #Tarina server
+    if state == True:
+        #Try to run tarinaserver on port 8080
+        try:
+            call (['./srv/tarinaserver.py 8080 &'], shell = True)
+            return 'on'
+        except:
+            writemessage("could not run tarina server")
+            time.sleep(2)
+            return 'off'
+    if state == False:
+        os.system('pkill -9 tarinaserver.py')
+        return 'off'
+
+
 #-------------Start main--------------
 
 def main():
@@ -1101,7 +1120,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'TIMELAPSE', 'UPLOAD', 'UPDATE', 'SHUTDOWN', 'WIFI', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'ADELAY', 'SRV:', 'WIFI', 'LOAD', 'NEW'
     actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
 
     #STANDARD VALUES
@@ -1138,6 +1157,7 @@ def main():
     holdbutton = ''
     updatethumb = False
     delayerr = ''
+    serverstate = 'off'
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1158,12 +1178,7 @@ def main():
     screen = startinterface()
     camera = startcamera()
 
-    #Try to run tarinaserver on port 8080
-    #try:
-    #    call (['./srv/tarinaserver.py 8080 &'], shell = True)
-    #except:
-    #    writemessage("could not run tarina server")
-    #    time.sleep(2)
+
 
     #LOAD FILM AND SCENE SETTINGS
     filmname = getfilms(filmfolder)[0][0]
@@ -1381,6 +1396,13 @@ def main():
                     take = 1
                     selectedaction = 0
 
+        #ADELAY
+        elif pressed == 'middle' and menu[selected] == 'ADELAY':
+            foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+            filename = 'take' + str(take).zfill(3)
+            os.system('cp ' + foldername + filename + '.wav /dev/shm/')
+            delayerr = audiodelay(foldername,filename)
+
         #REMOVE
         #take
         elif pressed == 'delete' and menu[selected] == 'TAKE:':
@@ -1514,6 +1536,11 @@ def main():
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[1]) < 7.98:
                     camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
+            elif menu[selected] == 'SRV:':
+                if serverstate == 'on':
+                    serverstate = tarinaserver(False)
+                elif serverstate == 'off':
+                    serverstate = tarinaserver(True)
 
         #LEFT
         elif pressed == 'left':
@@ -1592,6 +1619,11 @@ def main():
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[1]) > 0.02:
                     camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
+            elif menu[selected] == 'SRV:':
+                if serverstate == 'on':
+                    serverstate = tarinaserver(False)
+                elif serverstate == 'off':
+                    serverstate = tarinaserver(True)
 
         #RIGHT
         elif pressed == 'right':
@@ -1642,7 +1674,7 @@ def main():
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
-        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', '', '', '', ''
+        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, '', '', ''
         header=''
         #Check if menu is changed and save settings
         if pressed != '' or recording == True or rendermenu == True:

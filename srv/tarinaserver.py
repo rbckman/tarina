@@ -8,8 +8,11 @@ rundir = os.path.dirname(__file__)
 if rundir != '':
     os.chdir(rundir)
 
+filmfolder = '/home/pi/Videos'
+
 # Link video directory to static dir
-os.system("ln -s /home/pi/Videos static/Videos")
+if os.path.isfile('static/Videos') == False:
+    os.system("ln -s -t static/ " + filmfolder)
 
 films = []
 
