@@ -7,13 +7,15 @@ rundir = os.path.dirname(__file__)
 if rundir != '':
     os.chdir(rundir)
 
-films_sorted = []
-filmfolder = '/home/nemo/'
+filmfolder = '/home/pi/Videos/'
 
+films_sorted = []
 films = os.walk(filmfolder).next()[1]
 for i in films:
     if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
         lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
-        append.films_sorted(i,lastupdate)
-films_sorted = sorted(films, key=lambda tup: tup[1])
+        films_sorted.append((i,lastupdate))
+    else:
+        films_sorted.append((i,0))
+films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
 print films_sorted

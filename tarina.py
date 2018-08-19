@@ -50,22 +50,24 @@ bus.write_byte_data(DEVICE,OLATA,0x4)
 
 #--------------Save settings-----------------
 
-def savesetting(brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm
-    pickle.dump(settings, open(filmfolder + "settings.p", "wb"))
+def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
+        print "settings saved"
     except:
         return
+        print "could not save settings"
 
 #--------------Load film settings--------------
 
-def loadfilmsettings(filmfolder, filmname):
-    settings = pickle.load(open(filmfolder + "settings.p", "rb"))
+def loadsettings(filmfolder, filmname):
     try:
         settings = pickle.load(open(filmfolder + filmname + "/settings.p", "rb"))
+        print "settings loaded"
         return settings
     except:
+        print "couldnt load settings"
         return ''
 
 #--------------Write the menu layer to dispmanx--------------
@@ -134,7 +136,7 @@ def countlast(filmname, filmfolder):
         allfiles = os.listdir(filmfolder + filmname)
     except:
         allfiles = []
-        scenes = 1
+        scenes = 0
     for a in allfiles:
         if 'scene' in a:
             scenes = scenes + 1
@@ -142,7 +144,7 @@ def countlast(filmname, filmfolder):
         allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3))
     except:
         allfiles = []
-        shots = 1
+        shots = 0
     for a in allfiles:
         if 'shot' in a:
             shots = shots + 1
@@ -155,6 +157,20 @@ def countlast(filmname, filmfolder):
         if '.mp4' in a:
             takes = takes + 1
     return scenes, shots, takes
+
+#------------Count scenes--------
+
+def countscenes(filmname, filmfolder):
+    scenes = 0
+    try:
+        allfiles = os.listdir(filmfolder + filmname)
+    except:
+        allfiles = []
+        scenes = 0
+    for a in allfiles:
+        if 'scene' in a:
+            scenes = scenes + 1
+    return scenes
 
 #------------Count shots--------
 
@@ -189,7 +205,6 @@ def counttakes(filmname, filmfolder, scene, shot):
 def renderlist(filmname, filmfolder, scene):
     scenefiles = []
     shots = countshots(filmname,filmfolder,scene)
-    takes = counttakes(filmname,filmfolder,scene,shots)
     shot = 1
     while shot <= shots:
         takes = counttakes(filmname,filmfolder,scene,shot)
@@ -242,7 +257,7 @@ def removeimage(camera, overlay):
 #-------------Browse2.0------------------
 
 def browse2(filmname, filmfolder, scene, shot, take, n, b):
-    scenes, k, l = countlast(filmname, filmfolder)
+    scenes = countscenes(filmname, filmfolder)
     shots = countshots(filmname, filmfolder, scene)
     takes = counttakes(filmname, filmfolder, scene, shot)
     #writemessage(str(scene) + ' < ' + str(scenes))
@@ -251,43 +266,33 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
     if selected == 0 and b == 1:
         if scene < scenes + 1: #remove this if u want to select any scene
             scene = scene + 1
-            shots = countshots(filmname, filmfolder, scene)
-            takes = counttakes(filmname, filmfolder, scene, shots)
-            shot = shots 
-            take = takes
+            shot = countshots(filmname, filmfolder, scene)
+            take = counttakes(filmname, filmfolder, scene, shots)
             #if take == 0:
                 #shot = shot - 1
                 #take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == 1:
         if shot < shots + 1: #remove this if u want to select any shot
             shot = shot + 1 
-            takes = counttakes(filmname, filmfolder, scene, shot)
-            take = takes
+            take = counttakes(filmname, filmfolder, scene, shot)
     elif selected == 2 and b == 1:
         if take < takes + 1:
             take = take + 1 
     elif selected == 0 and b == -1:
         if scene > 1:
             scene = scene - 1
-            shots = countshots(filmname, filmfolder, scene)
-            takes = counttakes(filmname, filmfolder, scene, shots)
-            shot = shots
-            take = takes
+            shot = countshots(filmname, filmfolder, scene)
+            take = counttakes(filmname, filmfolder, scene, shots)
             #if take == 0:
             #    shot = shot - 1
             #    take = counttakes(filmname, filmfolder, scene, shot - 1)
     elif selected == 1 and b == -1:
         if shot > 1:
             shot = shot - 1
-            takes = counttakes(filmname, filmfolder, scene, shot)
-            take = takes
+            take = counttakes(filmname, filmfolder, scene, shot)
     elif selected == 2 and b == -1:
         if take > 1:
             take = take - 1 
-    if takes == 0:
-        take = 1
-    if shot == 0:
-        shot = 1
     return scene, shot, take
 
 #-------------Update------------------
@@ -305,7 +310,7 @@ def update(tarinaversion, tarinavername):
     f = open('/tmp/VERSION')
     versionnumber = f.readline()
     versionname = f.readline()
-    os.system('rm /tmp/VERSION*')
+    os.remove('/tmp/VERSION*')
     if float(tarinaversion) < float(versionnumber):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
@@ -325,9 +330,19 @@ def update(tarinaversion, tarinavername):
 
 #-------------Get films---------------
 
-def getfilms():
-    #create a film dictionary
-    return
+def getfilms(filmfolder):
+    #get a list of films, in order of settings.p file last modified
+    films_sorted = []
+    films = os.walk(filmfolder).next()[1]
+    for i in films:
+        if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
+            lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
+            films_sorted.append((i,lastupdate))
+        else:
+            films_sorted.append((i,0))
+    films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
+    print films_sorted
+    return films_sorted
 
 #-------------Load film---------------
 
@@ -336,17 +351,16 @@ def loadfilm(filmname, filmfolder):
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
-    films = os.walk(filmfolder).next()[1]
-    films.sort()
+    films = getfilms(filmfolder)
     filmstotal = len(films[1:])
     selectedfilm = 0
     selected = 0
     header = 'Up and down to select and load film'
     menu = 'FILM:', 'BACK'
     while True:
-        settings = films[selectedfilm], ''
+        settings = films[selectedfilm][0], ''
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
             if selectedfilm < filmstotal:
                 selectedfilm = selectedfilm + 1
@@ -360,57 +374,73 @@ def loadfilm(filmname, filmfolder):
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle' and menu[selected] == 'FILM:':
-            filmname = films[selectedfilm]
-            #scene = len(os.walk(filmfolder + filmname).next()[1])
-            scene, shot, take = countlast(filmname, filmfolder)
-            #writemessage(filmfolder + filmname + ' scenes ' + str(scene))
-            #time.sleep(5)
-            #alltakes = renderthumbnails(filmname, filmfolder)
-            #writemessage('This film has ' + str(alltakes) + ' takes')
-            #time.sleep(2)
+            filmname = films[selectedfilm][0]
             return filmname
         elif pressed == 'middle' and menu[selected] == 'BACK':
             writemessage('Returning')
-            time.sleep(1)
-            return
+            return filmname
         time.sleep(0.02)
 
 
 #-------------New film----------------
 
-def nameyourfilm():
+def nameyourfilm(filmfolder, filmname):
+    oldfilmname = filmname
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
-    abc = 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z', '_'
+    abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     abcx = 0
-    name = ''
     thefuck = ''
+    cursor = '_'
+    blinking = True
+    pausetime = time.time()
     while True:
-        message = 'Film name: ' + name + abc[abcx]
-        spaces = 27 - len(message)
-        writemessage(message + (spaces * ' ') + thefuck)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        message = 'Film name: ' + filmname
+        writemessage(message + cursor)
+        vumetermessage(thefuck)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if str(event) != '-1':
+            print str(event)
         if pressed == 'down':
             if abcx < (len(abc) - 1):
                 abcx = abcx + 1
+                cursor = abc[abcx]
         elif pressed == 'up':
             if abcx > 0:
                 abcx = abcx - 1
+                cursor = abc[abcx]
         elif pressed == 'right':
-            if len(name) < 10:
-                name = name + abc[abcx]
+            if len(filmname) < 25:
+                filmname = filmname + abc[abcx]
+                cursor = abc[abcx]
             else:
                 thefuck = 'Yo, maximum characters reached bro!'
-        elif pressed == 'left':
-            if len(name) > 0:
-                name = name[:-1]
+        elif pressed == 'left' or event == 263:
+            if len(filmname) > 0:
+                filmname = filmname[:-1]
+                cursor = abc[abcx]
                 thefuck = ''
-        elif pressed == 'middle':
-            if name > 0:
-                name = name + abc[abcx]
-                return(name)
+        elif pressed == 'middle' or event == 10:
+            if len(filmname) > 0:
+                if filmname in getfilms(filmfolder)[0]:
+                    thefuck = 'this filmname is already taken! chose another name!'
+                if filmname not in getfilms(filmfolder)[0]:
+                    return(filmname)
+        elif event == 27:
+            return oldfilmname
+        elif event in range(256):
+            if chr(event) in abc:
+                print str(event)
+                filmname = filmname + (chr(event))
+        if time.time() - pausetime > 0.5:
+            if blinking == True:
+                cursor = abc[abcx]
+            if blinking == False:
+                cursor = ' '
+            blinking = not blinking
+            pausetime = time.time()
         time.sleep(0.02)
 
 #------------Timelapse--------------------------
@@ -429,7 +459,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     while True:
         settings = str(between), str(duration), '', ''
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'up' and menu[selected] == 'BETWEEN:':
             between = between + 0.1
         elif pressed == 'down' and menu[selected] == 'BETWEEN:':
@@ -453,7 +483,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                 selected = selected - 1
         elif pressed == 'middle':
             if menu[selected] == 'START':
-                os.system('mkdir -p ' + foldername + 'timelapse')
+                os.makedirs(foldername + 'timelapse')
                 time.sleep(0.02)
                 writemessage('Recording timelapse, middlebutton to stop')
                 n = 1
@@ -463,7 +493,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                 files = []
                 while True:
                     t = time.time() - starttime
-                    pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     if recording == False and t > between:
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=20)
                         if sound == True:
@@ -524,7 +554,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                             ##MERGE AUDIO & VIDEO
                             writemessage('Merging audio & video')
                             call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
-                            os.system('rm ' +  renderfilename + '_tmp.mp4')
+                            os.remove(renderfilename + '_tmp.mp4')
                         else:
                             writemessage('No audio files found! View INSTALL file for instructions.')
                         #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
@@ -552,7 +582,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
     while True:
         settings = 'START'
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
         filename = 'take' + str(take).zfill(3)
         #if pressed == 'up' and selected == 0:
@@ -570,7 +600,7 @@ def photobooth(beeps, camera, filmfolder, filmname, scene, shot, take, filename)
             if selected == 0:
                 writemessage('SMILE!!!!')
                 time.sleep(2)
-                os.system('mkdir ' + foldername)
+                os.makedirs(foldername)
                 p = 0
                 for filename in camera.capture_continuous(foldername + '/img{counter:03d}.jpg'):
                     p = p + 1
@@ -608,11 +638,9 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     menu = '', ''
     settings = 'YES', 'NO'
     selected = 0
-    if os.path.exists(foldername + filename + '.mp4') == False:
-        return scene, shot, take
     while True:
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -631,29 +659,16 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 elif sceneshotortake == 'shot' and shot > 0:
                     writemessage('Removing shot ' + str(shot))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    filename = 'shot' + str(shot).zfill(3) + '*'
                     os.system('rm -r ' + foldername)
                     take = counttakes(filmname, filmfolder, scene, shot)
-                    take = 1
-                    if shot == 0:
-                        shot = 1
-                    time.sleep(1)
                 elif sceneshotortake == 'scene':
                     writemessage('Removing scene ' + str(scene))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
-                    filename = 'scene' + str(scene).zfill(3) + '*'
-                    if scene > 1:
-                        os.system('rm -r ' + foldername)
-                        scene = scene - 1
-                    if scene == 1:
-                        os.system('rm -r ' + foldername)
-                        os.system('mkdir ' + foldername)
-                    #shot = countshots(filmname, filmfolder, scene)
-                    #take = counttakes(filmname, filmfolder, scene, shot)
-                    #take = take + 1
-                    take = 1
-                    shot = 1
-                    time.sleep(1)
+                    os.system('rm -r ' + foldername)
+                    scene = countscenes(filmname, filmfolder)
+                elif sceneshotortake == 'film':
+                    foldername = filmfolder + filmname
+                    os.system('rm -r ' + foldername)
                 return scene, shot, take
             elif selected == 1:
                 return scene, shot, take
@@ -716,62 +731,6 @@ def organize(filmfolder, filmname):
 
     print 'Organizer done! Everything is tidy'
 
-#------------Happy with take or not?------------
-
-def happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder):
-    pressed = ''
-    buttonpressed = ''
-    buttontime = time.time()
-    holdbutton = ''
-    header = 'Are You Happy with Your Take? Retake if not!'
-    menu = '', '', '', '', ''
-    settings = 'VIEW', 'NEXT', 'RETAKE', 'REMOVE'
-    selected = 1
-    writemessage('Converting video, hold your horses...')
-    #call(['avconv', '-y', '-i', thefile + '.wav', '-acodec', 'libmp3lame', thefile + '.mp3'], shell=False)
-    #call(['MP4Box', '-add', thefile + '.h264', '-add', thefile + '.mp3', '-new', thefile + '.mp4'], shell=False)
-    while True:
-        writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'right':
-            if selected < (len(settings) - 1):
-                selected = selected + 1
-        if pressed == 'left':
-            if selected > 0:
-                selected = selected - 1
-        if pressed == 'middle':
-            if selected == 0:
-                compileshot(foldername + filename)
-                playthis(foldername + filename, camera)
-            #NEXTSHOT (also check if coming from browse)
-            elif selected == 1:
-                #scenes, shots, takes = countlast(filmname, filmfolder)
-                #writemessage(str(scenes) + ' ' + str(shots) + ' ' + str(takes))
-                #time.sleep(2)
-                #if takes > 0:
-                    #shots = shots + 1
-                    #os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                shot = shot + 1
-                takes = counttakes(filmname, filmfolder, scene, shot)
-                if takes == 0:
-                    takes = 1
-                os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/')
-                writemessage('Congratz!')
-                time.sleep(0.2)
-                return scene, shot, takes, thefile
-            #RETAKE
-            elif selected == 2:
-                take = take + 1
-                writemessage('You made a shitty shot!')
-                time.sleep(0.2)
-                thefile = ''
-                return scene, shot, take, thefile
-            #REMOVE
-            elif selected == 3:
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-                return scene, shot, take, thefile
-        time.sleep(0.02)
-                
 #-------------Compile Shot--------------
 
 def compileshot(filename):
@@ -841,8 +800,8 @@ def render(filmfiles, filename):
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
         call(['MP4Box', '-add', filename + '_tmp.mp4', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
-        os.system('rm ' + filename + '_tmp.mp4')
-        os.system('rm ' + filename + '.mp3')
+        os.remove(filename + '_tmp.mp4')
+        os.remove(filename + '.mp3')
     else:
         writemessage('No audio files found! View INSTALL file for instructions.')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
@@ -871,7 +830,7 @@ def playthis(filename, camera):
     while clipduration > t:
         header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
         writemenu(menu,settings,selected,header)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -939,7 +898,7 @@ def audiodelay(foldername, filename):
         #trim from end and put a 0.005 in- and outfade
         os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
-        os.system('rm ' + foldername + filename + '_temp.wav ')
+        os.remove(foldername + filename + '_temp.wav')
         delayerr = 'A' + str(audiosync)
     else:
         #calculate difference
@@ -954,7 +913,7 @@ def audiodelay(foldername, filename):
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
         delayerr = 'V' + str(audiosyncms)
-    os.system('rm /dev/shm/' + filename + '.wav')
+    os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
@@ -972,7 +931,7 @@ def audiosilence(foldername,filename):
     print('Videofile is: ' + str(videos) + 's ' + str(videoms))
     os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos) + '.' + str(videoms).zfill(3))
     os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav')
-    os.system('rm /dev/shm/' + filename + '.wav')
+    os.remove('/dev/shm/' + filename + '.wav')
 
 #--------------Copy to USB-------------------
 
@@ -983,7 +942,7 @@ def copytousb(filmfolder, filmname):
     holdbutton = ''
     writemessage('Searching for usb storage device, middlebutton to cancel')
     while True:
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         usbconnected = os.path.ismount('/media/usb0')
         if pressed == 'middle':
             writemessage('canceling..')
@@ -1002,7 +961,7 @@ def copytousb(filmfolder, filmname):
                     filmfiles.extend(renderlist(filmname, filmfolder, scene))
                 scene = scene + 1
             #RENDER FILES TO MP4 ON USB STICK
-            os.system('mkdir -p /media/usb0/' + filmname)
+            os.makedirs('/media/usb0/' + filmname)
             for f in filmfiles[:]:
                 os.system('MP4Box -add ' + f + '.mp4 -new /media/usb0/' + filmname + '/' + f[-24:] + '.mp4')
                 os.system('cp ' + f + '.wav /media/usb0/' + filmname + '/' + f[-24:] + '.wav')
@@ -1069,21 +1028,21 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'quit'
         elif event == curses.KEY_ENTER or event == 10 or event == 13 or readbus == 247:
             pressed = 'middle'
-        elif event == ord('w') or event == curses.KEY_UP or readbus == 191: 
+        elif event == curses.KEY_UP or readbus == 191: 
             pressed = 'up'
-        elif event == ord('s') or event == curses.KEY_DOWN or readbus == 254:
+        elif event == curses.KEY_DOWN or readbus == 254:
             pressed = 'down'
-        elif event == ord('a') or event == curses.KEY_LEFT or readbus == 239:
+        elif event == curses.KEY_LEFT or readbus == 239:
             pressed = 'left'
-        elif event == ord('d') or event == curses.KEY_RIGHT or readbus == 251:
+        elif event == curses.KEY_RIGHT or readbus == 251:
             pressed = 'right'
-        elif event == ord('e') or readbus == 127:
+        elif event == 339 or readbus == 127:
             pressed = 'record'
-        elif event == ord('c') or readbus == 253:
+        elif event == 338 or readbus == 253:
             pressed = 'retake'
-        elif event == ord('q') or readbus == 223:
+        elif event == 9 or readbus == 223:
             pressed = 'view'
-        elif event == ord('z') or readbus2 == 246:
+        elif event == 330 or readbus2 == 246:
             pressed = 'delete'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
@@ -1095,7 +1054,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if float(time.time() - buttontime) > 0.15 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
             pressed = holdbutton
-    return pressed, buttonpressed, buttontime, holdbutton
+    return pressed, buttonpressed, buttontime, holdbutton, event
 
 def startinterface():
     call (['./startinterface.sh &'], shell = True)
@@ -1132,7 +1091,7 @@ def startcamera():
 def main():
     filmfolder = "/home/pi/Videos/"
     if os.path.isdir(filmfolder) == False:
-        os.system('mkdir ' + filmfolder)
+        os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
 
     #MENUS
@@ -1189,10 +1148,6 @@ def main():
     disk = os.statvfs(filmfolder)
     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
 
-    #COUNT FILM FILES
-    files = os.listdir(filmfolder)
-    filename_count = len(files)
-
     screen = startinterface()
     camera = startcamera()
 
@@ -1204,29 +1159,28 @@ def main():
     #    time.sleep(2)
 
     #LOAD FILM AND SCENE SETTINGS
+    filmname = getfilms(filmfolder)[0][0]
+    organize(filmfolder, filmname)
+    scene, shot, take = countlast(filmname, filmfolder)
     try:
-        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
     except:
-        writemessage("no film settings found")
-        time.sleep(2)
+        print "no"
+        
 
     #FILE & FOLDER NAMES
-    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-    filename = 'take' + str(take).zfill(3)
+    #foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+    #filename = 'take' + str(take).zfill(3)
 
     #NEW FILM (IF NOTHING TO LOAD)
     if filmname == '':
-        filmname = nameyourfilm()
+        filmname = nameyourfilm(filmfolder, 'untitled')
 
     if flip == "yes":
         camera.vflip = True
         camera.hflip = True
-    os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
     os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
     os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-
-    #ORGANIZE
-    organize(filmfolder, filmname)
 
     #THUMBNAILCHECKER
     oldscene = scene
@@ -1236,7 +1190,7 @@ def main():
     #MAIN LOOP
     while True:
         #GPIO.output(18,backlight)
-        pressed, buttonpressed, buttontime, holdbutton = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        pressed, buttonpressed, buttontime, holdbutton, event = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
 
         #QUIT
@@ -1269,7 +1223,8 @@ def main():
             if recording == False and recordable == True:
                 if beeps > 0:
                     buzzer(beeps)
-                os.system('mkdir -p ' + foldername)
+                if os.path.isdir(foldername) == False:
+                    os.makedirs(foldername)
                 #camera.led = True
                 os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
                 camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
@@ -1372,30 +1327,6 @@ def main():
             if recording == False:
                 copytousb(filmfolder, filmname)
 
-        #NEW SCENE
-        elif pressed == 'middle' and selectedaction == 22:
-            if recording == False:
-                scene = scene + 1
-                take = 1
-                shot = 1
-                os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                writemessage('New scene!')
-                time.sleep(2)
-                selectedaction = 0
-
-        #NEW SHOT
-        elif pressed == 'middle' and selectedaction == 27:
-            if recording == False:
-                takes = counttakes(filmname, filmfolder, scene, shot)
-                if takes > 0:
-                    shot = shot + 1
-                    takes = counttakes(filmname, filmfolder, scene, shot)
-                    take = takes + 1
-                    os.system('mkdir -p ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                else:
-                    writemessage('This is it maan')
-                    time.sleep(2)
-
         #UPLOAD
         elif pressed == 'middle' and menu[selected] == 'UPLOAD':
             buttonpressed = time.time()
@@ -1408,12 +1339,13 @@ def main():
 
         #LOAD FILM
         elif pressed == 'middle' and menu[selected] == 'LOAD':
-            filmname = loadfilm(filmname,filmfolder)
+            filmname = loadfilm(filmname, filmfolder)
+            organize(filmfolder, filmname)
+            scene, shot, take = countlast(filmname, filmfolder)
             try:
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm = loadfilmsettings(filmfolder, filmname)
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
             except:
-                writemessage("no film settings found")
-                time.sleep(2)
+                print "no film settings found"
 
         #UPDATE
         elif pressed == 'middle' and menu[selected] == 'UPDATE':
@@ -1430,15 +1362,17 @@ def main():
         #NEW FILM
         elif pressed == 'middle' and menu[selected] == 'NEW':
             if recording == False:
-                scene = 1
-                shot = 1
-                take = 1
-                selectedaction = 0
-                filmname = nameyourfilm()
-                os.system('mkdir -p ' + filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-                writemessage('Good luck with your film ' + filmname + '!')
-                time.sleep(2)
-                selectedaction = 0
+                oldname = filmname
+                filmname = nameyourfilm(filmfolder, '')
+                if filmname != oldname:
+                    os.makedirs(filmfolder + filmname)
+                    writemessage('Good luck with your film ' + filmname + '!')
+                    updatethumb = True
+                    updatemenu = True
+                    scene = 1
+                    shot = 1
+                    take = 1
+                    selectedaction = 0
 
         #REMOVE
         #take
@@ -1465,6 +1399,23 @@ def main():
             renderfilm = True
             updatethumb = True
             time.sleep(0.2)
+        #film
+        elif pressed == 'delete' and menu[selected] == 'FILM:':
+            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'film')
+            filmname = getfilms(filmfolder)[0][0]
+            if filmname == '':
+                filmname = nameyourfilm(filmfolder,'')
+            else:
+                scene, shot, take = countlast(filmname, filmfolder)
+                try:
+                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
+                except:
+                    print "no"
+                organize(filmfolder, filmname)
+                renderscene = True
+                renderfilm = True
+                updatethumb = True
+                time.sleep(0.2)
 
         #Middle button auto mode on/off
         elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
@@ -1642,6 +1593,13 @@ def main():
             if selected == 4: #jump over recording time
                 selected = 5
 
+        if scene == 0:
+            scene = 1
+        if take == 0:
+            take = 1
+        if shot == 0:
+            shot = 1
+
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
@@ -1678,15 +1636,15 @@ def main():
         settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', '', '', '', ''
         header=''
         #Check if menu is changed and save settings
-        if pressed != '' or pressed != 'hold' or recording == True or rendermenu == True:
+        if pressed != '' or recording == True or rendermenu == True:
             writemenu(menu,settings,selected,header)
+            rendermenu = False
             #save settings if menu has been updated every 5 seconds passed
             if recording == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesetting(camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, filmfolder, filmname, scene, shot, take, thefile, beeps, flip, renderscene, renderfilm)
+                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm)
                     pausetime = time.time()
             #writemessage(pressed)
-            rendermenu = False
         time.sleep(0.0555)
 if __name__ == '__main__':
     import sys
