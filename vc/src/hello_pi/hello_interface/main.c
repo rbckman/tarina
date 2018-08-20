@@ -48,7 +48,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(80,80,80,0xff), /* fg */
+                                     GRAPHICS_RGBA32(100,100,100,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 74, text_size);
       }
@@ -81,7 +81,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(20,0,20,0xff), /* bg */
+                                     GRAPHICS_RGBA32(50,50,50,0xff), /* bg */
                                      text, 74, text_size);
       }
    return 0;

@@ -899,6 +899,9 @@ def audiodelay(foldername, filename):
         os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
+        if int(audiosync) > 200:
+            writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
+            time.sleep(10)
         delayerr = 'A' + str(audiosync)
     else:
         #calculate difference
@@ -911,7 +914,7 @@ def audiodelay(foldername, filename):
         print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
         #make the delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
-        os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
+        os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '_temp.wav')
         os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
         delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
@@ -1072,6 +1075,7 @@ def startinterface():
     curses.noecho()
     screen.nodelay(1)
     curses.curs_set(0)
+    screen.clear()
     return screen
 
 def stopinterface(camera):
@@ -1178,7 +1182,7 @@ def main():
     screen = startinterface()
     camera = startcamera()
 
-
+    time.sleep(1)
 
     #LOAD FILM AND SCENE SETTINGS
     filmname = getfilms(filmfolder)[0][0]
@@ -1187,7 +1191,7 @@ def main():
     try:
         camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
     except:
-        print "no"
+        print "no settings loaded"
         
 
     #FILE & FOLDER NAMES
