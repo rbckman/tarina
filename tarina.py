@@ -1055,7 +1055,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
-    if readbus == 255 and readbus2 == 247:
+    if readbus == 255 and readbus2 == 247 and event == -1:
         buttonpressed = False
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
