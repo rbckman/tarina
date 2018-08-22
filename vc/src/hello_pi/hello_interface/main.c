@@ -48,7 +48,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(100,100,100,0xff), /* fg */
+                                     GRAPHICS_RGBA32(180,180,180,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 74, text_size);
       }
@@ -64,7 +64,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(60,60,60,0xff), /* fg */
+                                     GRAPHICS_RGBA32(30,30,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 74, text_size);
       }
@@ -80,8 +80,8 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(50,50,50,0xff), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,0xff), /* fg */
+                                     GRAPHICS_RGBA32(255,255,255,0xff), /* bg */
                                      text, 74, text_size);
       }
    return 0;
@@ -109,7 +109,7 @@ int main(void)
 
    graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 1);
 
-   uint32_t text_size = 20;
+   uint32_t text_size = 16;
    int selected;
    int len_string_header;
    int len_string_film;
@@ -279,7 +279,7 @@ int main(void)
               // blue, at the top (y=40)
               // selected 0 1 2 3 4 5 6 7 8
               int space = 10;
-              int morespace = 15;
+              int morespace = 6;
               int color = 5;
               // draw the text if updated
               if(strlen(header) != 0) {
@@ -322,7 +322,7 @@ int main(void)
               }
               }
               if(strlen(header) == 0) {
-              render_subtitle(img, rec, text_size, 690, y_offset5, 2);
+              render_subtitle(img, rec, text_size, 700, y_offset3, 3);
               if(selected == 0){
               render_subtitle(img, film, text_size, 0, y_offset2, 1);
               }
