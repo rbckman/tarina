@@ -13,12 +13,7 @@ apt-get -y install git python-picamera python-imaging python-pexpect libav-tools
 rpi-update
 echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
-echo "changing cpu governor to performance..."
-cat <<'EOF' > /etc/default/cpufrequtils
-GOVERNOR="performance"
-EOF
 echo "Adding to /boot/config.txt"
-cp rpihdtft/dt-blob.bin /boot/
 cat <<'EOF' >> /boot/config.txt
 #Rpi-hd-tft
 dtoverlay=dpi18
@@ -36,7 +31,7 @@ dpi_output_format=0x6f015
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3 
 start_x=1
-gpu_mem=128
+gpu_mem=512
 dtoverlay=pi3-disable-bt-overlay
 dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
