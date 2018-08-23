@@ -1083,7 +1083,7 @@ def stopinterface(camera):
     camera.close()
     os.system('pkill -9 arecord')
     os.system('pkill -9 startinterface')
-    os.system('pkill -9 camerainterface')
+    os.system('pkill -9 tarinagui')
     os.system('pkill -9 tarinaserver.py')
     curses.nocbreak()
     curses.echo()
@@ -1699,7 +1699,7 @@ if __name__ == '__main__':
         print 'Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1]
         os.system('pkill arecord')
         os.system('pkill startinterface')
-        os.system('pkill camerainterface')
+        os.system('pkill tarinagui')
         curses.nocbreak()
         curses.echo()
         curses.endwin()
