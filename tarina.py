@@ -819,9 +819,13 @@ def playthis(filename, camera):
     writemessage('Starting omxplayer')
     player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
-    time.sleep(2) 
+    time.sleep(1.5) 
     os.system('aplay -D plughw:0 ' + filename + '.wav &')
-    player.play()
+    try:
+        player.play()
+    except:
+        print 'something wrong with omxplayer'
+        return
     menu = 'BACK', 'PLAY FROM START'
     settings = '', ''
     selected = 0
