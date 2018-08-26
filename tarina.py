@@ -17,6 +17,7 @@
 #limitations under the License.
 
 import picamera
+import numpy as np
 import os
 import time
 from subprocess import call
@@ -818,8 +819,9 @@ def playthis(filename, camera):
     camera.stop_preview()
     writemessage('Starting omxplayer')
     player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    player.pause()
     #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
-    time.sleep(1.5) 
+    time.sleep(1) 
     os.system('aplay -D plughw:0 ' + filename + '.wav &')
     try:
         player.play()
@@ -1096,8 +1098,15 @@ def stopinterface(camera):
 def startcamera():
     camera = picamera.PiCamera()
     camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
+    #lensshade = ''
+    #try:
+    #    npzfile = np.load('./lensconfig.npz')
+    #    lensshade = npzfile['lens_shading_table']
+    #    camera.lens_shading_table = lensshade
+    #except:
+    #    pass
     camera.framerate = 24.999
-    camera.crop       = (0, 0, 1.0, 1.0)
+    camera.crop = (0, 0, 1.0, 1.0)
     camera.led = False
     camera.start_preview()
     camera.awb_mode = 'auto'
