@@ -901,12 +901,13 @@ def audiodelay(foldername, filename):
         audiosync = int(audiolenght) - int(videolenght)
         newaudiolenght = int(audiolenght) - audiosync
         print('Audiofile is: ' + str(audiosync) + 'ms longer')
-        #trim from end and put a 0.005 in- and outfade
+        #trim from end and put a 0.01 in- and outfade
         os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
         if int(audiosync) > 200:
             writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
+            vumetermessage('Consider changing to a faster microsd card.')
             time.sleep(10)
         delayerr = 'A' + str(audiosync)
     else:
@@ -918,11 +919,14 @@ def audiodelay(foldername, filename):
                 audiosyncs = audiosyncs - 1
             audiosyncms = 1000 + audiosyncms
         print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
-        #make the delay file
+        #make fade
+        os.system('sox -G /dev/shm' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
+        #make delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
-        os.system('sox /dev/shm/' + filename + '.wav /dev/shm/silence.wav ' + foldername + filename + '_temp.wav')
-        os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
+        #add silence to end
+        os.system('sox ' + foldername + filename + '_temp.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
+        os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
     os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
@@ -1107,6 +1111,7 @@ def startcamera():
     #    pass
     camera.framerate = 24.999
     camera.crop = (0, 0, 1.0, 1.0)
+    #camera.video_stabilization = True
     camera.led = False
     camera.start_preview()
     camera.awb_mode = 'auto'
