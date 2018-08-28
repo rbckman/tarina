@@ -920,7 +920,7 @@ def audiodelay(foldername, filename):
             audiosyncms = 1000 + audiosyncms
         print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
         #make fade
-        os.system('sox -G /dev/shm' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
+        os.system('sox -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         #add silence to end
@@ -1103,16 +1103,15 @@ def startcamera():
     camera = picamera.PiCamera()
     camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
     #lensshade = ''
-    #try:
-    #    npzfile = np.load('./lensconfig.npz')
-    #    lensshade = npzfile['lens_shading_table']
-    #    camera.lens_shading_table = lensshade
-    #except:
-    #    pass
+    npzfile = np.load('./lensconfig.npz')
+    lensshade = npzfile['lens_shading_table']
     camera.framerate = 24.999
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
+    #lens_shading_table = np.zeros(camera._lens_shading_table_shape(), dtype=np.uint8) + 32
+    #camera.lens_shading_table = lens_shading_table
+    camera.lens_shading_table = lensshade
     camera.start_preview()
     camera.awb_mode = 'auto'
     return camera
