@@ -1,8 +1,8 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - the DIY filmmaking device
-#Copyright 2018 Robin Bäckman
+#Tarina - 3d printable camera for lazy filmmakers
+#Copyright 2016 - 2018 Robin Bäckman
 
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -1197,29 +1197,17 @@ def main():
     disk = os.statvfs(filmfolder)
     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
 
-    #start interface
+    #START INTERFACE
     screen = startinterface()
     camera = startcamera()
     time.sleep(1)
 
     #LOAD FILM AND SCENE SETTINGS
     filmname = getfilms(filmfolder)[0][0]
-    organize(filmfolder, filmname)
-    scene, shot, take = countlast(filmname, filmfolder)
-        
-    #FILE & FOLDER NAMES
-    #foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-    #filename = 'take' + str(take).zfill(3)
 
     #NEW FILM (IF NOTHING TO LOAD)
     if filmname == '':
         filmname = nameyourfilm(filmfolder, 'untitled')
-
-    if flip == "yes":
-        camera.vflip = True
-        camera.hflip = True
-    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
-    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
 
     #THUMBNAILCHECKER
     oldscene = scene
@@ -1228,7 +1216,6 @@ def main():
 
     #MAIN LOOP
     while True:
-
 
         #GPIO.output(18,backlight)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1381,8 +1368,6 @@ def main():
         #LOAD FILM
         elif pressed == 'middle' and menu[selected] == 'LOAD':
             filmname = loadfilm(filmname, filmfolder)
-            organize(filmfolder, filmname)
-            scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = True
 
         #UPDATE
@@ -1454,9 +1439,6 @@ def main():
             else:
                 scene, shot, take = countlast(filmname, filmfolder)
                 loadfilmsettings = True
-                organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
                 updatethumb = True
                 time.sleep(0.2)
 
@@ -1635,6 +1617,26 @@ def main():
         if shot == 0:
             shot = 1
 
+        #Start Recording Time
+        if recording == True:
+            t = time.time() - starttime
+            rectime = time.strftime("%H:%M:%S", time.gmtime(t))
+
+        #load settings
+        if loadfilmsettings == True:
+            filmsettings = loadsettings(filmfolder, filmname)
+            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
+            time.sleep(0.2)
+            if flip == "yes":
+                camera.vflip = True
+                camera.hflip = True
+            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+            os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            organize(filmfolder, filmname)
+            scene, shot, take = countlast(filmname, filmfolder)
+            loadfilmsettings = False
+            rendermenu = True
+
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
@@ -1646,19 +1648,6 @@ def main():
                 oldshot = shot
                 oldtake = take
                 updatethumb = False
-
-        #Start Recording Time
-        if recording == True:
-            t = time.time() - starttime
-            rectime = time.strftime("%H:%M:%S", time.gmtime(t))
-
-        #load settings
-        if loadfilmsettings == True:
-            filmsettings = loadsettings(filmfolder, filmname)
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
-            time.sleep(0.2)
-            loadfilmsettings = False
-            rendermenu = True
 
         #If auto dont show value show auto
         if camera.iso == 0:
