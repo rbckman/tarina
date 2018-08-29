@@ -50,7 +50,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(225,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
-                                     text, 74, text_size);
+                                     text, 80, text_size);
       }
    if (fontcolor == 4) {
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -58,7 +58,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(51,51,51,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
-                                     text, 74, text_size);
+                                     text, 80, text_size);
       }
    if (fontcolor == 3) {
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -66,7 +66,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,30,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
-                                     text, 74, text_size);
+                                     text, 80, text_size);
       }
    if (fontcolor == 2) {
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -74,7 +74,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
-                                     text, 74, text_size);
+                                     text, 80, text_size);
       }
    if (fontcolor == 1) {
    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -82,7 +82,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* fg */
                                      GRAPHICS_RGBA32(200,200,200,0xff), /* bg */
-                                     text, 74, text_size);
+                                     text, 80, text_size);
       }
    return 0;
    }
@@ -139,7 +139,7 @@ int main(void)
    int len_string_more7;
    char check[500];
    char oldcheck[500];
-   char vumeter[80];
+   char vumeter[130];
    char menu[4];
    char header[100];
    char film[30];
@@ -172,7 +172,7 @@ int main(void)
       // char ch;
       FILE *fp;
       fp = fopen("/dev/shm/vumeter","r");
-      while(fgets(vumeter, 74, fp) != NULL);
+      while(fgets(vumeter, 130, fp) != NULL);
       fclose(fp);
       FILE *fp2;
       fp2 = fopen("/dev/shm/interface","r");

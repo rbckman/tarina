@@ -1411,8 +1411,8 @@ static void suspend(void)
 
 static void print_vu_meter_mono(int perc, int maxperc)
 {
-	const int bar_length = 50;
-	char line[80];
+	const int bar_length = 72;
+	char line[130];
 	int val;
 
 	for (val = 0; val <= perc * bar_length / 100 && val < bar_length; val++)
@@ -1426,12 +1426,12 @@ static void print_vu_meter_mono(int perc, int maxperc)
 		sprintf(line + val, "| MAX");
 	else
 		sprintf(line + val, "| %02i%%", maxperc);
+	if (perc > 100)
+		printf(_(" !clip  "));
         FILE *vumeter;
         vumeter = fopen("/dev/shm/vumeter","w");
         fputs(line, vumeter);
         fclose(vumeter);
-	if (perc > 100)
-		printf(_(" !clip  "));
 }
 
 static void print_vu_meter_stereo(int *perc, int *maxperc)
@@ -1469,10 +1469,6 @@ static void print_vu_meter_stereo(int *perc, int *maxperc)
 			memcpy(line + bar_length, tmp, 3);
 	}
 	line[bar_length * 2 + 6 + 2] = 0;
-        FILE *vumeter;
-        vumeter = fopen("/dev/shm/vumeter","w");
-        fputs(line, vumeter);
-        fclose(vumeter);
 }
 
 static void print_vu_meter(signed int *perc, signed int *maxperc)
