@@ -1144,8 +1144,6 @@ def main():
 
     #MENUS
     menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'ADELAY', 'SRV:', 'WIFI', 'LOAD', 'NEW'
-    actionmenu = 'Record', 'Play', 'Copy to USB', 'Upload', 'Update', 'New Film', 'Load Film', 'Remove', 'Photobooth'
-
     #STANDARD VALUES
     global screen
     keydelay = 0.0555
@@ -1191,10 +1189,6 @@ def main():
     tarinaversion = f.readline()
     tarinavername = f.readline()
 
-    #Rasbian version
-    f = open('/etc/debian_version')
-    debianversion = f.readlines()[0][0]
-
     #Turn off hdmi to save power
     os.system('tvservice -o')
 
@@ -1202,9 +1196,9 @@ def main():
     disk = os.statvfs(filmfolder)
     diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
 
+    #start interface
     screen = startinterface()
     camera = startcamera()
-
     time.sleep(1)
 
     #LOAD FILM AND SCENE SETTINGS
@@ -1212,11 +1206,10 @@ def main():
     organize(filmfolder, filmname)
     scene, shot, take = countlast(filmname, filmfolder)
     try:
-        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
+        filmsettings = loadsettings(filmfolder, filmname)
     except:
         print "no settings loaded"
         
-
     #FILE & FOLDER NAMES
     #foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     #filename = 'take' + str(take).zfill(3)
@@ -1228,8 +1221,8 @@ def main():
     if flip == "yes":
         camera.vflip = True
         camera.hflip = True
-    os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-    os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
+    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
 
     #THUMBNAILCHECKER
     oldscene = scene
@@ -1392,7 +1385,7 @@ def main():
             organize(filmfolder, filmname)
             scene, shot, take = countlast(filmname, filmfolder)
             try:
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
+                filmsettings = loadsettings(filmfolder, filmname)
             except:
                 print "no film settings found"
 
@@ -1407,6 +1400,10 @@ def main():
             os.system('wicd-curses')
             screen = startinterface()
             camera = startcamera()
+            try:
+                filmsettings  = loadsettings(filmfolder, filmname)
+            except:
+                print "no film settings found"
 
         #NEW FILM
         elif pressed == 'middle' and menu[selected] == 'NEW':
@@ -1464,7 +1461,7 @@ def main():
             else:
                 scene, shot, take = countlast(filmname, filmfolder)
                 try:
-                    camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = loadsettings(filmfolder, filmname)
+                    filmsettings = loadsettings(filmfolder, filmname)
                 except:
                     print "no"
                 organize(filmfolder, filmname)
@@ -1533,21 +1530,11 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel < 100:
                     miclevel = miclevel + 2
-                    #Wheezy
-                    if debianversion == '7':
-                        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                    #Jessie
-                    if debianversion > '7':
-                        os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel < 100:
                     headphoneslevel = headphoneslevel + 2
-                    #Wheezy
-                    if debianversion == '7':
-                        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                    #Jessie
-                    if debianversion > '8':
-                        os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
+                    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                 renderscene = True
@@ -1616,21 +1603,11 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel > 0:
                     miclevel = miclevel - 2
-                    #Wheezy
-                    if debianversion == '7':
-                        os.system('amixer -c 0 set Mic Capture ' + str(miclevel) + '%')
-                    #Jessie
-                    if debianversion > '7':
-                        os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel > 0:
                     headphoneslevel = headphoneslevel - 2
-                    #Wheezy
-                    if debianversion == '7':
-                        os.system('amixer -c 0 set Mic Playback ' + str(headphoneslevel) + '%')
-                    #Jessie
-                    if debianversion > '8':
-                        os.system('amixer -c 0 sset Mic Playback ' + str(headphoneslevel) + '%')
+                    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                 renderscene = True
@@ -1700,6 +1677,9 @@ def main():
         else:
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
+
+        #unload settings
+        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
 
         settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, '', '', ''
         header=''
