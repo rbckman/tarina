@@ -13,6 +13,8 @@ apt-get -y install git python-picamera python-imaging python-pexpect libav-tools
 rpi-update
 echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
+echo "installing openflexure microscope fork of picamera with lens shading correction..."
+pip install https://github.com/rwb27/openflexure_microscope_software/archive/master.zip
 echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
 
