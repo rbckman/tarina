@@ -15,6 +15,7 @@ echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
 echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
+
 #Rpi-hd-tft
 dtoverlay=dpi18
 overscan_left=0
@@ -37,6 +38,15 @@ dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
 force_turbo=1
 boot_delay=1
+dtparam=sd_overclock=90
+
+# Disable the ACT LED.
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=off
+
+# Disable the PWR LED.
+dtparam=pwr_led_trigger=none
+dtparam=pwr_led_activelow=offboot_delay=1
 EOF
 
 echo "Change hostname to tarina"
@@ -86,6 +96,7 @@ StandardError=inherit
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
+Nice=-1
 
 [Install]
 WantedBy=local-fs.target

@@ -474,7 +474,7 @@ int main(void)
       uint32_t y_offset = 460;
       render_subtitle(img, vumeter, text_size, 0, y_offset, 5);
       graphics_update_displayed_resource(img, 0, 0, 0, 0);
-      usleep(10000);
+      usleep(20000);
    }
 
    graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 0);

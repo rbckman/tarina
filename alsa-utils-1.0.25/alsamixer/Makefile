@@ -137,8 +137,8 @@ CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CURSESINC = <ncurses.h>
-CURSESLIB = -L/usr/lib/arm-linux-gnueabihf -lformw -lmenuw -lpanelw -lncursesw -ltinfo
-CURSES_CFLAGS = -I/usr/include/ncursesw
+CURSESLIB = -lform -lmenu -lpanel -lncurses -ltinfo
+CURSES_CFLAGS = -D_GNU_SOURCE -D_DEFAULT_SOURCE
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -237,8 +237,8 @@ localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
 mandir = ${datarootdir}/man
 mkdir_p = /bin/mkdir -p
-ncurses5_config = 
-ncursesw5_config = yes
+ncurses5_config = yes
+ncursesw5_config = 
 oldincludedir = /usr/include
 pdfdir = ${docdir}
 prefix = /usr
@@ -255,8 +255,8 @@ top_builddir = ..
 top_srcdir = ..
 udevrulesdir = /lib/udev/rules.d
 xmlto = yes
-AM_CFLAGS = -I/usr/include/ncursesw -DCURSESINC="<ncurses.h>"
-LDADD = -L/usr/lib/arm-linux-gnueabihf -lformw -lmenuw -lpanelw -lncursesw -ltinfo
+AM_CFLAGS = -D_GNU_SOURCE -D_DEFAULT_SOURCE -DCURSESINC="<ncurses.h>"
+LDADD = -lform -lmenu -lpanel -lncurses -ltinfo
 alsamixer_SOURCES = card_select.c card_select.h \
 		cli.c \
 		colors.c colors.h \

@@ -924,7 +924,7 @@ def audiodelay(foldername, filename):
         #make delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         #add silence to end
-        os.system('sox ' + foldername + filename + '_temp.wav /dev/shm/silence.wav ' + foldername + filename + '.wav')
+        os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav ' + foldername + filename + '_temp.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
@@ -1189,8 +1189,12 @@ def main():
     tarinaversion = f.readline()
     tarinavername = f.readline()
 
+    #Rasbian version
     f = open('/etc/debian_version')
     debianversion = f.readlines()[0][0]
+
+    #Turn off hdmi to save power
+    os.system('tvservice -o')
 
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)

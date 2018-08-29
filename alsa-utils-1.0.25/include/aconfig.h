@@ -9,7 +9,7 @@
 #define ENABLE_NLS 1
 
 /* Define if curses-based programs can show translated messages. */
-#define ENABLE_NLS_IN_CURSES 1
+/* #undef ENABLE_NLS_IN_CURSES */
 
 /* Define to 1 if you have the <alsa/mixer.h> header file. */
 #define HAVE_ALSA_MIXER_H 1
