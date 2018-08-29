@@ -1179,6 +1179,7 @@ def main():
     updatethumb = False
     delayerr = ''
     serverstate = 'off'
+    loadfilmsettings = True
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1205,10 +1206,6 @@ def main():
     filmname = getfilms(filmfolder)[0][0]
     organize(filmfolder, filmname)
     scene, shot, take = countlast(filmname, filmfolder)
-    try:
-        filmsettings = loadsettings(filmfolder, filmname)
-    except:
-        print "no settings loaded"
         
     #FILE & FOLDER NAMES
     #foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
@@ -1231,6 +1228,8 @@ def main():
 
     #MAIN LOOP
     while True:
+
+
         #GPIO.output(18,backlight)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
@@ -1384,10 +1383,7 @@ def main():
             filmname = loadfilm(filmname, filmfolder)
             organize(filmfolder, filmname)
             scene, shot, take = countlast(filmname, filmfolder)
-            try:
-                filmsettings = loadsettings(filmfolder, filmname)
-            except:
-                print "no film settings found"
+            loadfilmsettings = True
 
         #UPDATE
         elif pressed == 'middle' and menu[selected] == 'UPDATE':
@@ -1400,10 +1396,7 @@ def main():
             os.system('wicd-curses')
             screen = startinterface()
             camera = startcamera()
-            try:
-                filmsettings  = loadsettings(filmfolder, filmname)
-            except:
-                print "no film settings found"
+            loadfilmsettings = True
 
         #NEW FILM
         elif pressed == 'middle' and menu[selected] == 'NEW':
@@ -1460,10 +1453,7 @@ def main():
                 filmname = nameyourfilm(filmfolder,'')
             else:
                 scene, shot, take = countlast(filmname, filmfolder)
-                try:
-                    filmsettings = loadsettings(filmfolder, filmname)
-                except:
-                    print "no"
+                loadfilmsettings = True
                 organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
@@ -1662,6 +1652,14 @@ def main():
             t = time.time() - starttime
             rectime = time.strftime("%H:%M:%S", time.gmtime(t))
 
+        #load settings
+        if loadfilmsettings == True:
+            filmsettings = loadsettings(filmfolder, filmname)
+            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
+            time.sleep(0.2)
+            loadfilmsettings = False
+            rendermenu = True
+
         #If auto dont show value show auto
         if camera.iso == 0:
             cameraiso = 'auto'
@@ -1678,14 +1676,10 @@ def main():
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
-        #unload settings
-        camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
-
         settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, '', '', ''
-        header=''
         #Check if menu is changed and save settings
-        if pressed != '' or recording == True or rendermenu == True:
-            writemenu(menu,settings,selected,header)
+        if pressed != '-1' or recording == True or rendermenu == True:
+            writemenu(menu,settings,selected,'')
             rendermenu = False
             #save settings if menu has been updated every 5 seconds passed
             if recording == False:
