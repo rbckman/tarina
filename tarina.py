@@ -667,6 +667,8 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                     os.system('rm -r ' + foldername)
                     scene = countscenes(filmname, filmfolder)
+                    shot = 1
+                    take = 1
                 elif sceneshotortake == 'film':
                     foldername = filmfolder + filmname
                     os.system('rm -r ' + foldername)
@@ -924,7 +926,7 @@ def audiodelay(foldername, filename):
         #make delay file
         os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         #add silence to end
-        os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav ' + foldername + filename + '_temp.wav')
+        os.system('sox /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
