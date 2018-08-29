@@ -250,9 +250,12 @@ def displayimage(camera, filename):
 
 def removeimage(camera, overlay):
     if overlay:
-        camera.remove_overlay(overlay)
-        overlay = None
-        camera.start_preview()
+        try:
+            camera.remove_overlay(overlay)
+            overlay = None
+            camera.start_preview()
+        except:
+            pass
         return overlay
 
 #-------------Browse2.0------------------
@@ -1143,7 +1146,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'ADELAY', 'SRV:', 'WIFI', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'ADELAY', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
     #STANDARD VALUES
     global screen
     keydelay = 0.0555
@@ -1179,6 +1182,7 @@ def main():
     updatethumb = False
     delayerr = ''
     serverstate = 'off'
+    wifistate = 'on'
     loadfilmsettings = True
 
     #Save settings every 5 seconds
@@ -1254,8 +1258,8 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 #camera.led = True
-                os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
+                os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=24)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1376,7 +1380,7 @@ def main():
             selectedaction = 0
 
         #WIFI
-        elif pressed == 'middle' and menu[selected] == 'WIFI':
+        elif pressed == 'middle' and menu[selected] == 'WIFI:':
             stopinterface(camera)
             os.system('wicd-curses')
             screen = startinterface()
@@ -1527,6 +1531,13 @@ def main():
                     serverstate = tarinaserver(False)
                 elif serverstate == 'off':
                     serverstate = tarinaserver(True)
+            elif menu[selected] == 'WIFI:':
+                if wifistate == 'on':
+                    os.system('sudo iwconfig wlan0 txpower off')
+                    wifistate = 'off'
+                elif wifistate == 'off':
+                    os.system('sudo iwconfig wlan0 txpower auto')
+                    wifistate = 'on'
 
         #LEFT
         elif pressed == 'left':
@@ -1600,6 +1611,13 @@ def main():
                     serverstate = tarinaserver(False)
                 elif serverstate == 'off':
                     serverstate = tarinaserver(True)
+            elif menu[selected] == 'WIFI:':
+                if wifistate == 'on':
+                    os.system('sudo iwconfig wlan0 txpower off')
+                    wifistate = 'off'
+                elif wifistate == 'off':
+                    os.system('sudo iwconfig wlan0 txpower auto')
+                    wifistate = 'on'
 
         #RIGHT
         elif pressed == 'right':
@@ -1624,9 +1642,12 @@ def main():
 
         #load settings
         if loadfilmsettings == True:
-            filmsettings = loadsettings(filmfolder, filmname)
-            camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
-            time.sleep(0.2)
+            try:
+                filmsettings = loadsettings(filmfolder, filmname)
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
+                time.sleep(0.2)
+            except:
+                print 'could not load film settimgs'
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
@@ -1636,6 +1657,7 @@ def main():
             scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
+            updatethumb =  True
 
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
@@ -1665,7 +1687,7 @@ def main():
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
-        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, '', '', ''
+        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, wifistate, '', ''
         #Check if menu is changed and save settings
         if pressed != '-1' or recording == True or rendermenu == True:
             writemenu(menu,settings,selected,'')
