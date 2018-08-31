@@ -428,9 +428,14 @@ def nameyourfilm(filmfolder, filmname):
                 thefuck = ''
         elif pressed == 'middle' or event == 10:
             if len(filmname) > 0:
-                if filmname in getfilms(filmfolder)[0]:
-                    thefuck = 'this filmname is already taken! chose another name!'
-                if filmname not in getfilms(filmfolder)[0]:
+                try:
+                    if filmname in getfilms(filmfolder)[0]:
+                        thefuck = 'this filmname is already taken! chose another name!'
+                    if filmname not in getfilms(filmfolder)[0]:
+                        print "New film " + filmname
+                        return(filmname)
+                except:
+                    print "New film " + filmname
                     return(filmname)
         elif event == 27:
             return oldfilmname
@@ -1209,11 +1214,10 @@ def main():
     time.sleep(1)
 
     #LOAD FILM AND SCENE SETTINGS
-    filmname = getfilms(filmfolder)[0][0]
-
-    #NEW FILM (IF NOTHING TO LOAD)
-    if filmname == '':
-        filmname = nameyourfilm(filmfolder, 'untitled')
+    try:
+        filmname = getfilms(filmfolder)[0][0]
+    except:
+        filmname = ''
 
     #THUMBNAILCHECKER
     oldscene = scene
@@ -1390,7 +1394,7 @@ def main():
             loadfilmsettings = True
 
         #NEW FILM
-        elif pressed == 'middle' and menu[selected] == 'NEW':
+        elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
             if recording == False:
                 oldname = filmname
                 filmname = nameyourfilm(filmfolder, '')

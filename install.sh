@@ -13,7 +13,7 @@ rpi-update
 echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-pip install https://github.com/rwb27/picamera/archive/lens-shading.zip
+pip --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip
 echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
 
@@ -119,6 +119,13 @@ cp extras/.vimrc /home/pi/.vimrc
         * ) echo "Please answer yes or no.";;
     esac
 done
+
+sudo apt-get -y install wicd wicd-curses
+sudo apt-get -y purge dhcpcd5
+
+sudo systemctl disable lightdm.service --force
+sudo systemctl disable graphical.target --force
+sudo systemctl disable plymouth.service --force
 
 while true; do
     read -p "Reboot into Tarina now? (y)es or (n)o?" yn
