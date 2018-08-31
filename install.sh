@@ -121,7 +121,7 @@ cp extras/.vimrc /home/pi/.vimrc
 done
 
 sudo apt-get -y install wicd wicd-curses
-sudo apt-get -y purge dhcpcd5
+sudo apt-get -y purge dhcpcd5 plymouth
 
 sudo systemctl disable lightdm.service --force
 sudo systemctl disable graphical.target --force
