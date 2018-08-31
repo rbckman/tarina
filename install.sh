@@ -1,11 +1,10 @@
 #!/bin/bash
-# Install Tarina
 
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root, use sudo "$0" instead" 1>&2
-    exit 1
-fi
+ROOT_UID=0   # Root has $UID 0.
 
+if [ "$UID" -eq "$ROOT_UID" ]
+then
+echo "You are root."
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
@@ -132,4 +131,7 @@ reboot
     esac
 done
 
-
+else
+    echo "Run with sudo ./install.sh"
+fi
+exit 0
