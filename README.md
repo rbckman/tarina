@@ -40,19 +40,25 @@ python tarina.py
 
 [Telegram](https://t.me/tarinadiy)
 
-### Couldn't have been done without ###
+### Standing on the shoulders of GIANTS! ###
 
-Gnu/Linux/Debian 
+Gnu/Linux/Debian
 
-Raspberry Pi
-http://raspberrypi.org
+[Linux](https://github.com/torvalds/linux)
+
+[Debian](https://debian.org)
+
+[Gnu](https://gnu.org)
+
+[Raspberry Pi](https://raspberrypi.org)
 
 Python programming language
 http://python.org
 
 Picamera python module
-Dave Jones, for the awesome picamera python module
-http://picamera.readthedocs.org
+Dave Jones, for the awesome [picamera python module](https://github.com/waveform80/picamera)
+
+rwb27 for lens shading correction! Check out [Openflexure Microscope](https://github.com/rwb27/openflexure_microscope)
 
 Tasanakorn for fbcp so you can preview on the pitft
 https://github.com/tasanakorn/rpi-fbcp
