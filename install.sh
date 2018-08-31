@@ -98,7 +98,7 @@ StandardError=inherit
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
-Nice=-1
+Nice=-15
 
 [Install]
 WantedBy=local-fs.target

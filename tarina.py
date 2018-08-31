@@ -150,7 +150,7 @@ def countlast(filmname, filmfolder):
         if 'shot' in a:
             shots = shots + 1
     try:
-        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3) + '/shot' + str(shot).zfill(3))
+        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scenes).zfill(3) + '/shot' + str(shots).zfill(3))
     except:
         allfiles = []
         takes = 0
@@ -773,12 +773,11 @@ def render(filmfiles, filename):
     #show progress
     print str(videosize)
     while p.poll() is None:
-        time.sleep(0.2)
+        time.sleep(0.1)
         try:
             rendersize = countsize(filename + '.mp4')
         except:
             continue
-        rendersize
         writemessage('video rendering ' + str(rendersize) + ' of ' + str(videosize) + ' kb done')
     ##PASTE AUDIO TOGETHER
     writemessage('Hold on, rendering audio...')
@@ -824,12 +823,12 @@ def playthis(filename, camera):
     camera.stop_preview()
     writemessage('Starting omxplayer')
     player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
-    player.pause()
-    #os.system('omxplayer --layer 3 ' + filename + '.mp4 &')
-    time.sleep(1) 
-    os.system('aplay -D plughw:0 ' + filename + '.wav &')
+    time.sleep(1)
     try:
+        player.pause()
+        player.set_position(0)
         player.play()
+        os.system('aplay -D plughw:0 ' + filename + '.wav &')
     except:
         print 'something wrong with omxplayer'
         return
@@ -857,13 +856,15 @@ def playthis(filename, camera):
                 #os.system('pkill dbus-daemon')
                 #os.system('pkill omxplayer')
                 return
-            elif selected == 12:
-                player.stop()
+            elif selected == 1:
+                player.pause()
+                player.set_position(0)
                 os.system('pkill aplay')
                 #os.system('pkill omxplayer')
-                time.sleep(0.5)
+                time.sleep(1)
                 player.play()
-                os.system('aplay ' + filename + '.wav &')
+                os.system('aplay -D plughw:0 ' + filename + '.wav &')
+                starttime = time.time()
         time.sleep(0.02)
         t = time.time() - starttime
     player.quit()
@@ -1160,6 +1161,7 @@ def main():
     recording = False
     retake = False
     rendermenu = True
+    rerendermenu = 0
     overlay = None
     reclenght = 0
     t = 0
@@ -1628,13 +1630,6 @@ def main():
             if selected == 4: #jump over recording time
                 selected = 5
 
-        if scene == 0:
-            scene = 1
-        if take == 0:
-            take = 1
-        if shot == 0:
-            shot = 1
-
         #Start Recording Time
         if recording == True:
             t = time.time() - starttime
@@ -1658,6 +1653,13 @@ def main():
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
+
+        if scene == 0:
+            scene = 1
+        if take == 0:
+            take = 1
+        if shot == 0:
+            shot = 1
 
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
@@ -1687,13 +1689,19 @@ def main():
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
-        settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, wifistate, '', ''
         #Check if menu is changed and save settings
-        if pressed != '-1' or recording == True or rendermenu == True:
+        if buttonpressed == True or recording == True or rendermenu == True:
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
-            rendermenu = False
-            #save settings if menu has been updated every 5 seconds passed
-            if recording == False:
+            #Rerender menu five times to be able to se picamera settings change
+            if rerendermenu < 5:
+                rerendermenu = rerendermenu + 1
+                rendermenu = True
+            else:
+                rerendermenu = 0
+                rendermenu = False
+            #save settings if menu has been updated and 5 seconds passed
+            if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
                     savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm)
                     pausetime = time.time()
