@@ -1,6 +1,6 @@
-# Tarina #
-
 ![Tarina Leone, one done & one in post processing stage](docs/tarina-leone.jpg)
+
+# Tarina #
 
 ### 3d printable camera for lazy filmmakers ###
 Do it yourself video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Rather than editing later do a retake with a dedicated button. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable with body parts 3d printed. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
@@ -15,6 +15,8 @@ Do it yourself video camera with the ability to assemble your film, keeping trac
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
 With some hacking skills you should be able to get it to work with any Raspberry pi and all the Raspberry Pi compatible screens and cameras.
+
+[Build instructions and complete part list](docs/INSTRUCTIONS.md)
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
