@@ -16,7 +16,7 @@ Do it yourself video camera with the ability to assemble your film, keeping trac
 
 With some hacking skills you should be able to get it to work with any Raspberry pi and all the Raspberry Pi compatible screens and cameras.
 
-[Build instructions and complete part list](docs/BUILDTARINA.md)
+[Build instructions and complete part list](docs/tarina-build-instructions.md)
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 

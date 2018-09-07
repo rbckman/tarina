@@ -1,13 +1,10 @@
-<link rel="stylesheet" href="style.css" type="text/css" rel="stylesheet"/>
-
-
 
 TARINA BUILD INSTRUCTIONS
 =========================
 
 Build instructions for the lazy filmmakers. If your dog dies while building this I am not responsible.
 
-[Buy the parts](#buy-the-parts)
+[Get the parts](#get-the-parts)
 
 [3d printing](#3d-printing)
 
@@ -27,7 +24,7 @@ Build instructions for the lazy filmmakers. If your dog dies while building this
 
 ---
 
-Buy the parts
+Get the parts
 =============
 
 Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend. 
@@ -40,7 +37,6 @@ Price ~30 eur
 
 The heart of Tarina. Why Raspberry pi you ask? There are several reasons:
 
-* Available everywhere.
 * Huge support.
 * The great Debian based os Raspbian (beeing a debian nerd myself).
 * Low price.
@@ -387,4 +383,3 @@ This lens is good. Will write a longer review once I have more filming hours.
 
 ---
 
-that's all folks...
