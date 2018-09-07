@@ -263,6 +263,18 @@ We only need the metal parts from these, if you have som thin metal you could cu
 
 
 
+----------------------------
+3.5mm Jack to Jack Aux Cable
+----------------------------
+Price ~1 eur
+
+From microphone to mic-in.
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/store/product/1-Piece-Short-0-2M-20cm-Red-3-5mm-Jack-to-Jack-Aux-Cable-Male-to/505072_32833465555.html?spm=2114.search0104.3.9.383e3c3dVjq9DY&ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5016020_10059_10696_100031_5015320_5016120_10084_10083_5015420_10103_451_10618_452_10304_10307_10820_10821_10302,searchweb201603_55,ppcSwitch_2&algo_expid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812-1&algo_pvid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812&priceBeautifyAB=0) 
+
+
+
 ---------------------------
 Parts grand total ~185 eur
 
