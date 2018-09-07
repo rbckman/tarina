@@ -19,21 +19,21 @@ Build instructions for the lazy filmmakers. If your dog dies while building this
 
 [Installing software](#installing-software)
 
-------------------------
+[Tested lenses](#tested-lenses)
 
-![Building Tarina](tarina-build.jpg)
+---
 
+![Tarina parts layed out](tarina-build.jpg)
 
+---
 
--------------
 Buy the parts
 =============
 
-First we need to order all parts, here is what will work. There are other parts that probably will work but this is what I recommend. 
+Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend. 
 
+---
 
-
-----------------
 Raspberry pi 3 B
 ----------------
 Price ~30 eur
@@ -53,9 +53,8 @@ The 3B+ is too powerhungry for the Powerbooster 1000C thats why I went with 3B
 **Buy**
 [Aliexpress](https://www.aliexpress.com/store/product/Raspberry-Pi-3-Model-B-Raspberry-Pi-Raspberry-Pi3-B-Pi-3-Pi-3B-With-WiFi/3242037_32900816535.html?spm=2114.search0104.3.113.7a702274lCPIr4&ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5016020_5015416_10059_10696_100031_5015320_10084_10083_10103_451_10618_452_5016116_10304_10307_10820_10821_10302,searchweb201603_55,ppcSwitch_2&algo_expid=0a48bb10-5985-49ff-be76-433eb1f8685b-15&algo_pvid=0a48bb10-5985-49ff-be76-433eb1f8685b&priceBeautifyAB=0)
 
+---
 
-
---------------------------------------------------------
 Arducam 8 MP Sony IMX219 camera module with CS lens 2718
 --------------------------------------------------------
 Price ~60 eur
@@ -67,9 +66,8 @@ This module and lens gives good hd video quality with the ability to manually fo
 **Buy**
 [uctronics](http://www.uctronics.com/arducam-8-mp-sony-imx219-camera-module-with-cs-lens-2717-for-raspberry-pi.html)
 
+---
 
-
----------------------------------
 Ugeek 3.5 inch 800x480 TFT Screen
 ---------------------------------
 Price ~35 eur
@@ -89,9 +87,8 @@ This is not a touchscreen but I dont think touchscreens are good for cameras any
 **Buy**
 [Aliexpress](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)
 
+---
 
-
---------------------------
 USB via vt1620a Sound card
 --------------------------
 Price ~1 eur
@@ -101,9 +98,8 @@ Really cheap usb soundcard. It has been working suprisingly well. Have not teste
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB)
 
+---
 
-
----------------------------
 3.7v 7800mAh li-ion Battery
 ---------------------------
 Price ~17 eur
@@ -111,11 +107,10 @@ Price ~17 eur
 I have tried several batteries, the adafruit 6800mAh is also fine.
 
 **Buy**
-[Aliexpress](https://www.aliexpress.com/item/free-shipping-3-7v-7800mah-18650-li-ion-rechargeable-battery-pack-18650-3P-lithium-ion-battery/32823635264.html?spm=a2g0s.9042311.0.0.49ba4c4dyoKkZS) (10 hours filming)
+[Aliexpress](https://www.aliexpress.com/item/free-shipping-3-7v-7800mah-18650-li-ion-rechargeable-battery-pack-18650-3P-lithium-ion-battery/32823635264.html?spm=a2g0s.9042311.0.0.49ba4c4dyoKkZS)
 
+---
 
-
--------------------------
 Adafruit Powerboost 1000C
 -------------------------
 Price ~23 eur
@@ -127,9 +122,8 @@ This is the only power board that I could find with the feature to run the camer
 **Buy**
 [Ebay](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)
 
+---
 
-
-------------------------------------------------
 8x8x5MM DIP-4 Silicone Switch Mute Silent button
 ------------------------------------------------
 Price ~2 eur/20 pcs
@@ -139,9 +133,8 @@ You can only buy a pack of 20 pcs but these buttons are good and silent! Not nec
 **Buy**
 [Ebay](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT)
 
+---
 
-
------------------------------------------------
 MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C
 -----------------------------------------------
 Price ~1 eur
@@ -151,9 +144,19 @@ This will be connected to the screen I2C port. This is not necessary if you inte
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/10PCS-MCP23017-E-SP-DIP-28-MCP23017-16-Bit-I-O-Expander-with-I2C-Interface-IC/32665631086.html?spm=a2g0s.9042311.0.0.27424c4dn4m008)
 
+---
 
+Piezo Electronic Buzzer
+-----------------------
+Price ~1 eur
 
--------------------------------------------------------------------
+Very useful for timing shots!
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/store/product/New-Arrival-Durable-3-24V-Piezo-Electronic-Buzzer-Alarm-95DB-Continuous-Sound-Beeper-For-Arduino-Car/1959068_32666789405.html?spm=2114.search0204.3.1.4cef4057RBI3xn&ws_ab_test=searchweb0_0,searchweb201602_3_10065_10068_10059_5015413_5015313_10696_100031_10084_10083_5016113_10103_451_10618_452_10304_10307_10820_10821_10302_5016013,searchweb201603_45,ppcSwitch_4_ppcChannel&algo_expid=c84318cd-b50e-4370-9cad-6ae9bc7963ae-0&algo_pvid=c84318cd-b50e-4370-9cad-6ae9bc7963ae&priceBeautifyAB=0)
+
+---
+
 1A 30V DC 250V Black Latching On Off Mini Torch Push Button Switch
 -------------------------------------------------------------------
 Price ~1 eur/10 pcs
@@ -163,9 +166,8 @@ This serves as the microphone and screen on/off button
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/10Pcs-Set-1A-30V-DC-250V-Black-Latching-On-Off-Mini-Torch-Push-Button-Switch-G08/32756874522.html?spm=a2g0s.9042311.0.0.27424c4ddFzv3i)
 
+---
 
-
---------------------------------------
 Latching push button switch 10mm fixed
 --------------------------------------
 Price ~5 eur/24 pcs
@@ -175,10 +177,9 @@ I use this as the powerbutton. I have tried different versions of safe shutdown 
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/24pcs-latching-push-button-switch-10mm-fixed-pushbutton-switch-latching-maintained-push-buttons/32770346793.html?spm=a2g0s.9042311.0.0.27424c4ddFzv3i)
 
+---
 
-
-------------------------------------------------
-1/4"-20 UNC 304 A2 Stainless Steel Hex Full Nuts
+Stainless Steel Hex Full Nut 1/4 inch -20 UNC 304 A2 
 ------------------------------------------------
 Price ~2 eur/10 pcs
 
@@ -187,9 +188,8 @@ This is the standard camera stand nuts. If you never use a stand then you dont n
 **Buy**
 [Ebay](https://www.ebay.com/itm/1-4-20-UNC-304-A2-Stainless-Steel-Hex-Full-Nuts-Qty-10PCS-/222134363896?hash=item33b83d66f8)<br>
 
+---
 
-
-----------------------------
 MAX9812 Microphone Amplifier
 ----------------------------
 Price ~2 eur
@@ -199,9 +199,8 @@ This makes suprisingly good sounding sound!
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/MIC-microphone-amplifier-module-sound-module-voice-module/32268198506.html?spm=a2g0s.9042311.0.0.3ac34c4dNug0b5)
 
+--
 
-
------------------------------------------------------------
 3.5mm Female 5 Pins Stereo Headset Interior PCB Mount Audio
 -----------------------------------------------------------
 Price ~1 eur/10 pcs
@@ -211,9 +210,8 @@ Microphone input.
 **Buy**
 [Ebay](https://www.ebay.com/itm/10pcs-3-5mm-Female-5-Pins-Stereo-Headset-Interior-PCB-Mount-Audio-Jack-Socket-/252376936189?hash=item3ac2d66efd)
 
+---
 
-
---------------
 LR44 Batteries
 --------------
 Price ~2 eur/10 pcs
@@ -223,9 +221,8 @@ Microphone batteries
 **Buy**
 [Aliexpress](https://www.aliexpress.com/store/product/10PCS-Lot-100-Genuine-wholesale-GP-A76-GPA76-LR44-AG13-LR44-SR44-battery-LR44-357-AG13/1120058_32739450265.html?spm=2114.search0104.3.44.5b5d32dbJK5uJ1&ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5015418_5016020_10059_10696_100031_5015320_10084_10083_10103_451_10618_452_10304_10307_10820_10821_5016118_10302,searchweb201603_55,ppcSwitch_2&algo_expid=8af0bcbe-dcb8-4f9a-bd47-084a4d77561a-6&algo_pvid=8af0bcbe-dcb8-4f9a-bd47-084a4d77561a&priceBeautifyAB=0)
 
+---
 
-
------------
 Screws M3x12
 -----------
 Price ~2 eur/25 pcs
@@ -236,9 +233,8 @@ These hold the camera together.
 Your local harware store
 [Motonet (store in Finland)](https://www.motonet.fi/fi/tuote/389247/Uraruuvi-3x12-A2-RST-25kpl)
 
+---
 
-
-----------------
 Screws 2.2x9.5mm
 ----------------
 Price ~1 eur/20 pcs
@@ -249,9 +245,8 @@ These hold the camera/mic together.
 Your local hardware store
 [Hobbycenter (store in Finland)](https://www.hobbycenter.fi/kavan-puuruuvi-22x95mm-20-kpl-0096a)
 
+---
 
-
---------------------------------------
 LR44 Button Cell Battery Socket Holder
 --------------------------------------
 Price ~1 eur/pcs
@@ -261,9 +256,8 @@ We only need the metal parts from these, if you have som thin metal you could cu
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/5Pcs-lot-AG13-LR44-Button-Cell-Battery-Socket-Holder-Plastic-Case-TBH-AG13-B/32833837989.html?spm=a2g0s.9042311.0.0.27424c4dE5lqct)
 
+---
 
-
-----------------------------
 3.5mm Jack to Jack Aux Cable
 ----------------------------
 Price ~1 eur
@@ -273,12 +267,12 @@ From microphone to mic-in.
 **Buy**
 [Aliexpress](https://www.aliexpress.com/store/product/1-Piece-Short-0-2M-20cm-Red-3-5mm-Jack-to-Jack-Aux-Cable-Male-to/505072_32833465555.html?spm=2114.search0104.3.9.383e3c3dVjq9DY&ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5016020_10059_10696_100031_5015320_5016120_10084_10083_5015420_10103_451_10618_452_10304_10307_10820_10821_10302,searchweb201603_55,ppcSwitch_2&algo_expid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812-1&algo_pvid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812&priceBeautifyAB=0) 
 
+---
 
-
----------------------------
 Parts grand total ~185 eur
 
------------
+---
+
 3d printing
 ===========
 
@@ -299,9 +293,8 @@ You'll find all the 3d parts in the 3d folder.
 * [right-side](https://github.com/rbckman/tarina/blob/master/3d/tarina-right-side.stl)
 * [screen-lid](https://github.com/rbckman/tarina/blob/master/3d/tarina-screen-lid.stl)
 
+---
 
-
----------------
 Post processing
 ===============
 
@@ -315,25 +308,22 @@ So far I've come to this conclusion:
 * Paint two layers again
 * Continue til satisfied
 
+---
 
-
--------------------
 Soldering stuff
 ===================
 
 Documentation on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
+---
 
-
--------------------
 Putting it together
 ===================
 
 Documentation is on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
+---
 
-
--------------------
 Installing software
 ===================
 
@@ -357,5 +347,33 @@ You'r ready to rumble:
 ```
 python tarina.py
 ```
+Happy filming!
+
+![Should be looking like this once finnished](tarina-leone.jpg)
+
+---
+
+Tested lenses
+=============
+
+Here is what I'm testing right now.
+
+---
+
+Yumiki 6-60mm 1/3" CS Lens CCTV Lens IR F1.6 Manual Zoom Manual Iris 
+--------------------------------------------------------------------
+
+[Aliexpress](https://www.aliexpress.com/item/6-60mm-1-3-CS-Lens-CCTV-Lens-IR-F1-6-Manual-Zoom-Manual-Iris-for/32793850795.html?spm=a2g0s.9042311.0.0.27424c4dmtk6IZ)
+
+---
+
+Camera Lens 2.8-12mm Varifocal
+------------------------------
+
+This lens is good. Will write a longer review once I have more filming hours.
+
+[Aliexpress](https://www.aliexpress.com/item/Megapixel-Fixed-Iris-HD-CCTV-Camera-Lens-2-8-12mm-Varifocal-HD-Security-Camera-Lens-Manual/32644427822.html?spm=a2g0s.9042311.0.0.27424c4dmtk6IZ)
+
+---
 
 that's all folks...
