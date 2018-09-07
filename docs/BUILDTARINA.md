@@ -251,6 +251,18 @@ Your local hardware store
 
 
 
+--------------------------------------
+LR44 Button Cell Battery Socket Holder
+--------------------------------------
+Price ~1 eur/pcs
+
+We only need the metal parts from these, if you have som thin metal you could cut these yourself.
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/5Pcs-lot-AG13-LR44-Button-Cell-Battery-Socket-Holder-Plastic-Case-TBH-AG13-B/32833837989.html?spm=a2g0s.9042311.0.0.27424c4dE5lqct)
+
+
+
 ---------------------------
 Parts grand total ~185 eur
 
@@ -258,7 +270,7 @@ Parts grand total ~185 eur
 3d printing
 ===========
 
-While waiting for ordered parts lets 3d print the rest of the parts. I recommend printing with a solid 90% infill. Now it is pretty crusial that you have a good calibrated printer so that you don't over/under print. Some parts need to be very precise to work.
+While waiting for ordered parts lets 3d print the rest of the parts. I recommend printing with a solid 90% infill. Now it is pretty crucial that you have a good calibrated printer so that you don't over/under print. Some parts need to be very precise to work.
 
 You'll find all the 3d parts in the 3d folder.
 
