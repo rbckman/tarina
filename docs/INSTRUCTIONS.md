@@ -7,7 +7,7 @@ TARINA BUILD INSTUCTIONS
 
 Build instructions for the lazy filmmaker camera.
 
-[Buy the parts](#Buy the parts)
+[Buy the parts](#Buy-the-parts)
 [3d printing](#3d printing)
 [Post processing](#Post processing)
 [Soldering buttons](#Soldering buttons)
@@ -19,7 +19,7 @@ Build instructions for the lazy filmmaker camera.
 
 
 -------------
-Buy the parts
+Buy-the-parts
 =============
 
 First we need to order all parts, here is what will work. There are other parts that probably works but this is what I recommend and support. 
