@@ -2,7 +2,7 @@
 
 
 
-TARINA BUILD INSTUCTIONS
+TARINA BUILD INSTRUCTIONS
 =========================
 
 Build instructions for the lazy filmmakers.
