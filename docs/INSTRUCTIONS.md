@@ -5,7 +5,7 @@
 TARINA BUILD INSTUCTIONS
 =========================
 
-Build instructions for the lazy filmmaker camera.
+Build instructions for the lazy filmmakers.
 
 [Buy the parts](#buy-the-parts)
 
@@ -18,6 +18,8 @@ Build instructions for the lazy filmmaker camera.
 [Putting it together](#putting-it-together)
 
 [Installing software](#installing-software)
+
+------------------------
 
 ![Tarina Leone, one done & one in post processing stage](tarina-leone.jpg)
 
@@ -330,6 +332,6 @@ sudo ./install.sh
 You'r ready to rumble:
 ```
 python tarina.py
-
+```
 
 that's all folks...
