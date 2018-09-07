@@ -7,19 +7,18 @@ TARINA BUILD INSTUCTIONS
 
 Build instructions for the lazy filmmaker camera.
 
-1. [Buy the parts](#Parts)
-2. [3d printing](#3d printing)
-3. [Post processing](#Post processing)
-4. [Soldering buttons](#Soldering buttons)
-5. [Putting it together](#Putting it together)
-6. [Installing software](#Installing software)
+[Buy the parts](#Buy the parts)
+[3d printing](#3d printing)
+[Post processing](#Post processing)
+[Soldering buttons](#Soldering buttons)
+[Putting it together](#Putting it together)
+[Installing software](#Installing software)
 
 ![Tarina Leone, one done & one in post processing stage](tarina-leone.jpg)
 
 
 
 -------------
-Step one
 Buy the parts
 =============
 
@@ -247,10 +246,8 @@ Your local hardware store
 
 ---------------------------
 Parts grand total ~185 eur
----------------------------
 
 -----------
-Step two
 3d printing
 ===========
 
@@ -274,7 +271,6 @@ You'll find all the 3d parts in the 3d folder.
 
 
 ---------------
-Step three
 Post processing
 ===============
 
