@@ -270,7 +270,7 @@ From microphone to mic-in.
 ---
 
 Rii mini i8+ mini keyboard
-==========================
+--------------------------
 Price ~17 eur
 
 Wireless control over camera. You will also need this for wifi settings etc. (Recommended) This is one of the best mini keyboards I've tried. 
