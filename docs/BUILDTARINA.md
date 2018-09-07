@@ -269,7 +269,18 @@ From microphone to mic-in.
 
 ---
 
-Parts grand total ~185 eur
+Rii mini i8+ mini keyboard
+==========================
+Price ~17 eur
+
+Wireless control over camera. You will also need this for wifi settings etc. (Recommended) This is one of the best mini keyboards I've tried. 
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/Rii-mini-i8-Russian-English-Spanish-Hebrew-Version-Wireless-Backlit-Keyboard-with-Touchpad-for-PC-Smart/32450468690.html?spm=a2g0s.9042311.0.0.27424c4dKdqpVO)
+
+---
+
+Parts grand total ~200 eur
 
 ---
 
