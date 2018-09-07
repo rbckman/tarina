@@ -8,11 +8,16 @@ TARINA BUILD INSTUCTIONS
 Build instructions for the lazy filmmaker camera.
 
 [Buy the parts](#buy-the-parts)
-[3d printing](#3d printing)
-[Post processing](#Post processing)
-[Soldering buttons](#Soldering buttons)
-[Putting it together](#Putting it together)
-[Installing software](#Installing software)
+
+[3d printing](#3d-printing)
+
+[Post processing](#post-processing)
+
+[Soldering stuff](#soldering-stuff)
+
+[Putting it together](#putting-it-together)
+
+[Installing software](#installing-software)
 
 ![Tarina Leone, one done & one in post processing stage](tarina-leone.jpg)
 
@@ -287,8 +292,44 @@ So far I've come to this conclusion:
 
 
 -------------------
-Step four
+Soldering stuff
+===================
+
+Documentation on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+
+
+
+-------------------
 Putting it together
 ===================
 
+Documentation is on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
+
+
+-------------------
+Installing software
+===================
+
+Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+[Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
+```
+sudo raspi-config
+```
+Expand file system, enable camera and then reboot.
+Run this to install git:
+```
+sudo apt-get install git
+```
+Git clone tarina and then run install script with sudo:
+```
+git clone https://rbckman@bitbucket.org/rbckman/tarina.git
+cd tarina
+sudo ./install.sh
+```
+You'r ready to rumble:
+```
+python tarina.py
+
+
+that's all folks...
