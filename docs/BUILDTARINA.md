@@ -5,7 +5,7 @@
 TARINA BUILD INSTRUCTIONS
 =========================
 
-Build instructions for the lazy filmmakers.
+Build instructions for the lazy filmmakers. If your dog dies while building this I am not responsible.
 
 [Buy the parts](#buy-the-parts)
 
@@ -29,7 +29,7 @@ Build instructions for the lazy filmmakers.
 Buy the parts
 =============
 
-First we need to order all parts, here is what will work. There are other parts that probably works but this is what I recommend and support. 
+First we need to order all parts, here is what will work. There are other parts that probably will work but this is what I recommend. 
 
 
 
