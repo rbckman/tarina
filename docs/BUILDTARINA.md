@@ -21,7 +21,7 @@ Build instructions for the lazy filmmakers. If your dog dies while building this
 
 ------------------------
 
-![Tarina Leone, one done & one in post processing stage](tarina-leone.jpg)
+![Building Tarina](tarina-build.jpg)
 
 
 
