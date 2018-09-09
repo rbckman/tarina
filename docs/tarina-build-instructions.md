@@ -2,7 +2,8 @@
 TARINA BUILD INSTRUCTIONS
 =========================
 
-Build instructions for the lazy filmmakers. If your dog dies while building this I am not responsible.
+Step by step build instructions for the 3D printable Raspberry Pi video camera - Tarina. Now, this is still a work in progress and documentation is on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+
 
 [Get the parts](#get-the-parts)
 
@@ -27,7 +28,7 @@ Build instructions for the lazy filmmakers. If your dog dies while building this
 Get the parts
 =============
 
-Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend. 
+Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend.
 
 ---
 
@@ -139,6 +140,17 @@ This will be connected to the screen I2C port. This is not necessary if you inte
 
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/10PCS-MCP23017-E-SP-DIP-28-MCP23017-16-Bit-I-O-Expander-with-I2C-Interface-IC/32665631086.html?spm=a2g0s.9042311.0.0.27424c4dn4m008)
+
+---
+
+2x8cm double Side Copper prototype pcb
+--------------------------------------
+Price ~0.20 eur/pcs
+
+PCB board to solder all connections on the MCP23017-E/SP
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/5pcs-2x8cm-double-Side-Copper-prototype-pcb-2-8-panel-Universal-Board-for-Arduino-Free-Shipping/32820588012.html?spm=a2g0s.9042311.0.0.27424c4dPM5vVF)
 
 ---
 
@@ -309,11 +321,16 @@ This is still a work in progress...
 
 So far I've come to this conclusion:
 
-* Sanded with multiple grit/sandpaper from rough to the finest (from 120 to 400)
-* Paint first two layers
-* Sand again
-* Paint two layers again
-* Continue til satisfied
+* Put 3d printed parts together with screws.
+* Sand with sandpaper from rough to finest (from 120 to 400). I like to sand down all corners making them round.
+* Dust off.
+* Paint.
+* Wait til dry.
+* Paint again.
+* Wait til dry. I like to wait for atleast a day to make it really dry.
+* Sand again.
+* Paint and wait again.
+* Continue like this til you are satisfied with the feel, now I like to have a good grip so I finnish with sanding with 400 grit paper and leave it like that.
 
 ---
 
