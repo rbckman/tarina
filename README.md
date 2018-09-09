@@ -3,9 +3,13 @@ Tarina
 
 ![Tarina Leone, one done & one in post processing stage](docs/tarina-leone.jpg)
 
-3d printable camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Do the magic rendering stuff in camera to see how yor montage flows, retake if necessary. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
+3d printable video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Render a film or scene in-camera to see how your montage flows & retake if necessary. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
 
-### Hardware ###
+
+
+Hardware
+--------
+
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
 [Arducam 8 MP Sony IMX219 camera module with CS lens 2718](http://www.uctronics.com/arducam-8-mp-sony-imx219-camera-module-with-cs-lens-2717-for-raspberry-pi.html)<br>
 [3.5 inch 800x480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)<br>
@@ -20,7 +24,11 @@ With some hacking skills you should be able to get it to work with any Raspberry
 
 Ready to print designs in [3d folder](https://github.com/rbckman/tarina/tree/master/3d)
 
-### Software ###
+
+
+Software
+--------
+
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
 ```
@@ -41,13 +49,17 @@ You'r ready to rumble:
 ```
 python tarina.py
 ```
-### Connect ###
+
+
+Connect
+-------
 
 [Telegram](https://t.me/tarinadiy)
 
-### Standing on the shoulders of GIANTS! ###
 
-Gnu/Linux/Debian
+
+Standing on the shoulders of giants
+------------------------------------
 
 [Linux](https://github.com/torvalds/linux)
 
@@ -57,35 +69,25 @@ Gnu/Linux/Debian
 
 [Raspberry Pi](https://raspberrypi.org)
 
-Python programming language
-http://python.org
+[Python programming language](https://python.org)
 
-Picamera python module
-Dave Jones, for the awesome [picamera python module](https://github.com/waveform80/picamera)
+Dave Jones's [Picamera python module](https://github.com/waveform80/picamera)
 
-rwb27 for lens shading correction! Check out [Openflexure Microscope](https://github.com/rwb27/openflexure_microscope)
+rwb27 for lens shading correction! Check out the 3d printable microscope [Openflexure](https://github.com/rwb27/openflexure_microscope)
 
-Tasanakorn for fbcp so you can preview on the pitft
-https://github.com/tasanakorn/rpi-fbcp
-
-Libav-tools (ffmpeg)
+FFmpeg & Libav-tools
 
 GPac library with MP4Box
 
-Blender
-http://blender.org
+[Blender](http://blender.org)
 
 aplay
 The awesome wav player/recorder with VU meter
 http://alsa.opensrc.org/Aplay
 
-Omxplayer
-Video player on the Raspberry pi
-https://github.com/huceke/omxplayer
+[Omxplayer](https://github.com/huceke/omxplayer)
 
-Python-omxplayer-wrapper
-Will Price
-https://github.com/willprice/python-omxplayer-wrapper
+[Will Price's Python-omxplayer-wrapper](https://github.com/willprice/python-omxplayer-wrapper)
 
 Sox
 
@@ -95,4 +97,5 @@ https://www.raspberrypi.org/forums/viewtopic.php?t=48967
 The Dispmanx library
 https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi
 
-### & many, many more projects! peace out...
+& many, many more projects! peace out...
+----------------------------------------
