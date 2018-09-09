@@ -3,7 +3,7 @@ Tarina
 
 ![Tarina Leone, one done & one in post processing stage](docs/tarina-leone.jpg)
 
-3d printable video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Render a film or scene in-camera to see how your montage flows & retake if necessary. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
+A 3D printable Raspberry Pi video camera with the ability to assemble your film, keeping track on your takes, shots and scenes. Render a film or scene in-camera to see how your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) flows & retake if necessary. Once you get it there’s less or no need for editing later. The device is designed with a "hackers/makers philosophy" and is easy to take apart and moddable. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with an python coded interface.
 
 
 
