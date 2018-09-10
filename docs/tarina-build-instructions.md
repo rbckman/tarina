@@ -2,7 +2,7 @@
 TARINA BUILD INSTRUCTIONS
 =========================
 
-Step by step build instructions for the 3D printable Raspberry Pi video camera - Tarina. Now, this is still a work in progress and documentation is on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
 
 [Get the parts](#get-the-parts)
@@ -86,7 +86,7 @@ This is not a touchscreen but I dont think touchscreens are good for cameras any
 
 ---
 
-USB via vt1620a Sound card
+USB via vt1620a sound card
 --------------------------
 Price ~1 eur
 
@@ -132,7 +132,7 @@ You can only buy a pack of 20 pcs but these buttons are good and silent! Not nec
 
 ---
 
-MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C
+MCP23017-E/SP DIP-28 16 bit I / O expander I2C
 -----------------------------------------------
 Price ~1 eur
 
@@ -143,7 +143,7 @@ This will be connected to the screen I2C port. This is not necessary if you inte
 
 ---
 
-2x8cm double Side Copper prototype pcb
+2x8cm double side copper prototype pcb
 --------------------------------------
 Price ~0.20 eur/pcs
 
@@ -154,7 +154,7 @@ PCB board to solder all connections on the MCP23017-E/SP
 
 ---
 
-Piezo Electronic Buzzer
+Piezo electronic buzzer
 -----------------------
 Price ~1 eur
 
@@ -165,8 +165,8 @@ Very useful for timing shots!
 
 ---
 
-1A 30V DC 250V Black Latching On Off Mini Torch Push Button Switch
--------------------------------------------------------------------
+Latching push button switch mini
+---------------------------------
 Price ~1 eur/10 pcs
 
 This serves as the microphone and screen on/off button
@@ -176,8 +176,8 @@ This serves as the microphone and screen on/off button
 
 ---
 
-Latching push button switch 10mm fixed
---------------------------------------
+Latching push button switch 10mm
+--------------------------------
 Price ~5 eur/24 pcs
 
 I use this as the powerbutton. I have tried different versions of safe shutdown buttons for the Raspberry pi but they have not worked as I wanted (they draw power even when Pi is powered off, this is not good). I have solved the problem with a menu button to safely shut down the camera. 
@@ -187,8 +187,8 @@ I use this as the powerbutton. I have tried different versions of safe shutdown 
 
 ---
 
-Stainless Steel Hex Full Nut 1/4 inch -20 UNC 304 A2 
-------------------------------------------------
+Nut 1/4 -20 UNC 304 A2 
+-----------------------
 Price ~2 eur/10 pcs
 
 This is the standard camera stand nuts. If you never use a stand then you dont need this.
@@ -198,7 +198,7 @@ This is the standard camera stand nuts. If you never use a stand then you dont n
 
 ---
 
-MAX9812 Microphone Amplifier
+MAX9812 Microphone amplifier
 ----------------------------
 Price ~2 eur
 
@@ -209,8 +209,8 @@ This makes suprisingly good sounding sound!
 
 ---
 
-3.5mm Female 5 Pins Stereo Headset Interior PCB Mount Audio
------------------------------------------------------------
+3.5mm Female stereo headset interior PCB mount
+----------------------------------------------
 Price ~1 eur/10 pcs
 
 Microphone input.
@@ -231,7 +231,7 @@ Microphone batteries
 
 ---
 
-Screws M3x12
+Screws M3x12mm
 -----------
 Price ~2 eur/25 pcs
 
@@ -255,7 +255,7 @@ Your local hardware store
 
 ---
 
-LR44 Button Cell Battery Socket Holder
+LR44 Button cell socket holder
 --------------------------------------
 Price ~1 eur/pcs
 
@@ -266,7 +266,7 @@ We only need the metal parts from these, if you have som thin metal you could cu
 
 ---
 
-3.5mm Jack to Jack Aux Cable
+3.5mm Jack to jack aux cable
 ----------------------------
 Price ~1 eur
 
@@ -337,14 +337,14 @@ So far I've come to this conclusion:
 Soldering stuff
 ===================
 
-Documentation on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+Documentation on its way, if you're in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
 ---
 
 Putting it together
 ===================
 
-Documentation is on its way, if your in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+Documentation on its way, if you're in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
 
 ---
 
