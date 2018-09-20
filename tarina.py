@@ -762,6 +762,10 @@ def render(filmfiles, filename):
 #---------------Play------------------------
 
 def playthis(filename, camera):
+    if not os.path.isfile(filename + '.mp4'):
+        #should probably check if its not a corrupted video file
+        print "no file to play"
+        return
     t = 0
     pressed = ''
     buttonpressed = ''
