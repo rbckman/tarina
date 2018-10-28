@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - 3d printable camera for lazy filmmakers
+#Tarina - A video and audio recorder with glue
 #Copyright 2016 - 2018 Robin Bäckman
 
 #Licensed under the Apache License, Version 2.0 (the "License");
@@ -388,13 +388,12 @@ def loadfilm(filmname, filmfolder):
 
 #-------------New film----------------
 
-def nameyourfilm(filmfolder, filmname):
+def nameyourfilm(filmfolder, filmname, abc):
     oldfilmname = filmname
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
-    abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     abcx = 0
     thefuck = ''
     cursor = '_'
@@ -1056,11 +1055,11 @@ def stopinterface(camera):
     curses.echo()
     curses.endwin()
 
-def startcamera():
+def startcamera(lens):
     camera = picamera.PiCamera()
     camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
     #lensshade = ''
-    npzfile = np.load('./lensconfig.npz')
+    npzfile = np.load('lenses/' + lens)
     lensshade = npzfile['lens_shading_table']
     camera.framerate = 24.999
     camera.crop = (0, 0, 1.0, 1.0)
@@ -1098,9 +1097,10 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'ADELAY', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'LENS:', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
     #STANDARD VALUES
     global screen
+    abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
     selectedaction = 0
     selected = 0
@@ -1126,8 +1126,9 @@ def main():
     flip = 'no'
     renderscene = True
     renderfilm = True
-    backlight = True
-    filmnames = os.listdir(filmfolder)
+    #filmnames = os.listdir(filmfolder)
+    lens = 'cs_6-60mm'
+    lenses = os.listdir('lenses/')
     buttontime = time.time()
     pressed = ''
     buttonpressed = False
@@ -1156,7 +1157,7 @@ def main():
 
     #START INTERFACE
     screen = startinterface()
-    camera = startcamera()
+    camera = startcamera(lens)
 
     #LOAD FILM AND SCENE SETTINGS
     try:
@@ -1172,7 +1173,6 @@ def main():
     #MAIN LOOP
     while True:
 
-        #GPIO.output(18,backlight)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
 
@@ -1182,14 +1182,6 @@ def main():
             os.system('clear')
             os.system('echo "Have a nice hacking time!"')
             break
-
-        #SCREEN ON/OFF
-        elif pressed == 'up' and pressed == 'down':
-            time.sleep(0.1)
-            if backlight == True:
-                backlight = False
-            else:
-                backlight = True
 
         #SHUTDOWN
         elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
@@ -1335,7 +1327,7 @@ def main():
             stopinterface(camera)
             os.system('wicd-curses')
             screen = startinterface()
-            camera = startcamera()
+            camera = startcamera(lens)
             loadfilmsettings = True
 
         #NEW FILM
@@ -1489,6 +1481,18 @@ def main():
                 elif wifistate == 'off':
                     os.system('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'LENS:':
+                s = 0
+                for a in lenses:
+                    if a == lens:
+                        selectlens = s
+                    s += 1
+                if selectlens < len(lenses) - 1:
+                    selectlens += 1
+                lens = os.listdir('lenses/')[selectlens]
+                npzfile = np.load('lenses/' + lens)
+                lensshade = npzfile['lens_shading_table']
+                camera.lens_shading_table = lensshade
 
         #LEFT
         elif pressed == 'left':
@@ -1569,6 +1573,18 @@ def main():
                 elif wifistate == 'off':
                     os.system('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'LENS:':
+                s = 0
+                for a in lenses:
+                    if a == lens:
+                        selectlens = s
+                    s += 1
+                if selectlens > 0:
+                    selectlens -= 1
+                lens = os.listdir('lenses/')[selectlens]
+                npzfile = np.load('lenses/' + lens)
+                lensshade = npzfile['lens_shading_table']
+                camera.lens_shading_table = lensshade
 
         #RIGHT
         elif pressed == 'right':
@@ -1640,7 +1656,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', '', serverstate, wifistate, '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 5:
@@ -1668,5 +1684,3 @@ if __name__ == '__main__':
         curses.nocbreak()
         curses.echo()
         curses.endwin()
-
-
