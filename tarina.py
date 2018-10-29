@@ -1,7 +1,7 @@
 #/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#Tarina - A video and audio recorder with glue
+#Tarina - a video & audio recorder with glue
 #Copyright 2016 - 2018 Robin Bäckman
 
 #Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,18 +36,23 @@ rundir = os.path.dirname(__file__)
 if rundir != '':
     os.chdir(rundir)
 
-bus = smbus.SMBus(3) # Rev 2 Pi uses 1
-DEVICE = 0x20 # Device address (A0-A2)
-IODIRB = 0x0d # Pin pullups B-side
-IODIRA = 0x00 # Pin pullups A-side 0x0c
-IODIRApullup = 0x0c # Pin pullups A-side 0x0c
-GPIOB  = 0x13 # Register B-side for inputs
-GPIOA  = 0x12 # Register A-side for inputs
-OLATA  = 0x14 # Register for outputs
-bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
-bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
-bus.write_byte_data(DEVICE,OLATA,0x4)
+#if buttons are installed
+try:
+    bus = smbus.SMBus(3) # Rev 2 Pi uses 1
+    DEVICE = 0x20 # Device address (A0-A2)
+    IODIRB = 0x0d # Pin pullups B-side
+    IODIRA = 0x00 # Pin pullups A-side 0x0c
+    IODIRApullup = 0x0c # Pin pullups A-side 0x0c
+    GPIOB  = 0x13 # Register B-side for inputs
+    GPIOA  = 0x12 # Register A-side for inputs
+    OLATA  = 0x14 # Register for outputs
+    bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
+    bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
+    bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
+    bus.write_byte_data(DEVICE,OLATA,0x4)
+    onlykeyboard = False
+except:
+    onlykeyboard = True
 
 #--------------Save settings-----------------
 
@@ -977,6 +982,15 @@ def buzzer(beeps):
     time.sleep(0.1)
     return
 
+def buzz(buzzerlenght):
+    buzzerdelay = 0.0001
+    for _ in xrange(buzzerlenght):
+        for value in [0xC, 0x4]:
+            #GPIO.output(1, value)
+            bus.write_byte_data(DEVICE,OLATA,value)
+            time.sleep(buzzerdelay)
+    return
+
 #-------------Check if file empty----------
 
 def empty(filename):
@@ -992,8 +1006,12 @@ def empty(filename):
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
     keydelay = 0.08
-    readbus = bus.read_byte_data(DEVICE,GPIOB)
-    readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+    if onlykeyboard == False:
+        readbus = bus.read_byte_data(DEVICE,GPIOB)
+        readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+    else:
+        readbus = 255
+        readbus2 = 247
     pressed = ''
     if buttonpressed == False:
         if event == 27:
@@ -1136,7 +1154,7 @@ def main():
     updatethumb = False
     delayerr = ''
     serverstate = 'off'
-    wifistate = 'on'
+    wifistate = 'off'
     loadfilmsettings = True
 
     #Save settings every 5 seconds
@@ -1200,7 +1218,6 @@ def main():
                     buzzer(beeps)
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
-                #camera.led = True
                 os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
                 camera.start_recording(foldername + filename + '.h264', format='h264', quality=24)
                 starttime = time.time()
@@ -1209,27 +1226,20 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                 recording = False
-                #camera.led = False
                 camera.stop_recording()
                 os.system('pkill arecord')
                 camera.capture(foldername + filename + '.png', resize=(800,340))
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
+                buzz(150)
                 thefile = foldername + filename 
-                #writemessage('Copying video file...')
-                #os.system('mv /dev/shm/' + filename + '.h264 ' + foldername)
                 renderscene = True
                 renderfilm = True
                 updatethumb = True
                 compileshot(foldername + filename)
                 delayerr = audiodelay(foldername,filename)
-                try:
-                    writemessage('Copying and syncing audio file...')
-                    #os.system('mv /dev/shm/' + filename + '.wav ' +  foldername)
-                except:
-                    writemessage('no audio file')
-                    time.sleep(0.5)
+                buzz(300)
             if pressed == 'record' and recordable == False:
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
@@ -1265,7 +1275,6 @@ def main():
                 if renderscene == True:
                     render(filmfiles, renderfilename)
                     renderscene = False
-                #writemessage(str(countvideosize(renderfilename)) + ' / ' + str(countvideosize(filmfiles) + countaudiosize(filmfiles)))
                 playthis(renderfilename, camera)
 
         #VIEW FILM
@@ -1287,9 +1296,6 @@ def main():
                     removeimage(camera, overlay)
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
-                    #viewshot(filmfolder, filmname, foldername, filename)
-                    #if filesize !
-                    #compileshot(foldername + filename)
                     playthis(foldername + filename, camera)
                     imagename = foldername + filename + '.png'
                     overlay = displayimage(camera, imagename)
