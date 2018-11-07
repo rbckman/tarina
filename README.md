@@ -27,7 +27,7 @@ The parts are built around the world by different manufacturers. They've been ch
 
 Software
 --------
-The interface focuses on presenting all essential detail for manual filming in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons which are: Enter, Up, Down, Left, Right, Record, Retake, View and Trash.
+The interface focuses on presenting all essential detail for manual filming in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons which are: Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
 
 Installing
 ----------
