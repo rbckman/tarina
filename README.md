@@ -3,10 +3,10 @@ Tarina
 
 ![Tarina Leone, one done & one in post processing stage](docs/tarina-leone.jpg)
 
-A camera for storytellers. Video camera that organizes takes, shots & scenes and glues your film together. 
+A video camera that organizes takes, shots & scenes and glues your film together. 
 
-Experience a new flow of filmmaking
------------------------------------
+Experience filmmaking flow
+------------------------------
 If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) flows, retake. Once you "get it" there’s no need for editing. The camera is designed with a "hackers/makers philosophy" and is easy to take apart. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
 
 Hardware
@@ -27,7 +27,7 @@ The parts are built around the world by different manufacturers. They've been ch
 
 Software
 --------
-The interface focuses on presenting all essential detail for manual filming in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons which are: Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+The interface focuses on presenting all essential detail for manual filming in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
 
 Installing
 ----------
