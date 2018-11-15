@@ -271,10 +271,10 @@ int main(void)
               //fclose(fp3);
               //const char *text = "Never give up on your dreams";
               uint32_t y_offset2 = 0;
-              uint32_t y_offset3 = 22;
-              uint32_t y_offset4 = 44;
-              uint32_t y_offset5 = 418;
-              uint32_t y_offset6 = 440;
+              uint32_t y_offset3 = 21;
+              uint32_t y_offset4 = 42;
+              uint32_t y_offset5 = 421;
+              uint32_t y_offset6 = 442;
               graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0xff));
               // blue, at the top (y=40)
               // selected 0 1 2 3 4 5 6 7 8
@@ -471,7 +471,7 @@ int main(void)
           //graphics_update_displayed_resource(img, 0, 0, 0, 0);
           }
       }
-      uint32_t y_offset = 460;
+      uint32_t y_offset = 463;
       render_subtitle(img, vumeter, text_size, 0, y_offset, 5);
       graphics_update_displayed_resource(img, 0, 0, 0, 0);
       usleep(20000);

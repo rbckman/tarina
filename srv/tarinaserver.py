@@ -20,7 +20,7 @@ urls = (
     '/', 'index'
 )
 
-render = web.template.render('templates/')
+render = web.template.render('templates/', base="base")
 
 class index:
     def GET(self):
