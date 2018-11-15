@@ -18,6 +18,7 @@
 
 import picamera
 import numpy as np
+import string
 import os
 import time
 from subprocess import call
@@ -991,6 +992,28 @@ def buzz(buzzerlenght):
             time.sleep(buzzerdelay)
     return
 
+#---------reading in a lens shading table----------
+
+def read_table(inFile):
+    # q&d-way to read in ls_table.h
+    ls_table = []
+    channel  = []
+    with open(inFile) as file:       
+        for line in file:
+            # we skip the unimportant stuff
+            if not (   line.startswith("uint") \
+                    or line.startswith("}")):
+                # the comments separate the color planes
+                if line.startswith("//"):                
+                    channel = []
+                    ls_table.append(channel)
+                else:
+                    # scan in a single line
+                    line = line.replace(',','')
+                    lineData = [int(x) for x in string.split(line,' ')]
+                    channel.append(lineData)
+    return np.array(ls_table,dtype=np.uint8)    
+
 #-------------Check if file empty----------
 
 def empty(filename):
@@ -1075,17 +1098,19 @@ def stopinterface(camera):
 
 def startcamera(lens):
     camera = picamera.PiCamera()
-    camera.resolution = (1640, 698) #tested modes 1920x816, 1296x552, v2 1640x698, 1640x1232
+    camera.resolution = (1296, 578) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
     #lensshade = ''
-    npzfile = np.load('lenses/' + lens)
-    lensshade = npzfile['lens_shading_table']
-    camera.framerate = 24.999
+    #npzfile = np.load('lenses/' + lens)
+    #lensshade = npzfile['lens_shading_table']
+    table = read_table('lenses/' + lens)
+    #camera.framerate = 24.999
+    camera.framerate = 26.04
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
     #lens_shading_table = np.zeros(camera._lens_shading_table_shape(), dtype=np.uint8) + 32
     #camera.lens_shading_table = lens_shading_table
-    camera.lens_shading_table = lensshade
+    camera.lens_shading_table = table
     camera.start_preview()
     camera.awb_mode = 'auto'
     return camera
@@ -1145,8 +1170,8 @@ def main():
     renderscene = True
     renderfilm = True
     #filmnames = os.listdir(filmfolder)
-    lens = 'cs_6-60mm'
     lenses = os.listdir('lenses/')
+    lens = lenses[0]
     buttontime = time.time()
     pressed = ''
     buttonpressed = False
@@ -1219,7 +1244,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=24)
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=20)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1228,11 +1253,13 @@ def main():
                 recording = False
                 camera.stop_recording()
                 os.system('pkill arecord')
-                camera.capture(foldername + filename + '.png', resize=(800,340))
+                if beeps > 0:
+                    buzz(150)
+                #camera.capture(foldername + filename + '.png', resize=(800,341))
+                camera.capture(foldername + filename + '.png', resize=(800,340), use_video_port=True)
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
-                buzz(150)
                 thefile = foldername + filename 
                 renderscene = True
                 renderfilm = True
@@ -1340,7 +1367,7 @@ def main():
         elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
             if recording == False:
                 oldname = filmname
-                filmname = nameyourfilm(filmfolder, '')
+                filmname = nameyourfilm(filmfolder, '',abc)
                 if filmname != oldname:
                     os.makedirs(filmfolder + filmname)
                     writemessage('Good luck with your film ' + filmname + '!')
@@ -1388,7 +1415,7 @@ def main():
             scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'film')
             filmname = getfilms(filmfolder)[0][0]
             if filmname == '':
-                filmname = nameyourfilm(filmfolder,'')
+                filmname = nameyourfilm(filmfolder,'',abc)
             else:
                 scene, shot, take = countlast(filmname, filmfolder)
                 loadfilmsettings = True
@@ -1496,9 +1523,10 @@ def main():
                 if selectlens < len(lenses) - 1:
                     selectlens += 1
                 lens = os.listdir('lenses/')[selectlens]
-                npzfile = np.load('lenses/' + lens)
-                lensshade = npzfile['lens_shading_table']
-                camera.lens_shading_table = lensshade
+                #npzfile = np.load('lenses/' + lens)
+                #lensshade = npzfile['lens_shading_table']
+                table = read_table('lenses/' + lens)
+                camera.lens_shading_table = table
 
         #LEFT
         elif pressed == 'left':
@@ -1588,9 +1616,10 @@ def main():
                 if selectlens > 0:
                     selectlens -= 1
                 lens = os.listdir('lenses/')[selectlens]
-                npzfile = np.load('lenses/' + lens)
-                lensshade = npzfile['lens_shading_table']
-                camera.lens_shading_table = lensshade
+                #npzfile = np.load('lenses/' + lens)
+                #lensshade = npzfile['lens_shading_table']
+                table = read_table('lenses/' + lens)
+                camera.lens_shading_table = table
 
         #RIGHT
         elif pressed == 'right':
