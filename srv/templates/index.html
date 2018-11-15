@@ -6,11 +6,14 @@ $var unrenderedfilms = unrenderedfilms
 
 $for i in renderedfilms:
     <p>--------------------------------------------------------------</p>
-    <h3>$i</h3>
-    <a href="static/Videos/$i/${i}.mp4"><img width="300px" src="static/Videos/$i/scene001/shot001/take001.png"/></a><br>
-
+    <h2>$i</h2>
+    <a href="static/Videos/$i/${i}.mp4"><img width="80%" src="static/Videos/$i/scene001/shot001/take001.png"/></a><br>
+    <p>Copy project to your destination:</p>
+    <pre>scp -r pi@tarina.local:~/Videos/$i /to/your/destination </pre>
 <h1>Films unrendered</h1>
 
 $for i in unrenderedfilms:
-    <h3>$i </h3>
+    <h2>$i </h2>
+    <p>Copy project to your destination:</p>
+    <pre>scp -r pi@tarina.local:~/Videos/$i /to/your/destination </pre>
 
