@@ -17,7 +17,8 @@ if os.path.isfile('static/Videos') == False:
 films = []
 
 urls = (
-    '/', 'index'
+    '/', 'index',
+    '/f/(.+)', 'films'
 )
 
 render = web.template.render('templates/', base="base")
@@ -33,6 +34,10 @@ class index:
             else:
                 unrenderedfilms.append(i)
         return render.index(renderedfilms, unrenderedfilms)
+
+def films:
+    def GET(self, film):
+        return render.filmpage(film)
 
 if __name__== "__main__":
     app = web.application(urls, globals())
