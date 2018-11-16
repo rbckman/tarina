@@ -109,6 +109,7 @@ echo "systemd configuration done!"
 
 echo "Installing server configuration"
 cp extras/tarina.conf /etc/apache2/sites-available/
+ln -s -t /var/www/ /home/pi/tarina/srv/
 a2dissite 000-default.conf
 a2ensite tarina.conf
 systemctl reload apache2
