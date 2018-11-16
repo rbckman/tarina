@@ -52,16 +52,16 @@ The 3B+ is too powerhungry for the Powerbooster 1000C thats why I went with 3B
 
 ---
 
-Arducam 8 MP Sony IMX219 camera module with CS lens 2718
---------------------------------------------------------
-Price ~60 eur
+Arducam 5 MP OV5647 camera module with CS lens
+----------------------------------------------
+Price ~30 eur
 
 This module and lens gives good hd video quality with the ability to manually focus and replace lenses. See tested lenses down below.
 
 **Links**
 [Arducam](http://arducam.com/)
 **Buy**
-[uctronics](http://www.uctronics.com/arducam-8-mp-sony-imx219-camera-module-with-cs-lens-2717-for-raspberry-pi.html)
+[ebay]((https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018)
 
 ---
 
