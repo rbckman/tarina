@@ -38,7 +38,7 @@ sudo apt-get install git
 ```
 Git clone tarina and then run install script with sudo:
 ```
-git clone https://rbckman@bitbucket.org/rbckman/tarina.git
+git clone https://github.com/rbckman/tarina.git
 cd tarina
 sudo ./install.sh
 ```
