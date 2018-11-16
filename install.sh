@@ -4,7 +4,32 @@ ROOT_UID=0   # Root has $UID 0.
 
 if [ "$UID" -eq "$ROOT_UID" ]
 then
-echo "You are root."
+echo "Hurray, you are root! Godspeed! Let's do this.."
+echo ""
+echo ""
+echo " _______       _____  _____ _   _          "
+echo "|__   __|/\   |  __ \|_   _| \ | |   /\    "
+echo "   | |  /  \  | |__) | | | |  \| |  /  \   "
+echo "   | | / /\ \ |  _  /  | | | . ` | / /\ \  "
+echo "   | |/ ____ \| | \ \ _| |_| |\  |/ ____ \ "
+echo "   |_/_/    \_\_|  \_\_____|_| \_/_/    \_\"
+echo ""
+echo "+-+ +-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+-+-+-+-+-+"
+echo "|a| |r|e|t|a|k|e| |o|n| |f|i|l|m|m|a|k|i|n|g|"
+echo "+-+ +-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+-+-+-+-+-+"
+echo ""
+echo ""
+sleep 2
+echo "setting up system for filmmaking flow..."
+sleep 1
+echo "3"
+sleep 1
+echo "2"
+sleep 1
+echo "1"
+sleep 1
+echo "if something goes wrong please submit bug to https://github.com/rbckman/tarina"
+sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
@@ -14,9 +39,11 @@ echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 pip --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip
-echo "Adding to /boot/config.txt"
+grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt || echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
 
+#-----Tarina configuration starts here-------
+#tarina-rpi-configuration-1.0
 #Rpi-hd-tft
 dtoverlay=dpi18
 overscan_left=0
@@ -48,6 +75,8 @@ dtparam=act_led_activelow=off
 # Disable the PWR LED.
 dtparam=pwr_led_trigger=none
 dtparam=pwr_led_activelow=offboot_delay=1
+#--------Tarina configuration end here---------
+
 EOF
 
 echo "Change hostname to tarina"
@@ -64,9 +93,13 @@ ff02::2		ip6-allrouters
 EOF
 
 echo "Adding to /boot/cmdline.txt"
+echo "ROB do this one better! ok? doesnt go to the end of the last line and need to somehow check if already there.."
+sleep 4
+echo "continue..
+sleep 1
 printf " consoleblank=0 logo.nologo loglevel=0" >> /boot/cmdline.txt
 
-echo "USB soundcard to default"
+echo "Make USB soundcard default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"
 cat <<'EOF' > /etc/modprobe.d/alsa-base.conf
 #set index value
@@ -107,7 +140,7 @@ systemctl enable tarina.service
 systemctl daemon-reload
 echo "systemd configuration done!"
 
-echo "Installing server configuration"
+echo "Installing tarina apache server configuration"
 cp extras/tarina.conf /etc/apache2/sites-available/
 ln -s -t /var/www/ /home/pi/tarina/srv/
 a2dissite 000-default.conf
