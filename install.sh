@@ -9,7 +9,7 @@ echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
 apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus python-webpy wicd
-rpi-update
+rpi-update apache2 libapache2-mod-wsgi
 echo "installing python-omxplayer-wrapper..."
 pip install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
@@ -33,7 +33,7 @@ dpi_output_format=0x6f015
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
 display_rotate=3 
 start_x=1
-gpu_mem=512
+gpu_mem=256
 dtoverlay=pi3-disable-bt-overlay
 dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
@@ -105,7 +105,13 @@ EOF
 chmod +x /home/pi/tarina/tarina.py
 systemctl enable tarina.service
 systemctl daemon-reload
-echo "Congrats everything done!"
+echo "systemd configuration done!"
+
+echo "Installing server configuration"
+cp extras/tarina.conf /etc/apache2/sites-available/
+a2dissite 000-default.conf
+a2ensite tarina.conf
+systemctl reload apache2
 
 while true; do
     read -p "Do you wish to add rbckmans special hacking tools & configurations (y)es or (n)o?" yn

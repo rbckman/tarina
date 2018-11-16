@@ -18,7 +18,7 @@ films = []
 
 urls = (
     '/', 'index',
-    '/f/(.+)', 'films'
+    '/f/(.*)', 'films'
 )
 
 render = web.template.render('templates/', base="base")
@@ -35,10 +35,14 @@ class index:
                 unrenderedfilms.append(i)
         return render.index(renderedfilms, unrenderedfilms)
 
-def films:
+class films:
     def GET(self, film):
         return render.filmpage(film)
 
-if __name__== "__main__":
-    app = web.application(urls, globals())
-    app.run()
+app = web.application(urls, globals(), autoreload=False)
+application = app.wsgifunc()
+
+#if __name__== "__main__":
+    #app = web.application(urls, globals())
+    #app.run()
+

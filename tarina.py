@@ -1091,7 +1091,7 @@ def stopinterface(camera):
     os.system('pkill -9 arecord')
     os.system('pkill -9 startinterface')
     os.system('pkill -9 tarinagui')
-    os.system('pkill -9 tarinaserver.py')
+    os.system('sudo systemctl stop apache2')
     curses.nocbreak()
     curses.echo()
     curses.endwin()
@@ -1118,16 +1118,16 @@ def startcamera(lens):
 def tarinaserver(state):
     #Tarina server
     if state == True:
-        #Try to run tarinaserver on port 8080
+        #Try to run apache
         try:
-            call (['./srv/tarinaserver.py 8080 &'], shell = True)
+            os.system('sudo systemctl start apache2')
             return 'on'
         except:
             writemessage("could not run tarina server")
             time.sleep(2)
             return 'off'
     if state == False:
-        os.system('pkill -9 tarinaserver.py')
+        os.system('sudo systemctl stop apache2')
         return 'off'
 
 
