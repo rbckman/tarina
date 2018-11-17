@@ -54,6 +54,7 @@ try:
     onlykeyboard = False
 except:
     onlykeyboard = True
+    print "could not find buttons!! running in only keyboard mode"
 
 #--------------Save settings-----------------
 

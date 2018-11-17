@@ -97,7 +97,8 @@ echo "ROB do this one better! ok? doesnt go to the end of the last line and need
 sleep 4
 echo "continue..
 sleep 1
-printf " consoleblank=0 logo.nologo loglevel=0" >> /boot/cmdline.txt
+echo "maybe put this??: consoleblank=0 logo.nologo loglevel=0"
+echo "at the end of line in this file /boot/cmdline.txt
 
 echo "Make USB soundcard default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"
