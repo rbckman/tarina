@@ -161,12 +161,14 @@ cp extras/.vimrc /home/pi/.vimrc
     esac
 done
 
-sudo apt-get -y install wicd wicd-curses
-sudo apt-get -y purge dhcpcd5 plymouth
+apt-get -y install wicd wicd-curses
+apt-get -y purge dhcpcd5 plymouth
 
-sudo systemctl disable lightdm.service --force
-sudo systemctl disable graphical.target --force
-sudo systemctl disable plymouth.service --force
+systemctl disable lightdm.service --force
+systemctl disable graphical.target --force
+systemctl disable plymouth.service --force
+systemctl disable bluetooth.service 
+systemctl disable hciuart.service 
 
 while true; do
     read -p "Reboot into Tarina now? (y)es or (n)o?" yn
