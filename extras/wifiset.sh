@@ -1,3 +1,3 @@
 #!/bin/bash
-echo 'fuck you nokia wifi'
+echo 'Setting your wifi region'
 sudo iw reg set FI

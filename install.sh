@@ -161,14 +161,23 @@ cp extras/.vimrc /home/pi/.vimrc
     esac
 done
 
+echo "Setting up network configuration to use wicd program..."
+echo "it works nicer from the terminal than raspberry pi default"
 apt-get -y install wicd wicd-curses
 apt-get -y purge dhcpcd5 plymouth
 
+echo "Removing unnecessary programs from startup..."
 systemctl disable lightdm.service --force
 systemctl disable graphical.target --force
 systemctl disable plymouth.service --force
 systemctl disable bluetooth.service 
 systemctl disable hciuart.service 
+
+echo "Configure wifi region settings to FI, finland"
+echo "You can change settings in extras/wifiset.sh file"
+cp extras/wifiset.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable wifiset.service
 
 while true; do
     read -p "Reboot into Tarina now? (y)es or (n)o?" yn
