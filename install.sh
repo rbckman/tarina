@@ -4,8 +4,15 @@ ROOT_UID=0   # Root has $UID 0.
 
 if [ "$UID" -eq "$ROOT_UID" ]
 then
-echo "Hurray, you are root! Godspeed! Let's do this.."
-cat << "EOF"
+   echo "OK"
+else
+    echo "Run with sudo!"
+    echo "sudo ./install.sh"
+    exit 0
+fi
+
+echo "Hurray, you are root! Let's do this.."
+cat <<'EOF'
 
    _______       _____  _____ _   _          
   |__   __|/\   |  __ \|_   _| \ | |   /\    
@@ -33,15 +40,20 @@ sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus python-webpy wicd
-rpi-update apache2 libapache2-mod-wsgi
+apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus python-webpy apache2 libapache2-mod-wsgi libdbus-glib-1-dev dbus libdbus-1-dev
+echo "Getting the latest firmware for rpi..."
+rpi-update
 echo "installing python-omxplayer-wrapper..."
-pip install omxplayer-wrapper
+pip install omxplayer-wrapper --upgrade
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-pip --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip
-grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt || echo "Adding to /boot/config.txt"
-cat <<'EOF' >> /boot/config.txt
+pip --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
 
+if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
+then
+echo "Tarina configuration seems to be in order in /boot/config.txt"
+else
+echo "Adding to /boot/config.txt"
+cat <<'EOF' >> /boot/config.txt
 #-----Tarina configuration starts here-------
 #tarina-rpi-configuration-1.0
 #Rpi-hd-tft
@@ -67,22 +79,21 @@ disable_splash=1
 force_turbo=1
 boot_delay=1
 dtparam=sd_overclock=90
-
 # Disable the ACT LED.
 dtparam=act_led_trigger=none
 dtparam=act_led_activelow=off
-
 # Disable the PWR LED.
 dtparam=pwr_led_trigger=none
 dtparam=pwr_led_activelow=offboot_delay=1
 #--------Tarina configuration end here---------
-
 EOF
+fi
 
 echo "Change hostname to tarina"
 cat <<'EOF' > /etc/hostname
 tarina
 EOF
+
 cat <<'EOF' > /etc/hosts
 127.0.0.1	localhost
 ::1		localhost ip6-localhost ip6-loopback
@@ -92,13 +103,9 @@ ff02::2		ip6-allrouters
 127.0.1.1	tarina
 EOF
 
-echo "Adding to /boot/cmdline.txt"
-echo "ROB do this one better! ok? doesnt go to the end of the last line and need to somehow check if already there.."
+echo "consoleblank=0 logo.nologo loglevel=0"
+echo "may be put at the end of line in this file /boot/cmdline.txt"
 sleep 4
-echo "continue..
-sleep 1
-echo "maybe put this??: consoleblank=0 logo.nologo loglevel=0"
-echo "at the end of line in this file /boot/cmdline.txt
 
 echo "Make USB soundcard default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"
@@ -136,6 +143,7 @@ Nice=-15
 [Install]
 WantedBy=local-fs.target
 EOF
+
 chmod +x /home/pi/tarina/tarina.py
 systemctl enable tarina.service
 systemctl daemon-reload
@@ -149,7 +157,7 @@ a2ensite tarina.conf
 systemctl reload apache2
 
 while true; do
-    read -p "Do you wish to add rbckmans special hacking tools & configurations (y)es or (n)o?" yn
+    read -p "Do you wish to add rbckmans special hacking tools and configurations [y]es or [n]o?" yn
     case $yn in
         [Yy]* ) echo "Adding hacking tools..."
 apt-get -y install vim htop screen nmap
@@ -163,8 +171,8 @@ done
 
 echo "Setting up network configuration to use wicd program..."
 echo "it works nicer from the terminal than raspberry pi default"
-apt-get -y install wicd wicd-curses
 apt-get -y purge dhcpcd5 plymouth
+apt-get -y install wicd wicd-curses
 
 echo "Removing unnecessary programs from startup..."
 systemctl disable lightdm.service --force
@@ -180,7 +188,7 @@ systemctl daemon-reload
 systemctl enable wifiset.service
 
 while true; do
-    read -p "Reboot into Tarina now? (y)es or (n)o?" yn
+    read -p "Reboot into Tarina now? [y]es or [n]o?" yn
     case $yn in
         [Yy]* ) echo "Rebooting now..."
 reboot
@@ -190,7 +198,3 @@ reboot
     esac
 done
 
-else
-    echo "Run with sudo ./install.sh"
-fi
-exit 0
