@@ -80,7 +80,7 @@ def loadsettings(filmfolder, filmname):
 
 #--------------Write the menu layer to dispmanx--------------
 
-def writemenu(menu,settings,selected,header):
+def writemenu_old(menu,settings,selected,header):
     menudone = ''
     menudone += str(selected).zfill(3)
     menudone += str(len(header)).zfill(3) + header
@@ -94,13 +94,26 @@ def writemenu(menu,settings,selected,header):
     f.write(menudone)
     f.close()
 
+def writemenu(menu,settings,selected,header):
+    menudone = ''
+    menudone += str(selected) + '\n'
+    menudone += header + '\n'
+    for i, s in zip(menu, settings):
+        menudone += i + s + '\n'
+    spaces = len(menudone) - 500
+    menudone += spaces * ' '
+    #menudone += 'EOF'
+    f = open('/dev/shm/interface', 'w')
+    f.write(menudone)
+    f.close()
+
 #------------Write to screen----------------
 
 def writemessage(message):
     menudone = ""
-    menudone += '000'
-    menudone += str(len(message)).zfill(3) + message
-    menudone += 'EOF'
+    menudone += '0' + '\n'
+    menudone += message + '\n'
+    #menudone += 'EOF'
     #clear = 500
     #clear = clear - len(message)
     f = open('/dev/shm/interface', 'w')
