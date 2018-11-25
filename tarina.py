@@ -1192,8 +1192,6 @@ def main():
     holdbutton = ''
     updatethumb = False
     delayerr = ''
-    serverstate = 'off'
-    wifistate = 'off'
     loadfilmsettings = True
 
     #Save settings every 5 seconds
@@ -1226,6 +1224,12 @@ def main():
     oldscene = scene
     oldshot = shot
     oldtake = take 
+
+    #TURN OFF WIFI AND TARINA SERVER
+    serverstate = 'off'
+    wifistate = 'off'
+    #os.system('sudo iwconfig wlan0 txpower off')
+    #serverstate = tarinaserver(False)
 
     #MAIN LOOP
     while True:
@@ -1708,7 +1712,7 @@ def main():
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 5:
+            if rerendermenu < 1000:
                 rerendermenu = rerendermenu + 1
                 rendermenu = True
             else:
