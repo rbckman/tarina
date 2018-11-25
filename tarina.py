@@ -1712,7 +1712,7 @@ def main():
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 1000:
+            if rerendermenu < 100000:
                 rerendermenu = rerendermenu + 1
                 rendermenu = True
             else:
