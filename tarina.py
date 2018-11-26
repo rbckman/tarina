@@ -80,20 +80,6 @@ def loadsettings(filmfolder, filmname):
 
 #--------------Write the menu layer to dispmanx--------------
 
-def writemenu_old(menu,settings,selected,header):
-    menudone = ''
-    menudone += str(selected).zfill(3)
-    menudone += str(len(header)).zfill(3) + header
-    for i, s in zip(menu, settings):
-        menudone += str(len(i) + len(s)).zfill(3)
-        menudone += i + s
-    spaces = len(menudone) - 500
-    menudone += spaces * ' '
-    menudone += 'EOF'
-    f = open('/dev/shm/interface', 'w')
-    f.write(menudone)
-    f.close()
-
 def writemenu(menu,settings,selected,header):
     menudone = ''
     menudone += str(selected) + '\n'
@@ -1715,7 +1701,7 @@ def main():
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 10000:
+            if rerendermenu < 100000:
                 rerendermenu = rerendermenu + 1
                 rendermenu = True
             else:
