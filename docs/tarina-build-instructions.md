@@ -61,7 +61,7 @@ This module and lens gives good hd video quality with the ability to manually fo
 **Links**
 [Arducam](http://arducam.com/)
 **Buy**
-[ebay]((https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018)
+[ebay](https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018)
 
 ---
 

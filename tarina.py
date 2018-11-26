@@ -1118,7 +1118,7 @@ def startcamera(lens):
     #lensshade = npzfile['lens_shading_table']
     table = read_table('lenses/' + lens)
     #camera.framerate = 24.999
-    camera.framerate = 26.04
+    camera.framerate = 26.03
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
@@ -1270,6 +1270,7 @@ def main():
                 diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
                 recording = False
                 camera.stop_recording()
+                time.sleep(0.1) #get audio at least 0.1 longer
                 os.system('pkill arecord')
                 if beeps > 0:
                     buzz(150)
@@ -1284,7 +1285,9 @@ def main():
                 updatethumb = True
                 compileshot(foldername + filename)
                 delayerr = audiodelay(foldername,filename)
-                buzz(300)
+                if beeps > 0:
+                    buzz(300)
+            #if not in last shot or take then go to it
             if pressed == 'record' and recordable == False:
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
@@ -1712,7 +1715,7 @@ def main():
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 100000:
+            if rerendermenu < 10000:
                 rerendermenu = rerendermenu + 1
                 rendermenu = True
             else:
