@@ -56,7 +56,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(51,51,51,0xff), /* fg */
+                                     GRAPHICS_RGBA32(30,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 80, text_size);
         }
@@ -72,7 +72,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
+                                     GRAPHICS_RGBA32(30,255,30,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
                                      text, 80, text_size);
         }
@@ -210,7 +210,21 @@ int main(void)
         //graphics_update_displayed_resource(img, 0, 0, 0, 0);
         }
         uint32_t y_offset = 463;
-        render_subtitle(img, vumeter, text_size, 0, y_offset, 5);
+        char s_vol1 = vumeter[75];
+        char s_vol2 = vumeter[76];
+        char s_vol[1];
+        s_vol[0] = s_vol1;
+        s_vol[1] = s_vol2;
+        int vol = atoi(s_vol);
+        int vucolor = 5;
+        //printf("%s", s_vol);
+        if (vol >= 0 && vol < 35)
+            vucolor = 4;
+        if (vol >= 35 && vol < 90)
+            vucolor = 2;
+        if (vol >= 90)
+            vucolor = 3;
+        render_subtitle(img, vumeter, text_size, 0, y_offset, vucolor);
         graphics_update_displayed_resource(img, 0, 0, 0, 0);
         usleep(20000);
     }
