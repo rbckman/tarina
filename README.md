@@ -27,7 +27,7 @@ The parts are built around the world by different manufacturers. They've been ch
 
 Software
 --------
-The interface focuses on presenting all essential detail for manual filming in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+The interface focuses on presenting the essentials for film making in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
 
 Installing
 ----------
@@ -49,7 +49,14 @@ python tarina.py
 
 Why
 ---
-Make your own tools to get to know your craft.
+Make your own tools to really get down to the nitty-gritty of your craft.
+
+Donations
+---------
+bitcoin tips are always welcome on the adress below:
+```
+bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76
+```
 
 Connect
 -------
