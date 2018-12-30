@@ -55,7 +55,7 @@ Donations
 ---------
 bitcoin tips are always welcome on the adress below:
 ```
-1NpFmK9AjTo477L9SfsiW7RyLnrgExX2Uc
+15tSsUaUXAy6gmAZvZtHDAn17AtTqv1T1n
 ```
 
 Connect
