@@ -51,13 +51,6 @@ Why
 ---
 Make your own tools to really get down to the nitty-gritty of your craft.
 
-Donations
----------
-bitcoin tips are always welcome on the adress below:
-```
-15tSsUaUXAy6gmAZvZtHDAn17AtTqv1T1n
-```
-
 Connect
 -------
 [Telegram](https://t.me/tarinadiy)
