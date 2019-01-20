@@ -908,7 +908,6 @@ def audiosilence(foldername,filename):
     print('Videofile is: ' + str(videos) + 's ' + str(videoms))
     os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos) + '.' + str(videoms).zfill(3))
     os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav')
-    os.remove('/dev/shm/' + filename + '.wav')
 
 #--------------Copy to USB-------------------
 
@@ -1295,9 +1294,13 @@ def main():
                 filename = 'take' + str(take).zfill(3)
                 thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
                 if thefile != '':
-                    scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
+                    #scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
                     #render thumbnail
-                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png &')
+                    writemessage('creating thumbnail')
+                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png')
+                    updatethumb =  True
+                    renderscene = True
+                    renderfilm = True
 
         #VIEW SCENE
         elif pressed == 'view' and menu[selected] == 'SCENE:':
