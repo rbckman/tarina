@@ -465,14 +465,16 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     buttontime = time.time()
     holdbutton = ''
     sound = False
-    between = 1
-    duration = 1
+    between = 3
+    duration = 0.1
     selected = 0
     header = 'Adjust how many seconds between and filming'
     menu = 'BETWEEN:', 'DURATION:', 'START', 'BACK'
     while True:
         settings = str(between), str(duration), '', ''
         writemenu(menu,settings,selected,header)
+	seconds = (3600 / between) * duration
+	vumetermessage('1 h timelapse filming equals ' + str(seconds) + ' second clip   '
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'up' and menu[selected] == 'BETWEEN:':
             between = between + 0.1
