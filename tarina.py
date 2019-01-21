@@ -1099,7 +1099,7 @@ def stopinterface(camera):
 
 def startcamera(lens):
     camera = picamera.PiCamera()
-    camera.resolution = (1296, 552) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
+    camera.resolution = (1920, 816) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
