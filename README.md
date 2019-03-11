@@ -53,7 +53,8 @@ Make your own tools to really get down to the nitty-gritty of your craft.
 
 Connect
 -------
-[Telegram](https://t.me/tarinadiy)
+[Telegram](https://t.me/tarinafilms)
+[#tarina channel on freenode](http://webchat.freenode.net/?channels=tarina)
 
 Standing on the shoulders of giants
 -----------------------------------
