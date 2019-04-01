@@ -11,7 +11,7 @@ Step by step build instructions for a 3D printable Raspberry Pi video camera. No
 
 [Post processing](#post-processing)
 
-[Soldering stuff](#soldering-stuff)
+[Wiring](#wiring)
 
 [Putting it together](#putting-it-together)
 
@@ -334,10 +334,10 @@ So far I've come to this conclusion:
 
 ---
 
-Soldering stuff
-===================
+Wiring
+======
 
-Documentation on its way, if you're in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+![Tarina wiring diagram](wiring.png)
 
 ---
 
