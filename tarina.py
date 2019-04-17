@@ -579,6 +579,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                         return renderfilename
                     time.sleep(0.0555)
             if menu[selected] == 'BACK':
+                writemessage('ok!')
                 return ''
         time.sleep(0.02)
 
@@ -780,13 +781,13 @@ def playthis(filename, camera):
     holdbutton = ''
     camera.stop_preview()
     writemessage('Starting omxplayer')
-    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys', '-o', 'alsa:hw:0,0'])
     time.sleep(1)
     try:
         player.pause()
         player.set_position(0)
         player.play()
-        os.system('aplay -D plughw:0 ' + filename + '.wav &')
+        #os.system('aplay -D plughw:0 ' + filename + '.wav &')
     except:
         print 'something wrong with omxplayer'
         return
@@ -808,20 +809,24 @@ def playthis(filename, camera):
         elif pressed == 'middle':
             time.sleep(0.2)
             if selected == 0 or player.playback_status() == "Stopped":
-                player.stop()
-                player.quit()
-                os.system('pkill aplay')
+                try:
+                    player.stop()
+                    player.quit()
+                except:
+                    pass
+                #os.system('pkill aplay')
                 #os.system('pkill dbus-daemon')
                 #os.system('pkill omxplayer')
                 return
             elif selected == 1:
-                player.pause()
-                player.set_position(0)
-                os.system('pkill aplay')
-                #os.system('pkill omxplayer')
-                time.sleep(1)
-                player.play()
-                os.system('aplay -D plughw:0 ' + filename + '.wav &')
+                try:
+                    player.pause()
+                    player.set_position(0)
+                    time.sleep(1)
+                    player.play()
+                except:
+                    pass
+                #os.system('aplay -D plughw:0 ' + filename + '.wav &')
                 starttime = time.time()
         time.sleep(0.02)
         t = time.time() - starttime
