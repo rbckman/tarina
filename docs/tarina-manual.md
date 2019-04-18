@@ -20,6 +20,8 @@ Contents
 
 Introduction
 ============
+![Tarina UI](tarina-filming-02.jpg)
+
 The UI in Tarina is design so that all settings is made visible and quickly accessible at all times and this is implemented with as few keys as possible.
 
 Key pattern is as following.
@@ -32,7 +34,6 @@ Key pattern is as following.
 
 With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.
 
-![Tarina UI](tarina-filming-02.jpg)
 
 Get the parts
 =============
