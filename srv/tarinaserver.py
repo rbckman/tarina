@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import web
 import os
@@ -23,9 +23,23 @@ urls = (
 
 render = web.template.render('templates/', base="base")
 
+def getfilms(filmfolder):
+    #get a list of films, in order of settings.p file last modified
+    films_sorted = []
+    films = next(os.walk(filmfolder))[1]
+    for i in films:
+        if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
+            lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
+            films_sorted.append((i,lastupdate))
+        else:
+            films_sorted.append((i,0))
+    films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
+    print(films_sorted)
+    return films_sorted
+
 class index:
     def GET(self):
-        films = os.walk('static/Videos/').next()[1]
+        films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
         for i in films:

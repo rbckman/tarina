@@ -44,7 +44,7 @@ apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpuf
 echo "Getting the latest firmware for rpi..."
 rpi-update
 echo "installing python-omxplayer-wrapper..."
-pip3 install omxplayer-wrapper --upgrade
+pip3 install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 pip3 --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
 echo "installing web.py for the tarina webserver..."
@@ -131,7 +131,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/python /home/pi/tarina/tarina.py
+ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py
 User=pi
 Restart=on-failure
 StandardInput=tty-force
