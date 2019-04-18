@@ -9,14 +9,30 @@ Step by step build instructions for a 3D printable Raspberry Pi video camera. No
 Contents
 --------
 
-1. [Get the parts](#get-the-parts)
-2. [3d printing](#3d-printing)
-3. [Post processing](#post-processing)
-4. [Wiring](#wiring)
-5. [Putting it together](#putting-it-together)
-6. [Installing software](#installing-software)
-7. [Tested lenses](#tested-lenses)
+1. [introduction](#intro)
+2. [Get the parts](#get-the-parts)
+3. [3d printing](#3d-printing)
+4. [Post processing](#post-processing)
+5. [Wiring](#wiring)
+6. [Putting it together](#putting-it-together)
+7. [Installing software](#installing-software)
+8. [Tested lenses](#tested-lenses)
 
+Introduction
+============
+The UI in Tarina is design so that all settings is made visible and quickly accessible at all times and this is implemented with as few keys as possible.
+
+Key pattern is as following.
+
+(view)   (up)    (record)
+
+(left)   (enter) (right)
+
+(remove) (down)  (retake)
+
+With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.
+
+![Tarina UI](tarina-filming-02.jpg)
 
 Get the parts
 =============
