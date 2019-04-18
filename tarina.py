@@ -1,8 +1,8 @@
-#/usr/bin/env python
+#/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 #Tarina - a video & audio recorder with glue
-#Copyright 2016 - 2018 Robin Bäckman
+#Copyright 2016 - 2019 Robin Bäckman
 
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ try:
     onlykeyboard = False
 except:
     onlykeyboard = True
-    print "could not find buttons!! running in only keyboard mode"
+    print("could not find buttons!! running in only keyboard mode")
 
 #--------------Save settings-----------------
 
@@ -62,20 +62,20 @@ def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter
     settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
-        print "settings saved"
+        print("settings saved")
     except:
         return
-        print "could not save settings"
+        print("could not save settings")
 
 #--------------Load film settings--------------
 
 def loadsettings(filmfolder, filmname):
     try:
         settings = pickle.load(open(filmfolder + filmname + "/settings.p", "rb"))
-        print "settings loaded"
+        print("settings loaded")
         return settings
     except:
-        print "couldnt load settings"
+        print("couldnt load settings")
         return ''
 
 #--------------Write the menu layer to dispmanx--------------
@@ -351,7 +351,7 @@ def getfilms(filmfolder):
         else:
             films_sorted.append((i,0))
     films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
-    print films_sorted
+    print(films_sorted)
     return films_sorted
 
 #-------------Load film---------------
@@ -411,7 +411,7 @@ def nameyourfilm(filmfolder, filmname, abc):
         vumetermessage(thefuck)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if str(event) != '-1':
-            print str(event)
+            print(str(event))
         if pressed == 'down':
             if abcx < (len(abc) - 1):
                 abcx = abcx + 1
@@ -437,16 +437,16 @@ def nameyourfilm(filmfolder, filmname, abc):
                     if filmname in getfilms(filmfolder)[0]:
                         thefuck = 'this filmname is already taken! chose another name!'
                     if filmname not in getfilms(filmfolder)[0]:
-                        print "New film " + filmname
+                        print("New film " + filmname)
                         return(filmname)
                 except:
-                    print "New film " + filmname
+                    print("New film " + filmname)
                     return(filmname)
         elif event == 27:
             return oldfilmname
         elif event in range(256):
             if chr(event) in abc:
-                print str(event)
+                print(str(event))
                 filmname = filmname + (chr(event))
         if time.time() - pausetime > 0.5:
             if blinking == True:
@@ -646,34 +646,34 @@ def organize(filmfolder, filmname):
         for p in sorted(shots):
             takes = os.walk(filmfolder + filmname + '/' + i + '/' + p).next()[2]
             if len(takes) == 0:
-                print 'no takes in this shot, removing shot..'
+                print('no takes in this shot, removing shot..')
                 os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
             for s in sorted(takes):
                 if '.mp4' in s:
-                    print s
+                    print(s)
                     unorganized_nr = int(s[4:-4])
                     if organized_nr == unorganized_nr:
-                        print 'correct'
+                        print('correct')
                     if organized_nr != unorganized_nr:
-                        print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                        print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                         os.system('mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3) + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                     organized_nr = organized_nr + 1
     # Shots
     for i in sorted(scenes):
         shots = os.walk(filmfolder + filmname + '/' + i).next()[1]
         if len(shots) == 0:
-            print 'no shots in this scene, removing scene..'
+            print('no shots in this scene, removing scene..')
             os.system('rm -r ' + filmfolder + filmname + '/' + i)
         organized_nr = 1
         for p in sorted(shots):
             if 'shot' in p:
-                print p
+                print(p)
                 unorganized_nr = int(p[-3:])
                 if organized_nr == unorganized_nr:
-                    print 'correct'
+                    print('correct')
                 if organized_nr != unorganized_nr:
-                    print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                    print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                     os.system('mv ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
                 organized_nr = organized_nr + 1
 
@@ -681,16 +681,16 @@ def organize(filmfolder, filmname):
     organized_nr = 1
     for i in sorted(scenes):
         if 'scene' in i:
-            print i
+            print(i)
             unorganized_nr = int(i[-3:])
             if organized_nr == unorganized_nr:
-                print 'correct'
+                print('correct')
             if organized_nr != unorganized_nr:
-                print 'false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr)
+                print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                 os.system('mv ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
             organized_nr = organized_nr + 1
 
-    print 'Organizer done! Everything is tidy'
+    print('Organizer done! Everything is tidy')
 
 #-------------Compile Shot--------------
 
@@ -726,7 +726,7 @@ def render(filmfiles, filename):
     #call(videomerge, shell=True) #how to insert somekind of estimated time while it does this?
     p = Popen(videomerge)
     #show progress
-    print str(videosize)
+    print(str(videosize))
     while p.poll() is None:
         time.sleep(0.1)
         try:
@@ -772,7 +772,7 @@ def render(filmfiles, filename):
 def playthis(filename, camera):
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
-        print "no file to play"
+        print("no file to play")
         return
     t = 0
     pressed = ''
@@ -789,7 +789,7 @@ def playthis(filename, camera):
         player.play()
         #os.system('aplay -D plughw:0 ' + filename + '.wav &')
     except:
-        print 'something wrong with omxplayer'
+        print('something wrong with omxplayer')
         return
     menu = 'BACK', 'PLAY FROM START'
     settings = '', ''
@@ -1659,7 +1659,7 @@ def main():
                 camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
                 time.sleep(0.2)
             except:
-                print 'could not load film settimgs'
+                print('could not load film settings')
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
@@ -1681,7 +1681,7 @@ def main():
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
-                print 'okey something has changed'
+                print('okey something has changed')
                 overlay = removeimage(camera, overlay)
                 imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
                 overlay = displayimage(camera, imagename)
@@ -1729,10 +1729,10 @@ if __name__ == '__main__':
     try:
         main()
     except:
-        print 'Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1]
         os.system('pkill arecord')
         os.system('pkill startinterface')
         os.system('pkill tarinagui')
         curses.nocbreak()
         curses.echo()
         curses.endwin()
+        print('Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1])

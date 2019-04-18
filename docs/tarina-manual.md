@@ -321,7 +321,7 @@ Wiring
 Putting it together
 ===================
 
-Documentation on its way, if you're in a hurry feel free to drop a message in [telegram](https://t.me/tarinadiy)
+Documentation on its way, if you're in a hurry feel free to drop a message in [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 
 
 Installing software
