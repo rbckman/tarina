@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="keywords" content="Camera, 3d Printed, Filmmaker, Raspberry pi" />
+  <title>Tarina – a 3d printable camera for lazy filmmakers</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<h1 id="tarina-build-instructions">TARINA BUILD INSTRUCTIONS</h1>
+<p>Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in <a href="https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net">#tarina:bennysmatrixchat.ddns.net</a></p>
+<div class="figure">
+<img src="tarina-and-leon.jpg" alt="Tarina and Leon" />
+<p class="caption">Tarina and Leon</p>
+</div>
+<h2 id="contents">Contents</h2>
+<ol style="list-style-type: decimal">
+<li><a href="#get-the-parts">Get the parts</a></li>
+<li><a href="#3d-printing">3d printing</a></li>
+<li><a href="#post-processing">Post processing</a></li>
+<li><a href="#wiring">Wiring</a></li>
+<li><a href="#putting-it-together">Putting it together</a></li>
+<li><a href="#installing-software">Installing software</a></li>
+<li><a href="#tested-lenses">Tested lenses</a></li>
+</ol>
+<h1 id="get-the-parts">Get the parts</h1>
+<div class="figure">
+<img src="tarina-build.jpg" alt="Tarina parts layed out" />
+<p class="caption">Tarina parts layed out</p>
+</div>
+<p>Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend.</p>
+<h2 id="raspberry-pi-3-b">Raspberry pi 3 B</h2>
+<p>Price ~30 eur</p>
+<p>The heart of Tarina. Why Raspberry pi you ask? There are several reasons:</p>
+<ul>
+<li>Huge support.</li>
+<li>The great Debian based os Raspbian (beeing a debian nerd myself).</li>
+<li>Low price.</li>
+<li>Picamera.</li>
+</ul>
+<p>The 3B+ is too powerhungry for the Powerbooster 1000C thats why I went with 3B</p>
+<p><strong>Links</strong> <a href="https://raspberrypi.org">Raspberry pi site</a> <strong>Buy</strong> <a href="https://www.aliexpress.com/store/product/Raspberry-Pi-3-Model-B-Raspberry-Pi-Raspberry-Pi3-B-Pi-3-Pi-3B-With-WiFi/3242037_32900816535.html?spm=2114.search0104.3.113.7a702274lCPIr4&amp;ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5016020_5015416_10059_10696_100031_5015320_10084_10083_10103_451_10618_452_5016116_10304_10307_10820_10821_10302,searchweb201603_55,ppcSwitch_2&amp;algo_expid=0a48bb10-5985-49ff-be76-433eb1f8685b-15&amp;algo_pvid=0a48bb10-5985-49ff-be76-433eb1f8685b&amp;priceBeautifyAB=0">Aliexpress</a></p>
+<h2 id="arducam-5-mp-ov5647-camera-module-with-cs-lens">Arducam 5 MP OV5647 camera module with CS lens</h2>
+<p>Price ~30 eur</p>
+<p>This module and lens gives good hd video quality with the ability to manually focus and replace lenses. See tested lenses down below.</p>
+<p><strong>Links</strong> <a href="http://arducam.com/">Arducam</a> <strong>Buy</strong> <a href="https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018">ebay</a></p>
+<h2 id="ugeek-3.5-inch-800x480-tft-screen">Ugeek 3.5 inch 800x480 TFT Screen</h2>
+<p>Price ~35 eur</p>
+<p>Best 3.5 inch screen that I could find. Features worth mentioning:</p>
+<ul>
+<li>800x480 pixels</li>
+<li>Very responsible 11 ms.</li>
+<li>High contrast.</li>
+<li>Sunlight readable.</li>
+<li>I2C Master.</li>
+</ul>
+<p>This is not a touchscreen but I dont think touchscreens are good for cameras anyway.</p>
+<p><strong>Links</strong> <a href="http://www.raspberrypiwiki.com/index.php/3.5_inch_TFT_800x480@60fps">Raspberrypiwiki</a> <strong>Buy</strong> <a href="https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html">Aliexpress</a></p>
+<h2 id="usb-via-vt1620a-sound-card">USB via vt1620a sound card</h2>
+<p>Price ~1 eur</p>
+<p>Really cheap usb soundcard. It has been working suprisingly well. Have not tested other cards yet.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB">Aliexpress</a></p>
+<h2 id="v-7800mah-li-ion-battery">3.7v 7800mAh li-ion Battery</h2>
+<p>Price ~17 eur</p>
+<p>I have tried several batteries, the adafruit 6800mAh is also fine.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/free-shipping-3-7v-7800mah-18650-li-ion-rechargeable-battery-pack-18650-3P-lithium-ion-battery/32823635264.html?spm=a2g0s.9042311.0.0.49ba4c4dyoKkZS">Aliexpress</a></p>
+<h2 id="adafruit-powerboost-1000c">Adafruit Powerboost 1000C</h2>
+<p>Price ~23 eur</p>
+<p>This is the only power board that I could find with the feature to run the camera and charge it at the same time.</p>
+<p><strong>Links</strong> <a href="https://www.adafruit.com/product/2465">Adafruit</a> <strong>Buy</strong> <a href="https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&amp;hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&amp;_sacat=0&amp;_nkw=powerboost+1000c&amp;_from=R40&amp;rt=nc&amp;_trksid=m570.l1313">Ebay</a></p>
+<h2 id="x8x5mm-dip-4-silicone-switch-mute-silent-button">8x8x5MM DIP-4 Silicone Switch Mute Silent button</h2>
+<p>Price ~2 eur/20 pcs</p>
+<p>You can only buy a pack of 20 pcs but these buttons are good and silent! Not necessary if you want to control with keyboard like Rii mini 8+</p>
+<p><strong>Buy</strong> <a href="http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&amp;ssPageName=STRK%3AMEBIDX%3AIT">Ebay</a></p>
+<h2 id="mcp23017-esp-dip-28-16-bit-i-o-expander-i2c">MCP23017-E/SP DIP-28 16 bit I / O expander I2C</h2>
+<p>Price ~1 eur</p>
+<p>This will be connected to the screen I2C port. This is not necessary if you intend to control the camera with a keyboard like the Rii mini i8+</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/10PCS-MCP23017-E-SP-DIP-28-MCP23017-16-Bit-I-O-Expander-with-I2C-Interface-IC/32665631086.html?spm=a2g0s.9042311.0.0.27424c4dn4m008">Aliexpress</a></p>
+<h2 id="x8cm-double-side-copper-prototype-pcb">2x8cm double side copper prototype pcb</h2>
+<p>Price ~0.20 eur/pcs</p>
+<p>PCB board to solder all connections on the MCP23017-E/SP</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/5pcs-2x8cm-double-Side-Copper-prototype-pcb-2-8-panel-Universal-Board-for-Arduino-Free-Shipping/32820588012.html?spm=a2g0s.9042311.0.0.27424c4dPM5vVF">Aliexpress</a></p>
+<h2 id="piezo-electronic-buzzer">Piezo electronic buzzer</h2>
+<p>Price ~1 eur</p>
+<p>Very useful for timing shots!</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/store/product/New-Arrival-Durable-3-24V-Piezo-Electronic-Buzzer-Alarm-95DB-Continuous-Sound-Beeper-For-Arduino-Car/1959068_32666789405.html?spm=2114.search0204.3.1.4cef4057RBI3xn&amp;ws_ab_test=searchweb0_0,searchweb201602_3_10065_10068_10059_5015413_5015313_10696_100031_10084_10083_5016113_10103_451_10618_452_10304_10307_10820_10821_10302_5016013,searchweb201603_45,ppcSwitch_4_ppcChannel&amp;algo_expid=c84318cd-b50e-4370-9cad-6ae9bc7963ae-0&amp;algo_pvid=c84318cd-b50e-4370-9cad-6ae9bc7963ae&amp;priceBeautifyAB=0">Aliexpress</a></p>
+<h2 id="latching-push-button-switch-mini">Latching push button switch mini</h2>
+<p>Price ~1 eur/10 pcs</p>
+<p>This serves as the microphone and screen on/off button</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/10Pcs-Set-1A-30V-DC-250V-Black-Latching-On-Off-Mini-Torch-Push-Button-Switch-G08/32756874522.html?spm=a2g0s.9042311.0.0.27424c4ddFzv3i">Aliexpress</a></p>
+<h2 id="latching-push-button-switch-10mm">Latching push button switch 10mm</h2>
+<p>Price ~5 eur/24 pcs</p>
+<p>I use this as the powerbutton. I have tried different versions of safe shutdown buttons for the Raspberry pi but they have not worked as I wanted (they draw power even when Pi is powered off, this is not good). I have solved the problem with a menu button to safely shut down the camera.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/24pcs-latching-push-button-switch-10mm-fixed-pushbutton-switch-latching-maintained-push-buttons/32770346793.html?spm=a2g0s.9042311.0.0.27424c4ddFzv3i">Aliexpress</a></p>
+<h2 id="nut-14--20-unc-304-a2">Nut 1/4 -20 UNC 304 A2</h2>
+<p>Price ~2 eur/10 pcs</p>
+<p>This is the standard camera stand nuts. If you never use a stand then you dont need this.</p>
+<p><strong>Buy</strong> <a href="https://www.ebay.com/itm/1-4-20-UNC-304-A2-Stainless-Steel-Hex-Full-Nuts-Qty-10PCS-/222134363896?hash=item33b83d66f8">Ebay</a><br></p>
+<h2 id="max9812-microphone-amplifier">MAX9812 Microphone amplifier</h2>
+<p>Price ~2 eur</p>
+<p>This makes suprisingly good sounding sound!</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/MIC-microphone-amplifier-module-sound-module-voice-module/32268198506.html?spm=a2g0s.9042311.0.0.3ac34c4dNug0b5">Aliexpress</a></p>
+<h2 id="mm-female-stereo-headset-interior-pcb-mount">3.5mm Female stereo headset interior PCB mount</h2>
+<p>Price ~1 eur/10 pcs</p>
+<p>Microphone input.</p>
+<p><strong>Buy</strong> <a href="https://www.ebay.com/itm/10pcs-3-5mm-Female-5-Pins-Stereo-Headset-Interior-PCB-Mount-Audio-Jack-Socket-/252376936189?hash=item3ac2d66efd">Ebay</a></p>
+<h2 id="lr44-batteries">LR44 Batteries</h2>
+<p>Price ~2 eur/10 pcs</p>
+<p>Microphone batteries</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/store/product/10PCS-Lot-100-Genuine-wholesale-GP-A76-GPA76-LR44-AG13-LR44-SR44-battery-LR44-357-AG13/1120058_32739450265.html?spm=2114.search0104.3.44.5b5d32dbJK5uJ1&amp;ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5015418_5016020_10059_10696_100031_5015320_10084_10083_10103_451_10618_452_10304_10307_10820_10821_5016118_10302,searchweb201603_55,ppcSwitch_2&amp;algo_expid=8af0bcbe-dcb8-4f9a-bd47-084a4d77561a-6&amp;algo_pvid=8af0bcbe-dcb8-4f9a-bd47-084a4d77561a&amp;priceBeautifyAB=0">Aliexpress</a></p>
+<h2 id="screws-m3x12mm">Screws M3x12mm</h2>
+<p>Price ~2 eur/25 pcs</p>
+<p>These hold the camera together.</p>
+<p><strong>Buy</strong> Your local harware store <a href="https://www.motonet.fi/fi/tuote/389247/Uraruuvi-3x12-A2-RST-25kpl">Motonet (store in Finland)</a></p>
+<h2 id="screws-2.2x9.5mm">Screws 2.2x9.5mm</h2>
+<p>Price ~1 eur/20 pcs</p>
+<p>These hold the camera/mic together.</p>
+<p><strong>Buy</strong> Your local hardware store <a href="https://www.hobbycenter.fi/kavan-puuruuvi-22x95mm-20-kpl-0096a">Hobbycenter (store in Finland)</a></p>
+<h2 id="lr44-button-cell-socket-holder">LR44 Button cell socket holder</h2>
+<p>Price ~1 eur/pcs</p>
+<p>We only need the metal parts from these, if you have som thin metal you could cut these yourself.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/5Pcs-lot-AG13-LR44-Button-Cell-Battery-Socket-Holder-Plastic-Case-TBH-AG13-B/32833837989.html?spm=a2g0s.9042311.0.0.27424c4dE5lqct">Aliexpress</a></p>
+<h2 id="mm-jack-to-jack-aux-cable">3.5mm Jack to jack aux cable</h2>
+<p>Price ~1 eur</p>
+<p>From microphone to mic-in.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/store/product/1-Piece-Short-0-2M-20cm-Red-3-5mm-Jack-to-Jack-Aux-Cable-Male-to/505072_32833465555.html?spm=2114.search0104.3.9.383e3c3dVjq9DY&amp;ws_ab_test=searchweb0_0,searchweb201602_5_10065_10068_5016020_10059_10696_100031_5015320_5016120_10084_10083_5015420_10103_451_10618_452_10304_10307_10820_10821_10302,searchweb201603_55,ppcSwitch_2&amp;algo_expid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812-1&amp;algo_pvid=9ba0b376-e66f-48d2-9ccd-ecc1e8794812&amp;priceBeautifyAB=0">Aliexpress</a></p>
+<h2 id="rii-mini-i8-mini-keyboard">Rii mini i8+ mini keyboard</h2>
+<p>Price ~17 eur</p>
+<p>Wireless control over camera. You will also need this for wifi settings etc. (Recommended) This is one of the best mini keyboards I've tried.</p>
+<p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/Rii-mini-i8-Russian-English-Spanish-Hebrew-Version-Wireless-Backlit-Keyboard-with-Touchpad-for-PC-Smart/32450468690.html?spm=a2g0s.9042311.0.0.27424c4dKdqpVO">Aliexpress</a></p>
+<p>Parts grand total ~200 eur</p>
+<h1 id="d-printing">3d printing</h1>
+<p>While waiting for ordered parts lets 3d print the rest of the parts. I recommend printing with a solid 90% infill. Now it is pretty crucial that you have a good calibrated printer so that you don't over/under print. Some parts need to be very precise to work.</p>
+<p>You'll find all the 3d parts in the 3d folder.</p>
+<ul>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-body.stl">body</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-button-plate-bottom.stl">button-plate-bottom</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-button-plate-upper.stl">button-plate-upper</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-hdmi-cap.stl">hdmi-cap</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-left-side.stl">left-side</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-mic-body.stl">mic-body</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-mic-lid.stl">mic-lid</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-picamera-body.stl">picamera-body</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-picamera-body-lid.stl">picamera-body-lid</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-picamera-bridge.stl">picamera-bridge</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-right-side.stl">right-side</a></li>
+<li><a href="https://github.com/rbckman/tarina/blob/master/3d/tarina-screen-lid.stl">screen-lid</a></li>
+</ul>
+<h1 id="post-processing">Post processing</h1>
+<p>This is still a work in progress...</p>
+<p>So far I've come to this conclusion:</p>
+<ul>
+<li>Put 3d printed parts together with screws.</li>
+<li>Sand with sandpaper from rough to finest (from 120 to 400). I like to sand down all corners making them round.</li>
+<li>Dust off.</li>
+<li>Paint.</li>
+<li>Wait til dry.</li>
+<li>Paint again.</li>
+<li>Wait til dry. I like to wait for atleast a day to make it really dry.</li>
+<li>Sand again.</li>
+<li>Paint and wait again.</li>
+<li>Continue like this til you are satisfied with the feel, now I like to have a good grip so I finnish with sanding with 400 grit paper and leave it like that.</li>
+</ul>
+<h1 id="wiring">Wiring</h1>
+<p><img src="tarina-build-10.jpg" alt="3d printed and painted, next up sanding and adding one more paint layer" /> <img src="wiring.png" alt="Tarina wiring diagram" /> <img src="tarina-build-04.jpg" alt="Fitting everything together" /> <img src="tarina-build-07.jpg" alt="Building" /> <img src="tarina-build-02.jpg" alt="Ready for screen" /> <img src="tarina-build-08.jpg" alt="MCP and buttons" /> <img src="tarina-build-11.jpg" alt="MCP and buttons" /> <img src="tarina-build-07.jpg" alt="Building" /> <img src="tarina-build-10.jpg" alt="Sound card ready to be soldered" /></p>
+<h1 id="putting-it-together">Putting it together</h1>
+<p>Documentation on its way, if you're in a hurry feel free to drop a message in <a href="https://t.me/tarinadiy">telegram</a></p>
+<h1 id="installing-software">Installing software</h1>
+<p>Download latest <a href="https://www.raspberrypi.org/downloads/raspbian/">Raspbian</a> and follow <a href="https://www.raspberrypi.org/documentation/installation/installing-images/README.md">install instructions</a>. <a href="https://www.raspberrypi.org/documentation/remote-access/ssh/">Ssh into</a> Raspberry Pi and run:</p>
+<pre><code>sudo raspi-config</code></pre>
+<p>Expand file system, enable camera and then reboot. Run this to install git:</p>
+<pre><code>sudo apt-get install git</code></pre>
+<p>Git clone tarina and then run install script with sudo:</p>
+<pre><code>git clone https://github.com/rbckman/tarina.git
+cd tarina
+sudo ./install.sh</code></pre>
+<p>You'r ready to rumble:</p>
+<pre><code>python tarina.py</code></pre>
+<p>Happy filming!</p>
+<div class="figure">
+<img src="tarina-leone.jpg" alt="Should be looking like this once finnished" />
+<p class="caption">Should be looking like this once finnished</p>
+</div>
+<h1 id="tested-lenses">Tested lenses</h1>
+<p>Here is what I'm testing right now.</p>
+<h2 id="yumiki-6-60mm-13-cs-lens-cctv-lens-ir-f1.6-manual-zoom-manual-iris">Yumiki 6-60mm 1/3&quot; CS Lens CCTV Lens IR F1.6 Manual Zoom Manual Iris</h2>
+<p><a href="https://www.aliexpress.com/item/6-60mm-1-3-CS-Lens-CCTV-Lens-IR-F1-6-Manual-Zoom-Manual-Iris-for/32793850795.html?spm=a2g0s.9042311.0.0.27424c4dmtk6IZ">Aliexpress</a></p>
+<h2 id="camera-lens-2.8-12mm-varifocal">Camera Lens 2.8-12mm Varifocal</h2>
+<p>This lens is good. Will write a longer review once I have more filming hours.</p>
+<p><a href="https://www.aliexpress.com/item/Megapixel-Fixed-Iris-HD-CCTV-Camera-Lens-2-8-12mm-Varifocal-HD-Security-Camera-Lens-Manual/32644427822.html?spm=a2g0s.9042311.0.0.27424c4dmtk6IZ">Aliexpress</a></p>
+<hr />
+</body>
+</html>

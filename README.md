@@ -21,7 +21,7 @@ The parts are built around the world by different manufacturers. They've been ch
 [Adafruit Powerboost 1000C](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)<br>
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
-[Complete part list & Build instructions](docs/tarina-build-instructions.md)
+[Complete part list & Build instructions](docs/tarina-manual.md)
 
 [Ready to print 3d designs](https://github.com/rbckman/tarina/tree/master/3d)
 
@@ -53,8 +53,8 @@ Make your own tools to really get down to the nitty-gritty of your craft.
 
 Connect
 -------
-[Telegram](https://t.me/tarinafilms)
-[#tarina channel on freenode](http://webchat.freenode.net/?channels=tarina)
+Matrix [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+Mail rob(at)tarina.org
 
 Standing on the shoulders of giants
 -----------------------------------
@@ -62,3 +62,5 @@ This whole project has only been possible because of the people behind the free 
 
 [Gnu](https://gnu.org), [Linux](https://github.com/torvalds/linux), [Debian](https://debian.org), [Raspberry Pi](https://raspberrypi.org), 
 [Python programming language](https://python.org), Dave Jones's [Picamera python module](https://github.com/waveform80/picamera), rwb27 for lens shading correction! Check out the 3d printable microscope [Openflexure](https://github.com/rwb27/openflexure_microscope), FFmpeg & Libav-tools, GPac library with MP4Box, [Blender](http://blender.org), [aplay the awesome wav player/recorder with VU meter](http://alsa.opensrc.org/Aplay), [Omxplayer](https://github.com/huceke/omxplayer), [Will Price's Python-omxplayer-wrapper](https://github.com/willprice/python-omxplayer-wrapper), Sox, [The Dispmanx library](https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi)
+
+![Tarina and Leon](tarina-and-leon.jpg)
