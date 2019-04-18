@@ -59,7 +59,7 @@ There are several reasons why, will write a longer story why but heres some fund
 - be able to repair if something breaks
 - be able to expand / build on it / make modifications
 - be able to connect to it / program it to do things
-- do a film on the fly without the need of a another computer
+- do a film on the fly without the need of another computer
 - be able to watch your film directly on a screen once you're done filming
 - learn about programming and your own crafts to really get down to the nitty-gritty. 
 
