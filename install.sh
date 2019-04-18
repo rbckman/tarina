@@ -42,13 +42,13 @@ apt-get update
 apt-get upgrade -y
 apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount apache2 libapache2-mod-wsgi libdbus-glib-1-dev dbus libdbus-1-dev
 echo "Getting the latest firmware for rpi..."
-rpi-update
+SKIP_WARNING=1 rpi-update
 echo "installing python-omxplayer-wrapper..."
-pip3 install omxplayer-wrapper
+sudo pip3 install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-pip3 --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
+sudo pip3 --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
 echo "installing web.py for the tarina webserver..."
-pip3 install web.py==0.40-dev1
+sudo pip3 install web.py==0.40-dev1
 
 if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
 then

@@ -471,7 +471,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     header = 'Adjust how many seconds between and filming'
     menu = 'BETWEEN:', 'DURATION:', 'START', 'BACK'
     while True:
-        settings = str(between), str(duration), '', ''
+        settings = str(round(between,2)), str(round(duration,2)), '', ''
         writemenu(menu,settings,selected,header)
         seconds = (3600 / between) * duration
         vumetermessage('1 h timelapse filming equals ' + str(int(seconds)) + ' second clip   ')
@@ -733,7 +733,7 @@ def render(filmfiles, filename):
             rendersize = countsize(filename + '.mp4')
         except:
             continue
-        writemessage('video rendering ' + str(rendersize) + ' of ' + str(videosize) + ' kb done')
+        writemessage('video rendering ' + str(int(rendersize)) + ' of ' + str(int(videosize)) + ' kb done')
     ##PASTE AUDIO TOGETHER
     writemessage('Hold on, rendering audio...')
     audiomerge = ['sox']
@@ -756,7 +756,7 @@ def render(filmfiles, filename):
                 rendersize = countsize(filename + '.mp3')
             except:
                 continue
-            writemessage('audio rendering ' + str(rendersize) + ' of ' + str(int(audiosize)) + ' kb done')
+            writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
         call(['MP4Box', '-add', filename + '_tmp.mp4', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
@@ -781,13 +781,13 @@ def playthis(filename, camera):
     holdbutton = ''
     camera.stop_preview()
     writemessage('Starting omxplayer')
-    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys', '-o', 'alsa:hw:0,0'])
+    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     time.sleep(1)
     try:
         player.pause()
         player.set_position(0)
         player.play()
-        #os.system('aplay -D plughw:0 ' + filename + '.wav &')
+        os.system('aplay -D plughw:0 ' + filename + '.wav &')
     except:
         print('something wrong with omxplayer')
         return
@@ -812,21 +812,22 @@ def playthis(filename, camera):
                 try:
                     player.stop()
                     player.quit()
+                    os.system('pkill aplay')
                 except:
-                    pass
-                #os.system('pkill aplay')
-                #os.system('pkill dbus-daemon')
-                #os.system('pkill omxplayer')
+                    #kill it if it dont stop
+                    os.system('pkill dbus-daemon')
+                    os.system('pkill omxplayer')
                 return
             elif selected == 1:
                 try:
+                    os.system('pkill aplay')
                     player.pause()
                     player.set_position(0)
                     time.sleep(1)
                     player.play()
+                    os.system('aplay -D plughw:0 ' + filename + '.wav &')
                 except:
                     pass
-                #os.system('aplay -D plughw:0 ' + filename + '.wav &')
                 starttime = time.time()
         time.sleep(0.02)
         t = time.time() - starttime
