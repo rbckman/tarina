@@ -4,7 +4,7 @@ TARINA BUILD INSTRUCTIONS
 
 Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 
-![Tarina and Leon](tarina-and-leon.jpg)
+![Filming with Tarina](tarina-filming-01.jpg)
 
 Contents
 --------
