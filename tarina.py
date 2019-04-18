@@ -26,7 +26,7 @@ from subprocess import Popen
 from omxplayer import OMXPlayer
 import subprocess
 import sys
-import cPickle as pickle
+import pickle
 import curses
 import RPi.GPIO as GPIO
 from PIL import Image
@@ -343,7 +343,7 @@ def update(tarinaversion, tarinavername):
 def getfilms(filmfolder):
     #get a list of films, in order of settings.p file last modified
     films_sorted = []
-    films = os.walk(filmfolder).next()[1]
+    films = next(os.walk(filmfolder))[1]
     for i in films:
         if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
             lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
@@ -473,8 +473,8 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
     while True:
         settings = str(between), str(duration), '', ''
         writemenu(menu,settings,selected,header)
-	seconds = (3600 / between) * duration
-	vumetermessage('1 h timelapse filming equals ' + str(int(seconds)) + ' second clip   ')
+        seconds = (3600 / between) * duration
+        vumetermessage('1 h timelapse filming equals ' + str(int(seconds)) + ' second clip   ')
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'up' and menu[selected] == 'BETWEEN:':
             between = between + 0.1
@@ -579,7 +579,7 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                         return renderfilename
                     time.sleep(0.0555)
             if menu[selected] == 'BACK':
-                writemessage('ok!')
+                vumetermessage('ok!')
                 return ''
         time.sleep(0.02)
 
@@ -638,13 +638,13 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 #------------Organize----------------
 
 def organize(filmfolder, filmname):
-    scenes = os.walk(filmfolder + filmname).next()[1]
+    scenes = next(os.walk(filmfolder + filmname))[1]
 
     # Takes
     for i in sorted(scenes):
-        shots = os.walk(filmfolder + filmname + '/' + i).next()[1]
+        shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
         for p in sorted(shots):
-            takes = os.walk(filmfolder + filmname + '/' + i + '/' + p).next()[2]
+            takes = next(os.walk(filmfolder + filmname + '/' + i + '/' + p))[2]
             if len(takes) == 0:
                 print('no takes in this shot, removing shot..')
                 os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
@@ -661,7 +661,7 @@ def organize(filmfolder, filmname):
                     organized_nr = organized_nr + 1
     # Shots
     for i in sorted(scenes):
-        shots = os.walk(filmfolder + filmname + '/' + i).next()[1]
+        shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
         if len(shots) == 0:
             print('no shots in this scene, removing scene..')
             os.system('rm -r ' + filmfolder + filmname + '/' + i)
@@ -851,10 +851,10 @@ def viewfilm(filmfolder, filmname):
 
 def audiodelay(foldername, filename):
     writemessage('Audio syncing..')
-    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
-    videolenght = pipe.read()
-    pipe = subprocess.Popen('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True, stdout=subprocess.PIPE).stdout
-    audiolenght = pipe.read()
+    pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
+    videolenght = pipe.decode()
+    pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True)
+    audiolenght = pipe.decode()
     #if there is no audio lenght
     print('audio is:' + audiolenght)
     if not audiolenght.strip():
@@ -907,8 +907,8 @@ def audiodelay(foldername, filename):
 
 def audiosilence(foldername,filename):
     writemessage('Creating audiosilence..')
-    pipe = subprocess.Popen('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True, stdout=subprocess.PIPE).stdout
-    videolenght = pipe.read()
+    pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
+    videolenght = pipe.decode()
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
@@ -971,7 +971,7 @@ def buzzer(beeps):
     pausetime = 1
     while beeps > 1:
         buzzerdelay = 0.0001
-        for _ in xrange(buzzerrepetitions):
+        for _ in range(buzzerrepetitions):
             for value in [0xC, 0x4]:
                 #GPIO.output(1, value)
                 bus.write_byte_data(DEVICE,OLATA,value)
@@ -979,7 +979,7 @@ def buzzer(beeps):
         time.sleep(pausetime)
         beeps = beeps - 1
     buzzerdelay = 0.0001
-    for _ in xrange(buzzerrepetitions * 10):
+    for _ in range(buzzerrepetitions * 10):
         for value in [0xC, 0x4]:
             #GPIO.output(1, value)
             bus.write_byte_data(DEVICE,OLATA,value)
@@ -991,7 +991,7 @@ def buzzer(beeps):
 
 def buzz(buzzerlenght):
     buzzerdelay = 0.0001
-    for _ in xrange(buzzerlenght):
+    for _ in range(buzzerlenght):
         for value in [0xC, 0x4]:
             #GPIO.output(1, value)
             bus.write_byte_data(DEVICE,OLATA,value)
@@ -1016,7 +1016,7 @@ def read_table(inFile):
                 else:
                     # scan in a single line
                     line = line.replace(',','')
-                    lineData = [int(x) for x in string.split(line,' ')]
+                    lineData = [int(x) for x in line.split()]
                     channel.append(lineData)
     return np.array(ls_table,dtype=np.uint8)    
 
@@ -1200,7 +1200,7 @@ def main():
 
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
-    diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
+    diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
 
     #START INTERFACE
     screen = startinterface()
@@ -1259,7 +1259,7 @@ def main():
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
                 disk = os.statvfs(tarinafolder + '/')
-                diskleft = str(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024) + 'Gb'
+                diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
                 camera.stop_recording()
                 time.sleep(0.1) #get audio at least 0.1 longer

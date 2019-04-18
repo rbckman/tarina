@@ -40,13 +40,15 @@ sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python-picamera python-imaging python-pexpect libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount python-dbus python-webpy apache2 libapache2-mod-wsgi libdbus-glib-1-dev dbus libdbus-1-dev
+apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount apache2 libapache2-mod-wsgi libdbus-glib-1-dev dbus libdbus-1-dev
 echo "Getting the latest firmware for rpi..."
 rpi-update
 echo "installing python-omxplayer-wrapper..."
-pip install omxplayer-wrapper --upgrade
+pip3 install omxplayer-wrapper --upgrade
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-pip --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
+pip3 --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
+echo "installing web.py for the tarina webserver..."
+pip3 install web.py==0.40-dev1
 
 if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
 then
@@ -78,7 +80,7 @@ dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
 force_turbo=1
 boot_delay=1
-dtparam=sd_overclock=90
+# dtparam=sd_overclock=90
 # Disable the ACT LED.
 dtparam=act_led_trigger=none
 dtparam=act_led_activelow=off
