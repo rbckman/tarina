@@ -1499,7 +1499,7 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel < 100:
                     miclevel = miclevel + 2
-                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel < 100:
                     headphoneslevel = headphoneslevel + 2
@@ -1592,7 +1592,7 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel > 0:
                     miclevel = miclevel - 2
-                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel > 0:
                     headphoneslevel = headphoneslevel - 2
@@ -1663,7 +1663,7 @@ def main():
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
-            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '%')
+            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             organize(filmfolder, filmname)
             scene, shot, take = countlast(filmname, filmfolder)
