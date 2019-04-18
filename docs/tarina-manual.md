@@ -307,8 +307,8 @@ So far I've come to this conclusion:
 Wiring
 ======
 
-![3d printed and painted, next up sanding and adding one more paint layer](tarina-build-10.jpg)
 ![Tarina wiring diagram](wiring.png)
+![3d printed and painted, next up sanding and adding one more paint layer](tarina-build-13.jpg)
 ![Fitting everything together](tarina-build-04.jpg)
 ![Building](tarina-build-07.jpg)
 ![Ready for screen](tarina-build-02.jpg)
