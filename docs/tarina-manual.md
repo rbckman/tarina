@@ -235,6 +235,17 @@ These hold the camera together.
 **Buy**
 Your local harware store
 [Motonet (store in Finland)](https://www.motonet.fi/fi/tuote/389247/Uraruuvi-3x12-A2-RST-25kpl)
+[Ebay](https://www.ebay.com/itm/50X-Stainless-M1-6-M2-M3-M4-Countersunk-Flat-Head-Cross-Miniature-Screw-Bolts/392195849737?hash=item5b50b1be09:m:mGdurHGRlBzB-IIMJirP3Dw)
+
+
+Screws M3x30mm
+---------------
+Price ~2 eur/30 pcs
+
+These hold picamera-body to the body.
+
+**Buy**
+[Ebay](https://www.ebay.com/itm/20-pcs-M3-Screw-Diameter-3mm-Length-30mm-M3x30-Stainless-Steel-DIY/181846978737?epid=886666073&hash=item2a56ecb0b1:g:F1MAAOxyUylTSh9n)
 
 
 Screws 2.2x9.5mm
