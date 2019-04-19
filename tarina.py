@@ -572,10 +572,12 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                             call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
                             os.remove(renderfilename + '_tmp.mp4')
                         else:
-                            writemessage('No audio files found! View INSTALL file for instructions.')
+                            writemessage('No audio files found! tell Robin!')
+                            time.sleep(5)
                         #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
                         #cleanup
                         os.system('rm -r ' + foldername + 'timelapse')
+                        vumetermessage('timelapse done! ;)')
                         return renderfilename
                     time.sleep(0.0555)
             if menu[selected] == 'BACK':
@@ -758,7 +760,7 @@ def render(filmfiles, filename):
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
         os.system('sox -G -m -v 1 ' + filename + '_dub.wav -v 0.5 ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
-        os.remove(filename + '_tmp.wav')
+        #os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
@@ -776,7 +778,7 @@ def render(filmfiles, filename):
         os.remove(filename + '_tmp.mp4')
         os.remove(filename + '.mp3')
     else:
-        writemessage('No audio files found! View INSTALL file for instructions.')
+        writemessage('No audio files found!')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     return filename
 
@@ -923,12 +925,14 @@ def audiosilence(foldername,filename):
     writemessage('Creating audiosilence..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
     videolenght = pipe.decode()
+    print('Video lenght is ' + videolenght)
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
     print('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos) + '.' + str(videoms).zfill(3))
-    os.system('sox /dev/shm/silence.wav ' + foldername + filename + '.wav')
+    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
+    os.system('rm /dev/shm/silence.wav')
 
 #--------------Copy to USB-------------------
 
