@@ -549,20 +549,9 @@ def timelapse(beeps,camera,foldername,filename,tarinafolder):
                                 audiomerge.append(f + '.wav')
                             audiomerge.append(renderfilename + '.wav')
                             call(audiomerge, shell=False)
-                        ##CONVERT AUDIO IF WAV FILES FOUND
+                        ##MAKE AUDIO SILENCE
                         if sound == False:
                             audiosilence(foldername,filename)
-                        if os.path.isfile(renderfilename + '.wav'):
-                            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-                            call(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', renderfilename + '.mp3'], shell=False)
-                            ##MERGE AUDIO & VIDEO
-                            writemessage('Merging audio & video')
-                            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
-                            os.remove(renderfilename + '_tmp.mp4')
-                        else:
-                            writemessage('No audio files found! tell Robin!')
-                            time.sleep(5)
-                        #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
                         #cleanup
                         os.system('rm -r ' + foldername + 'timelapse')
                         vumetermessage('timelapse done! ;)')
@@ -748,7 +737,7 @@ def render(filmfiles, filename):
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
         os.system('sox -G -m -v 1 ' + filename + '_dub.wav -v 0.5 ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
-        #os.remove(filename + '_tmp.wav')
+        os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
