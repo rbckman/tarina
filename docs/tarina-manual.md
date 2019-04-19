@@ -8,15 +8,21 @@ Step by step build instructions for a 3D printable Raspberry Pi video camera. No
 
 Contents
 --------
+### Manual
+1. [Introduction](#introduction)
+2. [Keys](#keys)
+3. [Menus](#menus)
+4. [Faq](#faq)
 
-1. [introduction](#intro)
-2. [Get the parts](#get-the-parts)
-3. [3d printing](#3d-printing)
-4. [Post processing](#post-processing)
-5. [Wiring](#wiring)
-6. [Putting it together](#putting-it-together)
-7. [Installing software](#installing-software)
-8. [Tested lenses](#tested-lenses)
+### Building, repairing & modding
+1. [Get the parts](#get-the-parts)
+2. [3d printing](#3d-printing)
+3. [Post processing](#post-processing)
+4. [Wiring](#wiring)
+5. [Putting it together](#putting-it-together)
+6. [Installing software](#installing-software)
+7. [Tested lenses](#tested-lenses)
+
 
 Introduction
 ============
@@ -33,6 +39,26 @@ Key pattern is as following.
 (remove) (down)  (retake)
 
 With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.
+
+
+Menus
+=====
+As sad earlier you move around the settings with left and right. Here's a short explanation of all the settings and why they are where they are.
+
+### Film, scene, shot and take
+This is a thing you don't see on other cameras because they don't care about what you're filming, they'll just slap a random filename on your clip and store it. However this camera does care about your film and it wants to know where you are in your filmmaking process and wants to help put it together. Ofcourse this also means that you have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check you montage on the spot and do a retake if you need to fix something. Rather than filming a bunch of things and fixing it later.
+
+### Shutter, iso, red, blue
+
+### Bright, cont, sat
+
+### Flip, beep, lenght
+
+### Mic, phones
+
+### Dsk, shutdown, timelapse, lens
+
+### Srv, wifi, upload, load, new
 
 
 Get the parts
