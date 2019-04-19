@@ -34,6 +34,10 @@ The interface focuses on presenting the essentials for film making in one menu t
 - need a fast sd card although you can turn down the quality on h264 with low speed cards
 - the h264 needs to be converted to a mp4 container for viewing, right now I'm doing this right after filming a clip, however there will possible be a feature to film directly to mp4 in future releases of picamera
 
+### Features / ideas / to do
+- dubbing feature (basic concept alpha stage)
+- trimming takes
+
 Installing
 ----------
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).

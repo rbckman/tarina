@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import web
 import os
@@ -21,6 +21,7 @@ urls = (
     '/f/(.*)', 'films'
 )
 
+app = web.application(urls, globals())
 render = web.template.render('templates/', base="base")
 
 def getfilms(filmfolder):
@@ -28,7 +29,7 @@ def getfilms(filmfolder):
     films_sorted = []
     films = next(os.walk(filmfolder))[1]
     for i in films:
-        if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
+        if os.path.isfile(filmfolder + i + '/settings.p') == True:
             lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
             films_sorted.append((i,lastupdate))
         else:
@@ -43,20 +44,15 @@ class index:
         renderedfilms = []
         unrenderedfilms = []
         for i in films:
-            if os.path.isfile('static/Videos/' + i + '/' + i + '.mp4') == True:
-                renderedfilms.append(i)
+            if os.path.isfile('static/Videos/' + i[0] + '/' + i[0] + '.mp4') == True:
+                renderedfilms.append(i[0])
             else:
-                unrenderedfilms.append(i)
+                unrenderedfilms.append(i[0])
         return render.index(renderedfilms, unrenderedfilms)
 
 class films:
     def GET(self, film):
         return render.filmpage(film)
 
-app = web.application(urls, globals(), autoreload=False)
 application = app.wsgifunc()
-
-#if __name__== "__main__":
-    #app = web.application(urls, globals())
-    #app.run()
 

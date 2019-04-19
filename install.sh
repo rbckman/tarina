@@ -40,7 +40,7 @@ sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount apache2 libapache2-mod-wsgi libdbus-glib-1-dev dbus libdbus-1-dev
+apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev
 echo "Getting the latest firmware for rpi..."
 SKIP_WARNING=1 rpi-update
 echo "installing python-omxplayer-wrapper..."

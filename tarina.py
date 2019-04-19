@@ -611,6 +611,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 if sceneshotortake == 'take':
                     #os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
+                    os.system('rm ' + foldername + filename + '.wav')
                     os.system('rm ' + foldername + filename + '.png')
                     take = take - 1
                     if take == 0:
@@ -657,7 +658,10 @@ def organize(filmfolder, filmname):
                         print('correct')
                     if organized_nr != unorganized_nr:
                         print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
-                        os.system('mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3) + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
+                        mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
+                        os.system(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
+                        os.system(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
+                        os.system(mv + '.png ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.png')
                     organized_nr = organized_nr + 1
     # Shots
     for i in sorted(scenes):
@@ -746,6 +750,15 @@ def render(filmfiles, filename):
     #count estimated audio filesize with a bitrate of 320 kb/s
     audiosize = countsize(filename + '.wav') * 0.453
     rendersize = 0
+    #overdubbing
+    if os.path.isfile(filename + '_dub.wav'):
+        writemessage('Dub audio found lets mix...')
+        #sox -G -m -v 0.5 test.wav -v 1 guide.wav newtest.wav trim 0 audiolenght
+        pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
+        audiolenght = pipe.decode()
+        os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
+        os.system('sox -G -m -v 1 ' + filename + '_dub.wav -v 0.5 ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
