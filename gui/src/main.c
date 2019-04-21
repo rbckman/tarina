@@ -185,11 +185,11 @@ int main(void)
                         render_subtitle(img, line, text_size, row3, y_offset4, color);
                         row3 += read * space + morespace;
                     }
-                    if (linenr >= 17 && linenr <= 19){
+                    if (linenr >= 17 && linenr <= 22){
                         render_subtitle(img, line, text_size, row4, y_offset5, color);
                         row4 += read * space + morespace;
                     }
-                    if (linenr >= 20 && linenr <= 32){
+                    if (linenr >= 23 && linenr <= 35){
                         render_subtitle(img, line, text_size, row5, y_offset6, color);
                         row5 += read * space + morespace;
                     }

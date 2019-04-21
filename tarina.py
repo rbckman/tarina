@@ -1159,7 +1159,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'LENS:', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'LOAD', 'NEW'
     #STANDARD VALUES
     global screen
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
@@ -1375,7 +1375,7 @@ def main():
                     os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
                     vumetermessage('new dubbing made!')
                     dub = [1.0,1.0]
-                    renderfilm = False
+                    renderfilm = True
                     time.sleep(1)
                 except:
                     writemessage('No dubbing file found!')
@@ -1581,8 +1581,10 @@ def main():
             elif menu[selected] == 'DUB:':
                 if round(dub[1],1) == 1.0 and round(dub[0],1) > 0.0:
                     dub[0] -= 0.1
+                    renderfilm = True
                 if round(dub[0],1) == 1.0 and round(dub[1],1) < 1.0:
                     dub[1] += 0.1
+                    renderfilm = True
 
         #LEFT
         elif pressed == 'left':
@@ -1679,8 +1681,10 @@ def main():
             elif menu[selected] == 'DUB:':
                 if round(dub[0],1) == 1.0 and round(dub[1],1) > 0.0:
                     dub[1] -= 0.1
+                    renderfilm = True
                 if round(dub[1],1) == 1.0 and round(dub[0],1) < 1.0:
                     dub[0] += 0.1
+                    renderfilm = True
 
         #RIGHT
         elif pressed == 'right':
@@ -1700,7 +1704,7 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm = filmsettings
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub = filmsettings
                 time.sleep(0.2)
             except:
                 print('could not load film settings')
@@ -1752,7 +1756,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), diskleft, '', '', lens, serverstate, wifistate, '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 100000:
