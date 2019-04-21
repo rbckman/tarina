@@ -499,7 +499,7 @@ def timelapse(beeps,camera,foldername,filename):
                     t = time.time() - starttime
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     if recording == False and t > between:
-                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=23)
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=22)
                         if sound == True:
                             os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
@@ -781,6 +781,12 @@ def playthis(filename, camera, dub):
     try:
         player.pause()
         player.set_position(0)
+        if dub == True:
+            p = 0
+            while p < 3:
+                writemessage('Dubbing in ' + str(3 - p) + 's')
+                time.sleep(1)
+                p+=1
         player.play()
         os.system('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
@@ -967,12 +973,19 @@ def copytousb(filmfolder, filmname):
             time.sleep(2)
             return
 
-#-------------Upload Scene------------
+#-------------Upload film------------
 
 def uploadfilm(filename, filmname):
     ##SEND TO SERVER
     writemessage('Hold on, video uploading. middle button to cancel')
-    os.system('scp ' + filename + '.mp4 rob@tarina.org:/srv/www/tarina.org/public_html/videos/' + filmname + '.mp4')
+    try:
+        os.system('scp -P 13337 ' + filename + '.mp4 rob@tarina.org:/srv/www/tarina.org/public_html/videos/' + filmname + '.mp4')
+        writemessage('Yes! Film uploaded')
+        time.sleep(1)
+    except:
+        writemessage('hmm.. something went wrong')
+        time.sleep(1)
+    return
     #os.system('ssh -t rob@lulzcam.org "python /srv/www/lulzcam.org/newfilm.py"')
     
 
@@ -1268,7 +1281,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=23)
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1388,12 +1401,13 @@ def main():
 
         #UPLOAD
         elif pressed == 'middle' and menu[selected] == 'UPLOAD':
-            buttonpressed = time.time()
             if recording == False:
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
-                uploadfile = render(filmfiles, renderfilename, dub)
-                uploadfilm(uploadfile, filmname)
+                if renderfilm == True:
+                    render(filmfiles, renderfilename, dub)
+                    renderfilm = False
+                uploadfilm(renderfilename, filmname)
                 selectedaction = 0
 
         #LOAD FILM
