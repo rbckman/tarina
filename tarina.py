@@ -46,8 +46,8 @@ except:
 
 #--------------Save settings-----------------
 
-def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm
+def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
         print("settings saved")
@@ -447,7 +447,7 @@ def nameyourfilm(filmfolder, filmname, abc):
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,foldername,filename,tarinafolder):
+def timelapse(beeps,camera,foldername,filename):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -692,7 +692,7 @@ def compileshot(filename):
 
 #-------------Render-------(rename to compile or render)-----
 
-def render(filmfiles, filename):
+def render(filmfiles, filename, dub):
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     videosize = 0
@@ -736,7 +736,7 @@ def render(filmfiles, filename):
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        os.system('sox -G -m -v 1 ' + filename + '_dub.wav -v 0.5 ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        os.system('sox -G -m -v ' + str(dub[0]) + ' ' + filename + '_dub.wav -v ' + str(dub[1]) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
@@ -759,9 +759,9 @@ def render(filmfiles, filename):
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     return filename
 
-#---------------Play------------------------
+#---------------Play & DUB--------------------
 
-def playthis(filename, camera):
+def playthis(filename, camera, dub):
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
         print("no file to play")
@@ -772,7 +772,10 @@ def playthis(filename, camera):
     buttontime = time.time()
     holdbutton = ''
     camera.stop_preview()
-    writemessage('Starting omxplayer')
+    if dub == False:
+        writemessage('Starting omxplayer')
+    else: 
+        writemessage('Get ready dubbing!!')
     player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     time.sleep(1)
     try:
@@ -780,13 +783,21 @@ def playthis(filename, camera):
         player.set_position(0)
         player.play()
         os.system('aplay -D plughw:0 ' + filename + '.wav &')
+        if dub == True:
+            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '_dub.wav &')
     except:
         print('something wrong with omxplayer')
         return
-    menu = 'BACK', 'PLAY FROM START'
+    if dub == False:
+        menu = 'STOP', 'PLAY FROM START'
+    else: 
+        menu = 'STOP', 'DUB FROM START'
     settings = '', ''
     selected = 0
-    clipduration = player.duration()
+    if dub == False:
+        clipduration = player.duration()
+    else:
+        clipduration = 360000
     starttime = time.time()
     while clipduration > t:
         header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
@@ -800,11 +811,13 @@ def playthis(filename, camera):
                 selected = selected - 1
         elif pressed == 'middle':
             time.sleep(0.2)
-            if selected == 0 or player.playback_status() == "Stopped":
+            if menu[selected] == 'STOP' or player.playback_status() == "Stopped":
                 try:
                     player.stop()
                     player.quit()
                     os.system('pkill aplay')
+                    if dub == True:
+                        os.system('pkill arecord')
                 except:
                     #kill it if it dont stop
                     os.system('pkill dbus-daemon')
@@ -813,11 +826,15 @@ def playthis(filename, camera):
             elif selected == 1:
                 try:
                     os.system('pkill aplay')
+                    if dub == True:
+                        os.system('pkill arecord')
                     player.pause()
                     player.set_position(0)
                     time.sleep(1)
                     player.play()
                     os.system('aplay -D plughw:0 ' + filename + '.wav &')
+                    if dub == True:
+                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '_dub.wav &')
                 except:
                     pass
                 starttime = time.time()
@@ -1135,13 +1152,14 @@ def tarinaserver(state):
 #-------------Start main--------------
 
 def main():
+    global tarinafolder
     filmfolder = "/home/pi/Videos/"
     if os.path.isdir(filmfolder) == False:
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'LENS:', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'DSK:', 'SHUTDOWN', 'TIMELAPSE', 'LENS:', 'SRV:', 'WIFI:', 'LOAD', 'NEW'
     #STANDARD VALUES
     global screen
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
@@ -1180,6 +1198,7 @@ def main():
     updatethumb = False
     delayerr = ''
     loadfilmsettings = True
+    dub = [1.0,0.0]
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1294,9 +1313,9 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                thefile = timelapse(beeps,camera,foldername,filename,tarinafolder)
+                thefile = timelapse(beeps,camera,foldername,filename)
                 if thefile != '':
-                    #scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename, tarinafolder)
+                    #scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename)
                     #render thumbnail
                     writemessage('creating thumbnail')
                     os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png')
@@ -1312,9 +1331,9 @@ def main():
                 renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                 #Check if rendered video exist
                 if renderscene == True:
-                    render(filmfiles, renderfilename)
+                    render(filmfiles, renderfilename, dub)
                     renderscene = False
-                playthis(renderfilename, camera)
+                playthis(renderfilename, camera, False)
 
         #VIEW FILM
         elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -1323,9 +1342,9 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
                 if renderfilm == True:
-                    render(filmfiles, renderfilename)
+                    render(filmfiles, renderfilename, dub)
                     renderfilm = False
-                playthis(renderfilename, camera)
+                playthis(renderfilename, camera, False)
 
         #VIEW SHOT OR TAKE
         elif pressed == 'view':
@@ -1335,11 +1354,30 @@ def main():
                     removeimage(camera, overlay)
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
-                    playthis(foldername + filename, camera)
+                    playthis(foldername + filename, camera, False)
                     imagename = foldername + filename + '.png'
                     overlay = displayimage(camera, imagename)
                 else:
                     writemessage('no video')
+                    time.sleep(1)
+
+        #DUB
+        elif pressed == 'middle' and menu[selected] == 'DUB:':
+            if recording == False:
+                camera.stop_preview()
+                filmfiles = viewfilm(filmfolder, filmname)
+                renderfilename = filmfolder + filmname + '/' + filmname
+                if renderfilm == True:
+                    render(filmfiles, renderfilename, dub)
+                    renderfilm = False
+                playthis(renderfilename, camera, True)
+                try:
+                    os.system('sox -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_dub.wav fade 0.01 0 0.01')
+                    writemessage('new dubbing made!')
+                    dub = [1.0,1.0]
+                    time.sleep(1)
+                except:
+                    writemessage('No dubbing file found!')
                     time.sleep(1)
 
         #COPY TO USB
@@ -1353,7 +1391,7 @@ def main():
             if recording == False:
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
-                uploadfile = render(filmfiles, renderfilename)
+                uploadfile = render(filmfiles, renderfilename, dub)
                 uploadfilm(uploadfile, filmname)
                 selectedaction = 0
 
@@ -1539,6 +1577,11 @@ def main():
                 #lensshade = npzfile['lens_shading_table']
                 table = read_table('lenses/' + lens)
                 camera.lens_shading_table = table
+            elif menu[selected] == 'DUB:':
+                if dub[1] == 1 and dub[0] > 0:
+                    dub[0] -= 0.1
+                if dub[0] == 1 and dub[1] < 1:
+                    dub[1] += 0.1
 
         #LEFT
         elif pressed == 'left':
@@ -1632,6 +1675,11 @@ def main():
                 #lensshade = npzfile['lens_shading_table']
                 table = read_table('lenses/' + lens)
                 camera.lens_shading_table = table
+            elif menu[selected] == 'DUB:':
+                if dub[0] == 1 and dub[1] > 0:
+                    dub[1] -= 0.1
+                if dub[1] == 1 and dub[0] < 1:
+                    dub[0] += 0.1
 
         #RIGHT
         elif pressed == 'right':
@@ -1703,7 +1751,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), diskleft + ' ' + delayerr, '', '', lens, serverstate, wifistate, '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'ov' + dub[0] + 'dv' + dub[1], diskleft, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 100000:
@@ -1715,7 +1763,7 @@ def main():
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm)
+                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub)
                     pausetime = time.time()
             #writemessage(pressed)
         time.sleep(keydelay)
