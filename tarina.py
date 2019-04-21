@@ -553,7 +553,7 @@ def timelapse(beeps,camera,foldername,filename):
                         if sound == False:
                             audiosilence(foldername,filename)
                         #cleanup
-                        os.system('rm -r ' + foldername + 'timelapse')
+                        #os.system('rm -r ' + foldername + 'timelapse')
                         vumetermessage('timelapse done! ;)')
                         return renderfilename
                     time.sleep(0.0555)
@@ -781,6 +781,11 @@ def playthis(filename, camera, dub):
     try:
         player.pause()
         player.set_position(0)
+        if dub == True:
+            while i < 3:
+                writemessage('Dubbing in ' + str(3 - i) + ' s')
+                time.sleep(1)
+                i += 1
         player.play()
         os.system('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
