@@ -736,7 +736,7 @@ def render(filmfiles, filename, dub):
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        os.system('sox -G -m -v ' + str(dub[0]) + ' ' + filename + '_dub.wav -v ' + str(dub[1]) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        os.system('sox -V0 -G -m -v ' + str(round(dub[0],1)) + ' ' + filename + '_dub.wav -v ' + str(round(dub[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     if os.path.isfile(filename + '.wav'):
@@ -781,15 +781,10 @@ def playthis(filename, camera, dub):
     try:
         player.pause()
         player.set_position(0)
-        if dub == True:
-            while i < 3:
-                writemessage('Dubbing in ' + str(3 - i) + ' s')
-                time.sleep(1)
-                i += 1
         player.play()
         os.system('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
-            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '_dub.wav &')
+            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
     except:
         print('something wrong with omxplayer')
         return
@@ -820,13 +815,13 @@ def playthis(filename, camera, dub):
                 try:
                     player.stop()
                     player.quit()
-                    os.system('pkill aplay')
-                    if dub == True:
-                        os.system('pkill arecord')
+                    os.system('pkill aplay') 
                 except:
                     #kill it if it dont stop
                     os.system('pkill dbus-daemon')
                     os.system('pkill omxplayer')
+                if dub == True:
+                    os.system('pkill arecord')
                 return
             elif selected == 1:
                 try:
@@ -839,7 +834,7 @@ def playthis(filename, camera, dub):
                     player.play()
                     os.system('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
-                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '_dub.wav &')
+                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
                 except:
                     pass
                 starttime = time.time()
@@ -886,8 +881,8 @@ def audiodelay(foldername, filename):
         newaudiolenght = int(audiolenght) - audiosync
         print('Audiofile is: ' + str(audiosync) + 'ms longer')
         #trim from end and put a 0.01 in- and outfade
-        os.system('sox /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
-        os.system('sox -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
+        os.system('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
+        os.system('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
         if int(audiosync) > 200:
             writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
@@ -904,11 +899,11 @@ def audiodelay(foldername, filename):
             audiosyncms = 1000 + audiosyncms
         print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
         #make fade
-        os.system('sox -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
+        os.system('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
-        os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
+        os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
         #add silence to end
-        os.system('sox /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
+        os.system('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
@@ -929,7 +924,7 @@ def audiosilence(foldername,filename):
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
     print('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    os.system('sox -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
     os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
     os.system('rm /dev/shm/silence.wav')
 
@@ -1377,9 +1372,10 @@ def main():
                     renderfilm = False
                 playthis(renderfilename, camera, True)
                 try:
-                    os.system('sox -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_dub.wav fade 0.01 0 0.01')
-                    writemessage('new dubbing made!')
+                    os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
+                    vumetermessage('new dubbing made!')
                     dub = [1.0,1.0]
+                    renderfilm = False
                     time.sleep(1)
                 except:
                     writemessage('No dubbing file found!')
@@ -1583,9 +1579,9 @@ def main():
                 table = read_table('lenses/' + lens)
                 camera.lens_shading_table = table
             elif menu[selected] == 'DUB:':
-                if dub[1] == 1 and dub[0] > 0:
+                if round(dub[1],1) == 1.0 and round(dub[0],1) > 0.0:
                     dub[0] -= 0.1
-                if dub[0] == 1 and dub[1] < 1:
+                if round(dub[0],1) == 1.0 and round(dub[1],1) < 1.0:
                     dub[1] += 0.1
 
         #LEFT
@@ -1681,9 +1677,9 @@ def main():
                 table = read_table('lenses/' + lens)
                 camera.lens_shading_table = table
             elif menu[selected] == 'DUB:':
-                if dub[0] == 1 and dub[1] > 0:
+                if round(dub[0],1) == 1.0 and round(dub[1],1) > 0.0:
                     dub[1] -= 0.1
-                if dub[1] == 1 and dub[0] < 1:
+                if round(dub[1],1) == 1.0 and round(dub[0],1) < 1.0:
                     dub[0] += 0.1
 
         #RIGHT
@@ -1756,7 +1752,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'ov' + dub[0] + 'dv' + dub[1], diskleft, '', '', lens, serverstate, wifistate, '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), diskleft, '', '', lens, serverstate, wifistate, '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 100000:
