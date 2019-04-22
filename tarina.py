@@ -761,7 +761,7 @@ def render(filmfiles, filename, dub):
 
 #---------------Play & DUB--------------------
 
-def playthis(filename, camera, dub):
+def playthis(filename, camera, dub, headphoneslevel):
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
         print("no file to play")
@@ -772,15 +772,19 @@ def playthis(filename, camera, dub):
     buttontime = time.time()
     holdbutton = ''
     camera.stop_preview()
+    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     if dub == False:
         writemessage('Starting omxplayer')
+        menu = 'STOP', 'PLAY FROM START', 'PHONES:'
+        clipduration = player.duration()
     else: 
         writemessage('Get ready dubbing!!')
-    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
-    time.sleep(1)
+        menu = 'STOP', 'DUB FROM START', 'PHONES:'
+        clipduration = 360000
     try:
+        time.sleep(0.2)
+        player.seek(0)
         player.pause()
-        player.set_position(0)
         if dub == True:
             p = 0
             while p < 3:
@@ -794,19 +798,11 @@ def playthis(filename, camera, dub):
     except:
         print('something wrong with omxplayer')
         return
-    if dub == False:
-        menu = 'STOP', 'PLAY FROM START'
-    else: 
-        menu = 'STOP', 'DUB FROM START'
-    settings = '', ''
-    selected = 0
-    if dub == False:
-        clipduration = player.duration()
-    else:
-        clipduration = 360000
     starttime = time.time()
+    selected = 0
     while clipduration > t:
         header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
+        settings = '', '', str(headphoneslevel)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
@@ -815,6 +811,14 @@ def playthis(filename, camera, dub):
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
+        elif pressed == 'up':
+            if headphoneslevel < 100:
+                headphoneslevel = headphoneslevel + 2
+                os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+        elif pressed == 'down':
+            if headphoneslevel > 0:
+                headphoneslevel = headphoneslevel - 2
+                os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
         elif pressed == 'middle':
             time.sleep(0.2)
             if menu[selected] == 'STOP' or player.playback_status() == "Stopped":
@@ -829,6 +833,7 @@ def playthis(filename, camera, dub):
                 if dub == True:
                     os.system('pkill arecord')
                 return
+
             elif selected == 1:
                 try:
                     os.system('pkill aplay')
@@ -836,7 +841,12 @@ def playthis(filename, camera, dub):
                         os.system('pkill arecord')
                     player.pause()
                     player.set_position(0)
-                    time.sleep(1)
+                    if dub == True:
+                        p = 0
+                        while p < 3:
+                            writemessage('Dubbing in ' + str(3 - p) + 's')
+                            time.sleep(1)
+                            p+=1
                     player.play()
                     os.system('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
@@ -1346,7 +1356,7 @@ def main():
                 if renderscene == True:
                     render(filmfiles, renderfilename, dub)
                     renderscene = False
-                playthis(renderfilename, camera, False)
+                playthis(renderfilename, camera, False, headphoneslevel)
 
         #VIEW FILM
         elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -1357,7 +1367,7 @@ def main():
                 if renderfilm == True:
                     render(filmfiles, renderfilename, dub)
                     renderfilm = False
-                playthis(renderfilename, camera, False)
+                playthis(renderfilename, camera, False, headphoneslevel)
 
         #VIEW SHOT OR TAKE
         elif pressed == 'view':
@@ -1367,7 +1377,7 @@ def main():
                     removeimage(camera, overlay)
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
-                    playthis(foldername + filename, camera, False)
+                    playthis(foldername + filename, camera, False, headphoneslevel)
                     imagename = foldername + filename + '.png'
                     overlay = displayimage(camera, imagename)
                 else:
@@ -1383,7 +1393,7 @@ def main():
                 if renderfilm == True:
                     render(filmfiles, renderfilename, dub)
                     renderfilm = False
-                playthis(renderfilename, camera, True)
+                playthis(renderfilename, camera, True, headphoneslevel)
                 try:
                     os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
                     vumetermessage('new dubbing made!')
