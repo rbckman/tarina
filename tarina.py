@@ -986,17 +986,40 @@ def copytousb(filmfolder, filmname):
 #-------------Upload film------------
 
 def uploadfilm(filename, filmname):
-    ##SEND TO SERVER
-    writemessage('Hold on, video uploading. middle button to cancel')
-    try:
-        os.system('scp -P 13337 ' + filename + '.mp4 rob@tarina.org:/srv/www/tarina.org/public_html/videos/' + filmname + '.mp4')
-        writemessage('Yes! Film uploaded')
-        time.sleep(1)
-    except:
-        writemessage('hmm.. something went wrong')
-        time.sleep(1)
-    return
-    #os.system('ssh -t rob@lulzcam.org "python /srv/www/lulzcam.org/newfilm.py"')
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    mods = ['Back']
+    writemessage('Searching for upload mods')
+    with open(tarinafolder + '/mods/upload-mods-enabled') as m:
+        mods.append(m.readlines())
+    mods = [x.strip() for x in mods]
+    menu = mods
+    selected = 0
+    while True:
+        header = 'Where do you want to upload?'
+        settings = '', ''
+        writemenu(menu,settings,selected,header)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
+            if selected < (len(settings) - 1):
+                selected = selected + 1
+        elif pressed == 'left':
+            if selected > 0:
+                selected = selected - 1
+        if pressed == 
+        ##SEND TO SERVER
+        writemessage('Hold on, video uploading. middle button to cancel')
+        try:
+            os.system('scp -P 13337 ' + filename + '.mp4 rob@tarina.org:/srv/www/tarina.org/public_html/videos/' + filmname + '.mp4')
+            writemessage('Yes! Film uploaded')
+            time.sleep(1)
+        except:
+            writemessage('hmm.. something went wrong')
+            time.sleep(1)
+        return
+        #os.system('ssh -t rob@lulzcam.org "python /srv/www/lulzcam.org/newfilm.py"')
     
 
 #-------------Beeps-------------------
@@ -1182,7 +1205,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'MODS', 'LOAD', 'NEW'
     #STANDARD VALUES
     global screen
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'

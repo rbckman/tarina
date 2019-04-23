@@ -171,6 +171,19 @@ cp extras/.vimrc /home/pi/.vimrc
     esac
 done
 
+while true; do
+    read -p "Do you wish to install the youtube upload mod [y]es or [n]o?" yn
+    case $yn in
+        [Yy]* ) echo "Install youtube upload mod..."
+cd mods
+./install-youtube-upload.sh
+cd ..
+            break;;
+        [Nn]* ) echo "Nope, good, we dont want googly spyware everywhere! if you however wish to install it later go to the mods folder and run install-youtube-uploader.";break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 echo "Setting up network configuration to use wicd program..."
 echo "it works nicer from the terminal than raspberry pi default"
 apt-get -y purge dhcpcd5 plymouth
