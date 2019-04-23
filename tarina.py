@@ -46,8 +46,8 @@ except:
 
 #--------------Save settings-----------------
 
-def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub
+def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
         print("settings saved")
@@ -692,7 +692,7 @@ def compileshot(filename):
 
 #-------------Render-------(rename to compile or render)-----
 
-def render(filmfiles, filename, dub):
+def render(filmfiles, filename, dub, comp):
     #print filmfiles
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     videosize = 0
@@ -739,6 +739,12 @@ def render(filmfiles, filename, dub):
         os.system('sox -V0 -G -m -v ' + str(round(dub[0],1)) + ' ' + filename + '_dub.wav -v ' + str(round(dub[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
+    #compressing
+    if comp > 0 and os.path.isfile(filename + '.wav'):
+        writemessage('compressing audio')
+        os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
+        os.system('sox ' + filename + '_tmp.wav ' + filename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+        os.remove(filename + '_tmp.wav')
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
         p = Popen(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
@@ -1201,7 +1207,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'LOAD', 'NEW'
     #STANDARD VALUES
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -1240,6 +1246,7 @@ def main():
     delayerr = ''
     loadfilmsettings = True
     dub = [1.0,0.0]
+    comp = 1
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1383,7 +1390,7 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
                 if renderfilm == True:
-                    render(filmfiles, renderfilename, dub)
+                    render(filmfiles, renderfilename, dub, comp)
                     renderfilm = False
                 playthis(renderfilename, camera, False, headphoneslevel)
 
@@ -1409,7 +1416,7 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
                 if renderfilm == True:
-                    render(filmfiles, renderfilename, dub)
+                    render(filmfiles, renderfilename, dub, comp)
                     renderfilm = False
                 playthis(renderfilename, camera, True, headphoneslevel)
                 try:
@@ -1433,7 +1440,7 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 renderfilename = filmfolder + filmname + '/' + filmname
                 if renderfilm == True:
-                    render(filmfiles, renderfilename, dub)
+                    render(filmfiles, renderfilename, dub, comp)
                     renderfilm = False
                 cmd = uploadfilm(renderfilename, filmname)
                 stopinterface(camera)
@@ -1635,6 +1642,10 @@ def main():
                 if round(dub[0],1) == 1.0 and round(dub[1],1) < 1.0:
                     dub[1] += 0.1
                     renderfilm = True
+            elif menu[selected] == 'COMP:':
+                if comp < 1:
+                    comp += 1
+                    renderfilm = True
 
         #LEFT
         elif pressed == 'left':
@@ -1735,6 +1746,10 @@ def main():
                 if round(dub[1],1) == 1.0 and round(dub[0],1) < 1.0:
                     dub[0] += 0.1
                     renderfilm = True
+            elif menu[selected] == 'COMP:':
+                if comp > 0:
+                    comp -= 1
+                    renderfilm = True
 
         #RIGHT
         elif pressed == 'right':
@@ -1754,7 +1769,7 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub = filmsettings
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp = filmsettings
                 time.sleep(0.2)
             except:
                 print('could not load film settings')
@@ -1806,7 +1821,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 100000:
@@ -1818,7 +1833,7 @@ def main():
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub)
+                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp)
                     pausetime = time.time()
             #writemessage(pressed)
         time.sleep(keydelay)
