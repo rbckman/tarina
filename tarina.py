@@ -501,7 +501,7 @@ def timelapse(beeps,camera,foldername,filename):
                     if recording == False and t > between:
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=22)
                         if sound == True:
-                            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
+                            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
                         starttime = time.time()
                         recording = True
@@ -800,7 +800,7 @@ def playthis(filename, camera, dub, headphoneslevel):
         player.play()
         os.system('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
-            os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
     except:
         print('something wrong with omxplayer')
         return
@@ -856,7 +856,7 @@ def playthis(filename, camera, dub, headphoneslevel):
                     player.play()
                     os.system('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
-                        os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+                        os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
                 except:
                     pass
                 starttime = time.time()
@@ -1153,9 +1153,9 @@ def startinterface():
 def stopinterface(camera):
     camera.stop_preview()
     camera.close()
-    os.system('pkill -9 arecord')
-    os.system('pkill -9 startinterface')
-    os.system('pkill -9 tarinagui')
+    os.system('pkill arecord')
+    os.system('pkill startinterface')
+    os.system('pkill tarinagui')
     os.system('sudo systemctl stop apache2')
     screen.clear()
     curses.nocbreak()
@@ -1315,7 +1315,7 @@ def main():
                     buzzer(beeps)
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
-                os.system(tarinafolder + '/alsa-utils-1.0.25/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
+                os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
                 camera.start_recording(foldername + filename + '.h264', format='h264', quality=22)
                 starttime = time.time()
                 recording = True
@@ -1324,7 +1324,7 @@ def main():
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
                 camera.stop_recording()
-                time.sleep(0.1) #get audio at least 0.1 longer
+                time.sleep(0.01) #get audio at least 0.1 longer
                 os.system('pkill arecord')
                 if beeps > 0:
                     buzz(150)
@@ -1818,6 +1818,10 @@ def main():
         else:
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
+
+        if rectime == '':
+            if delayerr:
+                rectime = delayerr
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:

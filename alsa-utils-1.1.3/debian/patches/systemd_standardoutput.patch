@@ -1,0 +1,21 @@
+Author: Jordi Mallach <jordi@debian.org>
+Description: Do not force a StandardOutput definition.
+ /lib/systemd/system/alsa-restore.service and
+ /lib/systemd/system/alsa-store.service both specify
+ StandardOutput=syslog.  This overrides the DefaultStandardOutput setting
+ from /etc/systemd/system.conf, which the sysadmin can use to determine
+ how output gets logged.  In particular, the sysadmin may want output to
+ go to the journal, or to syslog, or nowhere at all.  This patch removes
+ the definition entirely, so the units can use the system default.
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=741123
+Forwarded: no
+
+Index: alsa-utils-1.1.3/alsactl/alsa-restore.service.in
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/alsa-restore.service.in
++++ alsa-utils-1.1.3/alsactl/alsa-restore.service.in
+@@ -14,4 +14,3 @@ Type=oneshot
+ RemainAfterExit=true
+ ExecStart=-@sbindir@/alsactl -E HOME=@alsactlhome@ restore
+ ExecStop=-@sbindir@/alsactl -E HOME=@alsactlhome@ store
+-StandardOutput=syslog

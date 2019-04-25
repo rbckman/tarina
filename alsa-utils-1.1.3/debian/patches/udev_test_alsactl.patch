@@ -1,0 +1,21 @@
+Author: Jordi Mallach <jordi@debian.org>
+Description: Test for availability of alsactl before restoring.
+ Add a test to the udev ruleset to check for /usr/sbin/alsactl, as it might
+ not be available at boot time on separate /usr systems.
+Forwarded: no
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=713916
+
+Index: alsa-utils-1.1.3/alsactl/90-alsa-restore.rules.in
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/90-alsa-restore.rules.in
++++ alsa-utils-1.1.3/alsactl/90-alsa-restore.rules.in
+@@ -2,7 +2,7 @@ ACTION=="add", SUBSYSTEM=="sound", KERNE
+ GOTO="alsa_restore_end"
+ 
+ LABEL="alsa_restore_go"
+-TEST!="@daemonswitch@", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ restore $attr{device/number}"
+-TEST=="@daemonswitch@", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ nrestore $attr{device/number}"
++TEST!="@daemonswitch@", TEST=="/usr/sbin/alsactl", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ restore $attr{device/number}"
++TEST=="@daemonswitch@", TEST=="/usr/sbin/alsactl", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ nrestore $attr{device/number}"
+ 
+ LABEL="alsa_restore_end"

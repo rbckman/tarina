@@ -1,0 +1,124 @@
+Author: Elimar Riesebieter <riesebie@lxtec.de>
+Description: fix some spell errorrs in alsactl binary.
+
+Index: alsa-utils-1.1.3/alsactl/alsactl.c
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/alsactl.c
++++ alsa-utils-1.1.3/alsactl/alsactl.c
+@@ -90,7 +90,7 @@ static struct arg args[] = {
+ { FILEARG | 'e', "pid-file", "pathname for the process id (daemon mode)" },
+ { HEADER, NULL, "Available init options:" },
+ { ENVARG | 'E', "env", "set environment variable for init phase (NAME=VALUE)" },
+-{ FILEARG | 'i', "initfile", "main configuation file for init phase" },
++{ FILEARG | 'i', "initfile", "main configuration file for init phase" },
+ { 0, NULL, "  (default " DATADIR "/init/00main)" },
+ { 'b', "background", "run daemon in background" },
+ { 's', "syslog", "use syslog for messages" },
+Index: alsa-utils-1.1.3/alsactl/init_parse.c
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/init_parse.c
++++ alsa-utils-1.1.3/alsactl/init_parse.c
+@@ -939,7 +939,7 @@ static int get_key(char **line, char **k
+ }
+ 
+ /* extract possible KEY{attr} */
+-static char *get_key_attribute(struct space *space, char *str, char *res, size_t ressize)
++static char *get_key_attribute(struct space *space, char *str, char *res, size_t resize)
+ {
+ 	char *pos;
+ 	char *attr;
+@@ -953,7 +953,7 @@ static char *get_key_attribute(struct sp
+ 			return NULL;
+ 		}
+ 		pos[0] = '\0';
+-		strlcpy(res, attr, ressize);
++		strlcpy(res, attr, resize);
+ 		pos[0] = '}';
+ 		dbg("attribute='%s'", res);
+ 		return res;
+@@ -1209,7 +1209,7 @@ found:
+ 		/* possibly truncate to format-char specified length */
+ 		if (len != -1) {
+ 			head[len] = '\0';
+-			dbg("truncate to %i chars, subtitution string becomes '%s'", len, head);
++			dbg("truncate to %i chars, substitution string becomes '%s'", len, head);
+ 		}
+ 		strlcat(string, temp, maxsize);
+ 	}
+@@ -1242,7 +1242,7 @@ found:
+ static
+ int run_program1(struct space *space,
+ 		 const char *command0, char *result,
+-		 size_t ressize, size_t *reslen, int log)
++		 size_t resize, size_t *reslen, int log)
+ {
+ 	if (strncmp(command0, "__ctl_search", 12) == 0) {
+ 		const char *res = elemid_get(space, "do_search");
+@@ -1254,7 +1254,7 @@ int run_program1(struct space *space,
+ 		const char *res = elemid_get(space, "do_count");
+ 		if (res == NULL || strcmp(res, "0") == 0)
+ 			return EXIT_FAILURE;
+-		strlcpy(result, res, ressize);
++		strlcpy(result, res, resize);
+ 		return EXIT_SUCCESS;
+ 	}
+ 	Perror(space, "unknown buildin command '%s'", command0);
+Index: alsa-utils-1.1.3/alsactl/init_utils_run.c
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/init_utils_run.c
++++ alsa-utils-1.1.3/alsactl/init_utils_run.c
+@@ -24,12 +24,12 @@
+ static
+ int run_program1(struct space *space,
+ 	         const char *command0, char *result,
+-		 size_t ressize, size_t *reslen, int log);
++		 size_t resize, size_t *reslen, int log);
+ 
+ static
+ int run_program0(struct space *space,
+ 	         const char *command0, char *result,
+-		 size_t ressize, size_t *reslen, int log)
++		 size_t resize, size_t *reslen, int log)
+ {
+ 	int retval = 0;
+ 	int status;
+@@ -175,11 +175,11 @@ int run_program0(struct space *space,
+ 
+ 					/* store result for rule processing */
+ 					if (result) {
+-						if (respos + count < ressize) {
++						if (respos + count < resize) {
+ 							memcpy(&result[respos], inbuf, count);
+ 							respos += count;
+ 						} else {
+-							Perror(space, "ressize %ld too short", (long)ressize);
++							Perror(space, "resize %ld too short", (long)resize);
+ 							retval = -1;
+ 						}
+ 					}
+@@ -239,9 +239,9 @@ int run_program0(struct space *space,
+ 
+ static
+ int run_program(struct space *space, const char *command0, char *result,
+-		size_t ressize, size_t *reslen, int log)
++		size_t resize, size_t *reslen, int log)
+ {
+ 	if (command0[0] == '_' && command0[1] == '_')
+-		return run_program1(space, command0, result, ressize, reslen, log);
+-	return run_program0(space, command0, result, ressize, reslen, log);
++		return run_program1(space, command0, result, resize, reslen, log);
++	return run_program0(space, command0, result, resize, reslen, log);
+ }
+Index: alsa-utils-1.1.3/alsactl/state.c
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/state.c
++++ alsa-utils-1.1.3/alsactl/state.c
+@@ -1160,7 +1160,7 @@ static int restore_config_value(snd_ctl_
+ 	case SND_CTL_ELEM_TYPE_IEC958:
+ 		break;
+ 	default:
+-		cerror(doit, "Unknow control type: %d", type);
++		cerror(doit, "Unknown control type: %d", type);
+ 		return -EINVAL;
+ 	}
+ 	return 0;

@@ -1,0 +1,6 @@
+alsactl_home.patch
+systemd_standardoutput.patch
+udev_test_alsactl.patch
+spellfixes.patch
+systemd_Documentation_key.patch
+do-not-check-for-sys-kernel-uevent_helper.patch

@@ -113,10 +113,10 @@ int main(void)
     FILE * fp;
     FILE * fp2;
     FILE * fp3;
-    char * line = NULL;
+    char * line = 0;
     //char * b = NULL;
-    size_t len;
-    ssize_t read;
+    size_t len = 0;
+    ssize_t read = 0;
     int linenr = 0;
     int selected;
     char newread[500];
@@ -127,8 +127,10 @@ int main(void)
         // char ch;
         linenr = 0;
         fp = fopen("/dev/shm/interface","r");
-        fread(newread, sizeof(char), 500, fp);
-        fclose(fp);
+        if (fp != NULL){
+            fread(newread, sizeof(char), 500, fp);
+            fclose(fp);
+        }
         fp3 = fopen("/dev/shm/vumeter","r");
         while(fgets(vumeter, 130, fp3) != NULL);
         fclose(fp3);
@@ -155,58 +157,62 @@ int main(void)
             int header = 0;
             // draw the text if updated
             fp2 = fopen("/dev/shm/interface", "r");
-            while ((read = getline(&line, &len, fp2)) != -1) {
-                //line = b;
-                read = read - 1; //don't count the selected line
-                line[read] = '\0'; //remove return char
-                //printf("%s",line);
-                if (linenr == 0)
-                    selected = atoi(line);
-                if (linenr == selected + 2)
-                    color = 1; //selected color
-                else
-                    color = 5; //unselected
-                if ((linenr == 1) && (read > 0))
-                    header = 1; //write header menu
-                if ((linenr == 1) && (read == 0))
-                    header = 0; //write normal menu
-                if (header == 0) {
-                    if ((linenr == 6) && (read > 0)) //show recording time if there is any
-                        render_subtitle(img, line, text_size, 700, y_offset3, 3);
-                    if (linenr >= 2 && linenr <= 5){
-                        render_subtitle(img, line, text_size, row1, y_offset2, color);
-                        row1 += read * space + morespace;
+            if (fp2 != NULL){
+                while ((read = getline(&line, &len, fp2)) != -1) {
+                    //line = b;
+                    read = read - 1; //don't count the selected line
+                    line[read] = '\0'; //remove return char
+                    //printf("%s",line);
+                    if (linenr == 0)
+                        selected = atoi(line);
+                    if (linenr == selected + 2)
+                        color = 1; //selected color
+                    else
+                        color = 5; //unselected
+                    if ((linenr == 1) && (read > 0))
+                        header = 1; //write header menu
+                    if ((linenr == 1) && (read == 0))
+                        header = 0; //write normal menu
+                    if (header == 0) {
+                        if ((linenr == 6) && (read > 0)) //show recording time if there is any
+                            render_subtitle(img, line, text_size, 700, y_offset3, 3);
+                        if (linenr >= 2 && linenr <= 5){
+                            render_subtitle(img, line, text_size, row1, y_offset2, color);
+                            row1 += read * space + morespace;
+                        }
+                        if (linenr >= 7 && linenr <= 10){
+                            render_subtitle(img, line, text_size, row2, y_offset3, color);
+                            row2 += read * space + morespace;
+                        }
+                        if (linenr >= 11 && linenr <= 16){
+                            render_subtitle(img, line, text_size, row3, y_offset4, color);
+                            row3 += read * space + morespace;
+                        }
+                        if (linenr >= 17 && linenr <= 23){
+                            render_subtitle(img, line, text_size, row4, y_offset5, color);
+                            row4 += read * space + morespace;
+                        }
+                        if (linenr >= 23 && linenr <= 35){
+                            render_subtitle(img, line, text_size, row5, y_offset6, color);
+                            row5 += read * space + morespace;
+                        }
                     }
-                    if (linenr >= 7 && linenr <= 10){
-                        render_subtitle(img, line, text_size, row2, y_offset3, color);
-                        row2 += read * space + morespace;
+                    if (header == 1) {
+                        if (linenr == 1)
+                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
+                        if (linenr > 1) {
+                            render_subtitle(img, line, text_size, row1, y_offset3, color);
+                            row1 += read * space + morespace;
+                        }
                     }
-                    if (linenr >= 11 && linenr <= 16){
-                        render_subtitle(img, line, text_size, row3, y_offset4, color);
-                        row3 += read * space + morespace;
-                    }
-                    if (linenr >= 17 && linenr <= 23){
-                        render_subtitle(img, line, text_size, row4, y_offset5, color);
-                        row4 += read * space + morespace;
-                    }
-                    if (linenr >= 23 && linenr <= 35){
-                        render_subtitle(img, line, text_size, row5, y_offset6, color);
-                        row5 += read * space + morespace;
-                    }
+                    linenr += 1;
+                    free(line);
+                    line = NULL;
                 }
-                if (header == 1) {
-                    if (linenr == 1)
-                        render_subtitle(img, line, text_size, 0, y_offset2, 5);
-                    if (linenr > 1) {
-                        render_subtitle(img, line, text_size, row1, y_offset3, color);
-                        row1 += read * space + morespace;
-                    }
-                }
-                linenr += 1;
                 free(line);
                 line = NULL;
+                fclose(fp2);
             }
-            fclose(fp2);
         //graphics_update_displayed_resource(img, 0, 0, 0, 0);
         }
         uint32_t y_offset = 463;

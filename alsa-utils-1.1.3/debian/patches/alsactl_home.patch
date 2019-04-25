@@ -1,0 +1,72 @@
+Author: Jordi Mallach <jordi@debian.org>
+Description: add new configure switch to set alsactl's homedir.
+Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=712980
+
+Index: alsa-utils-1.1.3/configure.ac
+===================================================================
+--- alsa-utils-1.1.3.orig/configure.ac
++++ alsa-utils-1.1.3/configure.ac
+@@ -409,6 +409,12 @@ AC_ARG_WITH([alsactl-pidfile-dir],
+         [ALSACTL_PIDFILE_DIR="/var/run"])
+ AC_SUBST(ALSACTL_PIDFILE_DIR)
+ 
++AC_ARG_WITH([alsactl-home-dir],
++        AS_HELP_STRING([--with-alsactl-home-dir=DIR], [Directory to use as homedir for alsactl]),
++        [ALSACTL_HOME_DIR="$withval"],
++        [ALSACTL_HOME_DIR="/var/run/alsa"])
++AC_SUBST(ALSACTL_HOME_DIR)
++
+ AC_ARG_WITH([alsactl-daemonswitch],
+         AS_HELP_STRING([--with-alsactl-daemonswitch=FILE], [File to test for the daemon mode]),
+         [ALSACTL_DAEMONSWITCH="$withval"],
+Index: alsa-utils-1.1.3/alsactl/Makefile.am
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/Makefile.am
++++ alsa-utils-1.1.3/alsactl/Makefile.am
+@@ -40,6 +40,7 @@ endif
+ edit = \
+ 	$(SED) -r -e 's,@sbindir\@,$(sbindir),g' \
+ 		  -e 's,@mydatadir\@,$(mydatadir),g' \
++		  -e 's,@alsactlhome\@,$(ALSACTL_HOME_DIR),g' \
+ 		  -e 's,@daemonswitch\@,$(ALSACTL_DAEMONSWITCH),g' \
+ 							< $< > $@ || rm $@
+ 
+Index: alsa-utils-1.1.3/alsactl/alsa-restore.service.in
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/alsa-restore.service.in
++++ alsa-utils-1.1.3/alsactl/alsa-restore.service.in
+@@ -12,6 +12,6 @@ After=alsa-state.service
+ [Service]
+ Type=oneshot
+ RemainAfterExit=true
+-ExecStart=-@sbindir@/alsactl restore
+-ExecStop=-@sbindir@/alsactl store
++ExecStart=-@sbindir@/alsactl -E HOME=@alsactlhome@ restore
++ExecStop=-@sbindir@/alsactl -E HOME=@alsactlhome@ store
+ StandardOutput=syslog
+Index: alsa-utils-1.1.3/alsactl/alsa-state.service.in
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/alsa-state.service.in
++++ alsa-utils-1.1.3/alsactl/alsa-state.service.in
+@@ -10,5 +10,5 @@ After=sysinit.target
+ 
+ [Service]
+ Type=simple
+-ExecStart=-@sbindir@/alsactl -s -n 19 -c rdaemon
+-ExecStop=-@sbindir@/alsactl -s kill save_and_quit
++ExecStart=-@sbindir@/alsactl -E HOME=@alsactlhome@ -s -n 19 -c rdaemon
++ExecStop=-@sbindir@/alsactl -E HOME=@alsactlhome@ -s kill save_and_quit
+Index: alsa-utils-1.1.3/alsactl/90-alsa-restore.rules.in
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/90-alsa-restore.rules.in
++++ alsa-utils-1.1.3/alsactl/90-alsa-restore.rules.in
+@@ -2,7 +2,7 @@ ACTION=="add", SUBSYSTEM=="sound", KERNE
+ GOTO="alsa_restore_end"
+ 
+ LABEL="alsa_restore_go"
+-TEST!="@daemonswitch@", RUN+="@sbindir@/alsactl restore $attr{device/number}"
+-TEST=="@daemonswitch@", RUN+="@sbindir@/alsactl nrestore $attr{device/number}"
++TEST!="@daemonswitch@", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ restore $attr{device/number}"
++TEST=="@daemonswitch@", RUN+="@sbindir@/alsactl -E HOME=@alsactlhome@ nrestore $attr{device/number}"
+ 
+ LABEL="alsa_restore_end"

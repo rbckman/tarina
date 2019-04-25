@@ -1,0 +1,6 @@
+debian/utils.sh /usr/share/alsa
+lib/systemd
+lib/udev
+usr/bin
+usr/sbin
+usr/share

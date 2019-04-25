@@ -1,0 +1,29 @@
+From 914357670ad69b2771df4b77a9d681036c8c5f1c Mon Sep 17 00:00:00 2001
+From: Elimar Riesebieter <riesebie@lxtec.de>
+Date: Fri, 13 Jan 2017 09:13:50 +0100
+Subject: [PATCH] do not check for /sys/kernel/uevent_helper.
+
+
+CONFIG_UEVENT_HELPER=y is depreacated and also not provided on stretch's Debian
+kernels. Skip the test for it in alsactl.
+
+---
+ alsactl/init_sysfs.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+Index: alsa-utils-1.1.3/alsactl/init_sysfs.c
+===================================================================
+--- alsa-utils-1.1.3.orig/alsactl/init_sysfs.c
++++ alsa-utils-1.1.3/alsactl/init_sysfs.c
+@@ -43,11 +43,6 @@ static int sysfs_init(void)
+ 	dbg("sysfs_path='%s'", sysfs_path);
+ 
+ 	strlcpy(sysfs_test, sysfs_path, sizeof(sysfs_test));
+-	strlcat(sysfs_test, "/kernel/uevent_helper", sizeof(sysfs_test));
+-	if (access(sysfs_test, F_OK)) {
+-		error("sysfs path '%s' is invalid\n", sysfs_path);
+-		return -errno;
+-	}
+ 
+ 	INIT_LIST_HEAD(&attr_list);
+ 	return 0;
