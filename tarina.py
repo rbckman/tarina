@@ -517,7 +517,7 @@ def timelapse(beeps,camera,foldername,filename):
                         recording = False
                         starttime = time.time()
                         t = 0
-                    if pressed == 'middle':
+                    if pressed == 'middle' and n > 1:
                         if recording == True:
                             os.system('pkill arecord')
                             camera.stop_recording()
