@@ -22,5 +22,6 @@ sudo apt install libasound2-dev
 make
 cd aplay
 make
+make arecord
 ```
 

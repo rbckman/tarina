@@ -212,7 +212,7 @@ def renderlist(filmname, filmfolder, scene):
     #time.sleep(2)
     return scenefiles
 
-#-------------Display png-------------------
+#-------------Display jpeg-------------------
 
 def displayimage(camera, filename):
     # Load the arbitrarily sized image
@@ -591,7 +591,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     #os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
                     os.system('rm ' + foldername + filename + '.wav')
-                    os.system('rm ' + foldername + filename + '.png')
+                    os.system('rm ' + foldername + filename + '.jpeg')
                     take = take - 1
                     if take == 0:
                         take = 1
@@ -640,7 +640,7 @@ def organize(filmfolder, filmname):
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                         os.system(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                         os.system(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
-                        os.system(mv + '.png ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.png')
+                        os.system(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     organized_nr = organized_nr + 1
     # Shots
     for i in sorted(scenes):
@@ -1324,12 +1324,15 @@ def main():
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
                 camera.stop_recording()
-                time.sleep(0.01) #get audio at least 0.1 longer
+                time.sleep(0.005) #get audio at least 0.1 longer
                 os.system('pkill arecord')
                 if beeps > 0:
                     buzz(150)
-                #camera.capture(foldername + filename + '.png', resize=(800,341))
-                camera.capture(foldername + filename + '.png', resize=(800,340), use_video_port=True)
+                #camera.capture(foldername + filename + '.jpeg', resize=(800,341))
+                try:
+                    camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                except:
+                    print('something wrong with camera jpeg capture')
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -1366,7 +1369,7 @@ def main():
                     #scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename)
                     #render thumbnail
                     writemessage('creating thumbnail')
-                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.png')
+                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
                     renderscene = True
                     renderfilm = True
@@ -1403,7 +1406,7 @@ def main():
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     playthis(foldername + filename, camera, False, headphoneslevel)
-                    imagename = foldername + filename + '.png'
+                    imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
                 else:
                     writemessage('no video')
@@ -1796,7 +1799,7 @@ def main():
             if recording == False:
                 print('okey something has changed')
                 overlay = removeimage(camera, overlay)
-                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.png'
+                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename)
                 oldscene = scene
                 oldshot = shot
