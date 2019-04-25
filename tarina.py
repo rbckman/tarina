@@ -1324,7 +1324,7 @@ def main():
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
                 camera.stop_recording()
-                time.sleep(0.005) #get audio at least 0.1 longer
+                #time.sleep(0.005) #get audio at least 0.1 longer
                 os.system('pkill arecord')
                 if beeps > 0:
                     buzz(150)
@@ -1382,7 +1382,7 @@ def main():
                 renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                 #Check if rendered video exist
                 if renderscene == True:
-                    render(filmfiles, renderfilename, dub)
+                    render(filmfiles, renderfilename, dub, comp)
                     renderscene = False
                 playthis(renderfilename, camera, False, headphoneslevel)
 
