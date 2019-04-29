@@ -917,7 +917,7 @@ def audiodelay(foldername, filename):
         os.system('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         os.system('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
-        if int(audiosync) > 200:
+        if int(audiosync) > 250:
             writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
             vumetermessage('Consider changing to a faster microsd card.')
             time.sleep(10)
@@ -926,20 +926,20 @@ def audiodelay(foldername, filename):
         #calculate difference
         audiosyncs = videos - audios
         audiosyncms = videoms - audioms
-        if audiosyncms < 0:
-            if audiosyncs > 0:
-                audiosyncs = audiosyncs - 1
-            audiosyncms = 1000 + audiosyncms
-        print('Videofile is: ' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms longer')
+        #if audiosyncms < 0:
+        #    if audiosyncs > 0:
+        #        audiosyncs = audiosyncs - 1
+        #    audiosyncms = 1000 + audiosyncms
+        print('Videofile is: ' + str(audiosyncs) + 's longer')
         #make fade
         os.system('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
-        os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(audiosyncs) + '.' + str(audiosyncms).zfill(3))
+        os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(round(audiosyncs,3)))
         #add silence to end
         os.system('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
-        delayerr = 'V' + str(audiosyncs) + 's ' + str(audiosyncms) + 'ms'
+        delayerr = 'V' + str(round(audiosyncs,3))
     os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
@@ -1114,7 +1114,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     pressed = ''
     if buttonpressed == False:
         if event == 27:
-            pressed = 'quit'
+            pressed = 'dontquit'
         elif event == curses.KEY_ENTER or event == 10 or event == 13 or readbus == 247:
             pressed = 'middle'
         elif event == curses.KEY_UP or readbus == 191: 
