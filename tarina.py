@@ -777,8 +777,22 @@ def playthis(filename, camera, dub, headphoneslevel):
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
+    playing = False
     camera.stop_preview()
     player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    a = 0
+    while playing != True:
+        try:
+            playing = player.is_playing()
+        except:
+            time.sleep(0.01)
+        if a > 100:
+            writemessage('Something wrong with the clip!')
+            time.sleep(2)
+            return
+        a += 1
+    player.seek(0)
+    player.pause()
     if dub == False:
         writemessage('Starting omxplayer')
         menu = 'STOP', 'PLAY FROM START', 'PHONES:'
@@ -788,9 +802,6 @@ def playthis(filename, camera, dub, headphoneslevel):
         menu = 'STOP', 'DUB FROM START', 'PHONES:'
         clipduration = 360000
     try:
-        time.sleep(0.2)
-        player.seek(0)
-        player.pause()
         if dub == True:
             p = 0
             while p < 3:
