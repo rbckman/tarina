@@ -1125,7 +1125,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'left'
         elif event == curses.KEY_RIGHT or readbus == 251:
             pressed = 'right'
-        elif event == 339 or readbus == 127:
+        elif event == 339 or event == ord(' ') or readbus == 127:
             pressed = 'record'
         elif event == 338 or readbus == 253:
             pressed = 'retake'
