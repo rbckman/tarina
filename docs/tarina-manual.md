@@ -1,6 +1,6 @@
 
-TARINA BUILD INSTRUCTIONS
-=========================
+TARINA MANUAL
+=============
 
 Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 
@@ -8,7 +8,7 @@ Step by step build instructions for a 3D printable Raspberry Pi video camera. No
 
 Contents
 --------
-### Manual
+### The interface
 1. [Introduction](#introduction)
 2. [Keys](#keys)
 3. [Menus](#menus)
@@ -28,35 +28,42 @@ Introduction
 ============
 ![Tarina UI](tarina-filming-02.jpg)
 
-The UI in Tarina is design so that all settings is made visible and quickly accessible at all times and this is implemented with as few keys as possible.
+The interface focuses on presenting the essentials for film making in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
 
-Key pattern is as following.
+Keys
+====
 
-(view)   (up)    (record)
+### Buttons
+![Buttons](buttons.png)
 
-(left)   (enter) (right)
+### Keyboard
+![Buttons](keyboard.jpg)
 
-(remove) (down)  (retake)
+The enter key has some special elements. (Imrovement) Will write out on the last row a help for each menu.
 
 With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.
 
-
 Menus
 =====
-As sad earlier you move around the settings with left and right. Here's a short explanation of all the settings and why they are where they are.
+A short explanation of all the settings and why they are where they are.
 
 ### Film, scene, shot and take
-This is a thing you don't see on other cameras because they don't care about what you're filming, they'll just slap a random filename on your clip and store it. However this camera does care about your film and it wants to know where you are in your filmmaking process and wants to help put it together. Ofcourse this also means that you have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check you montage on the spot and do a retake if you need to fix something. Rather than filming a bunch of things and fixing it later.
+This you don't see on other cameras because they don't care about what you're filming however this camera does and it wants to know where you are in your filmmaking process and help put it together. Of course this means that ***you*** have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check your montage on the spot and do a retake if you need to fix something. Rather than filming a bunch of things and fixing it later.
 
 ### Shutter, iso, red, blue
+Shutter and iso are well know basic camera concepts. With red and blue you control the colors. If you press enter while on any of these then it will go into auto mode and if you press it again it will go back to manual mode with the current auto settings. I'm using this feature to quickly find a reasonable good value before I'm locking and tuning the settings manually to my likings. Cuz you always will know better than the robots!
 
 ### Bright, cont, sat
+Color grade on the go with brightness, contrast and saturation. You will probably have to play with theses to figure out what you want. Remember that as you're making your film ready while you're shooting it take by take, there's no color grading later on so you'll have to settle on your color grade before you film. To get that good old spaghetti western look and go with the contrast at -19.
 
 ### Flip, beep, lenght
+If you go gonzo, flippin it is the way to go! beep is a countdown timer from the moment you press rec or retake to when it actually starts filming. Lenght let's you put in the lenght of your take before you actually start filming. Both of these are very useful if you film action alone and can't reach for the buttons. 
 
 ### Mic, phones
+Control teh level of your mic and headphones.
 
 ### Dsk, shutdown, timelapse, lens
+Disk space, showing you how much of space left on your sd card.
 
 ### Srv, wifi, upload, load, new
 
