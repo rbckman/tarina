@@ -1105,7 +1105,7 @@ def empty(filename):
         time.sleep(2)
         return True
 
-#------------Check if button pressed and if hold-----------
+#--------------BUTTONS-------------
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
@@ -1119,7 +1119,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     pressed = ''
     if buttonpressed == False:
         if event == 27:
-            pressed = 'dontquit'
+            pressed = 'quit'
         elif event == curses.KEY_ENTER or event == 10 or event == 13 or readbus == 247:
             pressed = 'middle'
         elif event == curses.KEY_UP or readbus == 191: 
@@ -1308,7 +1308,7 @@ def main():
         #event = screen.getch()
 
         #QUIT
-        if pressed == 'quit':
+        if pressed == 'noquit' and buttontime > 3:
             stopinterface(camera)
             os.system('clear')
             os.system('echo "Have a nice hacking time!"')
