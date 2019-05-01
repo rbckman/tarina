@@ -779,7 +779,12 @@ def playthis(filename, camera, dub, headphoneslevel):
     holdbutton = ''
     playing = False
     camera.stop_preview()
-    player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    try:
+        player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
+    except:
+        writemessage('Something wrong with omxplayer')
+        time.sleep(2)
+        return
     a = 0
     while playing != True:
         try:
