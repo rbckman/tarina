@@ -165,7 +165,7 @@ while true; do
     read -p "Do you wish to add capabilities to backup to all different harddrives like ntfs and vfat systems?" yn
     case $yn in
         [Yy]* ) echo "Adding harddrive tools..."
-apt-get -y ntfs-3g exfat-fuse
+apt-get -y install ntfs-3g exfat-fuse
 sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
 sed -i '/FS_MOUNTOPTIONS=/c\FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"' /etc/usbmount/usbmount.conf
 sed -i '/FILESYSTEMS=/c\FILESYSTEMS="vfat ext2 ext3 ext4 hfsplus ntfs fuseblk vfat"' /etc/usbmount/usbmount.conf
