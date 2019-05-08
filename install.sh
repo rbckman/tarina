@@ -158,17 +158,17 @@ a2dissite 000-default.conf
 a2ensite tarina.conf
 systemctl reload apache2
 
+echo 'Dont do sync while copying to usb drives, does increase speed alöt!'
+sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
+
 while true; do
     read -p "Do you wish to add capabilities to backup to all different harddrives like ntfs and vfat systems?" yn
     case $yn in
         [Yy]* ) echo "Adding harddrive tools..."
-echo "Adding ntfs to usbmount"
 apt-get -y ntfs-3g exfat-fuse
-echo "Enable usb hdd automount, ntfs, fat and ext drives hopefully should all work."
 sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
 sed -i '/FS_MOUNTOPTIONS=/c\FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"' /etc/usbmount/usbmount.conf
 sed -i '/FILESYSTEMS=/c\FILESYSTEMS="vfat ext2 ext3 ext4 hfsplus ntfs fuseblk vfat"' /etc/usbmount/usbmount.conf
-sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
 echo "All this hard work to figure out how to keep NTFS mounted was done by F. Untermoser"
 echo "Found it here https://raspberrypi.stackexchange.com/questions/41959/automount-various-usb-stick-file-systems-on-jessie-lite"
 echo "Big props! thanks alot!"
