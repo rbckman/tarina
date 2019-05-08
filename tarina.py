@@ -1186,11 +1186,13 @@ def startcamera(lens):
     #lensshade = npzfile['lens_shading_table']
     table = read_table('lenses/' + lens)
     #camera.framerate = 24.999
-    v = picamera.camera.mo.MMALCameraInfo().info_rev
+    v = camera.revision
+    # v1 = 'ov5647'
+    # v2 = 
     print("picamera version is: " + str(v))
-    if v > 1:
+    if v == 'img':
         camera.framerate = 23.2
-    else:
+    if v == 'ov5647':
         camera.framerate = 26.03
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
