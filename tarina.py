@@ -315,17 +315,12 @@ def update(tarinaversion, tarinavername):
     if round(float(tarinaversion),3) < round(float(versionnumber),3):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
-        timeleft = 0
-        while timeleft < 5:
-            writemessage('Updating in ' + str(3 - timeleft) + ' seconds.')
-            time.sleep(1)
-            timeleft = timeleft + 1
         writemessage('Updating...')
         os.system('git pull')
         writemessage('Update done, will now reboot Tarina')
         waitforanykey()
         writemessage('Hold on rebooting Tarina...')
-        os.system('reboot')
+        os.system('sudo reboot')
     writemessage('Version is up-to-date!')
     return tarinaversion, tarinavername
 
@@ -1022,8 +1017,9 @@ def webz_on():
         socket.create_connection(("www.google.com", 80))
         return True
     except OSError:
-        writemessage('No internet connection!')
-        time.sleep(2)
+        pass
+    writemessage('No internet connection!')
+    time.sleep(2)
     return False
 
 #-------------Upload film------------
