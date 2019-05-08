@@ -151,6 +151,9 @@ systemctl enable tarina.service
 systemctl daemon-reload
 echo "systemd configuration done!"
 
+echo "Enable USB HDD auto mount"
+sudo sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
+
 echo "Installing tarina apache server configuration"
 cp extras/tarina.conf /etc/apache2/sites-available/
 ln -s -t /var/www/ /home/pi/tarina/srv/
