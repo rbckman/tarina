@@ -316,7 +316,7 @@ def update(tarinaversion, tarinavername):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
         writemessage('Updating...')
-        os.system('git pull')
+        os.system('git -C ' + tarinafolder + ' pull')
         writemessage('Update done, will now reboot Tarina')
         waitforanykey()
         writemessage('Hold on rebooting Tarina...')
