@@ -1562,6 +1562,20 @@ def main():
             os.system('cp ' + foldername + filename + '.wav /dev/shm/')
             delayerr = audiodelay(foldername,filename)
 
+        #HELPME
+        elif event == ord('H'):
+            if webz_on() == True:
+                writemessage('Rob resolving the error now...')
+                try:
+                    stopinterface(camera)
+                    os.system('reset')
+                    os.system('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
+                    screen = startinterface()
+                    camera = startcamera(lens)
+                    loadfilmsettings = True
+                except:
+                    writemessage('sry! no rob help installed')
+
         #REMOVE
         #take
         elif pressed == 'delete' and menu[selected] == 'TAKE:':
