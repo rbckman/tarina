@@ -40,7 +40,7 @@ sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev
+apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
 echo "Getting the latest firmware for rpi..."
 SKIP_WARNING=1 rpi-update
 echo "installing python-omxplayer-wrapper..."
@@ -163,7 +163,7 @@ while true; do
     case $yn in
         [Yy]* ) echo "Adding harddrive tools..."
 echo "Adding ntfs to usbmount"
-apt-get -y usbmount ntfs-3g exfat-fuse
+apt-get -y ntfs-3g exfat-fuse
 echo "Enable usb hdd automount, ntfs, fat and ext drives hopefully should all work."
 sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
 sed -i '/FS_MOUNTOPTIONS=/c\FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"' /etc/usbmount/usbmount.conf
