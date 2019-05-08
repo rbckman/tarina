@@ -162,7 +162,7 @@ echo 'Dont do sync while copying to usb drives, does increase speed alöt!'
 sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
 
 while true; do
-    read -p "Do you wish to add capabilities to backup to all different harddrives like ntfs and vfat systems?" yn
+    read -p "Do you wish to add capabilities to backup to all different harddrives like ntfs and vfat systems? [y]es or [n]o" yn
     case $yn in
         [Yy]* ) echo "Adding harddrive tools..."
 apt-get -y install ntfs-3g exfat-fuse
