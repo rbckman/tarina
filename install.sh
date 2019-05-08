@@ -40,7 +40,7 @@ sleep 3
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils usbmount apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev
+apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev
 echo "Getting the latest firmware for rpi..."
 SKIP_WARNING=1 rpi-update
 echo "installing python-omxplayer-wrapper..."
@@ -151,15 +151,53 @@ systemctl enable tarina.service
 systemctl daemon-reload
 echo "systemd configuration done!"
 
-echo "Enable USB HDD auto mount"
-sudo sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
-
 echo "Installing tarina apache server configuration"
 cp extras/tarina.conf /etc/apache2/sites-available/
 ln -s -t /var/www/ /home/pi/tarina/srv/
 a2dissite 000-default.conf
 a2ensite tarina.conf
 systemctl reload apache2
+
+while true; do
+    read -p "Do you wish to add capabilities to backup to all different harddrives like ntfs and vfat systems?" yn
+    case $yn in
+        [Yy]* ) echo "Adding harddrive tools..."
+echo "Adding ntfs to usbmount"
+apt-get -y usbmount ntfs-3g exfat-fuse
+echo "Enable usb hdd automount, ntfs, fat and ext drives hopefully should all work."
+sed -i -e 's/MountFlags=slave/MountFlags=shared/g' /lib/systemd/system/systemd-udevd.service
+sed -i '/FS_MOUNTOPTIONS=/c\FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"' /etc/usbmount/usbmount.conf
+sed -i '/FILESYSTEMS=/c\FILESYSTEMS="vfat ext2 ext3 ext4 hfsplus ntfs fuseblk vfat"' /etc/usbmount/usbmount.conf
+sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
+echo "All this hard work to figure out how to keep NTFS mounted was done by F. Untermoser"
+echo "Found it here https://raspberrypi.stackexchange.com/questions/41959/automount-various-usb-stick-file-systems-on-jessie-lite"
+echo "Big props! thanks alot!"
+
+cat <<'EOF' > /etc/udev/rules.d/usbmount.rules
+KERNEL=="sd*", DRIVERS=="sbp2",         ACTION=="add",  PROGRAM="/bin/systemd-escape -p --template=usbmount@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
+KERNEL=="sd*", SUBSYSTEMS=="usb",       ACTION=="add",  PROGRAM="/bin/systemd-escape -p --template=usbmount@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
+KERNEL=="ub*", SUBSYSTEMS=="usb",       ACTION=="add",  PROGRAM="/bin/systemd-escape -p --template=usbmount@.service $env{DEVNAME}", ENV{SYSTEMD_WANTS}+="%c"
+KERNEL=="sd*",                          ACTION=="remove",       RUN+="/usr/share/usbmount/usbmount remove"
+KERNEL=="ub*",                          ACTION=="remove",       RUN+="/usr/share/usbmount/usbmount remove"
+EOF
+
+cat <<'EOF' > /etc/systemd/system/usbmount@.service
+[Unit]
+BindTo=%i.device
+After=%i.device
+
+[Service]
+Type=oneshot
+TimeoutStartSec=0
+Environment=DEVNAME=%I
+ExecStart=/usr/share/usbmount/usbmount add
+RemainAfterExit=yes
+EOF
+            break;;
+        [Nn]* ) echo "Nope, okay! who wants those shitty systems anyways!";break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
 
 while true; do
     read -p "Do you wish to add rbckmans special hacking tools and configurations [y]es or [n]o?" yn
