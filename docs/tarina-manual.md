@@ -406,7 +406,7 @@ sudo ./install.sh
 ```
 You'r ready to rumble:
 ```
-python tarina.py
+python3 tarina.py
 ```
 Happy filming!
 

@@ -522,6 +522,11 @@ def timelapse(beeps,camera,foldername,filename):
                         if recording == True:
                             os.system('pkill arecord')
                             camera.stop_recording()
+                        #create thumbnail
+                        try:
+                            camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                        except:
+                            print('something wrong with camera jpeg capture')
                         writemessage('Compiling timelapse')
                         print('Hold on, rendering ' + str(len(files)) + ' files')
                         #RENDER VIDEO
@@ -554,7 +559,7 @@ def timelapse(beeps,camera,foldername,filename):
                         if sound == False:
                             audiosilence(foldername,filename)
                         #cleanup
-                        #os.system('rm -r ' + foldername + 'timelapse')
+                        os.system('rm -r ' + foldername + 'timelapse')
                         vumetermessage('timelapse done! ;)')
                         return renderfilename
                     time.sleep(0.0555)
@@ -969,7 +974,7 @@ def audiosilence(foldername,filename):
 
 #--------------Copy to USB-------------------
 
-def copytousb(filmfolder, filmname):
+def copytousb(filmfolder):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -984,27 +989,27 @@ def copytousb(filmfolder, filmname):
             break
         time.sleep(0.02)
         if usbconnected == True:
-            writemessage('USB device found, copying files...')
-            #COUNT FILES
-            scenes, shots, takes = countlast(filmname, filmfolder)
-            scene = 1
-            filmfiles = []
-            while scene <= scenes:
-                shots = countshots(filmname, filmfolder, scene)
-                if shots > 0:
-                    filmfiles.extend(renderlist(filmname, filmfolder, scene))
-                scene = scene + 1
-            #RENDER FILES TO MP4 ON USB STICK
-            os.makedirs('/media/usb0/' + filmname)
-            for f in filmfiles[:]:
-                os.system('MP4Box -add ' + f + '.mp4 -new /media/usb0/' + filmname + '/' + f[-24:] + '.mp4')
-                os.system('cp ' + f + '.wav /media/usb0/' + filmname + '/' + f[-24:] + '.wav')
-            os.system('sync')
-            writemessage('all files copied successfully!')
-            time.sleep(1)
-            writemessage('You can safely unplug the usb device now')
-            time.sleep(2)
-            return
+            #Copy new files to usb device
+            try:
+                os.makedirs('/media/usb0/tarinafilms/')
+            except:
+                pass
+            try:
+                p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
+                filesystem = p.decode()
+                writemessage('Copying files to a ' + filesystem + ' hdd...)
+                os.system('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
+                os.system('sync')
+                os.system('pumount /media/usb0')
+                writemessage('all files copied successfully!')
+                waitforanykey()
+                writemessage('You can safely unplug the usb device now')
+                time.sleep(2)
+                return
+            except:
+                writemessage('Nope! something wrong with ur drive :(')
+                waitforanykey()
+                return
 
 #-------------Upload film------------
 
@@ -1107,6 +1112,22 @@ def empty(filename):
         return True
 
 #--------------BUTTONS-------------
+
+def waitforanykey():
+    vumetermessage("press any key to continue..")
+    time.sleep(1)
+    while True:
+        event = screen.getch()
+        if onlykeyboard == False:
+            readbus = bus.read_byte_data(DEVICE,GPIOB)
+            readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+        else:
+            readbus = 255
+            readbus2 = 247
+        if readbus != 255 or readbus2 != 247 or event != -1:
+            time.sleep(0.05)
+            vumetermessage(' ')
+            return
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     event = screen.getch()
@@ -1235,7 +1256,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW'
     #STANDARD VALUES
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -1394,10 +1415,9 @@ def main():
                 filename = 'take' + str(take).zfill(3)
                 thefile = timelapse(beeps,camera,foldername,filename)
                 if thefile != '':
-                    #scene, shot, take, thefile = happyornothappy(camera, thefile, scene, shot, take, filmfolder, filmname, foldername, filename)
                     #render thumbnail
-                    writemessage('creating thumbnail')
-                    os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
+                    #writemessage('creating thumbnail')
+                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
                     renderscene = True
                     renderfilm = True
@@ -1460,10 +1480,10 @@ def main():
                     writemessage('No dubbing file found!')
                     time.sleep(1)
 
-        #COPY TO USB
-        elif pressed == 'middle' and menu[selected] == 'COPY':
+        #BACKUP
+        elif pressed == 'middle' and menu[selected] == 'BACKUP':
             if recording == False:
-                copytousb(filmfolder, filmname)
+                copytousb(filmfolder)
 
         #UPLOAD
         elif pressed == 'middle' and menu[selected] == 'UPLOAD':
@@ -1856,7 +1876,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 100000:
