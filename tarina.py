@@ -1188,12 +1188,16 @@ def startcamera(lens):
     #camera.framerate = 24.999
     v = camera.revision
     # v1 = 'ov5647'
-    # v2 = 
+    # v2 = ? 
     print("picamera version is: " + str(v))
-    if v == 'img':
-        camera.framerate = 23.2
+    if v == 'somy, whatever it was':
+        camera.framerate = 24.999
     if v == 'ov5647':
+        # Different versions of ov5647 with different clock speeds, need to make a config file
+        # ov5647 Rev C
         camera.framerate = 26.03
+        # ov5647 Rev D"
+        # camera.framerate = 23.2
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
