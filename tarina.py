@@ -300,16 +300,18 @@ def update(tarinaversion, tarinavername):
     time.sleep(2)
     writemessage('Checking for updates...')
     try:
-        os.system('wget http://tarina.org/src/VERSION -P /tmp/')
+        os.system('wget -N https://raw.githubusercontent.com/rbckman/tarina/master/VERSION -P /tmp/')
     except:
         writemessage('Sorry buddy, no internet connection')
         time.sleep(2)
         return tarinaversion, tarinavername
-    f = open('/tmp/VERSION')
-    versionnumber = f.readline()
-    versionname = f.readline()
-    os.remove('/tmp/VERSION*')
-    if float(tarinaversion) < float(versionnumber):
+    try:
+        f = open('/tmp/VERSION')
+        versionnumber = f.readline()
+        versionname = f.readline()
+    except:
+        writemessage('hmm.. something wrong with the update')
+    if round(float(tarinaversion),3) < round(float(versionnumber),3):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
         timeleft = 0
@@ -323,7 +325,6 @@ def update(tarinaversion, tarinavername):
         time.sleep(3)
         os.system('reboot')
     writemessage('Version is up-to-date!')
-    time.sleep(2)
     return tarinaversion, tarinavername
 
 #-------------Get films---------------
