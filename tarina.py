@@ -19,6 +19,7 @@ import curses
 import RPi.GPIO as GPIO
 from PIL import Image
 import smbus
+import socket
 
 # Get path of the current dir, then use it as working directory:
 rundir = os.path.dirname(__file__)
@@ -998,7 +999,7 @@ def copytousb(filmfolder):
             try:
                 p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
                 filesystem = p.decode()
-                writemessage('Copying files to a ' + filesystem + ' hdd...)
+                writemessage('Copying files to a ' + filesystem + ' hdd...')
                 os.system('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
                 os.system('sync')
                 os.system('pumount /media/usb0')
@@ -1011,6 +1012,19 @@ def copytousb(filmfolder):
                 writemessage('Nope! something wrong with ur drive :(')
                 waitforanykey()
                 return
+
+#-----------Check for the webz---------
+
+def webz_on():
+    try:
+        # connect to the host -- tells us if the host is actually
+        # reachable
+        socket.create_connection(("www.google.com", 80))
+        return True
+    except OSError:
+        writemessage('No internet connection!')
+        time.sleep(2)
+    return False
 
 #-------------Upload film------------
 
@@ -1039,7 +1053,7 @@ def uploadfilm(filename, filmname):
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle' and  menu[selected] == 'Back':
-            return
+            return None
         elif pressed == 'middle' and  menu[selected] in mods:
             cmd = tarinafolder + '/mods/' + menu[selected] + '.sh ' + filmname + ' ' + filename
             print(cmd)
@@ -1488,22 +1502,24 @@ def main():
 
         #UPLOAD
         elif pressed == 'middle' and menu[selected] == 'UPLOAD':
-            if recording == False:
-                filmfiles = viewfilm(filmfolder, filmname)
-                renderfilename = filmfolder + filmname + '/' + filmname
-                if renderfilm == True:
-                    render(filmfiles, renderfilename, dub, comp)
-                    renderfilm = False
-                cmd = uploadfilm(renderfilename, filmname)
-                stopinterface(camera)
-                try:
-                    os.system(cmd)
-                except Exception as e: print(e)
-                time.sleep(10)
-                screen = startinterface()
-                camera = startcamera(lens)
-                loadfilmsettings = True
-                selectedaction = 0
+            if webz_on() == True:
+                if recording == False:
+                    filmfiles = viewfilm(filmfolder, filmname)
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilm = False
+                    cmd = uploadfilm(renderfilename, filmname)
+                    if cmd != None:
+                        stopinterface(camera)
+                        try:
+                            os.system(cmd)
+                        except Exception as e: print(e)
+                        time.sleep(10)
+                        screen = startinterface()
+                        camera = startcamera(lens)
+                        loadfilmsettings = True
+                    selectedaction = 0
 
         #LOAD FILM
         elif pressed == 'middle' and menu[selected] == 'LOAD':
@@ -1512,8 +1528,9 @@ def main():
 
         #UPDATE
         elif pressed == 'middle' and menu[selected] == 'UPDATE':
-            tarinaversion, tarinavername = update(tarinaversion, tarinavername)
-            selectedaction = 0
+            if webz_on() == True:
+                tarinaversion, tarinavername = update(tarinaversion, tarinavername)
+                selectedaction = 0
 
         #WIFI
         elif pressed == 'middle' and menu[selected] == 'WIFI:':
