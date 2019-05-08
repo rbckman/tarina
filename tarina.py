@@ -316,13 +316,14 @@ def update(tarinaversion, tarinavername):
         time.sleep(4)
         timeleft = 0
         while timeleft < 5:
-            writemessage('Updating in ' + str(5 - timeleft) + ' seconds.')
+            writemessage('Updating in ' + str(3 - timeleft) + ' seconds.')
             time.sleep(1)
             timeleft = timeleft + 1
         writemessage('Updating...')
         os.system('git pull')
+        writemessage('Update done, will now reboot Tarina')
+        waitforanykey()
         writemessage('Hold on rebooting Tarina...')
-        time.sleep(3)
         os.system('reboot')
     writemessage('Version is up-to-date!')
     return tarinaversion, tarinavername
