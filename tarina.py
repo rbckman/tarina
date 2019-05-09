@@ -697,6 +697,10 @@ def compileshot(filename):
 
 def render(filmfiles, filename, dub, comp):
     #print filmfiles
+    if len(filmfiles) < 1:
+        writemessage('Nothing here cant looki..')
+        time.sleep(2)
+        return None
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
     videosize = 0
     rendersize = 0
@@ -1436,25 +1440,25 @@ def main():
         #VIEW SCENE
         elif pressed == 'view' and menu[selected] == 'SCENE:':
             if recording == False:
-                camera.stop_preview()
                 filmfiles = renderlist(filmname, filmfolder, scene)
-                renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                #Check if rendered video exist
-                if renderscene == True:
-                    render(filmfiles, renderfilename, dub, comp)
-                    renderscene = False
-                playthis(renderfilename, camera, False, headphoneslevel)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
+                    #Check if rendered video exist
+                    if renderscene == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderscene = False
+                    playthis(renderfilename, camera, False, headphoneslevel)
 
         #VIEW FILM
         elif pressed == 'view' and menu[selected] == 'FILM:':
             if recording == False:
-                camera.stop_preview()
                 filmfiles = viewfilm(filmfolder, filmname)
-                renderfilename = filmfolder + filmname + '/' + filmname
-                if renderfilm == True:
-                    render(filmfiles, renderfilename, dub, comp)
-                    renderfilm = False
-                playthis(renderfilename, camera, False, headphoneslevel)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilm = False
+                    playthis(renderfilename, camera, False, headphoneslevel)
 
         #VIEW SHOT OR TAKE
         elif pressed == 'view':
@@ -1467,29 +1471,26 @@ def main():
                     playthis(foldername + filename, camera, False, headphoneslevel)
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
-                else:
-                    writemessage('no video')
-                    time.sleep(1)
 
         #DUB
         elif pressed == 'middle' and menu[selected] == 'DUB:':
             if recording == False:
-                camera.stop_preview()
                 filmfiles = viewfilm(filmfolder, filmname)
-                renderfilename = filmfolder + filmname + '/' + filmname
-                if renderfilm == True:
-                    render(filmfiles, renderfilename, dub, comp)
-                    renderfilm = False
-                playthis(renderfilename, camera, True, headphoneslevel)
-                try:
-                    os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
-                    vumetermessage('new dubbing made!')
-                    dub = [1.0,1.0]
-                    renderfilm = True
-                    time.sleep(1)
-                except:
-                    writemessage('No dubbing file found!')
-                    time.sleep(1)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilm = False
+                    playthis(renderfilename, camera, True, headphoneslevel)
+                    try:
+                        os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
+                        vumetermessage('new dubbing made!')
+                        dub = [1.0,1.0]
+                        renderfilm = True
+                        time.sleep(1)
+                    except:
+                        writemessage('No dubbing file found!')
+                        time.sleep(1)
 
         #BACKUP
         elif pressed == 'middle' and menu[selected] == 'BACKUP':
@@ -1501,21 +1502,22 @@ def main():
             if webz_on() == True:
                 if recording == False:
                     filmfiles = viewfilm(filmfolder, filmname)
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderfilm = False
-                    cmd = uploadfilm(renderfilename, filmname)
-                    if cmd != None:
-                        stopinterface(camera)
-                        try:
-                            os.system(cmd)
-                        except Exception as e: print(e)
-                        time.sleep(10)
-                        screen = startinterface()
-                        camera = startcamera(lens)
-                        loadfilmsettings = True
-                    selectedaction = 0
+                    if len(filmfiles) > 0:
+                        renderfilename = filmfolder + filmname + '/' + filmname
+                        if renderfilm == True:
+                            render(filmfiles, renderfilename, dub, comp)
+                            renderfilm = False
+                        cmd = uploadfilm(renderfilename, filmname)
+                        if cmd != None:
+                            stopinterface(camera)
+                            try:
+                                os.system(cmd)
+                            except Exception as e: print(e)
+                            time.sleep(10)
+                            screen = startinterface()
+                            camera = startcamera(lens)
+                            loadfilmsettings = True
+                        selectedaction = 0
 
         #LOAD FILM
         elif pressed == 'middle' and menu[selected] == 'LOAD':
