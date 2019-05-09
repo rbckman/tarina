@@ -994,7 +994,7 @@ def copytousb(filmfolder):
             try:
                 p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
                 filesystem = p.decode()
-                writemessage('Copying files to a ' + filesystem + ' hdd...')
+                writemessage('Copying files...')
                 os.system('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
                 os.system('sync')
                 os.system('pumount /media/usb0')

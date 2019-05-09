@@ -14,7 +14,7 @@ Contents
 3. [Menus](#menus)
 4. [Faq](#faq)
 
-### Building, repairing & modding
+### [Building, repairing & modding]
 1. [Get the parts](#get-the-parts)
 2. [3d printing](#3d-printing)
 3. [Post processing](#post-processing)
@@ -54,22 +54,42 @@ This you don't see on other cameras because they don't care about what you're fi
 Shutter and iso are well know basic camera concepts. With red and blue you control the colors. If you press enter while on any of these then it will go into auto mode and if you press it again it will go back to manual mode with the current auto settings. I'm using this feature to quickly find a reasonable good value before I'm locking and tuning the settings manually to my likings. Cuz you always will know better than the robots!
 
 ### Bright, cont, sat
-Color grade on the go with brightness, contrast and saturation. You will probably have to play with theses to figure out what you want. Remember that as you're making your film ready while you're shooting it take by take, there's no color grading later on so you'll have to settle on your color grade before you film. To get that good old spaghetti western look and go with the contrast at -19.
+Color grade on the go with brightness, contrast and saturation. You will probably have to play with theses to figure out what you want. Remember that as you're making your film ready while you're shooting it take by take, there's no color grading later on so you'll have to settle on your color grade before you film. To get that good old spaghetti western look go with the contrast at -19.
 
 ### Flip, beep, lenght
 If you go gonzo, flippin it is the way to go! beep is a countdown timer from the moment you press rec or retake to when it actually starts filming. Lenght let's you put in the lenght of your take before you actually start filming. Both of these are very useful if you film action alone and can't reach for the buttons. 
 
-### Mic, phones
-Control teh level of your mic and headphones.
+### Mic, phones, comp and dub
+Control teh level of your mic and headphones. Comp is a basic compressor to get really get your message across we need to hear ya so it's quite harsh as of the moment im writing this manual. But I like it when it goes craking up abit like in the good old 70s cinema. Dub is a recent feature as well and it does what it says. Do an audio dubbing over your film, make some music or whatever ya like. I'll do a scene based dub sometime in the future for sure, should not be that hard to implement (I hope).
 
-### Dsk, shutdown, timelapse, lens
-Disk space, showing you how much of space left on your sd card.
+### Timelapse
+Do a timelapse when you need to tell about time. There's an undermenu here where you can choose the intervall of the takes, now this isn't really a traditional timelapse with pictures it will instead do a 0.1 sec video at each intervall or it can be set to your likings but 0.1 is good for a traditional timelapse effect. At the bottom of the screen is a calculation of how long the clip will be if you do the timelapse for an hour. I'd say don't over do it a 10 - 20 clip is already quite a stretch but its up to you, you're the director.
 
-### Srv, wifi, upload, load, new
+### Lens
+A future implementation of lens shade correction will come where you get to do your own lens corrections to get those colors right on the spot.
 
+### Dsk, shutdown, srv, wifi
+Disk space, showing you how much of space left on your sd card. Shutdown when your done. Srv is a network server, if your connected to a network and put this on you should be able to go to any browser on any device and watch your movie films if you've rendered them first, just go to http://tarina.local. If you press enter on wifi you will be transported to a glorious program called Wicd curses, here you really need to have a keyboard to set up your connections. Hints are down on the screen what buttons to press. 
+
+### Update and upload
+Update the camera to the most exclusive version, this is still pretty much a-work-in-progress and as a warnign expect some bugs. But don't worry I'll be improving things but it takes time. Upload your film to the web, there is a youtube uploader mod you can install but you'll have to do some configs to make it work for you. Details in the mods directory.
+
+### Backup
+It's good to always backup your stuff! Plug in your usb drive and just press enter and sit back and relax as the wonderful work of computer copying does the magic. While your at it open a beer cuz it can take quite a while if you got much stuff on there. Now, this should be working on almost all hard drives but there are some that still use a very old file system called fat, and its as lazy as its given name and doesnt store critical information we would want, because we want the copying to only copy our new takes or retakes. So please use new drives like ntfs systems or ext or whatever they all are called. You'll find all you takes even the shitty ones on your harddrive in a directory called /tarinafilms/. One more thing, there are some drives that are very powerhungry and doesnt come with it's own power source, now these drives are very bad for this particular use because the Tarina has limited amounts of power for usb use, so to be sure it's gonna work, use a powered hard drives with its own power cord.
+
+### Load and new
+You can have many on going films, load em up or start as many films as you like.
+
+### Features to come
+Now I've already talked about some features that'll be implemented but three very important ones that you can expect in the near future are Yank(copy), Insert and Move. 
+
+------------------------------
+
+Building, repairing and modding
+===============================
 
 Get the parts
-=============
+--------------
 
 ![Tarina parts layed out](tarina-build.jpg)
 
