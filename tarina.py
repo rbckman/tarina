@@ -618,7 +618,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 return scene, shot, take
         time.sleep(0.02)
 
-#------------Organize----------------
+#------------Remove and Organize----------------
 
 def organize(filmfolder, filmname):
     scenes = next(os.walk(filmfolder + filmname))[1]
@@ -644,7 +644,8 @@ def organize(filmfolder, filmname):
                         os.system(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                         os.system(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
                         os.system(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
-                    organized_nr = organized_nr + 1
+                    organized_nr += 1
+
     # Shots
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
@@ -653,7 +654,9 @@ def organize(filmfolder, filmname):
             os.system('rm -r ' + filmfolder + filmname + '/' + i)
         organized_nr = 1
         for p in sorted(shots):
-            if 'shot' in p:
+            if 'insert' in p:
+                add_organize(filmfolder, filmname)
+            elif 'shot' in p:
                 print(p)
                 unorganized_nr = int(p[-3:])
                 if organized_nr == unorganized_nr:
@@ -661,12 +664,14 @@ def organize(filmfolder, filmname):
                 if organized_nr != unorganized_nr:
                     print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                     os.system('mv ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
-                organized_nr = organized_nr + 1
+                organized_nr += 1
 
     # Scenes
     organized_nr = 1
     for i in sorted(scenes):
-        if 'scene' in i:
+        if 'insert' in i:
+            add_organize(filmfolder, filmname)
+        elif 'scene' in i:
             print(i)
             unorganized_nr = int(i[-3:])
             if organized_nr == unorganized_nr:
@@ -674,9 +679,57 @@ def organize(filmfolder, filmname):
             if organized_nr != unorganized_nr:
                 print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                 os.system('mv ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
-            organized_nr = organized_nr + 1
+            organized_nr += 1
 
     print('Organizer done! Everything is tidy')
+    return
+
+
+#------------Add and Organize----------------
+
+def add_organize(filmfolder, filmname):
+    scenes = next(os.walk(filmfolder + filmname))[1]
+
+    # Shots
+    for i in sorted(scenes):
+        shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
+        if len(shots) == 0:
+            print('no shots in this scene, removing scene..')
+            os.system('rm -r ' + filmfolder + filmname + '/' + i)
+        organized_nr = len(shots)
+        for p in sorted(shots, reverse=True):
+            if 'insert' in p:
+                print(p)
+                os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
+                os.system('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3) + '/.placeholder')
+            elif 'shot' in p:
+                print(p)
+                unorganized_nr = int(p[-3:])
+                if organized_nr == unorganized_nr:
+                    print('correct')
+                if organized_nr != unorganized_nr:
+                    print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                    os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3)) 
+            organized_nr -= 1
+
+    # Scenes
+    organized_nr = len(scenes)
+    for i in sorted(scenes, reverse=True):
+        if 'insert' in i:
+            print(i)
+            os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3))
+            os.system('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
+        elif 'scene' in i:
+            print(i)
+            unorganized_nr = int(i[-3:])
+            if organized_nr == unorganized_nr:
+                print('correct')
+            if organized_nr != unorganized_nr:
+                print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                os.system('mv -n ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
+        organized_nr -= 1
+    return
+
 
 #-------------Compile Shot--------------
 
@@ -1349,31 +1402,265 @@ def main():
     #os.system('sudo iwconfig wlan0 txpower off')
     #serverstate = tarinaserver(False)
 
+    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+    filename = 'take' + str(take).zfill(3)
+    recordable = not os.path.isfile(foldername + filename + '.mp4')
+
     #MAIN LOOP
     while True:
-
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
+        if recording == False:
+            #QUIT
+            if pressed == 'noquit' and buttontime > 3:
+                stopinterface(camera)
+                os.system('clear')
+                os.system('echo "Have a nice hacking time!"')
+                break
 
-        #QUIT
-        if pressed == 'noquit' and buttontime > 3:
-            stopinterface(camera)
-            os.system('clear')
-            os.system('echo "Have a nice hacking time!"')
-            break
+            #SHUTDOWN
+            elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
+                writemessage('Hold on shutting down...')
+                time.sleep(1)
+                os.system('sudo shutdown -h now')
 
-        #SHUTDOWN
-        elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
-            writemessage('Hold on shutting down...')
-            time.sleep(1)
-            os.system('sudo shutdown -h now')
+            #TIMELAPSE
+            elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
+                overlay = removeimage(camera, overlay)
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    shot = countshots(filmname, filmfolder, scene) + 1
+                    take = 1
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                filename = 'take' + str(take).zfill(3)
+                thefile = timelapse(beeps,camera,foldername,filename)
+                if thefile != '':
+                    #render thumbnail
+                    #writemessage('creating thumbnail')
+                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
+                    updatethumb =  True
+                    renderscene = True
+                    renderfilm = True
+
+            #VIEW SCENE
+            elif pressed == 'view' and menu[selected] == 'SCENE:':
+                filmfiles = renderlist(filmname, filmfolder, scene)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
+                    #Check if rendered video exist
+                    if renderscene == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderscene = False
+                    playthis(renderfilename, camera, False, headphoneslevel)
+
+            #VIEW FILM
+            elif pressed == 'view' and menu[selected] == 'FILM:':
+                filmfiles = viewfilm(filmfolder, filmname)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilm = False
+                    playthis(renderfilename, camera, False, headphoneslevel)
+
+            #VIEW SHOT OR TAKE
+            elif pressed == 'view':
+                takes = counttakes(filmname, filmfolder, scene, shot)
+                if takes > 0:
+                    removeimage(camera, overlay)
+                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    filename = 'take' + str(take).zfill(3)
+                    playthis(foldername + filename, camera, False, headphoneslevel)
+                    imagename = foldername + filename + '.jpeg'
+                    overlay = displayimage(camera, imagename)
+
+            #DUB
+            elif pressed == 'middle' and menu[selected] == 'DUB:':
+                filmfiles = viewfilm(filmfolder, filmname)
+                if len(filmfiles) > 0:
+                    renderfilename = filmfolder + filmname + '/' + filmname
+                    if renderfilm == True:
+                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilm = False
+                    playthis(renderfilename, camera, True, headphoneslevel)
+                    try:
+                        os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
+                        vumetermessage('new dubbing made!')
+                        dub = [1.0,1.0]
+                        renderfilm = True
+                        time.sleep(1)
+                    except:
+                        writemessage('No dubbing file found!')
+                        time.sleep(1)
+
+            #BACKUP
+            elif pressed == 'middle' and menu[selected] == 'BACKUP':
+                copytousb(filmfolder)
+
+            #UPLOAD
+            elif pressed == 'middle' and menu[selected] == 'UPLOAD':
+                if webz_on() == True:
+                    filmfiles = viewfilm(filmfolder, filmname)
+                    if len(filmfiles) > 0:
+                        renderfilename = filmfolder + filmname + '/' + filmname
+                        if renderfilm == True:
+                            render(filmfiles, renderfilename, dub, comp)
+                            renderfilm = False
+                        cmd = uploadfilm(renderfilename, filmname)
+                        if cmd != None:
+                            stopinterface(camera)
+                            try:
+                                os.system(cmd)
+                            except Exception as e: print(e)
+                            time.sleep(10)
+                            screen = startinterface()
+                            camera = startcamera(lens)
+                            loadfilmsettings = True
+                        selectedaction = 0
+
+            #LOAD FILM
+            elif pressed == 'middle' and menu[selected] == 'LOAD':
+                filmname = loadfilm(filmname, filmfolder)
+                loadfilmsettings = True
+
+            #UPDATE
+            elif pressed == 'middle' and menu[selected] == 'UPDATE':
+                if webz_on() == True:
+                    tarinaversion, tarinavername = update(tarinaversion, tarinavername)
+                    selectedaction = 0
+
+            #WIFI
+            elif pressed == 'middle' and menu[selected] == 'WIFI:':
+                stopinterface(camera)
+                os.system('wicd-curses')
+                screen = startinterface()
+                camera = startcamera(lens)
+                loadfilmsettings = True
+
+            #NEW FILM
+            elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
+                oldname = filmname
+                filmname = nameyourfilm(filmfolder, '',abc)
+                if filmname != oldname:
+                    os.makedirs(filmfolder + filmname)
+                    writemessage('Good luck with your film ' + filmname + '!')
+                    updatethumb = True
+                    updatemenu = True
+                    scene = 1
+                    shot = 1
+                    take = 1
+                    selectedaction = 0
+
+            #ADELAY
+            elif pressed == 'middle' and menu[selected] == 'ADELAY':
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                filename = 'take' + str(take).zfill(3)
+                os.system('cp ' + foldername + filename + '.wav /dev/shm/')
+                delayerr = audiodelay(foldername,filename)
+
+            #YANK(COPY) SHOT
+            elif event == ord('Y') and menu[selected] == 'SHOT:' and recordable == False:
+                yankedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
+                vumetermessage('Shot ' + str(shot) + ' yanked(copied)')
+                time.sleep(1)
+
+            #YANK(COPY) SCENE
+            elif event == ord('Y') and menu[selected] == 'SCENE:' and recordable == False:
+                yankedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                vumetermessage('Scene ' + str(scene) + ' yanked(copied)')
+                time.sleep(1)
+
+            #PASTE SHOT
+            elif event == ord('P') and recordable == False:
+                if menu[selected] == 'SHOT:' and yankedshot:
+                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                    os.system('cp -r ' + yankedshot + ' ' + pasteshot)
+                    add_organize(filmfolder, filmname)
+                    renderscene = True
+                    renderfilm = True
+                    updatethumb = True
+                    vumetermessage('Shot ' + str(scene) + ' pasted!')
+                    time.sleep(1)
+                elif menu[selected] == 'SCENE:' and yankedscene:
+                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                    os.system('cp -r ' + yankedscene + ' ' + pastescene)
+                    add_organize(filmfolder, filmname)
+                    renderscene = True
+                    renderfilm = True
+                    updatethumb = True
+                    vumetermessage('Scene ' + str(scene) + ' pasted!')
+                    time.sleep(1)
+
+            #INSERT SHOT
+            elif event == ord('I') and menu[selected] == 'SHOT:' and recordable == False:
+                insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                add_organize(filmfolder, filmname)
+                os.makedirs(insertshot)
+                vumetermessage('Shot ' + str(shot) + ' inserted')
+                time.sleep(1)
+
+            #INSERT SCENE
+            elif event == ord('I') and menu[selected] == 'SCENE:' and recordable == False:
+                insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                os.makedirs(insertscene)
+                add_organize(filmfolder, filmname)
+                vumetermessage('Scene ' + str(scene) + ' inserted')
+                time.sleep(1)
+
+            #HELPME
+            elif event == ord('H'):
+                if webz_on() == True:
+                    writemessage('Rob resolving the error now...')
+                    try:
+                        stopinterface(camera)
+                        os.system('reset')
+                        os.system('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
+                        screen = startinterface()
+                        camera = startcamera(lens)
+                        loadfilmsettings = True
+                    except:
+                        writemessage('sry! no rob help installed')
+
+            #REMOVE
+            #take
+            elif pressed == 'delete' and menu[selected] == 'TAKE:':
+                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
+                organize(filmfolder, filmname)
+                renderscene = True
+                renderfilm = True
+                updatethumb = True
+                time.sleep(0.2)
+            #shot
+            elif pressed == 'delete' and menu[selected] == 'SHOT:':
+                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
+                organize(filmfolder, filmname)
+                renderscene = True
+                renderfilm = True
+                updatethumb = True
+                time.sleep(0.2)
+            #scene
+            elif pressed == 'delete' and menu[selected] == 'SCENE:':
+                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
+                organize(filmfolder, filmname)
+                renderscene = True
+                renderfilm = True
+                updatethumb = True
+                time.sleep(0.2)
+            #film
+            elif pressed == 'delete' and menu[selected] == 'FILM:':
+                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'film')
+                filmname = getfilms(filmfolder)[0][0]
+                if filmname == '':
+                    filmname = nameyourfilm(filmfolder,'',abc)
+                else:
+                    scene, shot, take = countlast(filmname, filmfolder)
+                    loadfilmsettings = True
+                    updatethumb = True
+                    time.sleep(0.2)
 
         #RECORD AND PAUSE
-        elif pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800 and recordable == True:
+        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
             overlay = removeimage(camera, overlay)
-            foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-            filename = 'take' + str(take).zfill(3)
-            recordable = not os.path.isfile(foldername + filename + '.mp4')
             if recording == False and recordable == True:
                 if beeps > 0:
                     buzzer(beeps)
@@ -1417,199 +1704,6 @@ def main():
             if pressed == 'retake' and recordable == False:
                 take = counttakes(filmname, filmfolder, scene, shot)
                 take = take + 1
-
-        #TIMELAPSE
-        elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
-            overlay = removeimage(camera, overlay)
-            if recording == False: 
-                takes = counttakes(filmname, filmfolder, scene, shot)
-                if takes > 0:
-                    shot = countshots(filmname, filmfolder, scene) + 1
-                    take = 1
-                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                filename = 'take' + str(take).zfill(3)
-                thefile = timelapse(beeps,camera,foldername,filename)
-                if thefile != '':
-                    #render thumbnail
-                    #writemessage('creating thumbnail')
-                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
-                    updatethumb =  True
-                    renderscene = True
-                    renderfilm = True
-
-        #VIEW SCENE
-        elif pressed == 'view' and menu[selected] == 'SCENE:':
-            if recording == False:
-                filmfiles = renderlist(filmname, filmfolder, scene)
-                if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                    #Check if rendered video exist
-                    if renderscene == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderscene = False
-                    playthis(renderfilename, camera, False, headphoneslevel)
-
-        #VIEW FILM
-        elif pressed == 'view' and menu[selected] == 'FILM:':
-            if recording == False:
-                filmfiles = viewfilm(filmfolder, filmname)
-                if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderfilm = False
-                    playthis(renderfilename, camera, False, headphoneslevel)
-
-        #VIEW SHOT OR TAKE
-        elif pressed == 'view':
-            if recording == False:
-                takes = counttakes(filmname, filmfolder, scene, shot)
-                if takes > 0:
-                    removeimage(camera, overlay)
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                    filename = 'take' + str(take).zfill(3)
-                    playthis(foldername + filename, camera, False, headphoneslevel)
-                    imagename = foldername + filename + '.jpeg'
-                    overlay = displayimage(camera, imagename)
-
-        #DUB
-        elif pressed == 'middle' and menu[selected] == 'DUB:':
-            if recording == False:
-                filmfiles = viewfilm(filmfolder, filmname)
-                if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderfilm = False
-                    playthis(renderfilename, camera, True, headphoneslevel)
-                    try:
-                        os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
-                        vumetermessage('new dubbing made!')
-                        dub = [1.0,1.0]
-                        renderfilm = True
-                        time.sleep(1)
-                    except:
-                        writemessage('No dubbing file found!')
-                        time.sleep(1)
-
-        #BACKUP
-        elif pressed == 'middle' and menu[selected] == 'BACKUP':
-            if recording == False:
-                copytousb(filmfolder)
-
-        #UPLOAD
-        elif pressed == 'middle' and menu[selected] == 'UPLOAD':
-            if webz_on() == True:
-                if recording == False:
-                    filmfiles = viewfilm(filmfolder, filmname)
-                    if len(filmfiles) > 0:
-                        renderfilename = filmfolder + filmname + '/' + filmname
-                        if renderfilm == True:
-                            render(filmfiles, renderfilename, dub, comp)
-                            renderfilm = False
-                        cmd = uploadfilm(renderfilename, filmname)
-                        if cmd != None:
-                            stopinterface(camera)
-                            try:
-                                os.system(cmd)
-                            except Exception as e: print(e)
-                            time.sleep(10)
-                            screen = startinterface()
-                            camera = startcamera(lens)
-                            loadfilmsettings = True
-                        selectedaction = 0
-
-        #LOAD FILM
-        elif pressed == 'middle' and menu[selected] == 'LOAD':
-            filmname = loadfilm(filmname, filmfolder)
-            loadfilmsettings = True
-
-        #UPDATE
-        elif pressed == 'middle' and menu[selected] == 'UPDATE':
-            if webz_on() == True:
-                tarinaversion, tarinavername = update(tarinaversion, tarinavername)
-                selectedaction = 0
-
-        #WIFI
-        elif pressed == 'middle' and menu[selected] == 'WIFI:':
-            stopinterface(camera)
-            os.system('wicd-curses')
-            screen = startinterface()
-            camera = startcamera(lens)
-            loadfilmsettings = True
-
-        #NEW FILM
-        elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
-            if recording == False:
-                oldname = filmname
-                filmname = nameyourfilm(filmfolder, '',abc)
-                if filmname != oldname:
-                    os.makedirs(filmfolder + filmname)
-                    writemessage('Good luck with your film ' + filmname + '!')
-                    updatethumb = True
-                    updatemenu = True
-                    scene = 1
-                    shot = 1
-                    take = 1
-                    selectedaction = 0
-
-        #ADELAY
-        elif pressed == 'middle' and menu[selected] == 'ADELAY':
-            foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-            filename = 'take' + str(take).zfill(3)
-            os.system('cp ' + foldername + filename + '.wav /dev/shm/')
-            delayerr = audiodelay(foldername,filename)
-
-        #HELPME
-        elif event == ord('H'):
-            if webz_on() == True:
-                writemessage('Rob resolving the error now...')
-                try:
-                    stopinterface(camera)
-                    os.system('reset')
-                    os.system('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
-                    screen = startinterface()
-                    camera = startcamera(lens)
-                    loadfilmsettings = True
-                except:
-                    writemessage('sry! no rob help installed')
-
-        #REMOVE
-        #take
-        elif pressed == 'delete' and menu[selected] == 'TAKE:':
-            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
-            organize(filmfolder, filmname)
-            renderscene = True
-            renderfilm = True
-            updatethumb = True
-            time.sleep(0.2)
-        #shot
-        elif pressed == 'delete' and menu[selected] == 'SHOT:':
-            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
-            organize(filmfolder, filmname)
-            renderscene = True
-            renderfilm = True
-            updatethumb = True
-            time.sleep(0.2)
-        #scene
-        elif pressed == 'delete' and menu[selected] == 'SCENE:':
-            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
-            organize(filmfolder, filmname)
-            renderscene = True
-            renderfilm = True
-            updatethumb = True
-            time.sleep(0.2)
-        #film
-        elif pressed == 'delete' and menu[selected] == 'FILM:':
-            scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'film')
-            filmname = getfilms(filmfolder)[0][0]
-            if filmname == '':
-                filmname = nameyourfilm(filmfolder,'',abc)
-            else:
-                scene, shot, take = countlast(filmname, filmfolder)
-                loadfilmsettings = True
-                updatethumb = True
-                time.sleep(0.2)
 
         #Middle button auto mode on/off
         elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
@@ -1876,6 +1970,9 @@ def main():
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
                 print('okey something has changed')
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                filename = 'take' + str(take).zfill(3)
+                recordable = not os.path.isfile(foldername + filename + '.mp4')
                 overlay = removeimage(camera, overlay)
                 imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename)
