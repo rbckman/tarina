@@ -616,9 +616,9 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 elif sceneshotortake == 'film':
                     foldername = filmfolder + filmname
                     os.system('rm -r ' + foldername)
-                return scene, shot, take
+                return
             elif selected == 1:
-                return scene, shot, take
+                return
         time.sleep(0.02)
 
 #------------Remove and Organize----------------
@@ -696,9 +696,6 @@ def add_organize(filmfolder, filmname):
     # Shots
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
-        if len(shots) == 0:
-            print('no shots in this scene, removing scene..')
-            os.system('rm -r ' + filmfolder + filmname + '/' + i)
         organized_nr = len(shots)
         for p in sorted(shots, reverse=True):
             if 'insert' in p:
@@ -720,7 +717,7 @@ def add_organize(filmfolder, filmname):
     for i in sorted(scenes, reverse=True):
         if 'insert' in i:
             print(i)
-            os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3))
+            os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
             os.system('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
         elif 'scene' in i:
             print(i)
@@ -1573,7 +1570,7 @@ def main():
                 vumetermessage('Scene ' + str(scene) + ' yanked(copied)')
                 time.sleep(1)
 
-            #PASTE SHOT
+            #PASTE SHOT and PASTE SCENE
             elif event == ord('P') and recordable == False:
                 if menu[selected] == 'SHOT:' and yankedshot:
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
@@ -1588,6 +1585,7 @@ def main():
                     pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
                     add_organize(filmfolder, filmname)
+                    shot = countshots(filmname, filmfolder, scene)
                     renderscene = True
                     renderfilm = True
                     updatethumb = True
@@ -1627,7 +1625,7 @@ def main():
             #REMOVE
             #take
             elif pressed == 'delete' and menu[selected] == 'TAKE:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'take')
+                remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
@@ -1635,7 +1633,7 @@ def main():
                 time.sleep(0.2)
             #shot
             elif pressed == 'delete' and menu[selected] == 'SHOT:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'shot')
+                remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
                 renderscene = True
                 renderfilm = True
@@ -1643,15 +1641,16 @@ def main():
                 time.sleep(0.2)
             #scene
             elif pressed == 'delete' and menu[selected] == 'SCENE:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'scene')
+                remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
+                shot = countshots(filmname, filmfolder, scene)
                 renderscene = True
                 renderfilm = True
                 updatethumb = True
                 time.sleep(0.2)
             #film
             elif pressed == 'delete' and menu[selected] == 'FILM:':
-                scene, shot, take = remove(filmfolder, filmname, scene, shot, take, 'film')
+                remove(filmfolder, filmname, scene, shot, take, 'film')
                 filmname = getfilms(filmfolder)[0][0]
                 if filmname == '':
                     filmname = nameyourfilm(filmfolder,'',abc)
