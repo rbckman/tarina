@@ -387,7 +387,7 @@ def nameyourfilm(filmfolder, filmname, abc):
     buttontime = time.time()
     holdbutton = ''
     abcx = 0
-    thefuck = ''
+    thefuck = 'Up, Down (select characters) Right (next). Middle (done)'
     cursor = '_'
     blinking = True
     pausetime = time.time()
@@ -407,7 +407,7 @@ def nameyourfilm(filmfolder, filmname, abc):
                 abcx = abcx - 1
                 cursor = abc[abcx]
         elif pressed == 'right':
-            if len(filmname) < 25:
+            if len(filmname) < 30:
                 filmname = filmname + abc[abcx]
                 cursor = abc[abcx]
             else:
@@ -416,9 +416,10 @@ def nameyourfilm(filmfolder, filmname, abc):
             if len(filmname) > 0:
                 filmname = filmname[:-1]
                 cursor = abc[abcx]
-                thefuck = ''
         elif pressed == 'middle' or event == 10:
             if len(filmname) > 0:
+                if cursor != '_':
+                    filmname = filmname + abc[abcx]
                 try:
                     if filmname in getfilms(filmfolder)[0]:
                         thefuck = 'this filmname is already taken! chose another name!'
@@ -441,7 +442,7 @@ def nameyourfilm(filmfolder, filmname, abc):
                 cursor = ' '
             blinking = not blinking
             pausetime = time.time()
-        time.sleep(0.02)
+        time.sleep(0.08)
 
 #------------Timelapse--------------------------
 
@@ -1376,6 +1377,8 @@ def main():
 
     #Turn off hdmi to save power
     os.system('tvservice -o')
+    #Kernel page cache optimization for sd card
+    os.system('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
 
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
