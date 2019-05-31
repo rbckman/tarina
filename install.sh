@@ -41,8 +41,6 @@ echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
 apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
-echo "Getting the latest firmware for rpi..."
-SKIP_WARNING=1 rpi-update
 echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
