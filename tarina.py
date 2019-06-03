@@ -1318,7 +1318,7 @@ def startcamera(lens):
     if v == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # ov5647 Rev C
-        camera.framerate = 25
+        camera.framerate = 26.03
         # ov5647 Rev D"
         # camera.framerate = 23.2
     camera.crop = (0, 0, 1.0, 1.0)
@@ -1710,7 +1710,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.mp4', format='mp4', quality=23)
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=23)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1734,7 +1734,7 @@ def main():
                 renderscene = True
                 renderfilm = True
                 updatethumb = True
-                #compileshot(foldername + filename)
+                compileshot(foldername + filename)
                 delayerr = audiodelay(foldername,filename)
                 if beeps > 0:
                     buzz(300)
