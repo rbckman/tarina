@@ -15,16 +15,12 @@ from omxplayer import OMXPlayer
 import subprocess
 import sys
 import pickle
-import curses
 import RPi.GPIO as GPIO
 from PIL import Image
 import smbus
 import socket
-
-# Get path of the current dir, then use it as working directory:
-rundir = os.path.dirname(__file__)
-if rundir != '':
-    os.chdir(rundir)
+import shlex
+from blessed import Terminal
 
 #if buttons are installed
 try:
@@ -45,26 +41,37 @@ except:
     onlykeyboard = True
     print("could not find buttons!! running in only keyboard mode")
 
+#Lets bless the code!
+term = Terminal()
+
+#--------------Logger-----------------------
+
+class logger():
+    def info(info):
+        print(term.yellow(info))
+    def warning(warning):
+        print('Warning: ' + warning)
+
 #--------------Save settings-----------------
 
 def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp):
     settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
-        print("settings saved")
+        logger.info("settings saved")
     except:
         return
-        print("could not save settings")
+        logger.warning("could not save settings")
 
 #--------------Load film settings--------------
 
 def loadsettings(filmfolder, filmname):
     try:
         settings = pickle.load(open(filmfolder + filmname + "/settings.p", "rb"))
-        print("settings loaded")
+        logger.info("settings loaded")
         return settings
     except:
-        print("couldnt load settings")
+        logger.info("couldnt load settings")
         return ''
 
 #--------------Write the menu layer to dispmanx--------------
@@ -196,6 +203,24 @@ def counttakes(filmname, filmfolder, scene, shot):
             takes = takes + 1
     return takes
 
+#------------Run Command-------------
+
+def run_command(command_line):
+    #command_line_args = shlex.split(command_line)
+    logger.info('Running: "' + command_line + '"')
+    try:
+        process = subprocess.Popen(command_line, shell=True).wait()
+        # process_output is now a string, not a file,
+        # you may want to do:
+    except (OSError, CalledProcessError) as exception:
+        logger.warning('Exception occured: ' + str(exception))
+        logger.warning('Process failed')
+        return False
+    else:
+        # no exception was raised
+        logger.info('Process finished')
+    return True
+
 #-------------Render scene list--------------
 
 def renderlist(filmname, filmfolder, scene):
@@ -301,7 +326,7 @@ def update(tarinaversion, tarinavername):
     time.sleep(2)
     writemessage('Checking for updates...')
     try:
-        os.system('wget -N https://raw.githubusercontent.com/rbckman/tarina/master/VERSION -P /tmp/')
+        run_command('wget -N https://raw.githubusercontent.com/rbckman/tarina/master/VERSION -P /tmp/')
     except:
         writemessage('Sorry buddy, no internet connection')
         time.sleep(2)
@@ -316,11 +341,11 @@ def update(tarinaversion, tarinavername):
         writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
         writemessage('Updating...')
-        os.system('git -C ' + tarinafolder + ' pull')
+        run_command('git -C ' + tarinafolder + ' pull')
         writemessage('Update done, will now reboot Tarina')
         waitforanykey()
         writemessage('Hold on rebooting Tarina...')
-        os.system('sudo reboot')
+        run_command('sudo reboot')
     writemessage('Version is up-to-date!')
     return tarinaversion, tarinavername
 
@@ -337,7 +362,9 @@ def getfilms(filmfolder):
         else:
             films_sorted.append((i,0))
     films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
-    print(films_sorted)
+    logger.info('*-- Films --*')
+    for p in films_sorted:
+        logger.info(p[0])
     return films_sorted
 
 #-------------Load film---------------
@@ -396,23 +423,25 @@ def nameyourfilm(filmfolder, filmname, abc):
         writemessage(message + cursor)
         vumetermessage(thefuck)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if str(event) != '-1':
-            print(str(event))
         if pressed == 'down':
+            pausetime = time.time()
             if abcx < (len(abc) - 1):
                 abcx = abcx + 1
                 cursor = abc[abcx]
         elif pressed == 'up':
+            pausetime = time.time()
             if abcx > 0:
                 abcx = abcx - 1
                 cursor = abc[abcx]
         elif pressed == 'right':
+            pausetime = time.time()
             if len(filmname) < 30:
                 filmname = filmname + abc[abcx]
                 cursor = abc[abcx]
             else:
                 thefuck = 'Yo, maximum characters reached bro!'
         elif pressed == 'left' or event == 263:
+            pausetime = time.time()
             if len(filmname) > 0:
                 filmname = filmname[:-1]
                 cursor = abc[abcx]
@@ -424,17 +453,16 @@ def nameyourfilm(filmfolder, filmname, abc):
                     if filmname in getfilms(filmfolder)[0]:
                         thefuck = 'this filmname is already taken! chose another name!'
                     if filmname not in getfilms(filmfolder)[0]:
-                        print("New film " + filmname)
+                        logger.info("New film " + filmname)
                         return(filmname)
                 except:
-                    print("New film " + filmname)
+                    logger.info("New film " + filmname)
                     return(filmname)
         elif event == 27:
             return oldfilmname
-        elif event in range(256):
-            if chr(event) in abc:
-                print(str(event))
-                filmname = filmname + (chr(event))
+        elif event in abc:
+            pausetime = time.time()
+            filmname = filmname + event
         if time.time() - pausetime > 0.5:
             if blinking == True:
                 cursor = abc[abcx]
@@ -527,9 +555,9 @@ def timelapse(beeps,camera,foldername,filename):
                         try:
                             camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
                         except:
-                            print('something wrong with camera jpeg capture')
+                            logger.warning('something wrong with camera jpeg capture')
                         writemessage('Compiling timelapse')
-                        print('Hold on, rendering ' + str(len(files)) + ' files')
+                        logger.info('Hold on, rendering ' + str(len(files)) + ' files')
                         #RENDER VIDEO
                         renderfilename = foldername + filename
                         n = 1
@@ -633,40 +661,42 @@ def organize(filmfolder, filmname):
         for p in sorted(shots):
             takes = next(os.walk(filmfolder + filmname + '/' + i + '/' + p))[2]
             if len(takes) == 0:
-                print('no takes in this shot, removing shot..')
+                logger.info('no takes in this shot, removing shot..')
                 os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
             for s in sorted(takes):
                 if '.mp4' in s:
-                    print(s)
+                    #print(s)
                     unorganized_nr = int(s[4:-4])
                     if organized_nr == unorganized_nr:
-                        print('correct')
+                        #print('correct')
+                        pass
                     if organized_nr != unorganized_nr:
-                        print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
-                        os.system(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
-                        os.system(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
-                        os.system(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
+                        run_command(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
+                        run_command(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
+                        run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     organized_nr += 1
 
     # Shots
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
         if len(shots) == 0:
-            print('no shots in this scene, removing scene..')
+            logger.info('no shots in this scene, removing scene..')
             os.system('rm -r ' + filmfolder + filmname + '/' + i)
         organized_nr = 1
         for p in sorted(shots):
             if 'insert' in p:
                 add_organize(filmfolder, filmname)
             elif 'shot' in p:
-                print(p)
+                #print(p)
                 unorganized_nr = int(p[-3:])
                 if organized_nr == unorganized_nr:
-                    print('correct')
+                    #print('correct')
+                    pass
                 if organized_nr != unorganized_nr:
-                    print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                    #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                     os.system('mv ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
                 organized_nr += 1
 
@@ -676,16 +706,17 @@ def organize(filmfolder, filmname):
         if 'insert' in i:
             add_organize(filmfolder, filmname)
         elif 'scene' in i:
-            print(i)
+            #print(i)
             unorganized_nr = int(i[-3:])
             if organized_nr == unorganized_nr:
-                print('correct')
+                #print('correct')
+                pass
             if organized_nr != unorganized_nr:
-                print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                 os.system('mv ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
             organized_nr += 1
 
-    print('Organizer done! Everything is tidy')
+    logger.info('Organizer done! Everything is tidy')
     return
 
 
@@ -700,16 +731,17 @@ def add_organize(filmfolder, filmname):
         organized_nr = len(shots)
         for p in sorted(shots, reverse=True):
             if 'insert' in p:
-                print(p)
+                #print(p)
                 os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
-                os.system('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3) + '/.placeholder')
+                run_command('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3) + '/.placeholder')
             elif 'shot' in p:
-                print(p)
+                #print(p)
                 unorganized_nr = int(p[-3:])
                 if organized_nr == unorganized_nr:
-                    print('correct')
+                    #print('correct')
+                    pass
                 if organized_nr != unorganized_nr:
-                    print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                    #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                     os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3)) 
             organized_nr -= 1
 
@@ -717,16 +749,17 @@ def add_organize(filmfolder, filmname):
     organized_nr = len(scenes)
     for i in sorted(scenes, reverse=True):
         if 'insert' in i:
-            print(i)
+            #print(i)
             os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
-            os.system('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
+            run_command('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
         elif 'scene' in i:
-            print(i)
+            #print(i)
             unorganized_nr = int(i[-3:])
             if organized_nr == unorganized_nr:
-                print('correct')
+                #print('correct')
+                pass
             if organized_nr != unorganized_nr:
-                print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                 os.system('mv -n ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
         organized_nr -= 1
     return
@@ -741,11 +774,11 @@ def compileshot(filename):
         return
     else:
         writemessage('Converting to playable video')
-        os.system('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
+        run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
         os.system('rm ' + filename + '.h264')
-        #os.system('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
+        #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
-        #os.system('aplay ' + foldername + filename + '.wav')
+        #run_command('aplay ' + foldername + filename + '.wav')
 
 #-------------Render-------(rename to compile or render)-----
 
@@ -770,7 +803,6 @@ def render(filmfiles, filename, dub, comp):
     #call(videomerge, shell=True) #how to insert somekind of estimated time while it does this?
     p = Popen(videomerge)
     #show progress
-    print(str(videosize))
     while p.poll() is None:
         time.sleep(0.1)
         try:
@@ -797,14 +829,14 @@ def render(filmfiles, filename, dub, comp):
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        os.system('sox -V0 -G -m -v ' + str(round(dub[0],1)) + ' ' + filename + '_dub.wav -v ' + str(round(dub[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        run_command('sox -V0 -G -m -v ' + str(round(dub[0],1)) + ' ' + filename + '_dub.wav -v ' + str(round(dub[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
     ##CONVERT AUDIO IF WAV FILES FOUND
     #compressing
     if comp > 0 and os.path.isfile(filename + '.wav'):
         writemessage('compressing audio')
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        os.system('sox ' + filename + '_tmp.wav ' + filename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+        run_command('sox ' + filename + '_tmp.wav ' + filename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
         os.remove(filename + '_tmp.wav')
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
@@ -831,7 +863,7 @@ def render(filmfiles, filename, dub, comp):
 def playthis(filename, camera, dub, headphoneslevel):
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
-        print("no file to play")
+        logger.info("no file to play")
         return
     t = 0
     pressed = ''
@@ -875,11 +907,11 @@ def playthis(filename, camera, dub, headphoneslevel):
                 time.sleep(1)
                 p+=1
         player.play()
-        os.system('aplay -D plughw:0 ' + filename + '.wav &')
+        run_command('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
-            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+            run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
     except:
-        print('something wrong with omxplayer')
+        logger.info('something wrong with omxplayer')
         return
     starttime = time.time()
     selected = 0
@@ -897,11 +929,11 @@ def playthis(filename, camera, dub, headphoneslevel):
         elif pressed == 'up':
             if headphoneslevel < 100:
                 headphoneslevel = headphoneslevel + 2
-                os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+                run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
         elif pressed == 'down':
             if headphoneslevel > 0:
                 headphoneslevel = headphoneslevel - 2
-                os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+                run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
         elif pressed == 'middle':
             time.sleep(0.2)
             if menu[selected] == 'STOP' or player.playback_status() == "Stopped":
@@ -931,9 +963,9 @@ def playthis(filename, camera, dub, headphoneslevel):
                             time.sleep(1)
                             p+=1
                     player.play()
-                    os.system('aplay -D plughw:0 ' + filename + '.wav &')
+                    run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
-                        os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+                        run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
                 except:
                     pass
                 starttime = time.time()
@@ -961,13 +993,12 @@ def viewfilm(filmfolder, filmname):
 def audiodelay(foldername, filename):
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
-    videolenght = pipe.decode()
+    videolenght = pipe.decode().strip()
     pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True)
-    audiolenght = pipe.decode()
+    audiolenght = pipe.decode().strip()
     #if there is no audio lenght
-    print('audio is:' + audiolenght)
+    logger.info('audio is:' + audiolenght)
     if not audiolenght.strip():
-        print('jep jep')
         audiolenght = 0
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
@@ -978,12 +1009,12 @@ def audiodelay(foldername, filename):
         #calculate difference
         audiosync = int(audiolenght) - int(videolenght)
         newaudiolenght = int(audiolenght) - audiosync
-        print('Audiofile is: ' + str(audiosync) + 'ms longer')
+        logger.info('Audiofile is: ' + str(audiosync) + 'ms longer')
         #trim from end and put a 0.01 in- and outfade
-        os.system('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
-        os.system('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
+        run_command('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
+        run_command('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
-        if int(audiosync) > 250:
+        if int(audiosync) > 300:
             writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
             vumetermessage('Consider changing to a faster microsd card.')
             time.sleep(10)
@@ -996,13 +1027,13 @@ def audiodelay(foldername, filename):
         #    if audiosyncs > 0:
         #        audiosyncs = audiosyncs - 1
         #    audiosyncms = 1000 + audiosyncms
-        print('Videofile is: ' + str(audiosyncs) + 's longer')
+        logger.info('Videofile is: ' + str(audiosyncs) + 's longer')
         #make fade
-        os.system('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
+        run_command('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
-        os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(round(audiosyncs,3)))
+        run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(round(audiosyncs,3)))
         #add silence to end
-        os.system('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
+        run_command('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(round(audiosyncs,3))
@@ -1018,12 +1049,12 @@ def audiosilence(foldername,filename):
     writemessage('Creating audiosilence..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
     videolenght = pipe.decode()
-    print('Video lenght is ' + videolenght)
+    logger.info('Video lenght is ' + videolenght)
     #separate seconds and milliseconds
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
-    print('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    os.system('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    logger.info('Videofile is: ' + str(videos) + 's ' + str(videoms))
+    run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
     os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
     os.system('rm /dev/shm/silence.wav')
 
@@ -1053,9 +1084,9 @@ def copytousb(filmfolder):
                 p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
                 filesystem = p.decode()
                 writemessage('Copying files...')
-                os.system('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
-                os.system('sync')
-                os.system('pumount /media/usb0')
+                run_command('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
+                run_command('sync')
+                run_command('pumount /media/usb0')
                 writemessage('all files copied successfully!')
                 waitforanykey()
                 writemessage('You can safely unplug the usb device now')
@@ -1110,7 +1141,6 @@ def uploadfilm(filename, filmname):
             return None
         elif pressed == 'middle' and  menu[selected] in mods:
             cmd = tarinafolder + '/mods/' + menu[selected] + '.sh ' + filmname + ' ' + filename
-            print(cmd)
             return cmd
         time.sleep(0.02)
 
@@ -1186,7 +1216,14 @@ def waitforanykey():
     vumetermessage("press any key to continue..")
     time.sleep(1)
     while True:
-        event = screen.getch()
+        with term.cbreak():
+            val = term.inkey(timeout=0)
+        if not val:
+            event = -1
+        elif val.is_sequence:
+            event = val.name
+        elif val:
+            event = val
         if onlykeyboard == False:
             readbus = bus.read_byte_data(DEVICE,GPIOB)
             readbus2 = bus.read_byte_data(DEVICE,GPIOA)
@@ -1199,7 +1236,14 @@ def waitforanykey():
             return
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    event = screen.getch()
+    with term.cbreak():
+        val = term.inkey(timeout=0)
+    if not val:
+        event = -1
+    elif val.is_sequence:
+        event = val.name
+    elif val:
+        event = val
     keydelay = 0.08
     if onlykeyboard == False:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
@@ -1211,23 +1255,23 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if buttonpressed == False:
         if event == 27:
             pressed = 'quit'
-        elif event == curses.KEY_ENTER or event == 10 or event == 13 or readbus == 247:
+        elif event == 'KEY_ENTER' or event == 10 or event == 13 or readbus == 247:
             pressed = 'middle'
-        elif event == curses.KEY_UP or readbus == 191: 
+        elif event == 'KEY_UP' or readbus == 191: 
             pressed = 'up'
-        elif event == curses.KEY_DOWN or readbus == 254:
+        elif event == 'KEY_DOWN' or readbus == 254:
             pressed = 'down'
-        elif event == curses.KEY_LEFT or readbus == 239:
+        elif event == 'KEY_LEFT' or readbus == 239:
             pressed = 'left'
-        elif event == curses.KEY_RIGHT or readbus == 251:
+        elif event == 'KEY_RIGHT' or readbus == 251:
             pressed = 'right'
-        elif event == 339 or event == ord(' ') or readbus == 127:
+        elif event == 'KEY_PGUP' or event == ' ' or readbus == 127:
             pressed = 'record'
-        elif event == 338 or readbus == 253:
+        elif event == 'KEY_PGDOWN' or readbus == 253:
             pressed = 'retake'
-        elif event == 9 or readbus == 223:
+        elif event == 'KEY_TAB' or readbus == 223:
             pressed = 'view'
-        elif event == 330 or readbus2 == 246:
+        elif event == 'KEY_DELETE' or readbus2 == 246:
             pressed = 'delete'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
@@ -1247,15 +1291,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     return pressed, buttonpressed, buttontime, holdbutton, event, keydelay
 
 def startinterface():
-    call (['./startinterface.sh &'], shell = True)
-    screen = curses.initscr()
-    curses.cbreak(1)
-    screen.keypad(1)
-    curses.noecho()
-    screen.nodelay(1)
-    curses.curs_set(0)
-    screen.clear()
-    return screen
+    call(['./startinterface.sh &'], shell = True)
 
 def stopinterface(camera):
     camera.stop_preview()
@@ -1263,11 +1299,7 @@ def stopinterface(camera):
     os.system('pkill arecord')
     os.system('pkill startinterface')
     os.system('pkill tarinagui')
-    os.system('sudo systemctl stop apache2')
-    screen.clear()
-    curses.nocbreak()
-    curses.echo()
-    curses.endwin()
+    run_command('sudo systemctl stop apache2')
 
 def startcamera(lens):
     camera = picamera.PiCamera()
@@ -1280,13 +1312,13 @@ def startcamera(lens):
     v = camera.revision
     # v1 = 'ov5647'
     # v2 = ? 
-    print("picamera version is: " + str(v))
+    logger.info("picamera version is: " + str(v))
     if v == 'somy, whatever it was':
         camera.framerate = 24.999
     if v == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # ov5647 Rev C
-        camera.framerate = 26.03
+        camera.framerate = 25
         # ov5647 Rev D"
         # camera.framerate = 23.2
     camera.crop = (0, 0, 1.0, 1.0)
@@ -1304,14 +1336,14 @@ def tarinaserver(state):
     if state == True:
         #Try to run apache
         try:
-            os.system('sudo systemctl start apache2')
+            run_command('sudo systemctl start apache2')
             return 'on'
         except:
             writemessage("could not run tarina server")
             time.sleep(2)
             return 'off'
     if state == False:
-        os.system('sudo systemctl stop apache2')
+        run_command('sudo systemctl stop apache2')
         return 'off'
 
 
@@ -1319,6 +1351,11 @@ def tarinaserver(state):
 
 def main():
     global tarinafolder, screen, loadfilmsettings
+
+    # Get path of the current dir, then use it as working directory:
+    rundir = os.path.dirname(__file__)
+    if rundir != '':
+        os.chdir(rundir)
     filmfolder = "/home/pi/Videos/"
     if os.path.isdir(filmfolder) == False:
         os.makedirs(filmfolder)
@@ -1368,7 +1405,7 @@ def main():
 
     #Save settings every 5 seconds
     pausetime = time.time()
-    savesettingsevery = 5
+    savesettingsevery = 10
 
     #VERSION
     f = open(tarinafolder + '/VERSION')
@@ -1376,9 +1413,9 @@ def main():
     tarinavername = f.readline()
 
     #Turn off hdmi to save power
-    os.system('tvservice -o')
+    run_command('tvservice -o')
     #Kernel page cache optimization for sd card
-    os.system('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
+    run_command('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
 
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
@@ -1391,7 +1428,8 @@ def main():
     #LOAD FILM AND SCENE SETTINGS
     try:
         filmname = getfilms(filmfolder)[0][0]
-    except:
+    except Exception as e:
+        print(e)
         filmname = ''
 
     #THUMBNAILCHECKER
@@ -1402,7 +1440,7 @@ def main():
     #TURN OFF WIFI AND TARINA SERVER
     serverstate = 'off'
     wifistate = 'off'
-    #os.system('sudo iwconfig wlan0 txpower off')
+    #run_command('sudo iwconfig wlan0 txpower off')
     #serverstate = tarinaserver(False)
 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
@@ -1417,15 +1455,15 @@ def main():
             #QUIT
             if pressed == 'noquit' and buttontime > 3:
                 stopinterface(camera)
-                os.system('clear')
-                os.system('echo "Have a nice hacking time!"')
+                run_command('clear')
+                run_command('echo "Have a nice hacking time!"')
                 break
 
             #SHUTDOWN
             elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
-                os.system('sudo shutdown -h now')
+                run_command('sudo shutdown -h now')
 
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
@@ -1440,7 +1478,7 @@ def main():
                 if thefile != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
-                    #os.system('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
+                    #run_command('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
                     renderscene = True
                     renderfilm = True
@@ -1487,7 +1525,7 @@ def main():
                         renderfilm = False
                     playthis(renderfilename, camera, True, headphoneslevel)
                     try:
-                        os.system('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
+                        run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
                         vumetermessage('new dubbing made!')
                         dub = [1.0,1.0]
                         renderfilm = True
@@ -1513,8 +1551,8 @@ def main():
                         if cmd != None:
                             stopinterface(camera)
                             try:
-                                os.system(cmd)
-                            except Exception as e: print(e)
+                                run_command(cmd)
+                            except Exception as e: logger.warning(e)
                             time.sleep(10)
                             screen = startinterface()
                             camera = startcamera(lens)
@@ -1535,8 +1573,8 @@ def main():
             #WIFI
             elif pressed == 'middle' and menu[selected] == 'WIFI:':
                 stopinterface(camera)
-                os.system('wicd-curses')
-                screen = startinterface()
+                run_command('wicd-curses')
+                startinterface()
                 camera = startcamera(lens)
                 loadfilmsettings = True
 
@@ -1562,19 +1600,19 @@ def main():
                 delayerr = audiodelay(foldername,filename)
 
             #YANK(COPY) SHOT
-            elif event == ord('Y') and menu[selected] == 'SHOT:' and recordable == False:
+            elif event == 'Y' and menu[selected] == 'SHOT:' and recordable == False:
                 yankedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Shot ' + str(shot) + ' yanked(copied)')
                 time.sleep(1)
 
             #YANK(COPY) SCENE
-            elif event == ord('Y') and menu[selected] == 'SCENE:' and recordable == False:
+            elif event == 'Y' and menu[selected] == 'SCENE:' and recordable == False:
                 yankedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                 vumetermessage('Scene ' + str(scene) + ' yanked(copied)')
                 time.sleep(1)
 
             #PASTE SHOT and PASTE SCENE
-            elif event == ord('P') and recordable == False:
+            elif event == 'P' and recordable == False:
                 if menu[selected] == 'SHOT:' and yankedshot:
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
@@ -1596,7 +1634,7 @@ def main():
                     time.sleep(1)
 
             #INSERT SHOT
-            elif event == ord('I') and menu[selected] == 'SHOT:' and recordable == False:
+            elif event == 'I' and menu[selected] == 'SHOT:' and recordable == False:
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 add_organize(filmfolder, filmname)
                 os.makedirs(insertshot)
@@ -1604,7 +1642,7 @@ def main():
                 time.sleep(1)
 
             #INSERT SCENE
-            elif event == ord('I') and menu[selected] == 'SCENE:' and recordable == False:
+            elif event == 'I' and menu[selected] == 'SCENE:' and recordable == False:
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
                 os.makedirs(insertscene)
                 add_organize(filmfolder, filmname)
@@ -1612,14 +1650,14 @@ def main():
                 time.sleep(1)
 
             #HELPME
-            elif event == ord('H'):
+            elif event == 'H':
                 if webz_on() == True:
                     writemessage('Rob resolving the error now...')
                     try:
                         stopinterface(camera)
-                        os.system('reset')
-                        os.system('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
-                        screen = startinterface()
+                        run_command('reset')
+                        run_command('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
+                        startinterface()
                         camera = startcamera(lens)
                         loadfilmsettings = True
                     except:
@@ -1672,7 +1710,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=23)
+                camera.start_recording(foldername + filename + '.mp4', format='mp4', quality=23)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
@@ -1688,7 +1726,7 @@ def main():
                 try:
                     camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
                 except:
-                    print('something wrong with camera jpeg capture')
+                    logger.warning('something wrong with camera jpeg capture')
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -1696,7 +1734,7 @@ def main():
                 renderscene = True
                 renderfilm = True
                 updatethumb = True
-                compileshot(foldername + filename)
+                #compileshot(foldername + filename)
                 delayerr = audiodelay(foldername,filename)
                 if beeps > 0:
                     buzz(300)
@@ -1770,11 +1808,11 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel < 100:
                     miclevel = miclevel + 2
-                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
+                    run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel < 100:
                     headphoneslevel = headphoneslevel + 2
-                    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+                    run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                 renderscene = True
@@ -1797,10 +1835,10 @@ def main():
                     serverstate = tarinaserver(True)
             elif menu[selected] == 'WIFI:':
                 if wifistate == 'on':
-                    os.system('sudo iwconfig wlan0 txpower off')
+                    run_command('sudo iwconfig wlan0 txpower off')
                     wifistate = 'off'
                 elif wifistate == 'off':
-                    os.system('sudo iwconfig wlan0 txpower auto')
+                    run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
             elif menu[selected] == 'LENS:':
                 s = 0
@@ -1874,11 +1912,11 @@ def main():
             elif menu[selected] == 'MIC:':
                 if miclevel > 0:
                     miclevel = miclevel - 2
-                    os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
+                    run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             elif menu[selected] == 'PHONES:':
                 if headphoneslevel > 0:
                     headphoneslevel = headphoneslevel - 2
-                    os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+                    run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                 renderscene = True
@@ -1901,10 +1939,10 @@ def main():
                     serverstate = tarinaserver(True)
             elif menu[selected] == 'WIFI:':
                 if wifistate == 'on':
-                    os.system('sudo iwconfig wlan0 txpower off')
+                    run_command('sudo iwconfig wlan0 txpower off')
                     wifistate = 'off'
                 elif wifistate == 'off':
-                    os.system('sudo iwconfig wlan0 txpower auto')
+                    run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
             elif menu[selected] == 'LENS:':
                 s = 0
@@ -1952,12 +1990,12 @@ def main():
                 camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp = filmsettings
                 time.sleep(0.2)
             except:
-                print('could not load film settings')
+                logger.warning('could not load film settings')
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
-            os.system('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
-            os.system('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
+            run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             organize(filmfolder, filmname)
             scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
@@ -1974,7 +2012,7 @@ def main():
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
-                print('okey something has changed')
+                logger.info('okey something has changed')
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4')
@@ -2011,7 +2049,7 @@ def main():
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 100000:
+            if rerendermenu < 10:
                 rerendermenu = rerendermenu + 1
                 rendermenu = True
             else:
@@ -2032,7 +2070,4 @@ if __name__ == '__main__':
         os.system('pkill arecord')
         os.system('pkill startinterface')
         os.system('pkill tarinagui')
-        curses.nocbreak()
-        curses.echo()
-        curses.endwin()
         print('Unexpected error : ', sys.exc_info()[0], sys.exc_info()[1])
