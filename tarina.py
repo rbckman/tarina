@@ -1,4 +1,4 @@
-#/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Tarina - a DIY Raspberry Pi Video & Audio Recorder with Glue
