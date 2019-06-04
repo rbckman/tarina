@@ -65,7 +65,7 @@ Mail rob(at)tarina.org
 
 Support
 -------
-Bitcoin: bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76
+Bitcoin: 15JRxab5tMg9JeXbtpQsiPSCUmoYucjyYs
 
 Standing on the shoulders of giants
 -----------------------------------
