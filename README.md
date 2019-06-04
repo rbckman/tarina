@@ -65,7 +65,7 @@ Mail rob(at)tarina.org
 
 Support
 -------
-Bitcoin: [bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76](bitcoin:bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76)
+Bitcoin: bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76
 
 Standing on the shoulders of giants
 -----------------------------------
