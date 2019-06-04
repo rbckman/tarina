@@ -44,7 +44,7 @@ apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpuf
 echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-sudo pip3 --no-cache-dir install https://github.com/rwb27/picamera/archive/lens-shading.zip --upgrade
+sudo pip3 --no-cache-dir install https://github.com/rbckman/picamera/archive/master.zip --upgrade
 echo "installing web.py for the tarina webserver..."
 sudo pip3 install web.py==0.40-dev1
 

@@ -19,7 +19,7 @@ import RPi.GPIO as GPIO
 from PIL import Image
 import smbus
 import socket
-import shlex
+#import shlex
 from blessed import Terminal
 
 #if buttons are installed

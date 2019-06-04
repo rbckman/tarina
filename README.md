@@ -63,6 +63,10 @@ Connect
 Matrix [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 Mail rob(at)tarina.org
 
+Support
+-------
+Bitcoin: [bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76](bitcoin:bc1q4we7yjzxzppha445agcw997h8jgfs3exmfls76)
+
 Standing on the shoulders of giants
 -----------------------------------
 This whole project has only been possible because of the people behind the free and open source movement. Couldn't possible list all of the projects on which shoulders this is standing for it would reach the moon. A big shout out to all of ya!! Yaa all awesome!
