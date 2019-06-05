@@ -43,6 +43,8 @@ apt-get upgrade -y
 apt-get -y install git python3-pip libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
 echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
+echo "installing blessed..."
+sudo pip3 install blessed
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 sudo pip3 --no-cache-dir install https://github.com/rbckman/picamera/archive/master.zip --upgrade
 echo "installing web.py for the tarina webserver..."
