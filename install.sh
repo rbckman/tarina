@@ -28,15 +28,9 @@ cat <<'EOF'
 EOF
 sleep 2
 echo "setting up system for filmmaking flow..."
-sleep 1
-echo "3"
-sleep 1
-echo "2"
-sleep 1
-echo "1"
-sleep 1
+sleep 2
 echo "if something goes wrong please submit bug to https://github.com/rbckman/tarina"
-sleep 3
+sleep 2
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
@@ -203,31 +197,15 @@ ExecStart=/usr/share/usbmount/usbmount add
 RemainAfterExit=yes
 EOF
 
-while true; do
-    read -p "Do you wish to add rbckmans special hacking tools and configurations [y]es or [n]o?" yn
-    case $yn in
-        [Yy]* ) echo "Adding hacking tools..."
+echo "Adding hacking tools..."
 apt-get -y install vim htop screen nmap
 cp extras/.vimrc /root/.vimrc
 cp extras/.vimrc /home/pi/.vimrc
-            break;;
-        [Nn]* ) echo "Nope, okay!";break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
 
-while true; do
-    read -p "Do you wish to install the youtube upload mod [y]es or [n]o?" yn
-    case $yn in
-        [Yy]* ) echo "Install youtube upload mod..."
+echo "Installing youtube upload mod..."
 cd mods
 ./install-youtube-upload.sh
 cd ..
-            break;;
-        [Nn]* ) echo "Nope, good, we dont want googly spyware everywhere! if you however wish to install it later go to the mods folder and run install-youtube-uploader.";break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
 
 echo "Setting up network configuration to use wicd program..."
 echo "it works nicer from the terminal than raspberry pi default"
@@ -247,8 +225,19 @@ cp extras/wifiset.service /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable wifiset.service
 
+echo "HURRAY! WE ARE"
+cat <<'EOF'
+  _____   ____  _   _ ______ _ 
+ |  __ \ / __ \| \ | |  ____| |
+ | |  | | |  | |  \| | |__  | |
+ | |  | | |  | | . ` |  __| | |
+ | |__| | |__| | |\  | |____|_|
+ |_____/ \____/|_| \_|______(_)
+                               
+EOF
+
 while true; do
-    read -p "Reboot into Tarina now? [y]es or [n]o?" yn
+    read -p "Reboot into up-to-date Tarina now? [y]es or [n]o?" yn
     case $yn in
         [Yy]* ) echo "Rebooting now..."
 reboot
