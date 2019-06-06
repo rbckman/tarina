@@ -8,7 +8,7 @@ rundir = os.path.dirname(__file__)
 if rundir != '':
     os.chdir(rundir)
 
-filmfolder = '/home/pi/Videos'
+filmfolder = '/home/pi/Videos/'
 
 # Link video directory to static dir
 if os.path.isfile('static/Videos') == False:

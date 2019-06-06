@@ -786,7 +786,7 @@ def compileshot(filename):
 def render(filmfiles, filename, dub, comp):
     #print filmfiles
     if len(filmfiles) < 1:
-        writemessage('Nothing here cant looki..')
+        writemessage('Nothing here!')
         time.sleep(2)
         return None
     writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
