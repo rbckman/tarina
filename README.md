@@ -61,17 +61,20 @@ There are several reasons why, will write a longer story why but heres some fund
 Connect
 -------
 Matrix [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+
 Mail rob(at)tarina.org
 
 Support
 -------
 Bitcoin: 15JRxab5tMg9JeXbtpQsiPSCUmoYucjyYs
 
-Standing on the shoulders of giants
------------------------------------
-This whole project has only been possible because of the people behind the free and open source movement. Couldn't possible list all of the projects on which shoulders this is standing for it would reach the moon. A big shout out to all of ya!! Yaa all awesome!
+Very much appreciated!
+
+Standing on the shoulders of forward thinking, freedom loving generous people (powa to da people!)
+--------------------------------------------------------------------------------------------------
+This whole project has only been possible because of the people behind the free and open source movement. Couldn't possible list all of the projects on which shoulders this is standing for it would reach the moon. A big shout out to all of ya!! Yall awesome!
 
 [Gnu](https://gnu.org), [Linux](https://github.com/torvalds/linux), [Debian](https://debian.org), [Raspberry Pi](https://raspberrypi.org), 
-[Python programming language](https://python.org), Dave Jones's [Picamera python module](https://github.com/waveform80/picamera), rwb27 for lens shading correction! Check out the 3d printable microscope [Openflexure](https://github.com/rwb27/openflexure_microscope), FFmpeg & Libav-tools, GPac library with MP4Box, [Blender](http://blender.org), [aplay the awesome wav player/recorder with VU meter](http://alsa.opensrc.org/Aplay), [Popcornmix's Omxplayer](https://github.com/popcornmix/omxplayer), [Will Price's Python-omxplayer-wrapper](https://github.com/willprice/python-omxplayer-wrapper), Sox, [The Dispmanx library](https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi)
+[Python programming language](https://python.org), Dave Jones's [Picamera python module](https://github.com/waveform80/picamera), rwb27 for lens shading correction! Check out the 3d printable microscope [Openflexure](https://github.com/rwb27/openflexure_microscope), [FFmpeg](https://ffmpeg.org/), [Libav-tools](https://libav.org/), [GPac library with MP4Box](https://gpac.wp.imt.fr/mp4box/), [Blender](http://blender.org), [aplay the awesome wav player/recorder with VU meter](http://alsa.opensrc.org/Aplay), [Popcornmix's Omxplayer](https://github.com/popcornmix/omxplayer), [Will Price's Python-omxplayer-wrapper](https://github.com/willprice/python-omxplayer-wrapper), [SoX - Sound eXchange](http://sox.sourceforge.net/), [The Dispmanx library](https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi), [Blessed](http://blessed.readthedocs.io/),  [web.py](http://webpy.org), [Tokland's youtube-upload](https://github.com/tokland/youtube-upload)
 
 ![Tarina and Leon](docs/tarina-and-leon.jpg)

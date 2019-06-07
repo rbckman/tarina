@@ -795,50 +795,6 @@ def shotfiles(filmfolder, filmname, scene):
     #time.sleep(2)
     return files
 
-#-------------Get scene dub files-----------
-
-def getscenedubs(filmfolder, filmname, scene):
-    #search for dub files
-    print('getting scene dubs')
-    dubfiles = []
-    dubmix = []
-    rendered_dub = []
-    filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
-    allfiles = os.listdir(filefolder)
-    for a in allfiles:
-        if 'scene' + str(scene).zfill(3) + '_dub' in allfiles:
-            print('Dub audio found! ' + filefolder + a)
-            dubfiles.append(filefolder + a)
-    #check if dub mix has changed
-    if dubfiles:
-        try:
-            with open(filefolder + '.dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                dubmix.append(float(i))
-            print('dub is: ' + dubmix)
-        except:
-            print('cant find .dub file')
-            for i in dubfiles:
-                dubmix.extend(1.0, 1.0)
-            with open(filefolder + ".dub", "w") as f:
-                for i in dubmix:
-                    f.write(i)
-        try:
-            with open(filefolder + '.renderd_dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                rendered_dub.append(float(i))
-            print('dub is: ' + rendered_dub)
-        except:
-            print('no rendered dubmix found!')
-        if rendered_dub != dubmix:
-            return dubfiles, dubmix, True
-        else:
-            return dubfiles, dubmix, False
-    else:
-        return '', '', False
-
 
 
 #---------------Render Video------------------
@@ -924,48 +880,6 @@ def scenefiles(filmfolder, filmname):
     #time.sleep(2)
     return files
 
-#-------------Get film dub files-----------
-
-def getfilmdubs(filmfolder, filmname):
-    #search for dub files
-    dubfiles = []
-    dubmix = []
-    rendered_dub = []
-    filefolder = filmfolder + filmname + '/'
-    allfiles = os.listdir(filefolder)
-    for a in allfiles:
-        if filmname + '_dub' in allfiles:
-            print('Dub audio found! ' + filefolder + a)
-            dubfiles.append(filefolder + a)
-    #check if dub mix has changed
-    if dubfiles:
-        try:
-            with open(filefolder + '.dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                dubmix.append(float(i))
-            print('dub is: ' + dubmix)
-        except:
-            print('cant find .dub file')
-            for i in dubfiles:
-                dubmix.extend(1.0, 1.0)
-            with open(filefolder + ".dub", "w") as f:
-                for i in dubmix:
-                    f.write(i)
-        try:
-            with open(filefolder + '.renderd_dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                rendered_dub.append(float(i))
-            print('dub is: ' + rendered_dub)
-        except:
-            print('no rendered dubmix found!')
-        if rendered_dub != dubmix:
-            return dubfiles, dubmix, True
-        else:
-            return dubfiles, dubmix, False
-    else:
-        return '', '', False
 
 
 #-------------Render Scene-------------
@@ -1104,6 +1018,93 @@ def renderfilm(filmfolder, filmname, comp):
         print('Already rendered!')
     return renderfilename
 
+#-------------Get scene dub files-----------
+
+def getscenedubs(filmfolder, filmname, scene):
+    #search for dub files
+    print('getting scene dubs')
+    dubfiles = []
+    dubmix = []
+    rendered_dub = []
+    filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+    allfiles = os.listdir(filefolder)
+    for a in allfiles:
+        if 'scene' + str(scene).zfill(3) + '_dub' in a:
+            print('Dub audio found! ' + filefolder + a)
+            dubfiles.append(filefolder + a)
+    #check if dub mix has changed
+    if dubfiles:
+        try:
+            with open(filefolder + '.dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                dubmix.append(float(i))
+            print('dubmix loaded!')
+        except:
+            print('cant find .dub file')
+            for i in dubfiles:
+                dubmix.extend([1.0, 1.0])
+            with open(filefolder + ".dub", "w") as f:
+                for i in dubmix:
+                    f.write(str(i) + '\n')
+        try:
+            with open(filefolder + '.rendered_dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                rendered_dub.append(float(i))
+            print('rendered dub loaded')
+        except:
+            print('no rendered dubmix found!')
+        if rendered_dub != dubmix:
+            return dubfiles, dubmix, True
+        else:
+            return dubfiles, dubmix, False
+    else:
+        return '', '', False
+
+#-------------Get film dub files-----------
+
+def getfilmdubs(filmfolder, filmname):
+    #search for dub files
+    dubfiles = []
+    dubmix = []
+    rendered_dub = []
+    filefolder = filmfolder + filmname + '/'
+    allfiles = os.listdir(filefolder)
+    for a in allfiles:
+        if filmname + '_dub' in a:
+            print('Dub audio found! ' + filefolder + a)
+            dubfiles.append(filefolder + a)
+    #check if dub mix has changed
+    if dubfiles:
+        try:
+            with open(filefolder + '.dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                dubmix.append(float(i))
+            print('dub is: ' + dubmix)
+        except:
+            print('cant find .dub file')
+            for i in dubfiles:
+                dubmix.extend([1.0, 1.0])
+            with open(filefolder + ".dub", "w") as f:
+                for i in dubmix:
+                    f.write(str(i) + '\n')
+        try:
+            with open(filefolder + '.renderd_dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                rendered_dub.append(float(i))
+            print('dub is: ' + rendered_dub)
+        except:
+            print('no rendered dubmix found!')
+        if rendered_dub != dubmix:
+            return dubfiles, dubmix, True
+        else:
+            return dubfiles, dubmix, False
+    else:
+        return '', '', False
+
 #-------------Clip settings---------------
 
 def clipsettings(filmfolder, filmname, scene):
@@ -1127,20 +1128,20 @@ def clipsettings(filmfolder, filmname, scene):
     dubselected = len(dubfiles)
     while True:
         if dubfiles:
-            for i in range(dubselected):
+            for i in range(dubselected - 1):
                 dubmixcount += 2
-            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected) + ': ', ''
-            settings = '', 'o:' + str(round(newdub[0],1)) + ' d:' + str(round(newdub[1],1)), 'o:' + str(round(dubmix[dubmixcount],1)) + ' d:' + str(round(dubmix[dubmixcount + 1],1))
+            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected), ''
+            settings = '', str(round(newdub[0],1)) + '/' + str(round(newdub[1],1)), '', str(round(dubmix[dubmixcount],1)) + '/' + str(round(dubmix[dubmixcount + 1],1))
         else:
             menu = 'BACK', 'NEWDUB:'
-            settings = '', 'o:' + str(round(newdub[0],1)) + ' d:' + str(round(newdub[1],1))
+            settings = '', str(round(newdub[0],1)) + '/' + str(round(newdub[1],1))
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down' and selected == 2:
             if dubselected < len(dubfiles):
                 dubselected = dubselected + 1
         elif pressed == 'up' and selected == 2:
-            if dubselected > 0:
+            if dubselected > 1:
                 dubselected = dubselected - 1
         elif pressed == 'down' and selected == 1:
             if round(newdub[0],1) == 1.0 and round(newdub[1],1) > 0.0:
@@ -1152,15 +1153,15 @@ def clipsettings(filmfolder, filmname, scene):
                 newdub[0] -= 0.1
             if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
                 newdub[1] += 0.1
-        elif pressed == 'down' and selected == 2:
+        elif pressed == 'down' and selected == 3:
             if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
                 dubmix[dubmixcount + 1] -= 0.1
             if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
                 dubmix[dubmixcount] += 0.1
-        elif pressed == 'up' and selected == 2:
-            if round(newdub[1],1) == 1.0 and round(newdub[0],1) > 0.0:
+        elif pressed == 'up' and selected == 3:
+            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) > 0.0:
                 dubmix[dubmixcount] -= 0.1
-            if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
+            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) < 1.0:
                 dubmix[dubmixcount + 1] += 0.1
         elif pressed == 'right':
             if selected < (len(settings) - 1):
@@ -1168,10 +1169,10 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif pressed == 'middle' and selected == 'NEWDUB:':
+        elif pressed == 'middle' and menu[selected] == 'NEWDUB:':
             with open(filefolder + ".dub", "a") as f:
                 for i in newdub:
-                    f.write(i)
+                    f.write(str(i) + '\n')
             return True
         elif pressed == 'view' and selected == 2:
             if dubfiles:
@@ -1181,7 +1182,7 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'middle' and menu[selected] == 'BACK':
             with open(filefolder + ".dub", "w") as f:
                 for i in dubmix:
-                    f.write(i)
+                    f.write(str(i) + '\n')
             writemessage('Returning')
             os.system('pkill aplay')
             return False
