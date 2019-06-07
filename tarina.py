@@ -1090,22 +1090,23 @@ def clipsettings(filmname, filmfolder, scene_or_film, scene):
     selected = 0
     header = scene_or_film + ' ' + scene + ' settings'
     if scene_or_film == 'scene':
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
         dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
     if scene_or_film == 'film':
+        filefolder = filmfolder + filmname + '/'
         dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
     dubmixcount = 0
-    o = 1.0
-    d = 1.0
+    newdub = [1.0, 1.0]
     while True:
         dubselected = len(dubfiles)
         if len(dubfiles) > 0:
             for i in range(dubselected):
                 dubmixcount += 2
             menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected)] + ': ', ''
-            settings = '', 'o:' + str(o) + ' d:' + str(v), 'o:' + str(dubmix[dubmixcount]) + ' d:' str(dubmix[dubmixcount + 1]
+            settings = '', 'o:' + str(newdub[0]) + ' d:' + str(newdub[1]), 'o:' + str(dubmix[dubmixcount]) + ' d:' str(dubmix[dubmixcount + 1]
         else:
             menu = 'BACK', 'NEWDUB:'
-            settings = '', 'o:' str(o) + ' d:' + str(v)
+            settings = '', 'o:' str(newdub[0]) + ' d:' + str(newdub[1])
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down' and selected == 2:
@@ -1117,16 +1118,39 @@ def clipsettings(filmname, filmfolder, scene_or_film, scene):
         elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
+        elif pressed == 'up' and selected == 2:
+            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
+                dubmix[dubmixcount + 1] -= 0.1
+            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
+                dubmix[dubmixcount] += 0.1
+        elif pressed == 'down' and selected == 2:
+            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) > 0.0:
+                dubmix[dubmixcount] -= 0.1
+            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) < 1.0:
+                dubmix[dubmixcount + 1] += 0.1
+        elif pressed == 'up' and selected == 2:
+            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
+                dubmix[dubmixcount + 1] -= 0.1
+            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
+                dubmix[dubmixcount] += 0.1
+        elif pressed == 'down' and selected == 2:
+            if round(newdub[1],1) == 1.0 and round(newdub[0],1) > 0.0:
+                dubmix[dubmixcount] -= 0.1
+            if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
+                dubmix[dubmixcount + 1] += 0.1
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle' and selected == 'NEWDUB:':
-            return o, d
+            return newdub
         elif pressed == 'view' and selected == 2:
             t = os.system('pkill aplay')
             if t != 0:
                 run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
         elif pressed == 'middle' and menu[selected] == 'BACK':
+             with open(filefolder + ".dub", "w") as f:
+                for i in dubmix:
+                    f.write(i)
             writemessage('Returning')
             os.system('pkill aplay')
             return
@@ -1790,15 +1814,12 @@ def main():
                     overlay = displayimage(camera, imagename)
 
             #DUB
-            elif pressed == 'middle' and menu[selected] == 'DUB:':
+            elif pressed == 'middle' and menu[selected] == 'SCENE:':
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderfilm = False
-                    playthis(renderfilename, camera, True, headphoneslevel)
-                    try:
+                    dubmix = clipsettings(filmname, filmfolder, scene_or_film, scene):
+                    if dumbmix:
+                        playthis(renderfilename, camera, True, headphoneslevel)
                         run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
                         vumetermessage('new dubbing made!')
                         dub = [1.0,1.0]
