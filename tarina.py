@@ -778,9 +778,9 @@ class rerender():
     def sceneaudio(filmfolder, filmname, scene):
         os.system('touch ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/.renderaudio')
 
-#-------------Get scene files--------------
+#-------------Get shot files--------------
 
-def scenefiles(filmfolder, filmname, scene):
+def shotfiles(filmfolder, filmname, scene):
     files = []
     shots = countshots(filmname,filmfolder,scene)
     shot = 1
@@ -791,13 +791,13 @@ def scenefiles(filmfolder, filmname, scene):
             filename = 'take' + str(takes).zfill(3)
             files.append(folder + filename)
         shot = shot + 1
-    #writemessage(str(len(scenefiles)))
+    #writemessage(str(len(shotfiles)))
     #time.sleep(2)
     return files
 
-#-------------Get dub files-----------
+#-------------Get scene dub files-----------
 
-def getdubs(filmfolder, filmname, scene);
+def getscenedubs(filmfolder, filmname, scene);
     #search for dub files
     dubfiles = []
     dubmix = []
@@ -842,7 +842,7 @@ def renderscene(filmfolder, filmname, scene):
     #This function checks and calls rendervideo & renderaudio if something has changed in the film
     #Video
     videohash = ''
-    files = scenefiles(filmfolder, filmname, scene)
+    files = shotfiles(filmfolder, filmname, scene)
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/' 
     for p in files:
@@ -857,13 +857,12 @@ def renderscene(filmfolder, filmname, scene):
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
     if videohash != oldvideohash:
-        rendervideo(filmfiles, renderfilename)
+        rendervideo(filmfiles, renderfilename, 'scene ' str(scene))
     #Audio
     audiohash = ''
-    files = scenefiles(filmfolder, filmname, scene)
     for p in files:
         audiohash += countsize(p + '.wav')
-    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
+    dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
     for p in dubfiles:
         audiohash += countsize(p + '.wav') 
     print('Audiohash of scene is: ' + audiohash)
@@ -885,13 +884,13 @@ def renderscene(filmfolder, filmname, scene):
 
 #---------------Render Video------------------
 
-def rendervideo(filmfiles, filename):
+def rendervideo(filmfiles, filename, renderinfo):
     if len(filmfiles) < 1:
         writemessage('Nothing here!')
         time.sleep(2)
         return None
     print('Rendering videofiles: ' + filmfiles)
-    writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
+    writemessage('Hold on, rendering ' + renderinfo + ' with ' + str(len(filmfiles)) + ' files')
     videosize = 0
     rendersize = 0
     videomerge = ['MP4Box']
@@ -951,67 +950,116 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         print('Dub mix ' + str(dubcount) ' done!')
     return
 
-#-------------Render-------(rename to compile or render)-----
+#-------------Get scene files--------------
+
+def scenefiles(filmfolder, filmname):
+    files = []
+    scenes = countscenes(filmname,filmfolder)
+    scene = 1
+    while scene <= scenes:
+        folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/'
+        filename = 'scene' + str(scene).zfill(3)
+        files.append(folder + filename)
+        scene = scene + 1
+    #writemessage(str(len(shotfiles)))
+    #time.sleep(2)
+    return files
+
+#-------------Get film dub files-----------
+
+def getfilmdubs(filmfolder, filmname);
+    #search for dub files
+    dubfiles = []
+    dubmix = []
+    rendered_dub = []
+    filefolder = filmfolder + filmname + '/'
+    allfiles = os.listdir(filefolder)
+    for a in allfiles:
+        if filmname + '_dub' in allfiles:
+            print('Dub audio found! ' + filefolder + a)
+            dubfiles.append(filefolder + a)
+    #check if dub mix has changed
+    if dubfiles:
+        try:
+            with open(filefolder + '.dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                dubmix.append(float(i))
+            print('dub is: ' + dubmix)
+        except:
+            print('cant find .dub file')
+            for i in dubfiles:
+                dubmix.extend(1.0, 1.0)
+            with open(filefolder + ".dub", "w") as f:
+                for i in dubmix:
+                    f.write(i)
+        try:
+            with open(filefolder + '.renderd_dub', 'r') as f:
+                dubstr = f.read().splitlines()
+            for i in dubstr:
+                rendered_dub.append(float(i))
+            print('dub is: ' + rendered_dub)
+        except:
+            print('no rendered dubmix found!')
+        if rendered_dub != dubmix:
+            return dubfiles, dubmix, True
+        else:
+            return dubfiles, dubmix, False
+
+#-------------Render film-------(rename to compile or render)-----
 
 def renderfilm(filmfolder, filmname, dub, comp):
+    #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
     scenes = countscenes(filmfolder, filmname)
     for i in range(scenes):
         renderscene(filmfolder, filmname, i)
-    #print filmfiles
-    if len(filmfiles) < 1:
-        writemessage('Nothing here!')
-        time.sleep(2)
-        return None
-    writemessage('Hold on, rendering ' + str(len(filmfiles)) + ' files')
-    videosize = 0
-    rendersize = 0
-    videomerge = ['MP4Box']
-    videomerge.append('-force-cat')
-    for f in filmfiles[:]:
-        videosize = videosize + countsize(f + '.mp4')
-        videomerge.append('-cat')
-        videomerge.append(f + '.mp4')
-    videomerge.append('-new')
-    videomerge.append(filename + '.mp4')
-    #videomerge.append(filename + '.h264')
-    #call(videomerge, shell=True) #how to insert somekind of estimated time while it does this?
-    p = Popen(videomerge)
-    #show progress
-    while p.poll() is None:
-        time.sleep(0.1)
-        try:
-            rendersize = countsize(filename + '.mp4')
-        except:
-            continue
-        writemessage('video rendering ' + str(int(rendersize)) + ' of ' + str(int(videosize)) + ' kb done')
-    ##PASTE AUDIO TOGETHER
-    writemessage('Hold on, rendering audio...')
-    audiomerge = ['sox']
-    #if render > 2:
-    #    audiomerge.append(filename + '.wav')
-    for f in filmfiles:
-        audiomerge.append(f + '.wav')
-    audiomerge.append(filename + '.wav')
-    call(audiomerge, shell=False)
-    #count estimated audio filesize with a bitrate of 320 kb/s
-    audiosize = countsize(filename + '.wav') * 0.453
-    rendersize = 0
-    #overdubbing
-    if os.path.isfile(filename + '_dub.wav'):
-        writemessage('Dub audio found lets mix...')
-        #sox -G -m -v 0.5 test.wav -v 1 guide.wav newtest.wav trim 0 audiolenght
-        pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
-        audiolenght = pipe.decode()
-        os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        run_command('sox -V0 -G -m -v ' + str(round(dub[0],1)) + ' ' + filename + '_dub.wav -v ' + str(round(dub[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
-        os.remove(filename + '_tmp.wav')
-    ##CONVERT AUDIO IF WAV FILES FOUND
+    files = scenefiles(filmfolder, filmname)
+    #Video
+    videohash = ''
+    renderfilename = filmfolder + filmname + '/' + filmname
+    filmdir = filmfolder + filmname + '/' 
+    for p in files:
+        videohash = videohash + countsize(p + '.mp4')
+    print('Videohash of scene is: ' + videohash)
+    try:
+        with open(filmdir + '.videohash', 'r') as f:
+            oldvideohash = f.readlines().strip()
+        print('oldvideohash is: ' + oldvideohash)
+    except:
+        print('no videohash found, making one...')
+        with open(filmdir + '.videohash', 'w') as f:
+            f.write(videohash)
+    if videohash != oldvideohash:
+        rendervideo(filmfiles, renderfilename, filmname)
+    #Audio
+    audiohash = ''
+    for p in files:
+        audiohash += countsize(p + '.wav')
+    dubfiles, dubmix, newmix = getfilmdubs(filmfolder, filmname)
+    for p in dubfiles:
+        audiohash += countsize(p + '.wav') 
+    print('Audiohash of scene is: ' + audiohash)
+    try:
+        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'r') as f:
+            oldaudiohash = f.readlines().strip()
+        print('oldaudiohash is: ' + oldaudiohash)
+    except:
+        print('no audiohash found, making one...')
+        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'w') as f:
+            f.write(audiohash)
+    if audiohash != oldaudiohash or newmix == True:
+        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        os.system('cp ' + filmdir + '.dub ' + filmdir + '.rendered_dub')
+        print('Audio rendered!')
+    else:
+        print('Already rendered!')
     #compressing
     if comp > 0 and os.path.isfile(filename + '.wav'):
         writemessage('compressing audio')
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
         run_command('sox ' + filename + '_tmp.wav ' + filename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
         os.remove(filename + '_tmp.wav')
+    #muxing mp3 layer to mp4 file
     if os.path.isfile(filename + '.wav'):
         os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
         p = Popen(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
@@ -1031,6 +1079,58 @@ def renderfilm(filmfolder, filmname, dub, comp):
         writemessage('No audio files found!')
     #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
     return filename
+
+#-------------Clip settings---------------
+
+def clipsettings(filmname, filmfolder, scene_or_film, scene):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    selected = 0
+    header = scene_or_film + ' ' + scene + ' settings'
+    if scene_or_film == 'scene':
+        dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
+    if scene_or_film == 'film':
+        dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
+    dubmixcount = 0
+    o = 1.0
+    d = 1.0
+    while True:
+        dubselected = len(dubfiles)
+        if len(dubfiles) > 0:
+            for i in range(dubselected):
+                dubmixcount += 2
+            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected)] + ': ', ''
+            settings = '', 'o:' + str(o) + ' d:' + str(v), 'o:' + str(dubmix[dubmixcount]) + ' d:' str(dubmix[dubmixcount + 1]
+        else:
+            menu = 'BACK', 'NEWDUB:'
+            settings = '', 'o:' str(o) + ' d:' + str(v)
+        writemenu(menu,settings,selected,header)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'down' and selected == 2:
+            if dubselected < len(dubfiles):
+                dubselected = dubselected + 1
+        elif pressed == 'up':
+            if dubselected > 0:
+                dubselected = dubselected - 1
+        elif pressed == 'right':
+            if selected < (len(settings) - 1):
+                selected = selected + 1
+        elif pressed == 'left':
+            if selected > 0:
+                selected = selected - 1
+        elif pressed == 'middle' and selected == 'NEWDUB:':
+            return o, d
+        elif pressed == 'view' and selected == 2:
+            t = os.system('pkill aplay')
+            if t != 0:
+                run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
+        elif pressed == 'middle' and menu[selected] == 'BACK':
+            writemessage('Returning')
+            os.system('pkill aplay')
+            return
+        time.sleep(0.02)
 
 #---------------Play & DUB--------------------
 
@@ -1157,7 +1257,7 @@ def viewfilm(filmfolder, filmname):
     while scene <= scenes:
         shots = countshots(filmname, filmfolder, scene)
         if shots > 0:
-            filmfiles.extend(scenefiles(filmfolder, filmname, scene))
+            filmfiles.extend(shotfiles(filmfolder, filmname, scene))
         scene = scene + 1
     return filmfiles
 
@@ -1659,7 +1759,7 @@ def main():
 
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
-                filmfiles = scenefiles(filmfolder, filmname, scene)
+                filmfiles = shotfiles(filmfolder, filmname, scene)
                 if len(filmfiles) > 0:
                     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                     #Check if rendered video exist
