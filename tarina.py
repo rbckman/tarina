@@ -54,8 +54,8 @@ class logger():
 
 #--------------Save settings-----------------
 
-def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp
+def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
         logger.info("settings saved")
@@ -163,7 +163,7 @@ def countlast(filmname, filmfolder):
 
 #------------Count scenes--------
 
-def countscenes(filmname, filmfolder):
+def countscenes(filmfolder, filmname):
     scenes = 0
     try:
         allfiles = os.listdir(filmfolder + filmname)
@@ -266,7 +266,7 @@ def removeimage(camera, overlay):
 #-------------Browse2.0------------------
 
 def browse2(filmname, filmfolder, scene, shot, take, n, b):
-    scenes = countscenes(filmname, filmfolder)
+    scenes = countscenes(filmfolder, filmname)
     shots = countshots(filmname, filmfolder, scene)
     takes = counttakes(filmname, filmfolder, scene, shot)
     #writemessage(str(scene) + ' < ' + str(scenes))
@@ -625,7 +625,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     writemessage('Removing scene ' + str(scene))
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                     os.system('rm -r ' + foldername)
-                    scene = countscenes(filmname, filmfolder)
+                    scene = countscenes(filmfolder, filmname)
                     shot = 1
                     take = 1
                 elif sceneshotortake == 'film':
@@ -797,15 +797,16 @@ def shotfiles(filmfolder, filmname, scene):
 
 #-------------Get scene dub files-----------
 
-def getscenedubs(filmfolder, filmname, scene);
+def getscenedubs(filmfolder, filmname, scene):
     #search for dub files
+    print('getting scene dubs')
     dubfiles = []
     dubmix = []
     rendered_dub = []
     filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
     allfiles = os.listdir(filefolder)
     for a in allfiles:
-        if 'scene' str(scene).zfill(3) + '_dub' in allfiles:
+        if 'scene' + str(scene).zfill(3) + '_dub' in allfiles:
             print('Dub audio found! ' + filefolder + a)
             dubfiles.append(filefolder + a)
     #check if dub mix has changed
@@ -835,52 +836,10 @@ def getscenedubs(filmfolder, filmname, scene);
             return dubfiles, dubmix, True
         else:
             return dubfiles, dubmix, False
-
-#-------------Render Scene-------------
-
-def renderscene(filmfolder, filmname, scene):
-    #This function checks and calls rendervideo & renderaudio if something has changed in the film
-    #Video
-    videohash = ''
-    files = shotfiles(filmfolder, filmname, scene)
-    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/' 
-    for p in files:
-        videohash = videohash + countsize(p + '.mp4')
-    print('Videohash of scene is: ' + videohash)
-    try:
-        with open(scenedir + '.videohash', 'r') as f:
-            oldvideohash = f.readlines().strip()
-        print('oldvideohash is: ' + oldvideohash)
-    except:
-        print('no videohash found, making one...')
-        with open(scenedir + '.videohash', 'w') as f:
-            f.write(videohash)
-    if videohash != oldvideohash:
-        rendervideo(filmfiles, renderfilename, 'scene ' str(scene))
-    #Audio
-    audiohash = ''
-    for p in files:
-        audiohash += countsize(p + '.wav')
-    dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
-    for p in dubfiles:
-        audiohash += countsize(p + '.wav') 
-    print('Audiohash of scene is: ' + audiohash)
-    try:
-        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'r') as f:
-            oldaudiohash = f.readlines().strip()
-        print('oldaudiohash is: ' + oldaudiohash)
-    except:
-        print('no audiohash found, making one...')
-        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'w') as f:
-            f.write(audiohash)
-    if audiohash != oldaudiohash or newmix == True:
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
-        os.system('cp ' + scenedir + '.dub ' + scenedir + '.rendered_dub')
-        print('Audio rendered!')
     else:
-        print('Already rendered!')
-    return 
+        return '', '', False
+
+
 
 #---------------Render Video------------------
 
@@ -889,7 +848,7 @@ def rendervideo(filmfiles, filename, renderinfo):
         writemessage('Nothing here!')
         time.sleep(2)
         return None
-    print('Rendering videofiles: ' + filmfiles)
+    print('Rendering videofiles')
     writemessage('Hold on, rendering ' + renderinfo + ' with ' + str(len(filmfiles)) + ' files')
     videosize = 0
     rendersize = 0
@@ -912,7 +871,7 @@ def rendervideo(filmfiles, filename, renderinfo):
         except:
             continue
         writemessage('video rendering ' + str(int(rendersize)) + ' of ' + str(int(videosize)) + ' kb done')
-    print('Scene rendered!')
+    print('Video rendered!')
     return
 
 #---------------Render Audio----------------
@@ -922,7 +881,7 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         writemessage('Nothing here!')
         time.sleep(2)
         return None
-    print('Rendering audiofiles: ' + audiofiles)
+    print('Rendering audiofiles')
     ##PASTE AUDIO TOGETHER
     writemessage('Hold on, rendering audio...')
     audiomerge = ['sox']
@@ -947,14 +906,14 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         run_command('sox -V0 -G -m -v ' + str(round(dubmix[dubmixcount],1)) + ' ' + filename + '_dub' + str(dubcount) + '.wav -v ' + str(round(dubmix[dubmixcount + 1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         dubmixcount += 2
         os.remove(filename + '_tmp.wav')
-        print('Dub mix ' + str(dubcount) ' done!')
+        print('Dub mix ' + str(dubcount) + ' done!')
     return
 
 #-------------Get scene files--------------
 
 def scenefiles(filmfolder, filmname):
     files = []
-    scenes = countscenes(filmname,filmfolder)
+    scenes = countscenes(filmfolder,filmname)
     scene = 1
     while scene <= scenes:
         folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/'
@@ -967,7 +926,7 @@ def scenefiles(filmfolder, filmname):
 
 #-------------Get film dub files-----------
 
-def getfilmdubs(filmfolder, filmname);
+def getfilmdubs(filmfolder, filmname):
     #search for dub files
     dubfiles = []
     dubmix = []
@@ -1005,25 +964,84 @@ def getfilmdubs(filmfolder, filmname);
             return dubfiles, dubmix, True
         else:
             return dubfiles, dubmix, False
+    else:
+        return '', '', False
+
+
+#-------------Render Scene-------------
+
+def renderscene(filmfolder, filmname, scene):
+    #This function checks and calls rendervideo & renderaudio if something has changed in the film
+    #Video
+    videohash = ''
+    oldvideohash = ''
+    filmfiles = shotfiles(filmfolder, filmname, scene)
+    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
+    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/' 
+    for p in filmfiles:
+        videohash = videohash + str(int(countsize(p + '.mp4')))
+    print('Videohash of scene is: ' + videohash)
+    try:
+        with open(scenedir + '.videohash', 'r') as f:
+            oldvideohash = f.readline().strip()
+        print('oldvideohash is: ' + oldvideohash)
+    except:
+        print('no videohash found, making one...')
+        with open(scenedir + '.videohash', 'w') as f:
+            f.write(videohash)
+    if videohash != oldvideohash:
+        rendervideo(filmfiles, renderfilename, 'scene ' + str(scene))
+        print('updating videohash...')
+        with open(scenedir + '.videohash', 'w') as f:
+            f.write(videohash)
+    #Audio
+    audiohash = ''
+    oldaudiohash = ''
+    for p in filmfiles:
+        audiohash += str(int(countsize(p + '.wav')))
+    dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
+    for p in dubfiles:
+        audiohash += str(int(countsize(p + '.wav')))
+    print('Audiohash of scene is: ' + audiohash)
+    try:
+        with open(scenedir + '.audiohash', 'r') as f:
+            oldaudiohash = f.readline().strip()
+        print('oldaudiohash is: ' + oldaudiohash)
+    except:
+        print('no audiohash found, making one...')
+        with open(scenedir + '.audiohash', 'w') as f:
+            f.write(audiohash)
+    if audiohash != oldaudiohash or newmix == True:
+        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        print('updating audiohash...')
+        with open(scenedir + '.audiohash', 'w') as f:
+            f.write(audiohash)
+        os.system('cp ' + scenedir + '.dub ' + scenedir + '.rendered_dub')
+        print('Audio rendered!')
+    else:
+        print('Already rendered!')
+    return renderfilename
 
 #-------------Render film-------(rename to compile or render)-----
 
-def renderfilm(filmfolder, filmname, dub, comp):
+def renderfilm(filmfolder, filmname, comp):
     #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
     scenes = countscenes(filmfolder, filmname)
     for i in range(scenes):
-        renderscene(filmfolder, filmname, i)
-    files = scenefiles(filmfolder, filmname)
+        renderscene(filmfolder, filmname, i + 1)
+    filmfiles = scenefiles(filmfolder, filmname)
     #Video
     videohash = ''
+    oldvideohash = ''
     renderfilename = filmfolder + filmname + '/' + filmname
-    filmdir = filmfolder + filmname + '/' 
-    for p in files:
-        videohash = videohash + countsize(p + '.mp4')
-    print('Videohash of scene is: ' + videohash)
+    filmdir = filmfolder + filmname + '/'
+    for p in filmfiles:
+        print(p)
+        videohash += str(int(countsize(p + '.mp4')))
+    print('Videohash of film is: ' + videohash)
     try:
         with open(filmdir + '.videohash', 'r') as f:
-            oldvideohash = f.readlines().strip()
+            oldvideohash = f.readline().strip()
         print('oldvideohash is: ' + oldvideohash)
     except:
         print('no videohash found, making one...')
@@ -1031,129 +1049,142 @@ def renderfilm(filmfolder, filmname, dub, comp):
             f.write(videohash)
     if videohash != oldvideohash:
         rendervideo(filmfiles, renderfilename, filmname)
+        print('updating video hash')
+        with open(filmdir + '.videohash', 'w') as f:
+            f.write(videohash)
     #Audio
     audiohash = ''
-    for p in files:
-        audiohash += countsize(p + '.wav')
+    oldaudiohash = ''
+    for p in filmfiles:
+        print(p)
+        audiohash += str(int(countsize(p + '.wav')))
     dubfiles, dubmix, newmix = getfilmdubs(filmfolder, filmname)
     for p in dubfiles:
-        audiohash += countsize(p + '.wav') 
-    print('Audiohash of scene is: ' + audiohash)
+        audiohash += str(int(countsize(p + '.wav'))) 
+    print('Audiohash of film is: ' + audiohash)
     try:
-        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'r') as f:
-            oldaudiohash = f.readlines().strip()
+        with open(filmdir + '.audiohash', 'r') as f:
+            oldaudiohash = f.readline().strip()
         print('oldaudiohash is: ' + oldaudiohash)
     except:
         print('no audiohash found, making one...')
-        with open(filmfolder + filmname + 'scene' + str(scene).zfill(3) + '/.audiohash', 'w') as f:
+        with open(filmdir+ '.audiohash', 'w') as f:
             f.write(audiohash)
     if audiohash != oldaudiohash or newmix == True:
         renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        print('updating audiohash...')
+        with open(filmdir+ '.audiohash', 'w') as f:
+            f.write(audiohash)
         os.system('cp ' + filmdir + '.dub ' + filmdir + '.rendered_dub')
         print('Audio rendered!')
-    else:
-        print('Already rendered!')
-    #compressing
-    if comp > 0 and os.path.isfile(filename + '.wav'):
-        writemessage('compressing audio')
-        os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        run_command('sox ' + filename + '_tmp.wav ' + filename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
-        os.remove(filename + '_tmp.wav')
-    #muxing mp3 layer to mp4 file
-    if os.path.isfile(filename + '.wav'):
-        os.system('mv ' + filename + '.mp4 ' + filename + '_tmp.mp4')
-        p = Popen(['avconv', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
+        #compressing
+        if comp > 0:
+            writemessage('compressing audio')
+            os.system('cp ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
+            run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+            os.remove(renderfilename + '_tmp.wav')
+        #muxing mp3 layer to mp4 file
+        #count estimated audio filesize with a bitrate of 320 kb/s
+        audiosize = countsize(renderfilename + '.wav') * 0.453
+        os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+        p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
         while p.poll() is None:
             time.sleep(0.2)
             try:
-                rendersize = countsize(filename + '.mp3')
+                rendersize = countsize(renderfilename + '.mp3')
             except:
                 continue
             writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
-        call(['MP4Box', '-add', filename + '_tmp.mp4', '-add', filename + '.mp3', '-new', filename + '.mp4'], shell=False)
-        os.remove(filename + '_tmp.mp4')
-        os.remove(filename + '.mp3')
+        call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+        os.remove(renderfilename + '_tmp.mp4')
+        os.remove(renderfilename + '.mp3')
     else:
-        writemessage('No audio files found!')
-    #    call(['MP4Box', '-add', filename + '.h264', '-new', filename + '.mp4'], shell=False)
-    return filename
+        print('Already rendered!')
+    return renderfilename
 
 #-------------Clip settings---------------
 
-def clipsettings(filmname, filmfolder, scene_or_film, scene):
+def clipsettings(filmfolder, filmname, scene):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     selected = 0
-    header = scene_or_film + ' ' + scene + ' settings'
-    if scene_or_film == 'scene':
+    dubfiles = []
+    dubmix = []
+    if scene:
+        header = 'Scene ' + str(scene) + ' settings'
         filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
-        dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
-    if scene_or_film == 'film':
+        dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
+    else:
+        header = 'Film ' + filmname + ' settings'
         filefolder = filmfolder + filmname + '/'
-        dubfiles, dubmix, newmix = getscenedubs(filmname, filmfolder, scene)
+        dubfiles, dubmix, newmix = getfilmdubs(filmfolder, filmname)
     dubmixcount = 0
     newdub = [1.0, 1.0]
+    dubselected = len(dubfiles)
     while True:
-        dubselected = len(dubfiles)
-        if len(dubfiles) > 0:
+        if dubfiles:
             for i in range(dubselected):
                 dubmixcount += 2
-            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected)] + ': ', ''
-            settings = '', 'o:' + str(newdub[0]) + ' d:' + str(newdub[1]), 'o:' + str(dubmix[dubmixcount]) + ' d:' str(dubmix[dubmixcount + 1]
+            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected) + ': ', ''
+            settings = '', 'o:' + str(round(newdub[0],1)) + ' d:' + str(round(newdub[1],1)), 'o:' + str(round(dubmix[dubmixcount],1)) + ' d:' + str(round(dubmix[dubmixcount + 1],1))
         else:
             menu = 'BACK', 'NEWDUB:'
-            settings = '', 'o:' str(newdub[0]) + ' d:' + str(newdub[1])
+            settings = '', 'o:' + str(round(newdub[0],1)) + ' d:' + str(round(newdub[1],1))
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down' and selected == 2:
             if dubselected < len(dubfiles):
                 dubselected = dubselected + 1
-        elif pressed == 'up':
+        elif pressed == 'up' and selected == 2:
             if dubselected > 0:
                 dubselected = dubselected - 1
-        elif pressed == 'right':
-            if selected < (len(settings) - 1):
-                selected = selected + 1
-        elif pressed == 'up' and selected == 2:
+        elif pressed == 'down' and selected == 1:
+            if round(newdub[0],1) == 1.0 and round(newdub[1],1) > 0.0:
+                newdub[1] -= 0.1
+            if round(newdub[1],1) == 1.0 and round(newdub[0],1) < 1.0:
+                newdub[0] += 0.1
+        elif pressed == 'up' and selected == 1:
+            if round(newdub[1],1) == 1.0 and round(newdub[0],1) > 0.0:
+                newdub[0] -= 0.1
+            if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
+                newdub[1] += 0.1
+        elif pressed == 'down' and selected == 2:
             if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
                 dubmix[dubmixcount + 1] -= 0.1
             if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
                 dubmix[dubmixcount] += 0.1
-        elif pressed == 'down' and selected == 2:
-            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) > 0.0:
-                dubmix[dubmixcount] -= 0.1
-            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) < 1.0:
-                dubmix[dubmixcount + 1] += 0.1
         elif pressed == 'up' and selected == 2:
-            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
-                dubmix[dubmixcount + 1] -= 0.1
-            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
-                dubmix[dubmixcount] += 0.1
-        elif pressed == 'down' and selected == 2:
             if round(newdub[1],1) == 1.0 and round(newdub[0],1) > 0.0:
                 dubmix[dubmixcount] -= 0.1
             if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
                 dubmix[dubmixcount + 1] += 0.1
+        elif pressed == 'right':
+            if selected < (len(settings) - 1):
+                selected = selected + 1
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle' and selected == 'NEWDUB:':
-            return newdub
+            with open(filefolder + ".dub", "a") as f:
+                for i in newdub:
+                    f.write(i)
+            return True
         elif pressed == 'view' and selected == 2:
-            t = os.system('pkill aplay')
-            if t != 0:
-                run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
+            if dubfiles:
+                t = os.system('pkill aplay')
+                if t != 0:
+                    run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
         elif pressed == 'middle' and menu[selected] == 'BACK':
-             with open(filefolder + ".dub", "w") as f:
+            with open(filefolder + ".dub", "w") as f:
                 for i in dubmix:
                     f.write(i)
             writemessage('Returning')
             os.system('pkill aplay')
-            return
+            return False
         time.sleep(0.02)
 
 #---------------Play & DUB--------------------
@@ -1686,8 +1717,6 @@ def main():
     thefile = ''
     beeps = 0
     flip = 'no'
-    renderscene = True
-    renderfilm = True
     #filmnames = os.listdir(filmfolder)
     lenses = os.listdir('lenses/')
     lens = lenses[0]
@@ -1778,28 +1807,20 @@ def main():
                     #writemessage('creating thumbnail')
                     #run_command('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
-                    renderscene = True
-                    renderfilm = True
 
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
                 filmfiles = shotfiles(filmfolder, filmname, scene)
                 if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                     #Check if rendered video exist
-                    if renderscene == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderscene = False
+                    renderfilename = renderscene(filmfolder, filmname, scene)
                     playthis(renderfilename, camera, False, headphoneslevel)
 
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
-                    renderfilename = filmfolder + filmname + '/' + filmname
-                    if renderfilm == True:
-                        render(filmfiles, renderfilename, dub, comp)
-                        renderfilm = False
+                    renderfilename = renderfilm(filmfolder, filmname, comp)
                     playthis(renderfilename, camera, False, headphoneslevel)
 
             #VIEW SHOT OR TAKE
@@ -1813,20 +1834,28 @@ def main():
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
 
-            #DUB
+            #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
-                    dubmix = clipsettings(filmname, filmfolder, scene_or_film, scene):
-                    if dumbmix:
+                    newdub = clipsettings(filmfolder, filmname, scene)
+                    if newdub == True:
+                        renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                         playthis(renderfilename, camera, True, headphoneslevel)
                         run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
                         vumetermessage('new dubbing made!')
-                        dub = [1.0,1.0]
-                        renderfilm = True
                         time.sleep(1)
-                    except:
-                        writemessage('No dubbing file found!')
+
+            #DUB FILM
+            elif pressed == 'middle' and menu[selected] == 'FILM:':
+                filmfiles = viewfilm(filmfolder, filmname)
+                if len(filmfiles) > 0:
+                    newdub = clipsettings(filmfolder, filmname, '')
+                    if newdub == True:
+                        renderfilename = filmfolder + filmname + '/' + filmname
+                        playthis(renderfilename, camera, True, headphoneslevel)
+                        run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
+                        vumetermessage('new dubbing made!')
                         time.sleep(1)
 
             #BACKUP
@@ -1839,9 +1868,7 @@ def main():
                     filmfiles = viewfilm(filmfolder, filmname)
                     if len(filmfiles) > 0:
                         renderfilename = filmfolder + filmname + '/' + filmname
-                        if renderfilm == True:
-                            render(filmfiles, renderfilename, dub, comp)
-                            renderfilm = False
+                        render(filmfiles, renderfilename, dub, comp)
                         cmd = uploadfilm(renderfilename, filmname)
                         if cmd != None:
                             stopinterface(camera)
@@ -1912,8 +1939,6 @@ def main():
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
                     add_organize(filmfolder, filmname)
-                    renderscene = True
-                    renderfilm = True
                     updatethumb = True
                     vumetermessage('Shot ' + str(scene) + ' pasted!')
                     time.sleep(1)
@@ -1922,8 +1947,6 @@ def main():
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
                     add_organize(filmfolder, filmname)
                     shot = countshots(filmname, filmfolder, scene)
-                    renderscene = True
-                    renderfilm = True
                     updatethumb = True
                     vumetermessage('Scene ' + str(scene) + ' pasted!')
                     time.sleep(1)
@@ -1973,16 +1996,12 @@ def main():
             elif pressed == 'delete' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
                 updatethumb = True
                 time.sleep(0.2)
             #shot
             elif pressed == 'delete' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
-                renderscene = True
-                renderfilm = True
                 updatethumb = True
                 time.sleep(0.2)
             #scene
@@ -1990,8 +2009,6 @@ def main():
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
                 shot = countshots(filmname, filmfolder, scene)
-                renderscene = True
-                renderfilm = True
                 updatethumb = True
                 time.sleep(0.2)
             #film
@@ -2036,8 +2053,6 @@ def main():
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                 thefile = foldername + filename 
-                renderscene = True
-                renderfilm = True
                 updatethumb = True
                 compileshot(foldername + filename)
                 delayerr = audiodelay(foldername,filename)
@@ -2120,7 +2135,6 @@ def main():
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
-                renderscene = True
             elif menu[selected] == 'SHOT:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
             elif menu[selected] == 'TAKE:' and recording == False:
@@ -2161,14 +2175,11 @@ def main():
             elif menu[selected] == 'DUB:':
                 if round(dub[1],1) == 1.0 and round(dub[0],1) > 0.0:
                     dub[0] -= 0.1
-                    renderfilm = True
                 if round(dub[0],1) == 1.0 and round(dub[1],1) < 1.0:
                     dub[1] += 0.1
-                    renderfilm = True
             elif menu[selected] == 'COMP:':
                 if comp < 1:
                     comp += 1
-                    renderfilm = True
 
         #LEFT
         elif pressed == 'left':
@@ -2224,7 +2235,6 @@ def main():
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
-                renderscene = True
             elif menu[selected] == 'SHOT:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
             elif menu[selected] == 'TAKE:' and recording == False:
@@ -2265,14 +2275,11 @@ def main():
             elif menu[selected] == 'DUB:':
                 if round(dub[0],1) == 1.0 and round(dub[1],1) > 0.0:
                     dub[1] -= 0.1
-                    renderfilm = True
                 if round(dub[1],1) == 1.0 and round(dub[0],1) < 1.0:
                     dub[0] += 0.1
-                    renderfilm = True
             elif menu[selected] == 'COMP:':
                 if comp > 0:
                     comp -= 1
-                    renderfilm = True
 
         #RIGHT
         elif pressed == 'right':
@@ -2292,7 +2299,7 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp = filmsettings
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp = filmsettings
                 time.sleep(0.2)
             except:
                 logger.warning('could not load film settings')
@@ -2363,7 +2370,7 @@ def main():
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, renderscene, renderfilm, dub, comp)
+                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp)
                     pausetime = time.time()
             #writemessage(pressed)
         time.sleep(keydelay)
