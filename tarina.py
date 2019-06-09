@@ -766,18 +766,6 @@ def compileshot(filename):
         #time.sleep(0.8)
         #run_command('aplay ' + foldername + filename + '.wav')
 
-#-------------Render Check------------
-
-class rerender():
-    def video(filmfolder, filmname):
-        os.system('touch ' + filmfolder + filmname + '/.rendervideo')
-    def audio(filmfolder, filmname):
-        os.system('touch ' + filmfolder + filmname + '/.renderaudio')
-    def scenevideo(filmfolder, filmname, scene):
-        os.system('touch ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/.rendervideo')
-    def sceneaudio(filmfolder, filmname, scene):
-        os.system('touch ' + filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/.renderaudio')
-
 #-------------Get shot files--------------
 
 def shotfiles(filmfolder, filmname, scene):
@@ -794,8 +782,6 @@ def shotfiles(filmfolder, filmname, scene):
     #writemessage(str(len(shotfiles)))
     #time.sleep(2)
     return files
-
-
 
 #---------------Render Video------------------
 
@@ -847,22 +833,20 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         audiomerge.append(f + '.wav')
     audiomerge.append(filename + '.wav')
     call(audiomerge, shell=False)
-    #count estimated audio filesize with a bitrate of 320 kb/s
-    audiosize = countsize(filename + '.wav') * 0.453
-    rendersize = 0
-    #overdubbing
-    dubmixcount = 0
-    dubcount = 1
-    for i in dubfiles:
-        writemessage('Dub ' + str(dubcount) + ' audio found lets mix...')
-        #sox -G -m -v 0.5 test.wav -v 1 guide.wav newtest.wav trim 0 audiolenght
+    #DUBBING
+    p = 1
+    for i in dubmix:
+        writemessage('Dub ' + str(p) + ' audio found lets mix...')
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        run_command('sox -V0 -G -m -v ' + str(round(dubmix[dubmixcount],1)) + ' ' + filename + '_dub' + str(dubcount) + '.wav -v ' + str(round(dubmix[dubmixcount + 1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
-        dubmixcount += 2
+        #Fade
+        run_command('sox -V0 -G ' + filename + '_dub' + str(p) + '.wav ' + filename + '_fade.wav fade ' + str(round(i[2],1)) + ' 0 ' + str(round(i[3],1)))
+        run_command('sox -V0 -G -m -v ' + str(round(i[0],1)) + ' ' + filename + '_fade.wav -v ' + str(round(i[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        p += 1
         os.remove(filename + '_tmp.wav')
-        print('Dub mix ' + str(dubcount) + ' done!')
+        os.remove(filename + '_fade.wav')
+        print('Dub mix ' + str(p) + ' done!')
     return
 
 #-------------Get scene files--------------
@@ -879,8 +863,6 @@ def scenefiles(filmfolder, filmname):
     #writemessage(str(len(shotfiles)))
     #time.sleep(2)
     return files
-
-
 
 #-------------Render Scene-------------
 
@@ -913,9 +895,9 @@ def renderscene(filmfolder, filmname, scene):
     oldaudiohash = ''
     for p in filmfiles:
         audiohash += str(int(countsize(p + '.wav')))
-    dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
+    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
     for p in dubfiles:
-        audiohash += str(int(countsize(p + '.wav')))
+        audiohash += str(int(countsize(p)))
     print('Audiohash of scene is: ' + audiohash)
     try:
         with open(scenedir + '.audiohash', 'r') as f:
@@ -972,9 +954,9 @@ def renderfilm(filmfolder, filmname, comp):
     for p in filmfiles:
         print(p)
         audiohash += str(int(countsize(p + '.wav')))
-    dubfiles, dubmix, newmix = getfilmdubs(filmfolder, filmname)
+    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
     for p in dubfiles:
-        audiohash += str(int(countsize(p + '.wav'))) 
+        audiohash += str(int(countsize(p)))
     print('Audiohash of film is: ' + audiohash)
     try:
         with open(filmdir + '.audiohash', 'r') as f:
@@ -1018,92 +1000,52 @@ def renderfilm(filmfolder, filmname, comp):
         print('Already rendered!')
     return renderfilename
 
-#-------------Get scene dub files-----------
+#-------------Get dub files-----------
 
-def getscenedubs(filmfolder, filmname, scene):
+def getdubs(filmfolder, filmname, scene):
     #search for dub files
     print('getting scene dubs')
     dubfiles = []
     dubmix = []
     rendered_dub = []
-    filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+    rerender = False
+    if scene:
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+    else:
+        filefolder = filmfolder + filmname + '/'
     allfiles = os.listdir(filefolder)
     for a in allfiles:
-        if 'scene' + str(scene).zfill(3) + '_dub' in a:
+        if '_dub' in a:
             print('Dub audio found! ' + filefolder + a)
             dubfiles.append(filefolder + a)
     #check if dub mix has changed
-    if dubfiles:
+    dubnr = 1
+    for i in dubfiles:
+        dub = []
         try:
-            with open(filefolder + '.dub', 'r') as f:
+            with open(filefolder + '.dub' + str(dubnr), 'r') as f:
                 dubstr = f.read().splitlines()
             for i in dubstr:
-                dubmix.append(float(i))
-            print('dubmix loaded!')
+                dub.append(float(i))
+            print('dub ' + str(dubnr) + ' loaded!')
         except:
             print('cant find .dub file')
-            for i in dubfiles:
-                dubmix.extend([1.0, 1.0])
-            with open(filefolder + ".dub", "w") as f:
-                for i in dubmix:
+            dub = [1.0, 1.0, 0.0, 0.0]
+            with open(filefolder + ".dub" + str(dubnr), "w") as f:
+                for i in dub:
                     f.write(str(i) + '\n')
         try:
-            with open(filefolder + '.rendered_dub', 'r') as f:
+            with open(filefolder + '.rendered_dub' + str(dubnr), 'r') as f:
                 dubstr = f.read().splitlines()
             for i in dubstr:
                 rendered_dub.append(float(i))
             print('rendered dub loaded')
         except:
             print('no rendered dubmix found!')
-        if rendered_dub != dubmix:
-            return dubfiles, dubmix, True
-        else:
-            return dubfiles, dubmix, False
-    else:
-        return '', '', False
-
-#-------------Get film dub files-----------
-
-def getfilmdubs(filmfolder, filmname):
-    #search for dub files
-    dubfiles = []
-    dubmix = []
-    rendered_dub = []
-    filefolder = filmfolder + filmname + '/'
-    allfiles = os.listdir(filefolder)
-    for a in allfiles:
-        if filmname + '_dub' in a:
-            print('Dub audio found! ' + filefolder + a)
-            dubfiles.append(filefolder + a)
-    #check if dub mix has changed
-    if dubfiles:
-        try:
-            with open(filefolder + '.dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                dubmix.append(float(i))
-            print('dub is: ' + dubmix)
-        except:
-            print('cant find .dub file')
-            for i in dubfiles:
-                dubmix.extend([1.0, 1.0])
-            with open(filefolder + ".dub", "w") as f:
-                for i in dubmix:
-                    f.write(str(i) + '\n')
-        try:
-            with open(filefolder + '.renderd_dub', 'r') as f:
-                dubstr = f.read().splitlines()
-            for i in dubstr:
-                rendered_dub.append(float(i))
-            print('dub is: ' + rendered_dub)
-        except:
-            print('no rendered dubmix found!')
-        if rendered_dub != dubmix:
-            return dubfiles, dubmix, True
-        else:
-            return dubfiles, dubmix, False
-    else:
-        return '', '', False
+        if rendered_dub != dub:
+            rerender = True
+        dubmix.append(dub)
+    return dubfiles, dubmix, rerender
 
 #-------------Clip settings---------------
 
@@ -1118,75 +1060,119 @@ def clipsettings(filmfolder, filmname, scene):
     if scene:
         header = 'Scene ' + str(scene) + ' settings'
         filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
-        dubfiles, dubmix, newmix = getscenedubs(filmfolder, filmname, scene)
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
     else:
         header = 'Film ' + filmname + ' settings'
         filefolder = filmfolder + filmname + '/'
-        dubfiles, dubmix, newmix = getfilmdubs(filmfolder, filmname)
-    dubmixcount = 0
-    newdub = [1.0, 1.0]
-    dubselected = len(dubfiles)
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
+    newdub = [1.0, 1.0, 0.0, 0.0]
+    dubselected = len(dubfiles) - 1
+    dubrecord = ''
     while True:
+        nmix = round(newdub[0],1)
+        ndub = round(newdub[1],1)
+        nfadein = round(newdub[2],1)
+        nfadeout = round(newdub[3],1)
         if dubfiles:
-            for i in range(dubselected - 1):
-                dubmixcount += 2
-            menu = 'BACK', 'NEWDUB:', 'DUB' + str(dubselected), ''
-            settings = '', str(round(newdub[0],1)) + '/' + str(round(newdub[1],1)), '', str(round(dubmix[dubmixcount],1)) + '/' + str(round(dubmix[dubmixcount + 1],1))
+            mix = round(dubmix[dubselected][0],1)
+            dub = round(dubmix[dubselected][1],1)
+            fadein = round(dubmix[dubselected][2],1)
+            fadeout = round(dubmix[dubselected][3],1)
+            menu = 'BACK', 'NEWDUB:', '', '', 'DUB' + str(dubselected + 1), '', '', ''
+            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout), '', str(mix) + '/', '', str(dub), 'in:' + str(fadein) + ' out:' + str(fadeout)
         else:
-            menu = 'BACK', 'NEWDUB:'
-            settings = '', str(round(newdub[0],1)) + '/' + str(round(newdub[1],1))
+            menu = 'BACK', 'NEWDUB:', '', ''
+            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'down' and selected == 2:
-            if dubselected < len(dubfiles):
-                dubselected = dubselected + 1
-        elif pressed == 'up' and selected == 2:
-            if dubselected > 1:
-                dubselected = dubselected - 1
-        elif pressed == 'down' and selected == 1:
-            if round(newdub[0],1) == 1.0 and round(newdub[1],1) > 0.0:
+
+        #NEW DUB SETTINGS
+        if pressed == 'down' and selected == 1:
+            if newdub[0] == 1.0 and newdub[1] > 0.01:
                 newdub[1] -= 0.1
-            if round(newdub[1],1) == 1.0 and round(newdub[0],1) < 1.0:
+            if newdub[1] == 1.0 and newdub[0] < 1.0:
                 newdub[0] += 0.1
         elif pressed == 'up' and selected == 1:
-            if round(newdub[1],1) == 1.0 and round(newdub[0],1) > 0.0:
+            if newdub[1] == 1.0 and newdub[0] > 0.01:
                 newdub[0] -= 0.1
-            if round(newdub[0],1) == 1.0 and round(newdub[1],1) < 1.0:
+            if newdub[0] == 1.0 and newdub[1] < 1.0:
                 newdub[1] += 0.1
-        elif pressed == 'down' and selected == 3:
-            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) > 0.0:
-                dubmix[dubmixcount + 1] -= 0.1
-            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) < 1.0:
-                dubmix[dubmixcount] += 0.1
+        elif pressed == 'up' and selected == 2:
+            newdub[2] += 0.1
+        elif pressed == 'down' and selected == 2:
+            if newdub[2] > 0.01:
+                newdub[2] -= 0.1
         elif pressed == 'up' and selected == 3:
-            if round(dubmix[dubmixcount + 1],1) == 1.0 and round(dubmix[dubmixcount],1) > 0.0:
-                dubmix[dubmixcount] -= 0.1
-            if round(dubmix[dubmixcount],1) == 1.0 and round(dubmix[dubmixcount + 1],1) < 1.0:
-                dubmix[dubmixcount + 1] += 0.1
+            newdub[3] += 0.1
+        elif pressed == 'down' and selected == 3:
+            if newdub[3] > 0.01:
+                newdub[3] -= 0.1
+        elif pressed == 'middle' and selected == 1:
+            dubmix.append(newdub)
+            if scene:
+                dubrecord = filefolder + 'scene' + str(scene).zfill(3) + '_dub' + str(len(dubmix)) + '.wav'
+            else:
+                dubrecord = filefolder + filmname + '_dub' + str(len(dubmix)) + '.wav'
+            break
+
+        #DUB SETTINGS
+        elif pressed == 'down' and selected == 4:
+            if dubselected + 1 < len(dubfiles):
+                dubselected = dubselected + 1
+        elif pressed == 'up' and selected == 4:
+            if dubselected > 0:
+                dubselected = dubselected - 1
+        elif pressed == 'middle' and selected == 4:
+            if scene:
+                dubrecord = filefolder + 'scene' + str(scene).zfill(3) + '_dub' + str(dubselected + 1) + '.wav'
+            else:
+                dubrecord = filefolder + filmname + '_dub' + str(dubselected + 1) + '.wav'
+            break
+        elif pressed == 'down' and selected == 5:
+            if dubmix[dubselected][0] == 1.0 and dubmix[dubselected][1] > 0.01:
+                dubmix[dubselected][1] -= 0.1
+            if dubmix[dubselected][1] == 1.0 and dubmix[dubselected][0] < 1.0:
+                dubmix[dubselected][0] += 0.1
+        elif pressed == 'up' and selected == 5:
+            if dubmix[dubselected][1] == 1.0 and dubmix[dubselected][0] > 0.01:
+                dubmix[dubselected][0] -= 0.1
+            if dubmix[dubselected][0] == 1.0 and dubmix[dubselected][1] < 1.0:
+                dubmix[dubselected][1] += 0.1
+        elif pressed == 'up' and selected == 6:
+            dubmix[dubselected][2] += 0.1
+        elif pressed == 'down' and selected == 6:
+            if dubmix[dubselected][2] > 0.01:
+                dubmix[dubselected][2] -= 0.1
+        elif pressed == 'up' and selected == 7:
+            dubmix[dubselected][3] += 0.1
+        elif pressed == 'down' and selected == 7:
+            if dubmix[dubselected][3] > 0.01:
+                dubmix[dubselected][3] -= 0.1
+
         elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif pressed == 'middle' and menu[selected] == 'NEWDUB:':
-            with open(filefolder + ".dub", "a") as f:
-                for i in newdub:
-                    f.write(str(i) + '\n')
-            return True
         elif pressed == 'view' and selected == 2:
             if dubfiles:
                 t = os.system('pkill aplay')
                 if t != 0:
                     run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
         elif pressed == 'middle' and menu[selected] == 'BACK':
-            with open(filefolder + ".dub", "w") as f:
-                for i in dubmix:
-                    f.write(str(i) + '\n')
-            writemessage('Returning')
             os.system('pkill aplay')
-            return False
+            break
         time.sleep(0.02)
+    #Save dubmix before returning
+    if dubmix:
+        c = 1
+        for i in dubmix:
+            with open(filefolder + ".dub" + str(c), "w") as f:
+                for p in i:
+                    f.write(str(round(p,1)) + '\n')
+            c += 1
+    return dubrecord
 
 #---------------Play & DUB--------------------
 
@@ -1840,11 +1826,11 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
                     newdub = clipsettings(filmfolder, filmname, scene)
-                    if newdub == True:
+                    if newdub:
                         renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
                         playthis(renderfilename, camera, True, headphoneslevel)
-                        run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
-                        vumetermessage('new dubbing made!')
+                        run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                        vumetermessage('new scene dubbing made!')
                         time.sleep(1)
 
             #DUB FILM
@@ -1852,11 +1838,11 @@ def main():
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
                     newdub = clipsettings(filmfolder, filmname, '')
-                    if newdub == True:
+                    if newdub:
                         renderfilename = filmfolder + filmname + '/' + filmname
                         playthis(renderfilename, camera, True, headphoneslevel)
-                        run_command('sox -V0 -G /dev/shm/dub.wav ' + renderfilename + '_dub.wav')
-                        vumetermessage('new dubbing made!')
+                        run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                        vumetermessage('new film dubbing made!')
                         time.sleep(1)
 
             #BACKUP
