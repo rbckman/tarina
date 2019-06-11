@@ -54,8 +54,8 @@ class logger():
 
 #--------------Save settings-----------------
 
-def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp
+def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp):
+    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
         logger.info("settings saved")
@@ -674,7 +674,8 @@ def organize(filmfolder, filmname):
         organized_nr = 1
         for p in sorted(shots):
             if 'insert' in p:
-                add_organize(filmfolder, filmname)
+                #add_organize(filmfolder, filmname)
+                pass
             elif 'shot' in p:
                 #print(p)
                 unorganized_nr = int(p[-3:])
@@ -690,7 +691,8 @@ def organize(filmfolder, filmname):
     organized_nr = 1
     for i in sorted(scenes):
         if 'insert' in i:
-            add_organize(filmfolder, filmname)
+            #add_organize(filmfolder, filmname)
+            pass
         elif 'scene' in i:
             #print(i)
             unorganized_nr = int(i[-3:])
@@ -710,10 +712,15 @@ def organize(filmfolder, filmname):
 
 def add_organize(filmfolder, filmname):
     scenes = next(os.walk(filmfolder + filmname))[1]
-
+    for i in scenes:
+        if 'scene' not in i:
+            scenes.remove(i)
     # Shots
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
+        for c in shots:
+            if 'shot' not in c:
+                shots.remove(c)
         organized_nr = len(shots)
         for p in sorted(shots, reverse=True):
             if 'insert' in p:
@@ -835,16 +842,16 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     call(audiomerge, shell=False)
     #DUBBING
     p = 1
-    for i in dubmix:
+    for i, d in zip(dubmix, dubfiles):
         writemessage('Dub ' + str(p) + ' audio found lets mix...')
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
         #Fade
-        run_command('sox -V0 -G ' + filename + '_dub' + str(p) + '.wav ' + filename + '_fade.wav fade ' + str(round(i[2],1)) + ' 0 ' + str(round(i[3],1)))
-        run_command('sox -V0 -G -m -v ' + str(round(i[0],1)) + ' ' + filename + '_fade.wav -v ' + str(round(i[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
+        run_command('sox -V0 -G ' + d + ' /dev/shm/fade.wav fade ' + str(round(i[2],1)) + ' 0 ' + str(round(i[3],1)))
+        run_command('sox -V0 -G -m -v ' + str(round(i[0],1)) + ' /dev/shm/fade.wav -v ' + str(round(i[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
-        os.remove(filename + '_fade.wav')
+        os.remove('/dev/shm/fade.wav')
         print('Dub mix ' + str(p) + ' done!')
         p += 1
     return
@@ -913,7 +920,7 @@ def renderscene(filmfolder, filmname, scene):
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
         for i in range(len(dubfiles)):
-            os.system('cp ' + scenedir + '.dub' + str(i + 1) + ' ' + scenedir + '.rdub' + str(i + 1))
+            os.system('cp ' + scenedir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + scenedir + '/dub/.rendered' + str(i + 1).zfill(3))
         print('Audio rendered!')
     else:
         print('Already rendered!')
@@ -973,7 +980,7 @@ def renderfilm(filmfolder, filmname, comp):
         with open(filmdir+ '.audiohash', 'w') as f:
             f.write(audiohash)
         for i in range(len(dubfiles)):
-            os.system('cp ' + filmdir + '.dub' + str(i + 1) + ' ' + filmdir + '.rdub' + str(i + 1))
+            os.system('cp ' + filmdir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + filmdir + '/dub/.rendered' + str(i + 1).zfill(3))
         print('Audio rendered!')
         #compressing
         if comp > 0:
@@ -1011,12 +1018,16 @@ def getdubs(filmfolder, filmname, scene):
     dubmix = []
     rerender = False
     if scene:
-        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/dub/'
     else:
-        filefolder = filmfolder + filmname + '/'
-    allfiles = os.listdir(filefolder)
+        filefolder = filmfolder + filmname + '/dub/'
+    try:
+        allfiles = os.listdir(filefolder)
+    except:
+        print('no dubs')
+        return dubfiles, dubmix, rerender
     for a in allfiles:
-        if '_dub' in a:
+        if 'dub' in a:
             print('Dub audio found! ' + filefolder + a)
             dubfiles.append(filefolder + a)
     #check if dub mix has changed
@@ -1025,20 +1036,20 @@ def getdubs(filmfolder, filmname, scene):
         dub = []
         rendered_dub = []
         try:
-            with open(filefolder + '.dub' + str(dubnr), 'r') as f:
+            with open(filefolder + '.settings' + str(dubnr).zfill(3), 'r') as f:
                 dubstr = f.read().splitlines()
             for i in dubstr:
                 dub.append(float(i))
-            print('dub ' + str(dubnr) + ' loaded!')
+            print('dub ' + str(dubnr).zfill(3) + ' loaded!')
             print(dub)
         except:
-            print('cant find .dub file')
+            print('cant find settings file')
             dub = [1.0, 1.0, 0.0, 0.0]
-            with open(filefolder + ".dub" + str(dubnr), "w") as f:
+            with open(filefolder + ".settings" + str(dubnr).zfill(3), "w") as f:
                 for i in dub:
                     f.write(str(i) + '\n')
         try:
-            with open(filefolder + '.rdub' + str(dubnr), 'r') as f:
+            with open(filefolder + '.rendered' + str(dubnr).zfill(3), 'r') as f:
                 dubstr = f.read().splitlines()
             for i in dubstr:
                 rendered_dub.append(float(i))
@@ -1063,12 +1074,12 @@ def clipsettings(filmfolder, filmname, scene):
     dubfiles = []
     dubmix = []
     if scene:
-        header = 'Scene ' + str(scene) + ' settings'
-        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+        header = 'Scene ' + str(scene) + ' dubbing settings'
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/dub/'
         dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
     else:
-        header = 'Film ' + filmname + ' settings'
-        filefolder = filmfolder + filmname + '/'
+        header = 'Film ' + filmname + ' dubbing settings'
+        filefolder = filmfolder + filmname + '/dub/'
         dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
     newdub = [1.0, 1.0, 0.0, 0.0]
     dubselected = len(dubfiles) - 1
@@ -1083,21 +1094,21 @@ def clipsettings(filmfolder, filmname, scene):
             dub = round(dubmix[dubselected][1],1)
             fadein = round(dubmix[dubselected][2],1)
             fadeout = round(dubmix[dubselected][3],1)
-            menu = 'BACK', 'NEWDUB:', '', '', 'DUB' + str(dubselected + 1), '', '', ''
-            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout), '', str(mix) + '/' + str(dub), 'in:' + str(fadein), ' out:' + str(fadeout)
+            menu = 'BACK', 'ADD:', '', '', 'DUB' + str(dubselected + 1) + ':', '', '', ''
+            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout), '', str(mix) + '/' + str(dub), 'in:' + str(fadein), 'out:' + str(fadeout)
         else:
-            menu = 'BACK', 'NEWDUB:', '', ''
+            menu = 'BACK', 'ADD:', '', ''
             settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
 
         #NEW DUB SETTINGS
-        if pressed == 'down' and selected == 1:
+        if pressed == 'up' and selected == 1:
             if newdub[0] > 0.99 and newdub[1] > 0.01:
                 newdub[1] -= 0.1
             if newdub[1] > 0.99 and newdub[0] < 0.99:
                 newdub[0] += 0.1
-        elif pressed == 'up' and selected == 1:
+        elif pressed == 'down' and selected == 1:
             if newdub[1] > 0.99 and newdub[0] > 0.01:
                 newdub[0] -= 0.1
             if newdub[0] > 0.99 and newdub[1] < 0.99:
@@ -1114,10 +1125,7 @@ def clipsettings(filmfolder, filmname, scene):
                 newdub[3] -= 0.1
         elif pressed == 'middle' and selected == 1:
             dubmix.append(newdub)
-            if scene:
-                dubrecord = filefolder + 'scene' + str(scene).zfill(3) + '_dub' + str(len(dubmix)) + '.wav'
-            else:
-                dubrecord = filefolder + filmname + '_dub' + str(len(dubmix)) + '.wav'
+            dubrecord = filefolder + 'dub' + str(len(dubmix)).zfill(3) + '.wav'
             break
 
         #DUB SETTINGS
@@ -1128,17 +1136,14 @@ def clipsettings(filmfolder, filmname, scene):
             if dubselected > 0:
                 dubselected = dubselected - 1
         elif pressed == 'middle' and selected == 4:
-            if scene:
-                dubrecord = filefolder + 'scene' + str(scene).zfill(3) + '_dub' + str(dubselected + 1) + '.wav'
-            else:
-                dubrecord = filefolder + filmname + '_dub' + str(dubselected + 1) + '.wav'
+            dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
             break
-        elif pressed == 'down' and selected == 5:
+        elif pressed == 'up' and selected == 5:
             if dubmix[dubselected][0] >= 0.99 and dubmix[dubselected][1] > 0.01:
                 dubmix[dubselected][1] -= 0.1
             if dubmix[dubselected][1] >= 0.99 and dubmix[dubselected][0] < 0.99:
                 dubmix[dubselected][0] += 0.1
-        elif pressed == 'up' and selected == 5:
+        elif pressed == 'down' and selected == 5:
             if dubmix[dubselected][1] >= 0.99 and dubmix[dubselected][0] > 0.01:
                 dubmix[dubselected][0] -= 0.1
             if dubmix[dubselected][0] >= 0.99 and dubmix[dubselected][1] < 0.99:
@@ -1171,9 +1176,11 @@ def clipsettings(filmfolder, filmname, scene):
         time.sleep(0.02)
     #Save dubmix before returning
     if dubmix:
+        if os.path.isdir(filefolder) == False:
+            os.makedirs(filefolder)
         c = 1
         for i in dubmix:
-            with open(filefolder + ".dub" + str(c), "w") as f:
+            with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
                 for p in i:
                     f.write(str(round(p,1)) + '\n')
                     print(str(round(p,1)))
@@ -1182,7 +1189,7 @@ def clipsettings(filmfolder, filmname, scene):
 
 #---------------Play & DUB--------------------
 
-def playthis(filename, camera, dub, headphoneslevel):
+def playdub(filename, dub, headphoneslevel):
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
         logger.info("no file to play")
@@ -1193,7 +1200,6 @@ def playthis(filename, camera, dub, headphoneslevel):
     buttontime = time.time()
     holdbutton = ''
     playing = False
-    camera.stop_preview()
     try:
         player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
     except:
@@ -1269,8 +1275,8 @@ def playthis(filename, camera, dub, headphoneslevel):
                     os.system('pkill omxplayer')
                 if dub == True:
                     os.system('pkill arecord')
+                    time.sleep(0.2)
                 return
-
             elif selected == 1:
                 try:
                     os.system('pkill aplay')
@@ -1684,7 +1690,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'DUB:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW'
     #STANDARD VALUES
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -1720,7 +1726,6 @@ def main():
     updatethumb = False
     delayerr = ''
     loadfilmsettings = True
-    dub = [1.0,0.0]
     comp = 1
 
     #Save settings every 5 seconds
@@ -1807,14 +1812,14 @@ def main():
                 if len(filmfiles) > 0:
                     #Check if rendered video exist
                     renderfilename = renderscene(filmfolder, filmname, scene)
-                    playthis(renderfilename, camera, False, headphoneslevel)
+                    playdub(renderfilename, False, headphoneslevel)
 
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
                     renderfilename = renderfilm(filmfolder, filmname, comp)
-                    playthis(renderfilename, camera, False, headphoneslevel)
+                    playdub(renderfilename, False, headphoneslevel)
 
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -1823,7 +1828,7 @@ def main():
                     removeimage(camera, overlay)
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
-                    playthis(foldername + filename, camera, False, headphoneslevel)
+                    playdub(foldername + filename, False, headphoneslevel)
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
 
@@ -1834,7 +1839,7 @@ def main():
                     newdub = clipsettings(filmfolder, filmname, scene)
                     if newdub:
                         renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                        playthis(renderfilename, camera, True, headphoneslevel)
+                        playdub(renderfilename, True, headphoneslevel)
                         run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                         vumetermessage('new scene dubbing made!')
                         time.sleep(1)
@@ -1846,7 +1851,7 @@ def main():
                     newdub = clipsettings(filmfolder, filmname, '')
                     if newdub:
                         renderfilename = filmfolder + filmname + '/' + filmname
-                        playthis(renderfilename, camera, True, headphoneslevel)
+                        playdub(renderfilename, True, headphoneslevel)
                         run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                         vumetermessage('new film dubbing made!')
                         time.sleep(1)
@@ -1860,8 +1865,7 @@ def main():
                 if webz_on() == True:
                     filmfiles = viewfilm(filmfolder, filmname)
                     if len(filmfiles) > 0:
-                        renderfilename = filmfolder + filmname + '/' + filmname
-                        render(filmfiles, renderfilename, dub, comp)
+                        renderfilename = renderfilm(filmfolder, filmname, comp)
                         cmd = uploadfilm(renderfilename, filmname)
                         if cmd != None:
                             stopinterface(camera)
@@ -1927,7 +1931,7 @@ def main():
                 time.sleep(1)
 
             #PASTE SHOT and PASTE SCENE
-            elif event == 'P' and recordable == False:
+            elif event == 'P':
                 if menu[selected] == 'SHOT:' and yankedshot:
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
@@ -1944,11 +1948,34 @@ def main():
                     vumetermessage('Scene ' + str(scene) + ' pasted!')
                     time.sleep(1)
 
+            #MOVE SHOT and MOVE SCENE
+            elif event == 'M':
+                if menu[selected] == 'SHOT:' and yankedshot:
+                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                    os.system('cp -r ' + yankedshot + ' ' + pasteshot)
+                    os.system('rm -r ' + yankedshot)
+                    organize(filmfolder, filmname)
+                    add_organize(filmfolder, filmname)
+                    updatethumb = True
+                    vumetermessage('Shot ' + str(scene) + ' moved!')
+                    time.sleep(1)
+                elif menu[selected] == 'SCENE:' and yankedscene:
+                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                    os.system('cp -r ' + yankedscene + ' ' + pastescene)
+                    os.system('rm -r ' + yankedscene)
+                    organize(filmfolder, filmname)
+                    add_organize(filmfolder, filmname)
+                    shot = countshots(filmname, filmfolder, scene)
+                    updatethumb = True
+                    vumetermessage('Scene ' + str(scene) + ' moved!')
+                    time.sleep(1)
+
             #INSERT SHOT
             elif event == 'I' and menu[selected] == 'SHOT:' and recordable == False:
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
-                add_organize(filmfolder, filmname)
                 os.makedirs(insertshot)
+                add_organize(filmfolder, filmname)
+                updatethumb = True
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
 
@@ -1984,6 +2011,7 @@ def main():
                     loadfilmsetings = True
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
+
             #REMOVE
             #take
             elif pressed == 'delete' and menu[selected] == 'TAKE:':
@@ -2165,11 +2193,6 @@ def main():
                 #lensshade = npzfile['lens_shading_table']
                 table = read_table('lenses/' + lens)
                 camera.lens_shading_table = table
-            elif menu[selected] == 'DUB:':
-                if round(dub[1],1) == 1.0 and round(dub[0],1) > 0.0:
-                    dub[0] -= 0.1
-                if round(dub[0],1) == 1.0 and round(dub[1],1) < 1.0:
-                    dub[1] += 0.1
             elif menu[selected] == 'COMP:':
                 if comp < 1:
                     comp += 1
@@ -2351,7 +2374,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp),'o' + str(round(dub[0],1)) + ' d' + str(round(dub[1],1)), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 10:
@@ -2363,7 +2386,7 @@ def main():
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp)
+                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp)
                     pausetime = time.time()
             #writemessage(pressed)
         time.sleep(keydelay)
