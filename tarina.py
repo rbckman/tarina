@@ -393,21 +393,26 @@ def loadfilm(filmname, filmfolder):
 
 #-------------New film----------------
 
-def nameyourfilm(filmfolder, filmname, abc):
+def nameyourfilm(filmfolder, filmname, abc, newfilm):
     oldfilmname = filmname
+    if newfilm == True:
+        filmname = ''
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     abcx = 0
-    thefuck = 'Up, Down (select characters) Right (next). Middle (done)'
+    helpmessage = 'Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
     cursor = '_'
     blinking = True
     pausetime = time.time()
     while True:
-        message = 'Film name: ' + filmname
+        if newfilm == True:
+            message = 'New film name: ' + filmname
+        else:
+            message = 'Edit film name: ' + filmname
         writemessage(message + cursor)
-        vumetermessage(thefuck)
+        vumetermessage(helpmessage)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
             pausetime = time.time()
@@ -425,8 +430,8 @@ def nameyourfilm(filmfolder, filmname, abc):
                 filmname = filmname + abc[abcx]
                 cursor = abc[abcx]
             else:
-                thefuck = 'Yo, maximum characters reached bro!'
-        elif pressed == 'left' or event == 263:
+                helpmessage = 'Yo, maximum characters reached bro!'
+        elif pressed == 'left' or pressed == 'remove':
             pausetime = time.time()
             if len(filmname) > 0:
                 filmname = filmname[:-1]
@@ -436,15 +441,17 @@ def nameyourfilm(filmfolder, filmname, abc):
                 if cursor != '_':
                     filmname = filmname + abc[abcx]
                 try:
-                    if filmname in getfilms(filmfolder)[0]:
-                        thefuck = 'this filmname is already taken! chose another name!'
-                    if filmname not in getfilms(filmfolder)[0]:
+                    if filmname == oldfilmname:
+                        return oldfilmname
+                    elif filmname in getfilms(filmfolder)[0]:
+                        helpmessage = 'this filmname is already taken! chose another name!'
+                    elif filmname not in getfilms(filmfolder)[0]:
                         logger.info("New film " + filmname)
                         return(filmname)
                 except:
                     logger.info("New film " + filmname)
                     return(filmname)
-        elif event == 27:
+        elif pressed == 'retake':
             return oldfilmname
         elif event in abc:
             pausetime = time.time()
@@ -640,7 +647,9 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 
 def organize(filmfolder, filmname):
     scenes = next(os.walk(filmfolder + filmname))[1]
-
+    for i in scenes:
+        if 'scene' not in i:
+            scenes.remove(i)
     # Takes
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
@@ -723,8 +732,10 @@ def add_organize(filmfolder, filmname):
                 shots.remove(c)
         organized_nr = len(shots)
         for p in sorted(shots, reverse=True):
-            if 'insert' in p:
+            if 'yanked' in p:
                 #print(p)
+                os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr - 1).zfill(3) + '_yanked ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
+            elif 'insert' in p:
                 os.system('mv -n ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3))
                 run_command('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(organized_nr).zfill(3) + '/.placeholder')
             elif 'shot' in p:
@@ -741,8 +752,10 @@ def add_organize(filmfolder, filmname):
     # Scenes
     organized_nr = len(scenes)
     for i in sorted(scenes, reverse=True):
-        if 'insert' in i:
+        if 'yanked' in i:
             #print(i)
+            os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_yanked ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
+        elif 'insert' in p:
             os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
             run_command('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
         elif 'scene' in i:
@@ -1081,7 +1094,7 @@ def clipsettings(filmfolder, filmname, scene):
         header = 'Film ' + filmname + ' dubbing settings'
         filefolder = filmfolder + filmname + '/dub/'
         dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
-    newdub = [1.0, 1.0, 0.0, 0.0]
+    newdub = [1.0, 1.0, 0.1, 0.1]
     dubselected = len(dubfiles) - 1
     dubrecord = ''
     while True:
@@ -1190,35 +1203,40 @@ def clipsettings(filmfolder, filmname, scene):
 #---------------Play & DUB--------------------
 
 def playdub(filename, dub, headphoneslevel):
+    video = True
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
         logger.info("no file to play")
-        return
+        if dub == True:
+            video = False
+        else:
+            return
     t = 0
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     playing = False
-    try:
-        player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
-    except:
-        writemessage('Something wrong with omxplayer')
-        time.sleep(2)
-        return
-    a = 0
-    while playing != True:
+    if video == True:
         try:
-            playing = player.is_playing()
+            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
         except:
-            time.sleep(0.01)
-        if a > 100:
-            writemessage('Something wrong with the clip!')
+            writemessage('Something wrong with omxplayer')
             time.sleep(2)
             return
-        a += 1
-    player.seek(0)
-    player.pause()
+        a = 0
+        while playing != True:
+            try:
+                playing = player.is_playing()
+            except:
+                time.sleep(0.01)
+            if a > 100:
+                writemessage('Something wrong with the clip!')
+                time.sleep(2)
+                return
+            a += 1
+        player.seek(0)
+        player.pause()
     if dub == False:
         writemessage('Starting omxplayer')
         menu = 'STOP', 'PLAY FROM START', 'PHONES:'
@@ -1234,7 +1252,8 @@ def playdub(filename, dub, headphoneslevel):
                 writemessage('Dubbing in ' + str(3 - p) + 's')
                 time.sleep(1)
                 p+=1
-        player.play()
+        if video == True:
+            player.play()
         run_command('aplay -D plughw:0 ' + filename + '.wav &')
         if dub == True:
             run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
@@ -1244,7 +1263,10 @@ def playdub(filename, dub, headphoneslevel):
     starttime = time.time()
     selected = 0
     while clipduration > t:
-        header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
+        if dub == True:
+            header = 'Dubbing ' + str(round(t,1))
+        else:
+            header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
         settings = '', '', str(headphoneslevel)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1266,8 +1288,9 @@ def playdub(filename, dub, headphoneslevel):
             time.sleep(0.2)
             if menu[selected] == 'STOP' or player.playback_status() == "Stopped":
                 try:
-                    player.stop()
-                    player.quit()
+                    if video == True:
+                        player.stop()
+                        player.quit()
                     os.system('pkill aplay') 
                 except:
                     #kill it if it dont stop
@@ -1282,8 +1305,9 @@ def playdub(filename, dub, headphoneslevel):
                     os.system('pkill aplay')
                     if dub == True:
                         os.system('pkill arecord')
-                    player.pause()
-                    player.set_position(0)
+                    if video == True:
+                        player.pause()
+                        player.set_position(0)
                     if dub == True:
                         p = 0
                         while p < 3:
@@ -1299,7 +1323,8 @@ def playdub(filename, dub, headphoneslevel):
                 starttime = time.time()
         time.sleep(0.02)
         t = time.time() - starttime
-    player.quit()
+    if video == True:
+        player.quit()
     #os.system('pkill dbus-daemon')
 
 #---------------View Film--------------------
@@ -1547,7 +1572,7 @@ def waitforanykey():
         with term.cbreak():
             val = term.inkey(timeout=0)
         if not val:
-            event = -1
+            event = ''
         elif val.is_sequence:
             event = val.name
         elif val:
@@ -1558,20 +1583,21 @@ def waitforanykey():
         else:
             readbus = 255
             readbus2 = 247
-        if readbus != 255 or readbus2 != 247 or event != -1:
+        if readbus != 255 or readbus2 != 247 or event != '':
             time.sleep(0.05)
             vumetermessage(' ')
             return
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    with term.cbreak():
-        val = term.inkey(timeout=0)
-    if not val:
-        event = -1
-    elif val.is_sequence:
+    val = term.inkey(timeout=0)
+    if val.is_sequence:
         event = val.name
+        print(event)
     elif val:
         event = val
+        print(event)
+    else:
+        event = ''
     keydelay = 0.08
     if onlykeyboard == False:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
@@ -1600,13 +1626,13 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         elif event == 'KEY_TAB' or readbus == 223:
             pressed = 'view'
         elif event == 'KEY_DELETE' or readbus2 == 246:
-            pressed = 'delete'
+            pressed = 'remove'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
-    if readbus == 255 and readbus2 == 247 and event == -1:
+    if readbus == 255 and readbus2 == 247 and event == '':
         buttonpressed = False
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
@@ -1690,7 +1716,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE'
     #STANDARD VALUES
     abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -1834,27 +1860,23 @@ def main():
 
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
-                filmfiles = viewfilm(filmfolder, filmname)
-                if len(filmfiles) > 0:
-                    newdub = clipsettings(filmfolder, filmname, scene)
-                    if newdub:
-                        renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-                        playdub(renderfilename, True, headphoneslevel)
-                        run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
-                        vumetermessage('new scene dubbing made!')
-                        time.sleep(1)
+                newdub = clipsettings(filmfolder, filmname, scene)
+                if newdub:
+                    renderfilename = renderscene(filmfolder, filmname, scene)
+                    playdub(renderfilename, True, headphoneslevel)
+                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    vumetermessage('new scene dubbing made!')
+                    time.sleep(1)
 
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
-                filmfiles = viewfilm(filmfolder, filmname)
-                if len(filmfiles) > 0:
-                    newdub = clipsettings(filmfolder, filmname, '')
-                    if newdub:
-                        renderfilename = filmfolder + filmname + '/' + filmname
-                        playdub(renderfilename, True, headphoneslevel)
-                        run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
-                        vumetermessage('new film dubbing made!')
-                        time.sleep(1)
+                newdub = clipsettings(filmfolder, filmname, '')
+                if newdub:
+                    renderfilename = renderfilm(filmfolder, filmname, comp)
+                    playdub(renderfilename, True, headphoneslevel)
+                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    vumetermessage('new film dubbing made!')
+                    time.sleep(1)
 
             #BACKUP
             elif pressed == 'middle' and menu[selected] == 'BACKUP':
@@ -1899,9 +1921,8 @@ def main():
 
             #NEW FILM
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
-                oldname = filmname
-                filmname = nameyourfilm(filmfolder, '',abc)
-                if filmname != oldname:
+                newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
+                if filmname != newfilmname:
                     os.makedirs(filmfolder + filmname)
                     writemessage('Good luck with your film ' + filmname + '!')
                     updatethumb = True
@@ -1910,6 +1931,18 @@ def main():
                     shot = 1
                     take = 1
                     selectedaction = 0
+                else:
+                    vumetermessage('')
+
+            #EDIT FILM NAME
+            elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
+                newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
+                if filmname != newfilmname:
+                    os.system('mv ' + filmfolder + filmname + ' ' + filmfolder + newfilmname)
+                    filmname = newfilmname
+                    vumetermessage('Film title changed to ' + filmname + '!')
+                else:
+                    vumetermessage('')
 
             #ADELAY
             elif pressed == 'middle' and menu[selected] == 'ADELAY':
@@ -1933,41 +1966,44 @@ def main():
             #PASTE SHOT and PASTE SCENE
             elif event == 'P':
                 if menu[selected] == 'SHOT:' and yankedshot:
-                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
                     add_organize(filmfolder, filmname)
                     updatethumb = True
-                    vumetermessage('Shot ' + str(scene) + ' pasted!')
+                    vumetermessage('Shot pasted!')
                     time.sleep(1)
                 elif menu[selected] == 'SCENE:' and yankedscene:
-                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
                     add_organize(filmfolder, filmname)
                     shot = countshots(filmname, filmfolder, scene)
                     updatethumb = True
-                    vumetermessage('Scene ' + str(scene) + ' pasted!')
+                    vumetermessage('Scene pasted!')
                     time.sleep(1)
 
             #MOVE SHOT and MOVE SCENE
             elif event == 'M':
                 if menu[selected] == 'SHOT:' and yankedshot:
-                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
-                    os.system('rm -r ' + yankedshot)
-                    organize(filmfolder, filmname)
+                    os.system('rm -r ' + yankedshot + '/*')
+                    #Remove hidden placeholder
+                    os.system('rm ' + yankedshot + '/.placeholder')
                     add_organize(filmfolder, filmname)
+                    organize(filmfolder, filmname)
                     updatethumb = True
-                    vumetermessage('Shot ' + str(scene) + ' moved!')
+                    vumetermessage('Shot moved!')
                     time.sleep(1)
                 elif menu[selected] == 'SCENE:' and yankedscene:
-                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
-                    os.system('rm -r ' + yankedscene)
-                    organize(filmfolder, filmname)
+                    os.system('rm -r ' + yankedscene + '/*')
+                    os.system('rm ' + yankedscene + '/.placeholder')
                     add_organize(filmfolder, filmname)
+                    organize(filmfolder, filmname)
                     shot = countshots(filmname, filmfolder, scene)
                     updatethumb = True
-                    vumetermessage('Scene ' + str(scene) + ' moved!')
+                    vumetermessage('Scene moved!')
                     time.sleep(1)
 
             #INSERT SHOT
@@ -2014,30 +2050,30 @@ def main():
 
             #REMOVE
             #take
-            elif pressed == 'delete' and menu[selected] == 'TAKE:':
+            elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 updatethumb = True
                 time.sleep(0.2)
             #shot
-            elif pressed == 'delete' and menu[selected] == 'SHOT:':
+            elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
                 updatethumb = True
                 time.sleep(0.2)
             #scene
-            elif pressed == 'delete' and menu[selected] == 'SCENE:':
+            elif pressed == 'remove' and menu[selected] == 'SCENE:':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
                 shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
                 time.sleep(0.2)
             #film
-            elif pressed == 'delete' and menu[selected] == 'FILM:':
+            elif pressed == 'remove' and menu[selected] == 'FILM:':
                 remove(filmfolder, filmname, scene, shot, take, 'film')
                 filmname = getfilms(filmfolder)[0][0]
                 if filmname == '':
-                    filmname = nameyourfilm(filmfolder,'',abc)
+                    filmname = nameyourfilm(filmfolder,filmname,abc, True)
                 else:
                     scene, shot, take = countlast(filmname, filmfolder)
                     loadfilmsettings = True
@@ -2374,7 +2410,7 @@ def main():
 
         #Check if menu is changed and save settings
         if buttonpressed == True or recording == True or rendermenu == True:
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', ''
+            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu five times to be able to se picamera settings change
             if rerendermenu < 10:
@@ -2393,7 +2429,8 @@ def main():
 if __name__ == '__main__':
     import sys
     try:
-        main()
+        with term.cbreak():
+            main()
     except:
         os.system('pkill arecord')
         os.system('pkill startinterface')
