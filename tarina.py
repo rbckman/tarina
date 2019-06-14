@@ -1076,6 +1076,58 @@ def getdubs(filmfolder, filmname, scene):
         dubnr += 1
     return dubfiles, dubmix, rerender
 
+#------------Remove Dubs----------------
+
+def removedub(dubfolder, dubnr):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    selected = 0
+    header = 'Are you sure you want to remove dub ' + str(dubnr) + '?'
+    menu = 'NO', 'YES'
+    settings = '', ''
+    while True:
+        writemenu(menu,settings,selected,header)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressed == 'right':
+            if selected < (len(menu) - 1):
+                selected = selected + 1
+        elif pressed == 'left':
+            if selected > 0:
+                selected = selected - 1
+        elif pressed == 'middle' and selected == 0:
+            return
+        elif pressed == 'middle' and selected == 1: 
+            os.system('rm ' + dubfolder + 'dub' + str(dubnr).zfill(3) + '.wav')
+            os.system('rm ' + dubfolder + '.settings' + str(dubnr).zfill(3))
+            os.system('rm ' + dubfolder + '.rendered' + str(dubnr).zfill(3))
+            time.sleep(0.5)
+            print(dubfolder)
+            dubs = next(os.walk(dubfolder))[2]
+            print(dubs)
+            for i in dubs:
+                if 'dub' not in i:
+                    dubs.remove(i)
+            organized_nr = 1
+            for s in sorted(dubs):
+                if '.wav' in s:
+                    print(s)
+                    unorganized_nr = int(s[3:-4])
+                    if organized_nr == unorganized_nr:
+                        print('correct')
+                        pass
+                    if organized_nr != unorganized_nr:
+                        print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        run_command('mv ' + dubfolder + 'dub' + str(unorganized_nr).zfill(3) + '.wav ' + dubfolder + 'dub' + str(organized_nr).zfill(3) + '.wav')
+                        run_command('mv ' + dubfolder + '.settings' + str(unorganized_nr).zfill(3) + ' ' + dubfolder + '.settings' + str(organized_nr).zfill(3))
+                        run_command('mv ' + dubfolder + '.rendered' + str(unorganized_nr).zfill(3) + ' ' + dubfolder + '.rendered' + str(organized_nr).zfill(3))
+                    organized_nr += 1
+            logger.info('removed dub file!')
+            vumetermessage('dub removed!')
+            return
+        time.sleep(0.05)
+
 #-------------Clip settings---------------
 
 def clipsettings(filmfolder, filmname, scene):
@@ -1148,6 +1200,12 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'down' and selected == 4:
             if dubselected > 0:
                 dubselected = dubselected - 1
+        elif pressed == 'remove' and selected == 4:
+            removedub(filefolder, dubselected + 1)
+            dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
+            dubselected = len(dubfiles) - 1
+            if len(dubfiles) == 0:
+                selected = 0
         elif pressed == 'middle' and selected == 4:
             dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
             break
@@ -1186,7 +1244,7 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
-        time.sleep(0.02)
+        time.sleep(0.05)
     #Save dubmix before returning
     if dubmix:
         if os.path.isdir(filefolder) == False:
