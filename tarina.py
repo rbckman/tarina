@@ -602,7 +602,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     time.sleep(0.1)
     header = 'Are you sure you want to remove ' + sceneshotortake + '?'
     menu = '', ''
-    settings = 'YES', 'NO'
+    settings = 'NO', 'YES'
     selected = 0
     while True:
         writemenu(menu,settings,selected,header)
@@ -614,7 +614,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle':
-            if selected == 0:
+            if selected == 1:
                 if sceneshotortake == 'take':
                     #os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
@@ -639,7 +639,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     foldername = filmfolder + filmname
                     os.system('rm -r ' + foldername)
                 return
-            elif selected == 1:
+            elif selected == 0:
                 return
         time.sleep(0.02)
 
