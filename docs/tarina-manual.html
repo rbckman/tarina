@@ -10,6 +10,10 @@
   <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
+<div class="figure">
+<img src="tarina-logo.png" />
+
+</div>
 <h1 id="tarina-manual">TARINA MANUAL</h1>
 <p>Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in <a href="https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net">#tarina:bennysmatrixchat.ddns.net</a></p>
 <div class="figure">
@@ -51,20 +55,24 @@
 <img src="keyboard.jpg" alt="Buttons" />
 <p class="caption">Buttons</p>
 </div>
-<p>The enter key has some special elements. (Imrovement) Will write out on the last row a help for each menu.</p>
+<p>The enter key has some special elements. (Improvement) Will write out on the last row a help for each menu.</p>
 <p>With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.</p>
+<p>Then there's some special keys on the keyboard (CAPITAL):</p>
+<p>Y = Copy scene/shot M = Cut (as in cut and paste) scene/shot P = Paste scene/shot I = Insert scene/shot</p>
 <h1 id="menus">Menus</h1>
 <p>A short explanation of all the settings and why they are where they are.</p>
 <h3 id="film-scene-shot-and-take">Film, scene, shot and take</h3>
 <p>This you don't see on other cameras because they don't care about what you're filming however this camera does and it wants to know where you are in your filmmaking process and help put it together. Of course this means that <strong><em>you</em></strong> have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check your montage on the spot and do a retake if you need to fix something. Rather than filming a bunch of things and fixing it later.</p>
+<h3 id="dubbing">Dubbing</h3>
+<p>If you press enter while you've highlighted the film name or a scene you'll be entering dub settings menu. (ADD 1.0/1.0) this indicates the volume of the dub to the previous mix. So, for example if you want the dub volume to be 50% of the previous audio, theses settings would look like (ADD 0.5/1.0). The other setting is fade in and out in seconds (in: 0.5) (out: 1.0) whould be half a second in and a second out. Now if you press enter while the ADD is highlighted you'll be dubbing. You can change the settings later if you come back to the menu. You can add up to 99 tracks!</p>
 <h3 id="shutter-iso-red-blue">Shutter, iso, red, blue</h3>
 <p>Shutter and iso are well know basic camera concepts. With red and blue you control the colors. If you press enter while on any of these then it will go into auto mode and if you press it again it will go back to manual mode with the current auto settings. I'm using this feature to quickly find a reasonable good value before I'm locking and tuning the settings manually to my likings. Cuz you always will know better than the robots!</p>
 <h3 id="bright-cont-sat">Bright, cont, sat</h3>
 <p>Color grade on the go with brightness, contrast and saturation. You will probably have to play with theses to figure out what you want. Remember that as you're making your film ready while you're shooting it take by take, there's no color grading later on so you'll have to settle on your color grade before you film. To get that good old spaghetti western look go with the contrast at -19.</p>
 <h3 id="flip-beep-lenght">Flip, beep, lenght</h3>
 <p>If you go gonzo, flippin it is the way to go! beep is a countdown timer from the moment you press rec or retake to when it actually starts filming. Lenght let's you put in the lenght of your take before you actually start filming. Both of these are very useful if you film action alone and can't reach for the buttons.</p>
-<h3 id="mic-phones-comp-and-dub">Mic, phones, comp and dub</h3>
-<p>Control teh level of your mic and headphones. Comp is a basic compressor to get really get your message across we need to hear ya so it's quite harsh as of the moment im writing this manual. But I like it when it goes craking up abit like in the good old 70s cinema. Dub is a recent feature as well and it does what it says. Do an audio dubbing over your film, make some music or whatever ya like. I'll do a scene based dub sometime in the future for sure, should not be that hard to implement (I hope).</p>
+<h3 id="mic-phones-comp">Mic, phones, comp</h3>
+<p>Control teh level of your mic and headphones. Comp is a basic compressor to get really get your message across we need to hear ya so it's quite harsh as of the moment im writing this manual. But I like it when it goes craking up abit like in the good old 70s cinema.</p>
 <h3 id="timelapse">Timelapse</h3>
 <p>Do a timelapse when you need to tell about time. There's an undermenu here where you can choose the intervall of the takes, now this isn't really a traditional timelapse with pictures it will instead do a 0.1 sec video at each intervall or it can be set to your likings but 0.1 is good for a traditional timelapse effect. At the bottom of the screen is a calculation of how long the clip will be if you do the timelapse for an hour. I'd say don't over do it a 10 - 20 clip is already quite a stretch but its up to you, you're the director.</p>
 <h3 id="lens">Lens</h3>
