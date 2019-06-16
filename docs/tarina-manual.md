@@ -338,6 +338,7 @@ We only need the metal parts from these, if you have som thin metal you could cu
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/5Pcs-lot-AG13-LR44-Button-Cell-Battery-Socket-Holder-Plastic-Case-TBH-AG13-B/32833837989.html?spm=a2g0s.9042311.0.0.27424c4dE5lqct)
 
+[Aliexpress](https://www.aliexpress.com/item/4-Pcs-Black-Plastic-Button-Coin-Cell-Battery-Socket-Holder-for-2-x-AG13-LR44/33013344736.html?spm=a2g0s.9042311.0.0.671b4c4djbzZzg)
 
 3.5mm Jack to jack aux cable
 ----------------------------
