@@ -304,7 +304,7 @@ These hold the camera together.
 
 **Buy**
 Your local harware store
-[Motonet (store in Finland)](https://www.motonet.fi/fi/tuote/389247/Uraruuvi-3x12-A2-RST-25kpl)
+
 [Ebay](https://www.ebay.com/itm/50X-Stainless-M1-6-M2-M3-M4-Countersunk-Flat-Head-Cross-Miniature-Screw-Bolts/392195849737?hash=item5b50b1be09:m:mGdurHGRlBzB-IIMJirP3Dw)
 
 
@@ -325,9 +325,7 @@ Price ~1 eur/20 pcs
 These hold the camera/mic together.
 
 **Buy**
-Your local hardware store
-[Hobbycenter (store in Finland)](https://www.hobbycenter.fi/kavan-puuruuvi-22x95mm-20-kpl-0096a)
-
+[Ebay](https://www.ebay.com/itm/M2-2x9-5mm-Stainless-Steel-Phillips-Round-Pan-Head-Self-Tapping-Screws-50pcs/391417337610?epid=1563431736&hash=item5b224a970a:g:oC8AAOSwqDhbAlml)
 
 LR44 Button cell socket holder
 --------------------------------------
