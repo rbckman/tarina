@@ -1,8 +1,9 @@
 
 ![](tarina-logo.png)
 
-TARINA MANUAL
-=============
+<br>
+MANUAL
+======
 
 Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 
@@ -48,8 +49,11 @@ With keys up and down you change a specific setting for example shutter speed. W
 Then there's some special keys on the keyboard (CAPITAL):
 
 Y = Copy scene/shot
+
 M = Cut (as in cut and paste) scene/shot
+
 P = Paste scene/shot
+
 I = Insert scene/shot
 
 Menus
