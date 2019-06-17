@@ -1981,6 +1981,7 @@ def main():
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
                 if filmname != newfilmname:
+                    filmname = newfilmname
                     os.makedirs(filmfolder + filmname)
                     writemessage('Good luck with your film ' + filmname + '!')
                     updatethumb = True
