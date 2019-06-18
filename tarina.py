@@ -307,13 +307,13 @@ def browse2(filmname, filmfolder, scene, shot, take, n, b):
 #-------------Update------------------
 
 def update(tarinaversion, tarinavername):
-    writemessage('Current version ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
+    logger.info('Current version ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
     time.sleep(2)
-    writemessage('Checking for updates...')
+    logger.info('Checking for updates...')
     try:
         run_command('wget -N https://raw.githubusercontent.com/rbckman/tarina/master/VERSION -P /tmp/')
     except:
-        writemessage('Sorry buddy, no internet connection')
+        logger.info('Sorry buddy, no internet connection')
         time.sleep(2)
         return tarinaversion, tarinavername
     try:
@@ -321,18 +321,18 @@ def update(tarinaversion, tarinavername):
         versionnumber = f.readline()
         versionname = f.readline()
     except:
-        writemessage('hmm.. something wrong with the update')
+        logger.info('hmm.. something wrong with the update')
     if round(float(tarinaversion),3) < round(float(versionnumber),3):
-        writemessage('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
+        logger.info('New version found ' + versionnumber[:-1] + ' ' + versionname[:-1])
         time.sleep(4)
-        writemessage('Updating...')
+        logger.info('Updating...')
         run_command('git -C ' + tarinafolder + ' pull')
         run_command('sudo ' + tarinafolder + '/install.sh')
-        writemessage('Update done, will now reboot Tarina')
+        logger.info('Update done, will now reboot Tarina')
         waitforanykey()
-        writemessage('Hold on rebooting Tarina...')
+        logger.info('Hold on rebooting Tarina...')
         run_command('sudo reboot')
-    writemessage('Version is up-to-date!')
+    logger.info('Version is up-to-date!')
     return tarinaversion, tarinavername
 
 #-------------Get films---------------
