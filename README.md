@@ -21,7 +21,7 @@ The parts are built around the world by different manufacturers. They've been ch
 [Adafruit Powerboost 1000C](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)<br>
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
-[Complete part list & Build instructions](docs/tarina-manual.md)
+Check [MANUAL](docs/tarina-manual.md) for complete part list & build instructions
 
 [Ready to print 3d designs](https://github.com/rbckman/tarina/tree/master/3d)
 

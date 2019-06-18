@@ -521,7 +521,7 @@ def timelapse(beeps,camera,foldername,filename):
                     if recording == False and t > between:
                         if beeps > 0:
                             buzz(150)
-                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=23)
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=24, bitrate=15000000)
                         if sound == True:
                             os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
@@ -1831,7 +1831,7 @@ def main():
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
 
     #START INTERFACE
-    screen = startinterface()
+    startinterface()
     camera = startcamera(lens)
 
     #LOAD FILM AND SCENE SETTINGS
@@ -1953,7 +1953,7 @@ def main():
                                 run_command(cmd)
                             except Exception as e: logger.warning(e)
                             time.sleep(10)
-                            screen = startinterface()
+                            startinterface()
                             camera = startcamera(lens)
                             loadfilmsettings = True
                         selectedaction = 0
@@ -1966,7 +1966,11 @@ def main():
             #UPDATE
             elif pressed == 'middle' and menu[selected] == 'UPDATE':
                 if webz_on() == True:
+                    stopinterface(camera)
                     tarinaversion, tarinavername = update(tarinaversion, tarinavername)
+                    startinterface()
+                    camera = startcamera(lens)
+                    loadfilmsettings = True
                     selectedaction = 0
 
             #WIFI
@@ -2148,7 +2152,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=23)
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=24, bitrate=15000000)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
