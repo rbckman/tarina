@@ -1811,6 +1811,8 @@ def main():
     delayerr = ''
     loadfilmsettings = True
     comp = 1
+    yankedscene = ''
+    yankedshot = ''
 
     #Save settings every 5 seconds
     pausetime = time.time()
@@ -1895,45 +1897,55 @@ def main():
                 filmfiles = shotfiles(filmfolder, filmname, scene)
                 if len(filmfiles) > 0:
                     #Check if rendered video exist
+                    camera.stop_preview()
                     renderfilename = renderscene(filmfolder, filmname, scene)
                     playdub(renderfilename, False, headphoneslevel)
+                    camera.start_preview()
 
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
+                    camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp)
                     playdub(renderfilename, False, headphoneslevel)
+                    camera.start_preview()
 
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
                     removeimage(camera, overlay)
+                    camera.stop_preview()
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     playdub(foldername + filename, False, headphoneslevel)
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
+                    camera.start_preview()
 
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
                 newdub = clipsettings(filmfolder, filmname, scene)
                 if newdub:
+                    camera.stop_preview()
                     renderfilename = renderscene(filmfolder, filmname, scene)
                     playdub(renderfilename, True, headphoneslevel)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
+                    camera.start_preview()
                     time.sleep(1)
 
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
                 newdub = clipsettings(filmfolder, filmname, '')
                 if newdub:
+                    camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp)
                     playdub(renderfilename, True, headphoneslevel)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
+                    camera.start_preview()
                     time.sleep(1)
 
             #BACKUP
@@ -2029,7 +2041,11 @@ def main():
             #PASTE SHOT and PASTE SCENE
             elif event == 'P':
                 if menu[selected] == 'SHOT:' and yankedshot:
-                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
+                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
+                    try:
+                        os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
+                    except:
+                        pass
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
                     add_organize(filmfolder, filmname)
                     updatethumb = True
@@ -2048,6 +2064,10 @@ def main():
             elif event == 'M':
                 if menu[selected] == 'SHOT:' and yankedshot:
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
+                    try:
+                        os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
+                    except:
+                       pass
                     os.system('cp -r ' + yankedshot + ' ' + pasteshot)
                     os.system('rm -r ' + yankedshot + '/*')
                     #Remove hidden placeholder
