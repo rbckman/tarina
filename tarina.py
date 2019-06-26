@@ -2434,7 +2434,7 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, dub, comp = filmsettings
+                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp = filmsettings
                 time.sleep(0.2)
             except:
                 logger.warning('could not load film settings')
