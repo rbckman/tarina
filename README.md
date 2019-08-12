@@ -60,7 +60,7 @@ There are several reasons why, will write a longer story why but heres some fund
 
 Connect
 -------
-Matrix [#tarina:bennysmatrixchat.ddns.net](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+Matrix [#tarina:matrix.tarina.org](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
 
 Mail rob(at)tarina.org
 
