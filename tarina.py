@@ -1730,9 +1730,9 @@ def startcamera(lens):
     if v == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # ov5647 Rev C
-        # camera.framerate = 26.03
+        camera.framerate = 26.03
         # ov5647 Rev D"
-        camera.framerate = 23.16
+        # camera.framerate = 23.16
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
