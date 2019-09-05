@@ -521,7 +521,7 @@ def timelapse(beeps,camera,foldername,filename):
                     if recording == False and t > between:
                         if beeps > 0:
                             buzz(150)
-                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=24, bitrate=15000000)
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', bitrate=4000000)
                         if sound == True:
                             os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
@@ -1730,9 +1730,9 @@ def startcamera(lens):
     if v == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # ov5647 Rev C
-        camera.framerate = 26.03
+        # camera.framerate = 26.03
         # ov5647 Rev D"
-        # camera.framerate = 23.2
+        camera.framerate = 23.16
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
@@ -2172,7 +2172,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=24, bitrate=15000000)
+                camera.start_recording(foldername + filename + '.h264', format='h264', bitrate=4000000)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
