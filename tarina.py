@@ -2331,11 +2331,11 @@ def main():
             elif menu[selected] == 'RED:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[0]) < 7.98:
-                    camera.awb_gains = (float(camera.awb_gains[0]) + 0.02, float(camera.awb_gains[1]))
+                    camera.awb_gains = (round(camera.awb_gains[0],2) + 0.02, round(camera.awb_gains[1],2))
             elif menu[selected] == 'BLUE:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[1]) < 7.98:
-                    camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) + 0.02)
+                    camera.awb_gains = (round(camera.awb_gains[0],2), round(camera.awb_gains[1],2) + 0.02)
             elif menu[selected] == 'SRV:':
                 if serverstate == 'on':
                     serverstate = tarinaserver(False)
@@ -2426,11 +2426,11 @@ def main():
             elif menu[selected] == 'RED:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[0]) > 0.02:
-                    camera.awb_gains = (float(camera.awb_gains[0]) - 0.02, float(camera.awb_gains[1]))
+                    camera.awb_gains = (round(camera.awb_gains[0],2) - 0.02, round(camera.awb_gains[1],2))
             elif menu[selected] == 'BLUE:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[1]) > 0.02:
-                    camera.awb_gains = (float(camera.awb_gains[0]), float(camera.awb_gains[1]) - 0.02)
+                    camera.awb_gains = (round(camera.awb_gains[0],2), round(camera.awb_gains[1],2) - 0.02)
             elif menu[selected] == 'SRV:':
                 if serverstate == 'on':
                     serverstate = tarinaserver(False)
