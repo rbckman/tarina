@@ -19,6 +19,7 @@ import RPi.GPIO as GPIO
 from PIL import Image
 import smbus
 import socket
+import configparser
 #import shlex
 from blessed import Terminal
 
@@ -221,8 +222,6 @@ def run_command(command_line):
         logger.info('Process finished')
     return True
 
-
-
 #-------------Display jpeg-------------------
 
 def displayimage(camera, filename):
@@ -353,6 +352,55 @@ def getfilms(filmfolder):
         logger.info(p[0])
     return films_sorted
 
+#-------------Load tarina config---------------
+
+def getconfig(version):
+    home = os.path.expanduser('~')
+    configfile = home + '/.tarina/config.ini'
+    configdir = os.path.dirname(configfile)
+    if not os.path.isdir(configdir):
+        os.makedirs(configdir)
+    config = configparser.ConfigParser()
+    if config.read(configfile):
+        camera_model = config['SENSOR']['model']
+        camera_revision = config['SENSOR']['revision']
+        if camera_model == version:
+            return camera_model, camera_revision
+    elif version == 'imx219':
+        config['SENSOR']['model'] = version
+        config['SENSOR']['revision'] = 'standard'
+        with open(configfile, 'w') as f:
+            config.write(f)
+        return version, camera_revision
+    else:
+        pressed = ''
+        buttonpressed = ''
+        buttontime = time.time()
+        holdbutton = ''
+        selected = 0
+        header = 'What revision of ' + version + ' sensor are you using?'
+        menu = 'rev.C', 'rev.D'
+        while True:
+            settings = '', ''
+            writemenu(menu,settings,selected,header)
+            pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+            if pressed == 'right':
+                if selected < (len(settings) - 1):
+                    selected = selected + 1
+            elif pressed == 'left':
+                if selected > 0:
+                    selected = selected - 1
+            elif pressed == 'middle':
+                camera_model = version
+                camera_revision = menu[selected]
+                config['SENSOR'] = {}
+                config['SENSOR']['model'] = camera_model
+                config['SENSOR']['revision'] = camera_revision
+                with open(configfile, 'w') as f:
+                    config.write(f)
+                return camera_model, camera_revision
+            time.sleep(0.02)
+
 #-------------Load film---------------
 
 def loadfilm(filmname, filmfolder):
@@ -389,7 +437,6 @@ def loadfilm(filmname, filmfolder):
             writemessage('Returning')
             return filmname
         time.sleep(0.02)
-
 
 #-------------New film----------------
 
@@ -769,7 +816,6 @@ def add_organize(filmfolder, filmname):
                 os.system('mv -n ' + filmfolder + filmname + '/scene' + str(unorganized_nr).zfill(3) + ' ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
         organized_nr -= 1
     return
-
 
 #-------------Compile Shot--------------
 
@@ -1160,10 +1206,10 @@ def clipsettings(filmfolder, filmname, scene):
             fadein = round(dubmix[dubselected][2],1)
             fadeout = round(dubmix[dubselected][3],1)
             menu = 'BACK', 'ADD:', '', '', 'DUB' + str(dubselected + 1) + ':', '', '', ''
-            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout), '', str(mix) + '/' + str(dub), 'in:' + str(fadein), 'out:' + str(fadeout)
+            settings = '', 'd:' + str(nmix) + '/o:' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout), '', 'd:' + str(mix) + '/o' + str(dub), 'in:' + str(fadein), 'out:' + str(fadeout)
         else:
             menu = 'BACK', 'ADD:', '', ''
-            settings = '', str(nmix) + '/' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout)
+            settings = '', 'd:' + str(nmix) + '/o:' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
 
@@ -1722,17 +1768,20 @@ def startcamera(lens):
     table = read_table('lenses/' + lens)
     #camera.framerate = 24.999
     v = camera.revision
+    camera_model, camera_revision = getconfig(v)
     # v1 = 'ov5647'
     # v2 = ? 
-    logger.info("picamera version is: " + str(v))
-    if v == 'somy, whatever it was':
+    logger.info("picamera version is: " + camera_model + ' ' + camera_revision)
+    if camera_model == 'imx219':
         camera.framerate = 24.999
-    if v == 'ov5647':
+    if camera_model == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # ov5647 Rev C
-        camera.framerate = 26.03
+        if camera_revision == 'rev.C':
+            camera.framerate = 26.03
         # ov5647 Rev D"
-        # camera.framerate = 23.16
+        if camera_revision == 'rev.D':
+            camera.framerate = 23.16
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
