@@ -959,6 +959,7 @@ def renderscene(filmfolder, filmname, scene):
     #Audio
     audiohash = ''
     oldaudiohash = ''
+    newaudiomix = False
     for p in filmfiles:
         audiohash += str(int(countsize(p + '.wav')))
     dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
@@ -981,17 +982,23 @@ def renderscene(filmfolder, filmname, scene):
         for i in range(len(dubfiles)):
             os.system('cp ' + scenedir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + scenedir + '/dub/.rendered' + str(i + 1).zfill(3))
         print('Audio rendered!')
+        newaudiomix = True
     else:
         print('Already rendered!')
-    return renderfilename
+    return renderfilename, newaudiomix
 
-#-------------Render film-------(rename to compile or render)-----
+#-------------Render film------------
 
 def renderfilm(filmfolder, filmname, comp):
+    newaudiomix = False
     #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
     scenes = countscenes(filmfolder, filmname)
     for i in range(scenes):
-        renderscene(filmfolder, filmname, i + 1)
+        scenefilename, audiomix = renderscene(filmfolder, filmname, i + 1)
+        #Check if a scene has a new audiomix
+        print('audiomix of scene ' + str(i + 1) + ' is ' + str(audiomix))
+        if audiomix == True:
+            newaudiomix = True
     filmfiles = scenefiles(filmfolder, filmname)
     #Video
     videohash = ''
@@ -1033,7 +1040,7 @@ def renderfilm(filmfolder, filmname, comp):
         print('no audiohash found, making one...')
         with open(filmdir+ '.audiohash', 'w') as f:
             f.write(audiohash)
-    if audiohash != oldaudiohash or newmix == True:
+    if audiohash != oldaudiohash or newmix == True or newaudiomix == True:
         renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(filmdir+ '.audiohash', 'w') as f:
