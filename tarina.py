@@ -597,7 +597,7 @@ def timelapse(beeps,camera,foldername,filename):
                         except:
                             logger.warning('something wrong with camera jpeg capture')
                         writemessage('Compiling timelapse')
-                        logger.info('Hold on, rendering ' + str(len(files)) + ' files')
+                        logger.info('Hold on, rendering ' + str(len(files)) + ' scenes')
                         #RENDER VIDEO
                         renderfilename = foldername + filename
                         n = 1
@@ -1040,7 +1040,10 @@ def renderfilm(filmfolder, filmname, comp):
         print('no audiohash found, making one...')
         with open(filmdir+ '.audiohash', 'w') as f:
             f.write(audiohash)
-    if audiohash != oldaudiohash or newmix == True or newaudiomix == True:
+    #This is if the scene has a new audiomix
+    if newaudiomix == True:
+        newmix = True
+    if audiohash != oldaudiohash or newmix == True:
         renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(filmdir+ '.audiohash', 'w') as f:
@@ -1051,7 +1054,7 @@ def renderfilm(filmfolder, filmname, comp):
         #compressing
         if comp > 0:
             writemessage('compressing audio')
-            os.system('cp ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
+            os.system('mv ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
             run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
             os.remove(renderfilename + '_tmp.wav')
         #muxing mp3 layer to mp4 file
@@ -1068,6 +1071,8 @@ def renderfilm(filmfolder, filmname, comp):
             writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
         ##MERGE AUDIO & VIDEO
         writemessage('Merging audio & video')
+        #os.remove(renderfilename + '.mp4') 
+        call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
         call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
         os.remove(renderfilename + '_tmp.mp4')
         os.remove(renderfilename + '.mp3')
