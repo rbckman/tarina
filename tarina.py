@@ -1954,7 +1954,7 @@ def main():
                 if len(filmfiles) > 0:
                     #Check if rendered video exist
                     camera.stop_preview()
-                    renderfilename = renderscene(filmfolder, filmname, scene)
+                    renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     playdub(renderfilename, False, headphoneslevel)
                     camera.start_preview()
 
@@ -1985,7 +1985,7 @@ def main():
                 newdub = clipsettings(filmfolder, filmname, scene)
                 if newdub:
                     camera.stop_preview()
-                    renderfilename = renderscene(filmfolder, filmname, scene)
+                    renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     playdub(renderfilename, True, headphoneslevel)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
