@@ -1483,7 +1483,7 @@ def audiodelay(foldername, filename):
         run_command('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
         run_command('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
-        if int(audiosync) > 300:
+        if int(audiosync) > 400:
             writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
             vumetermessage('Consider changing to a faster microsd card.')
             time.sleep(10)
@@ -1788,12 +1788,14 @@ def startcamera(lens):
         camera.framerate = 24.999
     if camera_model == 'ov5647':
         # Different versions of ov5647 with different clock speeds, need to make a config file
+        # if there's more frames then the video will be longer when converting it to 25 fps,
+        # I try to get it as perfect as possible with trial and error.
         # ov5647 Rev C
         if camera_revision == 'rev.C':
             camera.framerate = 26.03
         # ov5647 Rev D"
         if camera_revision == 'rev.D':
-            camera.framerate = 23.16
+            camera.framerate = 23.15
     camera.crop = (0, 0, 1.0, 1.0)
     #camera.video_stabilization = True
     camera.led = False
