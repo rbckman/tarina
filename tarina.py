@@ -568,7 +568,7 @@ def timelapse(beeps,camera,foldername,filename):
                     if recording == False and t > between:
                         if beeps > 0:
                             buzz(150)
-                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=23, bitrate=5000000)
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=25, bitrate=5000000)
                         if sound == True:
                             os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
@@ -2225,7 +2225,7 @@ def main():
                     time.sleep(0.2)
 
         #RECORD AND PAUSE
-        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 800:
+        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 3600:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True:
                 if beeps > 0:
@@ -2233,7 +2233,7 @@ def main():
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=23, bitrate=5000000)
+                camera.start_recording(foldername + filename + '.h264', format='h264', quality=25, bitrate=5000000)
                 starttime = time.time()
                 recording = True
             elif recording == True and float(time.time() - starttime) > 0.2:
