@@ -6,7 +6,7 @@
 MANUAL
 ======
 
-Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
 
 ![Filming with Tarina](tarina-filming-01.jpg)
 
@@ -360,7 +360,6 @@ Wireless control over camera. You will also need this for wifi settings etc. (Re
 
 Parts grand total ~200 eur
 
-
 3d printing
 ===========
 
@@ -418,7 +417,7 @@ Wiring
 Putting it together
 ===================
 
-Documentation on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+Documentation on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
 
 
 Installing software

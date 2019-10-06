@@ -9,6 +9,11 @@ Experience filmmaking flow
 ------------------------------
 If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) flows, retake. Once you "get it" there’s no need for editing. The camera is designed with a "hackers/makers philosophy" and is easy to take apart. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
 
+Films made with Tarina
+----------------------
+[Building Tarina](https://youtu.be/7dhCiDPssR4) Filmed with my first Tarina, building the second unit.
+[Mushroom Season](https://youtu.be/ggehzyUThZk) Autumn colors. Also double mics connected with a audio cable y-splitter.
+
 Hardware
 --------
 The parts are built around the world by different manufacturers. They've been chosen on the basis of features, quality, openness, availabilty and price. One of the central ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is all 3d printable with a design that has the key element of flipping the lens 180 (gonzo style). Here's the main components: 
@@ -60,7 +65,7 @@ There are several reasons why, will write a longer story why but heres some fund
 
 Connect
 -------
-Matrix [#tarina:matrix.tarina.org](https://riot.im/app/#/room/!KHPruVufWZoLpQAUMZ:bennysmatrixchat.ddns.net)
+Matrix [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
 
 Mail rob(at)tarina.org
 
