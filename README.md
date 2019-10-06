@@ -9,10 +9,11 @@ Experience filmmaking flow
 ------------------------------
 If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) flows, retake. Once you "get it" there’s no need for editing. The camera is designed with a "hackers/makers philosophy" and is easy to take apart. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
 
-Films made with Tarina
+Made with Tarina
 ----------------------
-[Building Tarina](https://youtu.be/7dhCiDPssR4) Filmed with my first Tarina, building the second unit.
-[Mushroom Season](https://youtu.be/ggehzyUThZk) Autumn colors. Also double mics connected with a audio cable y-splitter.
+[Building Tarina](https://youtu.be/7dhCiDPssR4) is filmed with my first Tarina when building the second unit for a friend.
+
+[Mushroom Season](https://youtu.be/ggehzyUThZk) is a film where we go hunting mushrooms in the middle of the beautiful autumn here in Finland, showcasing the colors of the Picamera sensor in Tarina. Also trying out double mics connected with a audio cable y-splitter.
 
 Hardware
 --------
