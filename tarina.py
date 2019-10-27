@@ -1918,8 +1918,8 @@ def main():
     #TURN OFF WIFI AND TARINA SERVER
     serverstate = 'off'
     wifistate = 'off'
-    #run_command('sudo iwconfig wlan0 txpower off')
-    #serverstate = tarinaserver(False)
+    run_command('sudo iwconfig wlan0 txpower off')
+    serverstate = tarinaserver(False)
 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
     filename = 'take' + str(take).zfill(3)
