@@ -1361,6 +1361,10 @@ def playdub(filename, dub, headphoneslevel):
         writemessage('Get ready dubbing!!')
         menu = 'STOP', 'DUB FROM START', 'PHONES:'
         clipduration = 360000
+    #omxplayer hack to play really short videos.
+    if clipduration < 4:
+        logger.info("clip duration shorter than 4 sec")
+        player.previous()
     try:
         if dub == True:
             p = 0
