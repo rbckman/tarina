@@ -6,7 +6,7 @@
 MANUAL
 ======
 
-Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
+This is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
 
 ![Filming with Tarina](tarina-filming-01.jpg)
 
@@ -32,7 +32,12 @@ Introduction
 ============
 ![Tarina UI](tarina-filming-02.jpg)
 
-The interface focuses on presenting the essentials for film making in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+The interface focuses on presenting the essential tools in film making in one menu that is present and accessible all the time. You can control it with a keyboard or with the physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+
+Retake function
+---------------
+
+After recording a take you'll see an image of the last frame of that take. Now, if you hit record again you'll move to the next shot in your movie. If you press retake you'll be going to a new take of the same shot in your movie. Now, your back at the live view and next time you'll hit record it will actually record. So, if you're browsing shots and a frame is present instead of the live view, hitting record will take you to the next new shot in your movie. When live view is present it will always start recording. So record and retake are multi functional buttons.
 
 Keys
 ====
@@ -43,11 +48,9 @@ Keys
 ### Keyboard
 ![Buttons](keyboard.jpg)
 
-The enter key has some special elements. (Improvement) Will write out on the last row a help for each menu.
+With keys up and down you change a specific setting, for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. The last take is always the chosen one.
 
-With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.
-
-Then there's some special keys on the keyboard (CAPITAL):
+Special keys on the keyboard (CAPITAL):
 
 Y = Copy scene/shot
 
@@ -56,6 +59,12 @@ M = Cut (as in cut and paste) scene/shot
 P = Paste scene/shot
 
 I = Insert empty scene/shot
+
+space / pgup = Rec / Stop
+
+pgdwn / backspace = Retake
+
+tab = view
 
 Menus
 =====

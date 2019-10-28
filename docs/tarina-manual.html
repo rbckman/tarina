@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
   <meta name="keywords" content="Camera, 3d Printed, Filmmaker, Raspberry pi" />
-  <title>Tarina – a 3d printable camera for lazy filmmakers</title>
+  <title>Tarina – Tarina Manual</title>
   <style type="text/css">code{white-space: pre;}</style>
   <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -16,7 +16,7 @@
 </div>
 <p><br></p>
 <h1 id="manual">MANUAL</h1>
-<p>Step by step build instructions for a 3D printable Raspberry Pi video camera. Now, this is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in <a href="https://riot.im/app/#/room/#tarina:matrix.tarina.org">#tarina:matrix.tarina.org</a></p>
+<p>This is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in <a href="https://riot.im/app/#/room/#tarina:matrix.tarina.org">#tarina:matrix.tarina.org</a></p>
 <div class="figure">
 <img src="tarina-filming-01.jpg" alt="Filming with Tarina" />
 <p class="caption">Filming with Tarina</p>
@@ -44,7 +44,9 @@
 <img src="tarina-filming-02.jpg" alt="Tarina UI" />
 <p class="caption">Tarina UI</p>
 </div>
-<p>The interface focuses on presenting the essentials for film making in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.</p>
+<p>The interface focuses on presenting the essential tools in film making in one menu that is present and accessible all the time. You can control it with a keyboard or with the physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.</p>
+<h2 id="retake-function">Retake function</h2>
+<p>After recording a take you'll see an image of the last frame of that take. Now, if you hit record again you'll move to the next shot in your movie. If you press retake you'll be going to a new take of the same shot in your movie. Now, your back at the live view and next time you'll hit record it will actually record. So, if you're browsing shots and a frame is present instead of the live view, hitting record will take you to the next new shot in your movie. When live view is present it will always start recording. So record and retake are multi functional buttons.</p>
 <h1 id="keys">Keys</h1>
 <h3 id="buttons">Buttons</h3>
 <div class="figure">
@@ -56,13 +58,15 @@
 <img src="keyboard.jpg" alt="Buttons" />
 <p class="caption">Buttons</p>
 </div>
-<p>The enter key has some special elements. (Improvement) Will write out on the last row a help for each menu.</p>
-<p>With keys up and down you change a specific setting for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. As of now the last take is always chosen.</p>
-<p>Then there's some special keys on the keyboard (CAPITAL):</p>
+<p>With keys up and down you change a specific setting, for example shutter speed. With keys left and right you change what settings to change. With view, you can view the last shot or if you have a specific scene highlighted the camera would automatically glue all shots together and play that scene for you, same goes for film. With remove you can remove a specific take, shot, scene or film. With the retake button you retake a bad take, this is how the camera keeps track of your good takes. The last take is always the chosen one.</p>
+<p>Special keys on the keyboard (CAPITAL):</p>
 <p>Y = Copy scene/shot</p>
 <p>M = Cut (as in cut and paste) scene/shot</p>
 <p>P = Paste scene/shot</p>
 <p>I = Insert empty scene/shot</p>
+<p>space / pgup = Rec / Stop</p>
+<p>pgdwn / backspace = Retake</p>
+<p>tab = view</p>
 <h1 id="menus">Menus</h1>
 <p>A short explanation of all the settings and why they are where they are.</p>
 <h3 id="film-scene-shot-and-take">Film, scene, shot and take</h3>

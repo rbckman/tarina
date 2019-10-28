@@ -4,8 +4,16 @@ html
     color: #000;
 }
 
+body
+{
+    margin: 0 auto;
+    width:90%;
+    max-width:500px;
+}
+
 img
 {
     padding: 0px;
     width:100%;
+    max-width:500px;
 }
