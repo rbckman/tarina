@@ -235,15 +235,7 @@ cat <<'EOF'
  |_____/ \____/|_| \_|______(_)
                                
 EOF
-
-while true; do
-    read -p "Reboot into up-to-date Tarina now? [y]es or [n]o?" yn
-    case $yn in
-        [Yy]* ) echo "Rebooting now..."
+sleep 2
+echo "Rebooting into up-to-date Tarina..."
+sleep 2
 reboot
-            break;;
-        [Nn]* ) echo "Yes, sir! we are done!";break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
