@@ -86,28 +86,25 @@ Color grade on the go with brightness, contrast and saturation. You will probabl
 If you go gonzo, flippin it is the way to go! beep is a countdown timer from the moment you press rec or retake to when it actually starts filming. Lenght let's you put in the lenght of your take before you actually start filming. Both of these are very useful if you film action alone and can't reach for the buttons. 
 
 ### Mic, phones, comp
-Control teh level of your mic and headphones. Comp is a basic compressor to get really get your message across we need to hear ya so it's quite harsh as of the moment im writing this manual. But I like it when it goes craking up abit like in the good old 70s cinema.
+Control teh level of your mic and headphones. Comp is a basic compressor so your message comes across and we hear ya! it's quite harsh at the moment but I like it when it goes craking up abit like in the good old 70s cinema.
 
 ### Timelapse
-Do a timelapse when you need to tell about time. There's an undermenu here where you can choose the intervall of the takes, now this isn't really a traditional timelapse with pictures it will instead do a 0.1 sec video at each intervall or it can be set to your likings but 0.1 is good for a traditional timelapse effect. At the bottom of the screen is a calculation of how long the clip will be if you do the timelapse for an hour. I'd say don't over do it a 10 - 20 clip is already quite a stretch but its up to you, you're the director.
+Do a timelapse when you need to tell about time. There's an under menu here where you can choose the intervall of the takes, now this isn't really a traditional timelapse, it will instead do a 0.2 sec video at each intervall or it can be set to your likings but 0.2 is good for a traditional timelapse effect. At the bottom of the screen is a calculation of how long the clip will be if you do the timelapse for an hour. I'd say don't over do it! a 10 - 20 sec clip is already quite a stretch but its up to you, you're the movie film director.
 
 ### Lens
-A future implementation of lens shade correction will come where you get to do your own lens corrections to get those colors right on the spot.
+A future implementation of lens shade correction will come where you get to do your own lens corrections to get those colors right on the spot!
 
 ### Dsk, shutdown, srv, wifi
-Disk space, showing you how much of space left on your sd card. Shutdown when your done. Srv is a network server, if your connected to a network and put this on you should be able to go to any browser on any device and watch your movie films if you've rendered them first, just go to http://tarina.local. If you press enter on wifi you will be transported to a glorious program called Wicd curses, here you really need to have a keyboard to set up your connections. Hints are down on the screen what buttons to press. 
+Disk space, showing you how much of space left on your sd card. Shutdown, when your really done! it's good to do this before cutting the power or otherwise there's a small chance of sd card corruption. Srv is a network server, if your connected to a network and put this on you should be able to go to any browser on any device and watch your movie films (that is if you've rendered them first), just go to http://tarina.local or it might be that you have to know the ip address of your tarina (you'll find it when you've connected it. Press enter on wifi. There it is on the bottom of the screen, looks like this 192.168.1.105). If you press enter on wifi you will be transported to a glorious program called Wicd curses, here you really need to have a keyboard to set up your connections. Hints are down on the screen what buttons to press. To get back into Tarina press "q".
 
 ### Update and upload
-Update the camera to the most exclusive version, this is still pretty much a-work-in-progress and as a warnign expect some bugs. But don't worry I'll be improving things but it takes time. Upload your film to the web, there is a youtube uploader mod you can install but you'll have to do some configs to make it work for you. Details in the mods directory.
+Update the camera to the most exclusive version, this is still pretty much a-work-in-progress and as a warnign expect some bugs! don't worry I'll be improving things but it takes time. Upload your film to the web, there is a youtube uploader mod you can install but you'll have to do some configs to make it work for you. Details coming soon. Reach out to the matrix room if you're in a hurry..
 
 ### Backup
-It's good to always backup your stuff! Plug in your usb drive and just press enter and sit back and relax as the wonderful work of computer copying does the magic. While your at it open a beer cuz it can take quite a while if you got much stuff on there. Now, this should be working on almost all hard drives but there are some that still use a very old file system called fat, and its as lazy as its given name and doesnt store critical information we would want, because we want the copying to only copy our new takes or retakes. So please use new drives like ntfs systems or ext or whatever they all are called. You'll find all you takes even the shitty ones on your harddrive in a directory called /tarinafilms/. One more thing, there are some drives that are very powerhungry and doesnt come with it's own power source, now these drives are very bad for this particular use because the Tarina has limited amounts of power for usb use, so to be sure it's gonna work, use a powered hard drives with its own power cord.
+It's good to always backup your stuff! Plug in your usb drive and just press enter and sit back and relax as the wonderful work of computer copying does the magic. While you're at it open a beer cuz it can take quite a while if you got much stuff on there. Now, this should be working on almost all hard drives but there are some that still use a very old file system called fat, and its as lazy as its given name and doesnt store critical information we would want, because we want the copying to only copy our new takes or retakes. So please use new drives like ntfs systems or ext or whatever they all are called. You'll find all your takes even the shitty ones on your harddrive in a directory called /tarinafilms/. One more thing, there are some drives that are very power hungry and doesnt come with it's own power source, now these drives are very bad for this particular use because the Tarina has limited amounts of power for usb use, so to be sure it's gonna work, use powered hard drives that has got a power cord.
 
 ### Load and new
 You can have many on going films, load em up or start as many films as you like.
-
-### Features to come
-Now I've already talked about some features that'll be implemented but three very important ones that you can expect in the near future are Yank(copy), Insert and Move. 
 
 ------------------------------
 
