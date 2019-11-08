@@ -116,7 +116,7 @@ Get the parts
 
 ![Tarina parts layed out](tarina-build.jpg)
 
-Here is a list of parts that will work, there are other parts that probably will work but this is what I recommend.
+Here is a list of parts that will work, there are other parts that probably will work but requires some hacking.
 
 
 Raspberry pi 3 B
