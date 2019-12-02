@@ -461,6 +461,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
         writemessage(message + cursor)
         vumetermessage(helpmessage)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if event == ' ':
+            event = '_'
         if pressed == 'down':
             pausetime = time.time()
             if abcx < (len(abc) - 1):
@@ -485,13 +487,13 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                 cursor = abc[abcx]
         elif pressed == 'middle' or event == 10:
             if len(filmname) > 0:
-                if cursor != '_':
+                if abc[abcx] != '_':
                     filmname = filmname + abc[abcx]
                 try:
                     if filmname == oldfilmname:
                         return oldfilmname
                     elif filmname in getfilms(filmfolder)[0]:
-                        helpmessage = 'this filmname is already taken! chose another name!'
+                        helpmessage = 'this filmname is already taken! pick another name!'
                     elif filmname not in getfilms(filmfolder)[0]:
                         logger.info("New film " + filmname)
                         return(filmname)
@@ -799,10 +801,11 @@ def add_organize(filmfolder, filmname):
     # Scenes
     organized_nr = len(scenes)
     for i in sorted(scenes, reverse=True):
+        #print(i)
         if 'yanked' in i:
-            #print(i)
             os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_yanked ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
-        elif 'insert' in p:
+        elif 'insert' in i:
+            #print(p)
             os.system('mv -n ' + filmfolder + filmname + '/scene' + str(organized_nr - 1).zfill(3) + '_insert ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3))
             run_command('touch ' + filmfolder + filmname + '/scene' + str(organized_nr).zfill(3) + '/.placeholder')
         elif 'scene' in i:
@@ -1843,7 +1846,7 @@ def main():
     #MENUS
     menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE'
     #STANDARD VALUES
-    abc = '_', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
+    abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
     selectedaction = 0
     selected = 0
@@ -2108,6 +2111,7 @@ def main():
             #PASTE SHOT and PASTE SCENE
             elif event == 'P':
                 if menu[selected] == 'SHOT:' and yankedshot:
+                    vumetermessage('Pasting shot, please wait...')
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
                     try:
                         os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
@@ -2119,6 +2123,7 @@ def main():
                     vumetermessage('Shot pasted!')
                     time.sleep(1)
                 elif menu[selected] == 'SCENE:' and yankedscene:
+                    vumetermessage('Pasting scene, please wait...')
                     pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
                     add_organize(filmfolder, filmname)
@@ -2130,6 +2135,7 @@ def main():
             #MOVE SHOT and MOVE SCENE
             elif event == 'M':
                 if menu[selected] == 'SHOT:' and yankedshot:
+                    vumetermessage('Moving shot, please wait...')
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
                     try:
                         os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
@@ -2145,6 +2151,7 @@ def main():
                     vumetermessage('Shot moved!')
                     time.sleep(1)
                 elif menu[selected] == 'SCENE:' and yankedscene:
+                    vumetermessage('Moving scene, please wait...')
                     pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
                     os.system('cp -r ' + yankedscene + ' ' + pastescene)
                     os.system('rm -r ' + yankedscene + '/*')
@@ -2161,6 +2168,7 @@ def main():
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 os.makedirs(insertshot)
                 add_organize(filmfolder, filmname)
+                take = 1
                 updatethumb = True
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
@@ -2168,8 +2176,12 @@ def main():
             #INSERT SCENE
             elif event == 'I' and menu[selected] == 'SCENE:' and recordable == False:
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
+                logger.info("inserting scene")
                 os.makedirs(insertscene)
                 add_organize(filmfolder, filmname)
+                take = 1
+                shot = 1
+                updatethumb = True
                 vumetermessage('Scene ' + str(scene) + ' inserted')
                 time.sleep(1)
 
@@ -2204,20 +2216,20 @@ def main():
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 updatethumb = True
-                time.sleep(0.2)
+                time.sleep(0.5)
             #shot
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
                 updatethumb = True
-                time.sleep(0.2)
+                time.sleep(0.5)
             #scene
             elif pressed == 'remove' and menu[selected] == 'SCENE:':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
                 shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
-                time.sleep(0.2)
+                time.sleep(0.5)
             #film
             elif pressed == 'remove' and menu[selected] == 'FILM:':
                 remove(filmfolder, filmname, scene, shot, take, 'film')
@@ -2228,7 +2240,7 @@ def main():
                     scene, shot, take = countlast(filmname, filmfolder)
                     loadfilmsettings = True
                     updatethumb = True
-                    time.sleep(0.2)
+                    time.sleep(0.5)
 
         #RECORD AND PAUSE
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 3600:
