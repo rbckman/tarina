@@ -32,12 +32,14 @@ Introduction
 ============
 ![Tarina UI](tarina-filming-02.jpg)
 
-The interface focuses on presenting the essential tools in film making in one menu that is present and accessible all the time. You can control it with a keyboard or with the physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+The interface presents all the essential tools in film making under one menu that is present and accessible all the time. You can control it with a keyboard or with the physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
 
 Retake function
 ---------------
 
-After recording a take you'll see an image of the last frame of that take. Now, if you hit record again you'll move to the next shot in your movie. If you press retake you'll move to a new take of the same shot in your movie. Now, the live view is back and next time you'll hit record it will actually start recording. So, if you're browsing shots and a frame is present instead of the live view, hitting record will take you to the next new shot in your movie. Makes perfectly sense, right? When live view is present it will always start recording. So record and retake are multi functional buttons in that sense. Fiddle around with it, you'll totally get it and be blown away how simple it is.
+Always after recording a take you'll be presented with the last frame of that take. Now, if you are happy with it, press record again and you'll move to the next shot in your movie, oterwise press retake and you'll be filming a new take of that shot. At the time of writing the last take is always chosen into your movie film.
+
+Hint! pressing record while browsing existing takes, shots and scenes will take you to the last shot in that scene. Pressing retake will do just that, a retake. Makes perfectly sense, right? Fiddle around with it, you'll totally get it.
 
 Keys
 ====
@@ -71,10 +73,10 @@ Menus
 A short explanation of all the settings and why they are where they are.
 
 ### Film, scene, shot and take
-This you don't see on other cameras because they don't care about what you're filming, however this camera does and it wants to know where you are in your filmmaking process and help put it together. Of course this means that ***you*** have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check your montage on the spot and do a retake if you need to fix something rather than filming a bunch of things and fixing it later on another device. This will save ***you*** alot of time.
+This you don't see on other cameras because they don't care about what you're filming, however this camera does and it wants to know where you are in your filmmaking process and help put it together. Of course, this means that ***you*** have to know where you are in your filmmaking process. The idea of the workflow is: film only the essentials, check your montage on the spot and do a retake if you need to fix something rather than filming a bunch of things and fixing it later on. This will save ***you*** alot of time.
 
 ### Dubbing
-If you press enter while you've highlighted the film name or a scene you'll be entering dub settings menu. (ADD:d:1.0/o:1.0) this indicates the volume of the (d)ub to the previous (o)riginal mix. So, for example if you want the dub volume to be 50% of the previous audio, the settings would look like this (ADD:d:0.5/o:1.0). A good all-around background music volume level is only 10% so it would look like this (ADD:d:0.1/o:1.0). The other setting is fade in and out in seconds (in: 0.5) (out: 1.0) whould be half a second in and a second out. Now if you press enter while the ADD is highlighted you'll be dubbing. You can change the settings later if you come back to the menu. You can add up to 99 tracks!
+If you press enter while you've highlighted the film name or a scene you'll be entering dub settings menu. (ADD:d:1.0/o:1.0) this indicates the volume of the (d)ub to the previous (o)riginal mix. So, for example if you want the dub volume to be 50% of the previous audio, the settings would look like this (ADD:d:0.5/o:1.0). A good all-around background music volume level is only 10% so it would look like this (ADD:d:0.1/o:1.0). The other setting is fade in and out in seconds (in: 0.5) (out: 1.0) whould be half a second in and a second out. Now if you press enter while the ADD is highlighted you'll be dubbing. You can change the settings later if you come back to the menu.
 
 ### Shutter, iso, red, blue
 Shutter and iso are well know basic camera concepts. With red and blue you control the colors. If you press enter while on any of these then it will go into auto mode and if you press it again it will go back to manual mode with the current auto settings. I'm using this feature to quickly find a reasonable good value before I'm locking and tuning the settings manually to my likings. Cuz you always will know better than the robots!
