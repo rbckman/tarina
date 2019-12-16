@@ -202,6 +202,7 @@ This is the only power board that I could find with the feature to run the camer
 [Adafruit](https://www.adafruit.com/product/2465)
 **Buy**
 [Ebay](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)
+[Aliexpress](https://www.aliexpress.com/item/32881790567.html?spm=a2g0o.productlist.0.0.9e3b51caWDCb6A&algo_pvid=b569f235-3038-4305-abdc-24a84a3cd534&algo_expid=b569f235-3038-4305-abdc-24a84a3cd534-0&btsid=c7684116-cb0b-4c9c-967c-0deb42c7a73e&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
 
 
 8x8x5MM DIP-4 Silicone Switch Mute Silent button
@@ -212,6 +213,7 @@ You can only buy a pack of 20 pcs but these buttons are good and silent! Not nec
 
 **Buy**
 [Ebay](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT)
+[Aliexpress](https://www.aliexpress.com/item/32777086031.html?spm=a2g0o.productlist.0.0.5cfc6136IYeRxe&algo_pvid=f4209ce9-f7c5-47f1-8d98-6b0cd8affb32&algo_expid=f4209ce9-f7c5-47f1-8d98-6b0cd8affb32-0&btsid=7ceb3856-696f-4ddd-9858-84c295f67c48&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
 
 
 MCP23017-E/SP DIP-28 16 bit I / O expander I2C
@@ -281,7 +283,8 @@ Price ~2 eur
 This makes suprisingly good sounding sound!
 
 **Buy**
-[Aliexpress](https://www.aliexpress.com/item/MIC-microphone-amplifier-module-sound-module-voice-module/32268198506.html?spm=a2g0s.9042311.0.0.3ac34c4dNug0b5)
+[Aliexpress](https://www.aliexpress.com/item/4000155407648.html?spm=a2g0o.productlist.0.0.6531b3e4at8lT6&algo_pvid=0d7fd11d-df18-47a1-b2c8-5a4363b25058&algo_expid=0d7fd11d-df18-47a1-b2c8-5a4363b25058-1&btsid=81110095-4c46-46fd-9ab0-d55ad3e8a453&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
+[Ebay](https://www.ebay.com/itm/MAX9812-Microphone-Amplifier-Sound-MIC-Voice-Module-For-Arduino-3-3V-3-5V/123891576683?hash=item1cd8836f6b:g:aL4AAOSwtchdaPPB)
 
 
 3.5mm Female stereo headset interior PCB mount
@@ -461,6 +464,19 @@ Tested lenses
 
 Here is what I'm testing right now.
 
+2.8mm 3MP F1.2 CS
+-----------------
+Price ~ 6 €
+
+This is a good wide all around lens. Recomended!
+[Aliexpress](https://www.aliexpress.com/item/32973023765.html?spm=a2g0o.productlist.0.0.4e9c3761rLgRE0&algo_pvid=f9a62bbd-7981-48cb-a080-c39336b9f53f&algo_expid=f9a62bbd-7981-48cb-a080-c39336b9f53f-1&btsid=028c8b49-83e8-4c56-9b8b-6c32c36e65d9&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
+
+2.5mm 3MP F1.2 CS
+-----------------
+Price ~ 6 €
+
+This is an even wider lens. Seems to be the same manufacterer.
+[Aliexpress](https://www.aliexpress.com/item/32970488708.html?spm=a2g0o.detail.1000023.1.782e6003A85K1u)
 
 Yumiki 6-60mm 1/3" CS Lens CCTV Lens IR F1.6 Manual Zoom Manual Iris 
 --------------------------------------------------------------------
