@@ -292,7 +292,7 @@ Price ~2 eur
 This makes suprisingly good sounding sound!
 
 **Buy**
-[Aliexpress](https://www.aliexpress.com/item/4000155407648.html?spm=a2g0o.productlist.0.0.6531b3e4at8lT6&algo_pvid=0d7fd11d-df18-47a1-b2c8-5a4363b25058&algo_expid=0d7fd11d-df18-47a1-b2c8-5a4363b25058-1&btsid=81110095-4c46-46fd-9ab0-d55ad3e8a453&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
+[Aliexpress](https://www.aliexpress.com/item/32793366801.html?spm=a2g0o.productlist.0.0.3343b3e4A9qKJg&algo_pvid=b104d20a-b6da-4c46-9be9-d2b8ff358af1&algo_expid=b104d20a-b6da-4c46-9be9-d2b8ff358af1-6&btsid=40518322-e328-4247-9132-570609040804&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
 [Ebay](https://www.ebay.com/itm/MAX9812-Microphone-Amplifier-Sound-MIC-Voice-Module-For-Arduino-3-3V-3-5V/123891576683?hash=item1cd8836f6b:g:aL4AAOSwtchdaPPB)
 
 
@@ -354,8 +354,6 @@ Price ~1 eur/pcs
 We only need the metal parts from these, if you have som thin metal you could cut these yourself.
 
 **Buy**
-[Aliexpress](https://www.aliexpress.com/item/5Pcs-lot-AG13-LR44-Button-Cell-Battery-Socket-Holder-Plastic-Case-TBH-AG13-B/32833837989.html?spm=a2g0s.9042311.0.0.27424c4dE5lqct)
-
 [Aliexpress](https://www.aliexpress.com/item/4-Pcs-Black-Plastic-Button-Coin-Cell-Battery-Socket-Holder-for-2-x-AG13-LR44/33013344736.html?spm=a2g0s.9042311.0.0.671b4c4djbzZzg)
 
 3.5mm Jack to jack aux cable
@@ -377,8 +375,37 @@ Wireless control over camera. You will also need this for wifi settings etc. (Re
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/Rii-mini-i8-Russian-English-Spanish-Hebrew-Version-Wireless-Backlit-Keyboard-with-Touchpad-for-PC-Smart/32450468690.html?spm=a2g0s.9042311.0.0.27424c4dKdqpVO)
 
-
 Parts grand total ~200 eur
+
+Optional parts
+==============
+
+Tarina viewfinder 
+-----------------
+
+This is a 3.5 inch viewfinder for Tarina that you can 3d print and make by buying these three parts.
+
+Lens D42 F110mm
+---------------
+Price ~10 eur
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/32958816619.html?spm=a2g0s.9042311.0.0.6fb54c4dGb4wI7)
+
+Rubber Eyepiece
+---------------
+Price ~4 eur
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/32780859922.html?spm=a2g0s.9042311.0.0.27424c4dmVqriG)
+
+Magnets 25mm x 5mm x 1.5mm
+--------------------------
+Price ~3 eur 10 pcs
+
+**Buy**
+[Aliexpress](https://www.aliexpress.com/item/32963277127.html?spm=a2g0s.9042311.0.0.27424c4dRc1vCZ)
+
 
 3d printing
 ===========
