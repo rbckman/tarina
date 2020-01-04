@@ -16,10 +16,6 @@ Films made with Tarina
 
 Beatiful pictures and sounds from a bushcamp in Australia.
 
-### [Chillin Day in Ruhnu](https://www.youtube.com/watch?v=2t5h0sQ8GFc)
-
-The crew of sailing ship Spartan on a Viking Island outside Riga, Ruhnu.
-
 ### [Building Tarina](https://youtu.be/7dhCiDPssR4)
 
 A how to build Tarina film. 
