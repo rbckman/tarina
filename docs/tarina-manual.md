@@ -472,11 +472,11 @@ Installing software
 
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
+Go to home folder
 ```
-sudo raspi-config
+cd /home/pi
 ```
-Expand file system, enable camera and then reboot.
-Run this to install git:
+Install git
 ```
 sudo apt-get install git
 ```
