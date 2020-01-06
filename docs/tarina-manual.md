@@ -453,11 +453,8 @@ Wiring
 ![Tarina wiring diagram](wiring.png)
 ![3d printed and painted, next up sanding and adding one more paint layer](tarina-build-13.jpg)
 ![Fitting everything together](tarina-build-04.jpg)
-![Building](tarina-build-07.jpg)
 ![Ready for screen](tarina-build-02.jpg)
 ![MCP and buttons](tarina-build-08.jpg)
-![MCP and buttons](tarina-build-11.jpg)
-![Building](tarina-build-07.jpg)
 ![Sound card ready to be soldered](tarina-build-10.jpg)
 
 
@@ -472,6 +469,7 @@ Installing software
 
 Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
+
 Go to home folder
 ```
 cd /home/pi
