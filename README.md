@@ -51,6 +51,10 @@ Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and 
 ```
 sudo apt-get install git
 ```
+Go to /home/pi/ folder
+```
+cd /home/pi
+```
 Git clone tarina and then run install script with sudo:
 ```
 git clone https://github.com/rbckman/tarina.git
