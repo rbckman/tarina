@@ -512,7 +512,7 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                 cursor = ' '
             blinking = not blinking
             pausetime = time.time()
-        time.sleep(0.08)
+        time.sleep(keydelay)
 
 #------------Timelapse--------------------------
 
@@ -1758,7 +1758,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if readbus == 255 and readbus2 == 247 and event == '':
         buttonpressed = False
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
-        if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown':
+        if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown' or holdbutton == 'remove':
             pressed = holdbutton
             keydelay = 0.06
     if time.time() - buttontime > 2 and buttonpressed == True:
