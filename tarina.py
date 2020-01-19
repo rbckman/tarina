@@ -1712,7 +1712,8 @@ def waitforanykey():
             return
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    val = term.inkey(timeout=0)
+    with term.cbreak():
+        val = term.inkey(timeout=0)
     if val.is_sequence:
         event = val.name
         print(event)
@@ -2034,7 +2035,6 @@ def main():
                             try:
                                 run_command(cmd)
                             except Exception as e: logger.warning(e)
-                            time.sleep(10)
                             startinterface()
                             camera = startcamera(lens)
                             loadfilmsettings = True
@@ -2591,8 +2591,7 @@ def main():
 if __name__ == '__main__':
     import sys
     try:
-        with term.cbreak():
-            main()
+        main()
     except:
         os.system('pkill arecord')
         os.system('pkill startinterface')

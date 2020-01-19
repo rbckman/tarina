@@ -4,10 +4,23 @@
 # $2 filename
 PATH=`pwd`
 
-echo 'Youtube Title: '
-read title
-echo 'Description: '
-read description
+printf "\033c"
+
+/bin/cat <<'EOF'     
+
+                                _                          _                 _ 
+                      _        | |                        | |               | |
+    _   _  ___  _   _| |_ _   _| | _   ____    _   _ ____ | | ___   ____  _ | |
+   | | | |/ _ \| | | |  _) | | | || \ / _  )  | | | |  _ \| |/ _ \ / _  |/ || |
+   | |_| | |_| | |_| | |_| |_| | |_) | (/ /   | |_| | | | | | |_| ( ( | ( (_| |
+    \__  |\___/ \____|\___)____|____/ \____)   \____| ||_/|_|\___/ \_||_|\____|
+    (____/                                           |_|                        
+    
+
+EOF
+read -p "   Youtube film title: " title
+read -p "   Youtube film description: " description
+
 
 while true; do
     read -p 'Do you want your video public (y)es (n)o?:' yn
