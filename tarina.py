@@ -1805,7 +1805,7 @@ def startcamera(lens):
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
     camera.crop = (0, 0, 1.0, 1.0)
-    #camera.video_stabilization = True
+    camera.video_stabilization = True
     camera.led = False
     #lens_shading_table = np.zeros(camera._lens_shading_table_shape(), dtype=np.uint8) + 32
     #camera.lens_shading_table = lens_shading_table
