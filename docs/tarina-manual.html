@@ -90,6 +90,7 @@
 <p>Disk space, showing you how much of space left on your sd card. Shutdown, when your really done! it's good to do this before cutting the power or otherwise there's a small chance of sd card corruption. Srv is a network server, if your connected to a network and put this on you should be able to go to any browser on any device and watch your movie films (that is if you've rendered them first), just go to http://tarina.local or it might be that you have to know the ip address of your tarina (you'll find it when you've connected it. Press enter on wifi. There it is on the bottom of the screen, looks like this 192.168.1.105). If you press enter on wifi you will be transported to a glorious program called Wicd curses, here you really need to have a keyboard to set up your connections. Hints are down on the screen what buttons to press. To get back into Tarina press &quot;q&quot;.</p>
 <h3 id="update-and-upload">Update and upload</h3>
 <p>Update the camera to the most exclusive version, this is still pretty much a-work-in-progress and as a warnign expect some bugs! don't worry I'll be improving things but it takes time. Upload your film to the web, there is a youtube uploader mod you can install but you'll have to do some configs to make it work for you. Details coming soon. Reach out to the matrix room if you're in a hurry..</p>
+<p>to get the youtube api secrets <code>wget https://tarina.org/yt/.client_secrets.json</code></p>
 <h3 id="backup">Backup</h3>
 <p>It's good to always backup your stuff! Plug in your usb drive and just press enter and sit back and relax as the wonderful work of computer copying does the magic. While you're at it open a beer cuz it can take quite a while if you got much stuff on there. Now, this should be working on almost all hard drives but there are some that still use a very old file system called fat, and its as lazy as its given name and doesnt store critical information we would want, because we want the copying to only copy our new takes or retakes. So please use new drives like ntfs systems or ext or whatever they all are called. You'll find all your takes even the shitty ones on your harddrive in a directory called /tarinafilms/. One more thing, there are some drives that are very power hungry and doesnt come with it's own power source, now these drives are very bad for this particular use because the Tarina has limited amounts of power for usb use, so to be sure it's gonna work, use powered hard drives that has got a power cord.</p>
 <h3 id="load-and-new">Load and new</h3>
@@ -141,6 +142,10 @@
 <p>Price ~17 eur</p>
 <p>I have tried several batteries, the adafruit 6800mAh is also fine.</p>
 <p><strong>Buy</strong> <a href="https://www.aliexpress.com/item/free-shipping-3-7v-7800mah-18650-li-ion-rechargeable-battery-pack-18650-3P-lithium-ion-battery/32823635264.html?spm=a2g0s.9042311.0.0.49ba4c4dyoKkZS">Aliexpress</a></p>
+<p>Or you can buy 3 pcs of 3.7V 18650 Lithium cells and protect them with an Lithium Battery Protection Board Overcharge Over-discharge.</p>
+<p><a href="https://www.aliexpress.com/item/32826851071.html?spm=a2g0s.9042311.0.0.27424c4dUBojcv">Aliexpress</a></p>
+<p>Here's a pack with 40 pcs of 2600mAh 3.7V 18650 cells.</p>
+<p><a href="https://www.aliexpress.com/item/32795814865.html?spm=a2g0s.9042311.0.0.27424c4dUBojcv">Aliexpress</a></p>
 <h2 id="adafruit-powerboost-1000c">Adafruit Powerboost 1000C</h2>
 <p>Price ~23 eur</p>
 <p>This is the only power board that I could find with the feature to run the camera and charge it at the same time.</p>
@@ -256,13 +261,14 @@
 <li>Continue like this til you are satisfied with the feel, now I like to have a good grip so I finnish with sanding with 400 grit paper and leave it like that.</li>
 </ul>
 <h1 id="wiring">Wiring</h1>
-<p><img src="wiring.png" alt="Tarina wiring diagram" /> <img src="tarina-build-13.jpg" alt="3d printed and painted, next up sanding and adding one more paint layer" /> <img src="tarina-build-04.jpg" alt="Fitting everything together" /> <img src="tarina-build-07.jpg" alt="Building" /> <img src="tarina-build-02.jpg" alt="Ready for screen" /> <img src="tarina-build-08.jpg" alt="MCP and buttons" /> <img src="tarina-build-11.jpg" alt="MCP and buttons" /> <img src="tarina-build-07.jpg" alt="Building" /> <img src="tarina-build-10.jpg" alt="Sound card ready to be soldered" /></p>
+<p><img src="wiring.png" alt="Tarina wiring diagram" /> <img src="tarina-build-13.jpg" alt="3d printed and painted, next up sanding and adding one more paint layer" /> <img src="tarina-build-04.jpg" alt="Fitting everything together" /> <img src="tarina-build-02.jpg" alt="Ready for screen" /> <img src="tarina-build-08.jpg" alt="MCP and buttons" /> <img src="tarina-build-10.jpg" alt="Sound card ready to be soldered" /></p>
 <h1 id="putting-it-together">Putting it together</h1>
 <p>Documentation on its way, if you're in a hurry feel free to drop a message in <a href="https://riot.im/app/#/room/#tarina:matrix.tarina.org">#tarina:matrix.tarina.org</a></p>
 <h1 id="installing-software">Installing software</h1>
 <p>Download latest <a href="https://www.raspberrypi.org/downloads/raspbian/">Raspbian</a> and follow <a href="https://www.raspberrypi.org/documentation/installation/installing-images/README.md">install instructions</a>. <a href="https://www.raspberrypi.org/documentation/remote-access/ssh/">Ssh into</a> Raspberry Pi and run:</p>
-<pre><code>sudo raspi-config</code></pre>
-<p>Expand file system, enable camera and then reboot. Run this to install git:</p>
+<p>Go to home folder</p>
+<pre><code>cd /home/pi</code></pre>
+<p>Install git</p>
 <pre><code>sudo apt-get install git</code></pre>
 <p>Git clone tarina and then run install script with sudo:</p>
 <pre><code>git clone https://github.com/rbckman/tarina.git

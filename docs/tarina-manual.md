@@ -202,6 +202,13 @@ I have tried several batteries, the adafruit 6800mAh is also fine.
 **Buy**
 [Aliexpress](https://www.aliexpress.com/item/free-shipping-3-7v-7800mah-18650-li-ion-rechargeable-battery-pack-18650-3P-lithium-ion-battery/32823635264.html?spm=a2g0s.9042311.0.0.49ba4c4dyoKkZS)
 
+Or you can buy 3 pcs of 3.7V 18650 Lithium cells and protect them with an Lithium Battery Protection Board Overcharge Over-discharge.
+
+[Aliexpress](https://www.aliexpress.com/item/32826851071.html?spm=a2g0s.9042311.0.0.27424c4dUBojcv)
+
+Here's a pack with 40 pcs of 2600mAh 3.7V 18650 cells.
+
+[Aliexpress](https://www.aliexpress.com/item/32795814865.html?spm=a2g0s.9042311.0.0.27424c4dUBojcv)
 
 Adafruit Powerboost 1000C
 -------------------------
