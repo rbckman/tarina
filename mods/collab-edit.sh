@@ -4,4 +4,4 @@
 # $2 filename
 PATH=`pwd`
 
-/usr/bin/rsync --rsh='/usr/bin/ssh -p 13337' -avr -P /home/pi/Videos/$1 tarina@tarina.org:/home/tarina/Videos/$1 --delete
+/usr/bin/rsync --rsh='/usr/bin/ssh -p 13337' -avr -P /home/pi/Videos/$1 tarina@tarina.org:/home/tarina/Videos --delete
