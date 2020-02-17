@@ -1873,7 +1873,7 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
-    headphoneslevel = 50
+    headphoneslevel = 40
     miclevel = 50
     recording = False
     retake = False
