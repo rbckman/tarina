@@ -926,7 +926,7 @@ def scenefiles(filmfolder, filmname):
     scene = 1
     while scene <= scenes:
         folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/'
-        filename = 'scene' + str(scene).zfill(3)
+        filename = 'scene'
         files.append(folder + filename)
         scene = scene + 1
     #writemessage(str(len(shotfiles)))
@@ -941,8 +941,24 @@ def renderscene(filmfolder, filmname, scene):
     videohash = ''
     oldvideohash = ''
     filmfiles = shotfiles(filmfolder, filmname, scene)
-    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene' + str(scene).zfill(3)
-    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/' 
+    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene'
+    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+
+    # Check if video corrupt
+    renderfix = False
+    try:
+        pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + renderfilename + '.mp4', shell=True)
+        videolenght = pipe.decode().strip()
+    except:
+        videolenght = ''
+    print('Scene lenght ' + videolenght)
+    if videolenght == '':
+        print('Okey, scene file not found or is corrupted')
+        # For backwards compatibility remove old rendered scene files
+        run_command('rm ' + renderfilename + '*')
+        renderfix = True
+
+    # Video Hash
     for p in filmfiles:
         videohash = videohash + str(int(countsize(p + '.mp4')))
     print('Videohash of scene is: ' + videohash)
@@ -954,11 +970,14 @@ def renderscene(filmfolder, filmname, scene):
         print('no videohash found, making one...')
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
-    if videohash != oldvideohash:
+
+    # Render if needed
+    if videohash != oldvideohash or renderfix == True:
         rendervideo(filmfiles, renderfilename, 'scene ' + str(scene))
         print('updating videohash...')
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
+
     #Audio
     audiohash = ''
     oldaudiohash = ''
@@ -977,7 +996,7 @@ def renderscene(filmfolder, filmname, scene):
         print('no audiohash found, making one...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
-    if audiohash != oldaudiohash or newmix == True:
+    if audiohash != oldaudiohash or newmix == True or renderfix == True:
         renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
