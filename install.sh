@@ -134,7 +134,9 @@ StandardError=inherit
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes
-Nice=-15
+Nice=-20
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority=99
 
 [Install]
 WantedBy=local-fs.target
