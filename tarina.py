@@ -2269,42 +2269,42 @@ def audiodelay(foldername, filename):
     if not audiolenght.strip():
         audiolenght = 0
     #separate seconds and milliseconds
-    videoms = int(videolenght) % 1000
-    audioms = int(audiolenght) % 1000
-    videos = int(videolenght) / 1000
-    audios = int(audiolenght) / 1000
+    #videoms = int(videolenght) % 1000
+    #audioms = int(audiolenght) % 1000
+    #videos = int(videolenght) / 1000
+    #audios = int(audiolenght) / 1000
     if int(audiolenght) > int(videolenght):
         #calculate difference
         audiosync = int(audiolenght) - int(videolenght)
         newaudiolenght = int(audiolenght) - audiosync
         logger.info('Audiofile is: ' + str(audiosync) + 'ms longer')
         #trim from end and put a 0.01 in- and outfade
-        run_command('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -0.' + str(audiosync).zfill(3))
+        run_command('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
         run_command('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
         os.remove(foldername + filename + '_temp.wav')
-        if int(audiosync) > 400:
-            writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
-            vumetermessage('Consider changing to a faster microsd card.')
-            time.sleep(10)
+        #if int(audiosync) > 400:
+        #    writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
+        #    vumetermessage('Consider changing to a faster microsd card.')
+        #    time.sleep(10)
         delayerr = 'A' + str(audiosync)
     else:
         #calculate difference
-        audiosyncs = videos - audios
-        audiosyncms = videoms - audioms
+        #audiosyncs = videos - audios
+        #audiosyncms = videoms - audioms
         #if audiosyncms < 0:
         #    if audiosyncs > 0:
         #        audiosyncs = audiosyncs - 1
         #    audiosyncms = 1000 + audiosyncms
-        logger.info('Videofile is: ' + str(audiosyncs) + 's longer')
+        logger.info('Videofile is: ' + str(audiosync) + 'ms longer')
         #make fade
         run_command('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
-        run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(round(audiosyncs,3)))
+        run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
         #add silence to end
         run_command('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
         os.remove(foldername + filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
-        delayerr = 'V' + str(round(audiosyncs,3))
+        delayerr = 'V' + str(audiosync)
     os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
