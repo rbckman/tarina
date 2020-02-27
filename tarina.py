@@ -2408,7 +2408,7 @@ def uploadfilm(filename, filmname):
         elif pressed == 'middle' and  menu[selected] == 'Back':
             return None
         elif pressed == 'middle' and  menu[selected] in mods:
-            cmd = tarinafolder + '/mods/' + menu[selected] + '.sh ' + filmname + ' ' + filename
+            cmd = tarinafolder + '/mods/' + menu[selected] + '.sh ' + filmname + ' ' + filename + '.mp4'
             return cmd
         time.sleep(0.02)
 

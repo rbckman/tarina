@@ -41,4 +41,4 @@ while true; do
     esac
 done
 
-/usr/bin/python3 $PATH/mods/youtube-upload/youtube_upload/__main__.py --title="$title" --description="$description" --privacy="$privacy" $2.mp4
+/usr/bin/python3 $PATH/mods/youtube-upload/youtube_upload/__main__.py --title="$title" --description="$description" --privacy="$privacy" $2
