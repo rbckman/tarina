@@ -1950,7 +1950,9 @@ def removedub(dubfolder, dubnr):
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'middle' and selected == 0:
-            return
+            logger.info('dont remove dub')
+            time.sleep(0.3)
+            break
         elif pressed == 'middle' and selected == 1: 
             os.system('rm ' + dubfolder + 'dub' + str(dubnr).zfill(3) + '.wav')
             os.system('rm ' + dubfolder + '.settings' + str(dubnr).zfill(3))
@@ -1978,7 +1980,7 @@ def removedub(dubfolder, dubnr):
                     organized_nr += 1
             logger.info('removed dub file!')
             vumetermessage('dub removed!')
-            return
+            break
         time.sleep(0.05)
 
 #-------------Clip settings---------------
