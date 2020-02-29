@@ -195,6 +195,7 @@ def main():
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
                 filmfiles = shotfiles(filmfolder, filmname, scene)
+                writemessage('Loading scene...')
                 if len(filmfiles) > 0:
                     #Check if rendered video exist
                     camera.stop_preview()
@@ -205,6 +206,7 @@ def main():
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
+                writemessage('Loading film...')
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp)
@@ -214,6 +216,7 @@ def main():
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
                 takes = counttakes(filmname, filmfolder, scene, shot)
+                writemessage('Loading clip...')
                 if takes > 0:
                     removeimage(camera, overlay)
                     camera.stop_preview()
