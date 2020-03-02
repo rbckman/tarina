@@ -53,3 +53,34 @@ make
 make arecord
 ```
 
+
+Ecasound update
+===============
+
+### Python example
+
+from pyeca import *
+e = ECA_CONTROL_INTERFACE()
+e.command("cs-add chainsetup")
+e.command("c-add 1st_chain")
+e.command("ai-add plughw,0,0 ")
+e.command("ao-add /dev/dsp")
+e.command("cop-add -efl:100")
+e.command("cop-select 1")
+e.command("copp-select 1")
+e.command("cs-connect")
+e.command("start")
+
+
+# ecasound chainsetup file
+
+# general 
+-B:rtlowlatency -n:"write_chain" -X -z:noxruns -z:nopsr -z:mixmode,sum
+
+# audio inputs 
+-a:1chain,2chain -f:s16_le,2,44100 -i:alsahw,3,0,0
+
+# audio outputs 
+-a:1chain -f:s16_le,2,44100 -o:alsahw,3,0,0
+-a:2chain -f:s16_le,2,44100 -o:test.wav,
+
