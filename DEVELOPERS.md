@@ -59,6 +59,7 @@ Ecasound update
 
 ### Python example
 
+```
 from pyeca import *
 e = ECA_CONTROL_INTERFACE()
 e.command("cs-add chainsetup")
@@ -70,8 +71,11 @@ e.command("cop-select 1")
 e.command("copp-select 1")
 e.command("cs-connect")
 e.command("start")
+```
 
+### Ecasound config file
 
+```
 # ecasound chainsetup file
 
 # general 
@@ -83,4 +87,4 @@ e.command("start")
 # audio outputs 
 -a:1chain -f:s16_le,2,44100 -o:alsahw,3,0,0
 -a:2chain -f:s16_le,2,44100 -o:test.wav,
-
+```
