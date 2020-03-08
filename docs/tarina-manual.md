@@ -298,12 +298,14 @@ MAX9812 Microphone amplifier
 ----------------------------
 Price ~2 eur
 
-This makes suprisingly good sounding sound!
+This makes suprisingly good sounding sound! The original piece that I used is out of production, I have now found a similar module but I need to change the 3d module a little bit because the new module is alot smaller which is good. Need to test these new ones!
 
 **Buy**
-[Aliexpress](https://www.aliexpress.com/item/32793366801.html?spm=a2g0o.productlist.0.0.3343b3e4A9qKJg&algo_pvid=b104d20a-b6da-4c46-9be9-d2b8ff358af1&algo_expid=b104d20a-b6da-4c46-9be9-d2b8ff358af1-6&btsid=40518322-e328-4247-9132-570609040804&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
-[Ebay](https://www.ebay.com/itm/MAX9812-Microphone-Amplifier-Sound-MIC-Voice-Module-For-Arduino-3-3V-3-5V/123891576683?hash=item1cd8836f6b:g:aL4AAOSwtchdaPPB)
+[Aliexpress](https://www.aliexpress.com/item/32793366801.html?spm=a2g0o.productlist.0.0.3343b3e4A9qKJg&algo_pvid=b104d20a-b6da-4c46-9be9-d2b8ff358af1&algo_expid=b104d20a-b6da-4c46-9be9-d2b8ff358af1-6&btsid=40518322-e328-4247-9132-570609040804&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55) (out of stock)
+[Ebay](https://www.ebay.com/itm/MAX9812-Microphone-Amplifier-Sound-MIC-Voice-Module-For-Arduino-3-3V-3-5V/123891576683?hash=item1cd8836f6b:g:aL4AAOSwtchdaPPB) (out of stock)
 
+New module (still untested) [Aliexpress](https://www.aliexpress.com/item/33052676199.html?spm=a2g0o.productlist.0.0.2f162176RNC7gL&algo_pvid=4ad3160a-b57e-4a87-ac6c-f32584343324&algo_expid=4ad3160a-b57e-4a87-ac6c-f32584343324-0&btsid=0ab6fa8115836622569272085ec52c&ws_ab_test=searchweb0_0,searchweb201602_,searchweb201603_)
+Bigger electrec mics (if needed) [Aliexpress](https://www.aliexpress.com/item/32639718325.html?spm=a2g0s.9042311.0.0.27424c4d7cO7CI) 
 
 3.5mm Female stereo headset interior PCB mount
 ----------------------------------------------
