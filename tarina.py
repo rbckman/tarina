@@ -61,7 +61,7 @@ term = Terminal()
 #------------- The Main Thing --------------
 
 def main():
-    global tarinafolder, screen, loadfilmsettings
+    global tarinafolder, screen, loadfilmsettings, debianversion
 
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
@@ -122,6 +122,10 @@ def main():
     f = open(tarinafolder + '/VERSION')
     tarinaversion = f.readline()
     tarinavername = f.readline()
+
+    #DEBIAN VERSION
+    pipe = subprocess.check_output('lsb_release -c -s', shell=True)
+    debianversion = pipe.decode()
 
     #Turn off hdmi to save power
     run_command('tvservice -o')
@@ -1859,7 +1863,10 @@ def renderfilm(filmfolder, filmname, comp):
         #count estimated audio filesize with a bitrate of 320 kb/s
         audiosize = countsize(renderfilename + '.wav') * 0.453
         os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-        p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+        if debianversion == 'stretch':
+            p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+        else:
+            p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
         while p.poll() is None:
             time.sleep(0.2)
             try:
