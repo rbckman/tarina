@@ -34,7 +34,7 @@ sleep 2
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-apt-get -y install git python3-pip python-configparser libav-tools ffmpeg mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
+apt-get -y install git python3-pip python-configparser ffmpeg mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
 echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
 echo "installing blessed..."
