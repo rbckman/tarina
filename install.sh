@@ -107,10 +107,7 @@ echo "Make USB soundcard default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"
 cat <<'EOF' > /etc/modprobe.d/alsa-base.conf
 #set index value
-options snd_usb_audio index=0
-options snd_bcm2835 index=1
-#reorder
-options snd slots=snd_usb_audio, snd_bcm2835
+options snd-usb-audio index=-2
 EOF
 
 echo "Automatically boot to Tarina"
