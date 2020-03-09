@@ -1,9 +1,15 @@
 import sys
+import pyshorteners
+
+def shorten_url(url):
+    s = pyshorteners.Shortener()
+    short_url = s.tinyurl.short(url)
+    return short_url
 
 def get_code(authorize_url):
-    
+    short_url = shorten_url(authorize_url)
     """Show authorization URL and return the code the user wrote."""
-    message = "Check this link in your browser: {0}".format(authorize_url)
+    message = "Check this link in your browser: " + short_url
     sys.stderr.write(message + "\n")
     try: input = raw_input #For Python2 compatability
     except NameError: 

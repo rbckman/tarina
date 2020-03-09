@@ -227,6 +227,9 @@ cp extras/.vimrc /root/.vimrc
 cp extras/.vimrc /home/pi/.vimrc
 
 echo "Installing youtube upload mod..."
+sudo pip3 install pyshorteners
+sudo pip3 install google-api-python-client==1.7.3 oauth2client==4.1.2 progressbar2==3.38.0 httplib2==0.15.0
+
 cd mods
 ./install-youtube-upload.sh
 cd ..
