@@ -136,6 +136,7 @@ options snd_usb_audio index=0
 options snd_bcm2835 index=1
 #reorder
 options snd slots=snd_usb_audio, snd_bcm2835
+EOF
 fi
 
 echo "Automatically boot to Tarina"
