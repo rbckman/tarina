@@ -31,12 +31,8 @@ echo "setting up system for filmmaking flow..."
 sleep 2
 echo "if something goes wrong please submit bug to https://github.com/rbckman/tarina"
 sleep 2
-filename="/etc/debian_version"
-cat $filename | while read -r line; do
-	version="$line"
-	echo "Debian version $version"
-done
-if [ $version > 10 ]
+version="$(lsb_release -c -s)"
+if [ "$version" = "buster" ]
 then
     echo "Debian Buster found"
 else
@@ -45,7 +41,7 @@ fi
 echo "Installing all dependencies..."
 apt-get update
 apt-get upgrade -y
-if [ $version > 10 ]
+if [ "$version" = "buster" ]
 then
     apt-get -y install git python3-pip python-configparser libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
 else
@@ -121,7 +117,7 @@ sleep 4
 
 echo "Make USB soundcard default"
 echo "writing to /etc/modprobe.d/alsa-base.conf"
-if [ $version > 10 ]
+if [ "$version" = "buster" ]
 then
 echo "Debian Buster Alsa config"
 cat <<'EOF' > /etc/modprobe.d/alsa-base.conf
