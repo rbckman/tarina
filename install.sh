@@ -122,7 +122,7 @@ then
 echo "Debian Buster Alsa config"
 cat <<'EOF' > /etc/modprobe.d/alsa-base.conf
 #set index value
-options snd-usb-audio index=-2
+options snd_usb_audio index=-2
 EOF
 else
 echo "Debian Stretch Alsa config"
