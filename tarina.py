@@ -38,7 +38,7 @@ from blessed import Terminal
 
 #if buttons are installed
 try:
-    bus = smbus.SMBus(3) # Rev 2 Pi uses 1
+    bus = smbus.SMBus(11) # Rev 2 Pi uses 1
     DEVICE = 0x20 # Device address (A0-A2)
     IODIRB = 0x0d # Pin pullups B-side
     IODIRA = 0x00 # Pin pullups A-side 0x0c
