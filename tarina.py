@@ -1159,9 +1159,9 @@ def getconfig(version):
         holdbutton = ''
         selected = 0
         header = 'What revision of ' + version + ' sensor are you using?'
-        menu = 'rev.C', 'rev.D'
+        menu = 'rev.C', 'rev.D', 'hq-camera'
         while True:
-            settings = '', ''
+            settings = '', '', ''
             writemenu(menu,settings,selected,header)
             pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
             if pressed == 'right':
@@ -2585,11 +2585,11 @@ def stopinterface(camera):
 
 def startcamera(lens):
     camera = picamera.PiCamera()
-    camera.resolution = (1920, 816) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
+    camera.resolution = (2028, 863) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
-    table = read_table('lenses/' + lens)
+    #table = read_table('lenses/' + lens)
     #camera.framerate = 24.999
     v = camera.revision
     camera_model, camera_revision = getconfig(v)
@@ -2608,12 +2608,14 @@ def startcamera(lens):
         # ov5647 Rev D"
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
+    else:
+        camera.framerate = 24.999
     camera.crop = (0, 0, 1.0, 1.0)
     camera.video_stabilization = True
     camera.led = False
     #lens_shading_table = np.zeros(camera._lens_shading_table_shape(), dtype=np.uint8) + 32
     #camera.lens_shading_table = lens_shading_table
-    camera.lens_shading_table = table
+    #camera.lens_shading_table = table
     camera.start_preview()
     camera.awb_mode = 'auto'
     return camera
