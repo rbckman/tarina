@@ -54,7 +54,7 @@ sudo pip3 install blessed
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade
 echo "installing web.py for the tarina webserver..."
-sudo pip3 install web.py==0.40-dev1
+sudo pip3 install web.py==0.61
 
 if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
 then
