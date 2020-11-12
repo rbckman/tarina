@@ -226,6 +226,7 @@ def main():
                     camera.stop_preview()
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
+                    compileshot(foldername + filename)
                     playdub(foldername + filename, False, headphoneslevel)
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
@@ -324,13 +325,6 @@ def main():
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
-
-            #ADELAY
-            elif pressed == 'middle' and menu[selected] == 'ADELAY':
-                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
-                filename = 'take' + str(take).zfill(3)
-                os.system('cp ' + foldername + filename + '.wav /dev/shm/')
-                delayerr = audiodelay(foldername,filename)
 
             #YANK(COPY) SHOT
             elif event == 'Y' and menu[selected] == 'SHOT:' and recordable == False:
@@ -509,8 +503,9 @@ def main():
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                 thefile = foldername + filename 
                 updatethumb = True
-                compileshot(foldername + filename)
-                delayerr = audiodelay(foldername,filename)
+                #compileshot(foldername + filename)
+                os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
+                #delayerr = audiodelay(foldername,filename)
                 if beeps > 0:
                     buzz(300)
             #if not in last shot or take then go to it
@@ -778,6 +773,7 @@ def main():
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4')
+                recordable = not os.path.isfile(foldername + filename + '.h264')
                 overlay = removeimage(camera, overlay)
                 imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename)
@@ -938,7 +934,7 @@ def countlast(filmname, filmfolder):
         allfiles = []
         takes = 0
     for a in allfiles:
-        if '.mp4' in a:
+        if '.mp4' in a or '.h264' in a:
             takes = takes + 1
     return scenes, shots, takes
 
@@ -980,7 +976,7 @@ def counttakes(filmname, filmfolder, scene, shot):
         allfiles = []
         return takes
     for a in allfiles:
-        if '.mp4' in a:
+        if '.mp4' in a or '.h264' in a:
             takes = takes + 1
     return takes
 
@@ -1610,6 +1606,7 @@ def compileshot(filename):
     else:
         writemessage('Converting to playable video')
         run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
+        delayerr = audiodelay(filename)
         os.system('rm ' + filename + '.h264')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
@@ -1740,6 +1737,7 @@ def renderscene(filmfolder, filmname, scene):
 
     # Video Hash
     for p in filmfiles:
+        compileshot(p)
         videohash = videohash + str(int(countsize(p + '.mp4')))
     print('Videohash of scene is: ' + videohash)
     try:
@@ -1809,6 +1807,7 @@ def renderfilm(filmfolder, filmname, comp):
     filmdir = filmfolder + filmname + '/'
     for p in filmfiles:
         print(p)
+        compileshot(p)
         videohash += str(int(countsize(p + '.mp4')))
     print('Videohash of film is: ' + videohash)
     try:
@@ -2270,11 +2269,11 @@ def viewfilm(filmfolder, filmname):
 #--------------Audiodelay--------------------
 # make audio file same lenght as video file
 
-def audiodelay(foldername, filename):
+def audiodelay(filename):
     writemessage('Audio syncing..')
-    pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
+    pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
-    pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" /dev/shm/' + filename + '.wav', shell=True)
+    pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
     audiolenght = pipe.decode().strip()
     #if there is no audio lenght
     logger.info('audio is:' + audiolenght)
@@ -2291,9 +2290,9 @@ def audiodelay(foldername, filename):
         newaudiolenght = int(audiolenght) - audiosync
         logger.info('Audiofile is: ' + str(audiosync) + 'ms longer')
         #trim from end and put a 0.01 in- and outfade
-        run_command('sox -V0 /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
-        run_command('sox -V0 -G ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav fade 0.01 0 0.01')
-        os.remove(foldername + filename + '_temp.wav')
+        run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
+        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
+        os.remove(filename + '_temp.wav')
         #if int(audiosync) > 400:
         #    writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
         #    vumetermessage('Consider changing to a faster microsd card.')
@@ -2309,15 +2308,15 @@ def audiodelay(foldername, filename):
         #    audiosyncms = 1000 + audiosyncms
         logger.info('Videofile is: ' + str(audiosync) + 'ms longer')
         #make fade
-        run_command('sox -V0 -G /dev/shm/' + filename + '.wav ' + foldername + filename + '_temp.wav fade 0.01 0 0.01')
+        run_command('sox -V0 -G ' + filename + '.wav ' + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
         run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
         #add silence to end
-        run_command('sox -V0 /dev/shm/silence.wav ' + foldername + filename + '_temp.wav ' + foldername + filename + '.wav')
-        os.remove(foldername + filename + '_temp.wav')
+        run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav ' + filename + '.wav')
+        os.remove(filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
-    os.remove('/dev/shm/' + filename + '.wav')
+    #os.remove('/dev/shm/' + filename + '.wav')
     return delayerr
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
