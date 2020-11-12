@@ -1441,7 +1441,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
         elif pressed == 'middle':
             if selected == 1:
                 if sceneshotortake == 'take':
-                    #os.system('rm ' + foldername + filename + '.h264')
+                    os.system('rm ' + foldername + filename + '.h264')
                     os.system('rm ' + foldername + filename + '.mp4')
                     os.system('rm ' + foldername + filename + '.wav')
                     os.system('rm ' + foldername + filename + '.jpeg')
@@ -1485,9 +1485,9 @@ def organize(filmfolder, filmname):
                 os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
             for s in sorted(takes):
-                if '.mp4' in s:
+                if '.mp4' in s or '.h264' in s:
                     #print(s)
-                    unorganized_nr = int(s[4:-4])
+                    unorganized_nr = int(s[4:7])
                     if organized_nr == unorganized_nr:
                         #print('correct')
                         pass
@@ -1495,6 +1495,7 @@ def organize(filmfolder, filmname):
                         #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                         run_command(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
+                        run_command(mv + '.h264 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.h264')
                         run_command(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     organized_nr += 1
