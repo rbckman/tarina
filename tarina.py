@@ -772,8 +772,7 @@ def main():
                 logger.info('okey something has changed')
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                recordable = not os.path.isfile(foldername + filename + '.mp4')
-                recordable = not os.path.isfile(foldername + filename + '.h264')
+                recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
                 overlay = removeimage(camera, overlay)
                 imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename)
@@ -2520,10 +2519,10 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         val = term.inkey(timeout=0)
     if val.is_sequence:
         event = val.name
-        print(event)
+        #print(event)
     elif val:
         event = val
-        print(event)
+        #print(event)
     else:
         event = ''
     keydelay = 0.08
