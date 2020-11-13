@@ -9,13 +9,8 @@
 #      ```  ```   ``` ```  ``` ``` ```  ```` ```  ``` 
 #     ````   ``` ```` ```  ``` ``` ````  ``` ```  ````
 
-# a Retake on Filmmaking
-# envisiond & created by rbckman
-
+# a Muse of Filmmaking
 # https://tarina.org
-# contributes are welcome
-
-# peace brothers & sisters!
 
 import picamerax as picamera
 import numpy as np
@@ -37,14 +32,12 @@ import secrets
 #import shlex
 from blessed import Terminal
 
-#Lets bless the code!
+# bless the code!
 term = Terminal()
 
-#------------- The Main Thing --------------
-
 def main():
-    global tarinafolder, screen, loadfilmsettings, debianversion
-    i2cbuttons()
+    global tarinafolder, screen, loadfilmsettings, debianversion, i2cbuttons
+    i2cbuttons = i2cbuttons()
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -53,10 +46,8 @@ def main():
     if os.path.isdir(filmfolder) == False:
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
-
     #MENUS
     menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE'
-
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -70,7 +61,6 @@ def main():
     recording = False
     retake = False
     rendermenu = True
-    rerendermenu = 0
     overlay = None
     reclenght = 0
     t = 0
@@ -79,10 +69,8 @@ def main():
     shot = 1
     take = 1
     filmname = ''
-    thefile = ''
     beeps = 0
     flip = 'no'
-    #filmnames = os.listdir(filmfolder)
     lenses = os.listdir('lenses/')
     lens = lenses[0]
     buttontime = time.time()
@@ -95,45 +83,36 @@ def main():
     comp = 1
     yankedscene = ''
     yankedshot = ''
-
-    #Save settings every 5 seconds
+    #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
     savesettingsevery = 10
-
-    #VERSION
+    #TARINA VERSION
     f = open(tarinafolder + '/VERSION')
     tarinaversion = f.readline()
     tarinavername = f.readline()
-
     #DEBIAN VERSION
     pipe = subprocess.check_output('lsb_release -c -s', shell=True)
     debianversion = pipe.decode()
-
-    #Turn off hdmi to save power
+    #SYSTEM CONFIGS (turn off hdmi)
     run_command('tvservice -o')
     #Kernel page cache optimization for sd card
     run_command('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
-
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
-
     #START INTERFACE
     startinterface()
     camera = startcamera(lens)
-
     #LOAD FILM AND SCENE SETTINGS
     try:
         filmname = getfilms(filmfolder)[0][0]
     except Exception as e:
         print(e)
         filmname = ''
-
     #THUMBNAILCHECKER
     oldscene = scene
     oldshot = shot
     oldtake = take 
-
     #TURN OFF WIFI AND TARINA SERVER
     if sys.argv[1] == 'default':
         serverstate = 'off'
@@ -144,29 +123,20 @@ def main():
         serverstate = 'off'
         wifistate = 'on'
         serverstate = tarinaserver(False)
-
+    #TO_BE_OR_NOT_TO_BE 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
     filename = 'take' + str(take).zfill(3)
-    recordable = not os.path.isfile(foldername + filename + '.mp4')
-
-    #MAIN LOOP
+    recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
+    #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
         if recording == False:
-            #QUIT
-            if pressed == 'noquit' and buttontime > 3:
-                stopinterface(camera)
-                run_command('clear')
-                run_command('echo "Have a nice hacking time!"')
-                break
-
             #SHUTDOWN
-            elif pressed == 'middle' and menu[selected] == 'SHUTDOWN':
+            if pressed == 'middle' and menu[selected] == 'SHUTDOWN':
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
                 run_command('sudo shutdown -h now')
-
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -176,13 +146,12 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                thefile = timelapse(beeps,camera,foldername,filename)
-                if thefile != '':
+                renderedfilename = timelapse(beeps,camera,foldername,filename)
+                if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
                     #run_command('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
-
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
                 filmfiles = shotfiles(filmfolder, filmname, scene)
@@ -193,7 +162,6 @@ def main():
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     playdub(renderfilename, False, headphoneslevel)
                     camera.start_preview()
-
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
@@ -203,7 +171,6 @@ def main():
                     renderfilename = renderfilm(filmfolder, filmname, comp)
                     playdub(renderfilename, False, headphoneslevel)
                     camera.start_preview()
-
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
                 takes = counttakes(filmname, filmfolder, scene, shot)
@@ -218,7 +185,6 @@ def main():
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
                     camera.start_preview()
-
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
                 newdub = clipsettings(filmfolder, filmname, scene)
@@ -230,7 +196,6 @@ def main():
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
-
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
                 newdub = clipsettings(filmfolder, filmname, '')
@@ -242,11 +207,9 @@ def main():
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
-
             #BACKUP
             elif pressed == 'middle' and menu[selected] == 'BACKUP':
                 copytousb(filmfolder)
-
             #UPLOAD
             elif pressed == 'middle' and menu[selected] == 'UPLOAD':
                 if webz_on() == True:
@@ -263,12 +226,10 @@ def main():
                             camera = startcamera(lens)
                             loadfilmsettings = True
                         selectedaction = 0
-
             #LOAD FILM
             elif pressed == 'middle' and menu[selected] == 'LOAD':
                 filmname = loadfilm(filmname, filmfolder)
                 loadfilmsettings = True
-
             #UPDATE
             elif pressed == 'middle' and menu[selected] == 'UPDATE':
                 if webz_on() == True:
@@ -278,7 +239,6 @@ def main():
                     camera = startcamera(lens)
                     loadfilmsettings = True
                     selectedaction = 0
-
             #WIFI
             elif pressed == 'middle' and menu[selected] == 'WIFI:':
                 stopinterface(camera)
@@ -286,7 +246,6 @@ def main():
                 startinterface()
                 camera = startcamera(lens)
                 loadfilmsettings = True
-
             #NEW FILM
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
@@ -307,7 +266,6 @@ def main():
                     selectedaction = 0
                 else:
                     vumetermessage('')
-
             #EDIT FILM NAME
             elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
@@ -317,19 +275,16 @@ def main():
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
-
             #YANK(COPY) SHOT
             elif event == 'Y' and menu[selected] == 'SHOT:' and recordable == False:
                 yankedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Shot ' + str(shot) + ' yanked(copied)')
                 time.sleep(1)
-
             #YANK(COPY) SCENE
             elif event == 'Y' and menu[selected] == 'SCENE:' and recordable == False:
                 yankedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                 vumetermessage('Scene ' + str(scene) + ' yanked(copied)')
                 time.sleep(1)
-
             #PASTE SHOT and PASTE SCENE
             elif event == 'P':
                 if menu[selected] == 'SHOT:' and yankedshot:
@@ -353,7 +308,6 @@ def main():
                     updatethumb = True
                     vumetermessage('Scene pasted!')
                     time.sleep(1)
-
             #MOVE SHOT and MOVE SCENE
             elif event == 'M':
                 if menu[selected] == 'SHOT:' and yankedshot:
@@ -384,7 +338,6 @@ def main():
                     updatethumb = True
                     vumetermessage('Scene moved!')
                     time.sleep(1)
-
             #INSERT SHOT
             elif event == 'I' and menu[selected] == 'SHOT:' and recordable == False:
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
@@ -394,7 +347,6 @@ def main():
                 updatethumb = True
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
-
             #INSERT SCENE
             elif event == 'I' and menu[selected] == 'SCENE:' and recordable == False:
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
@@ -406,7 +358,6 @@ def main():
                 updatethumb = True
                 vumetermessage('Scene ' + str(scene) + ' inserted')
                 time.sleep(1)
-
             #HELPME
             elif event == 'H':
                 if webz_on() == True:
@@ -420,7 +371,6 @@ def main():
                         loadfilmsettings = True
                     except:
                         writemessage('sry! no rob help installed')
-
             #DEVELOP
             elif event == 'D':
                 try:
@@ -431,7 +381,6 @@ def main():
                     loadfilmsetings = True
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
-
             #REMOVE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
@@ -463,7 +412,6 @@ def main():
                     loadfilmsettings = True
                     updatethumb = True
                     time.sleep(0.5)
-
         #RECORD AND PAUSE
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 3600:
             overlay = removeimage(camera, overlay)
@@ -493,7 +441,6 @@ def main():
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
-                thefile = foldername + filename 
                 updatethumb = True
                 #compileshot(foldername + filename)
                 os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
@@ -509,8 +456,7 @@ def main():
             if pressed == 'retake' and recordable == False:
                 take = counttakes(filmname, filmfolder, scene, shot)
                 take = take + 1
-
-        #Middle button auto mode on/off
+        #ENTER (auto shutter, iso, awb on/off)
         elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
             if camera.shutter_speed == 0:
                 camera.shutter_speed = camera.exposure_speed
@@ -533,7 +479,6 @@ def main():
                 camera.awb_mode = 'off'
             else:
                 camera.awb_mode = 'auto'
-
         #UP
         elif pressed == 'up':
             if menu[selected] == 'BRIGHT:':
@@ -617,7 +562,6 @@ def main():
             elif menu[selected] == 'COMP:':
                 if comp < 1:
                     comp += 1
-
         #LEFT
         elif pressed == 'left':
             if selected > 0:
@@ -626,7 +570,6 @@ def main():
                 selected = len(menu) - 1
             if selected == 4:
                 selected = 3
-
         #DOWN
         elif pressed == 'down':
             if menu[selected] == 'BRIGHT:':
@@ -717,7 +660,6 @@ def main():
             elif menu[selected] == 'COMP:':
                 if comp > 0:
                     comp -= 1
-
         #RIGHT
         elif pressed == 'right':
             if selected < len(menu) - 1:
@@ -726,13 +668,11 @@ def main():
                 selected = 0
             if selected == 4: #jump over recording time
                 selected = 5
-
         #Start Recording Time
         if recording == True:
             t = time.time() - starttime
             rectime = time.strftime("%H:%M:%S", time.gmtime(t))
-
-        #load settings
+        #Load settings
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
@@ -750,14 +690,13 @@ def main():
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
-
-        if scene == 0:
-            scene = 1
-        if take == 0:
-            take = 1
-        if shot == 0:
-            shot = 1
-
+        #wtf is dis?
+        #if scene == 0:
+        #    scene = 1
+        #if take == 0:
+        #    take = 1
+        #if shot == 0:
+        #    shot = 1
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
@@ -772,8 +711,7 @@ def main():
                 oldshot = shot
                 oldtake = take
                 updatethumb = False
-
-        #If auto dont show value show auto
+        #If auto dont show value show auto (impovement here to show different colors in gui, yes!!?)
         if camera.iso == 0:
             cameraiso = 'auto'
         else:
@@ -789,11 +727,7 @@ def main():
             camerared = str(float(camera.awb_gains[0]))[:4]
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
-        if rectime == '':
-            if delayerr:
-                rectime = delayerr
-
-        #Check if menu is changed and save settings
+        #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
             writemenu(menu,settings,selected,'')
@@ -817,11 +751,10 @@ class logger():
     def warning(warning):
         print('Warning: ' + warning)
 
-
 #-------------i2c buttons-------------
 
 def i2cbuttons()
-    #if buttons are installed
+    #check if buttons are in the smbus
     try:
         bus = smbus.SMBus(11) # Rev 2 Pi uses 1
         DEVICE = 0x20 # Device address (A0-A2)
@@ -835,10 +768,10 @@ def i2cbuttons()
         bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
         bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
         bus.write_byte_data(DEVICE,OLATA,0x4)
-        onlykeyboard = False
+        return True
     except:
-        onlykeyboard = True
-        print("could not find buttons!! running in only keyboard mode")
+        return False
+        print("could not find i2c buttons!! running in keyboard only mode")
 
 #--------------Save settings-----------------
 
@@ -2556,7 +2489,7 @@ def waitforanykey():
             event = val.name
         elif val:
             event = val
-        if onlykeyboard == False:
+        if i2cbuttons == False:
             readbus = bus.read_byte_data(DEVICE,GPIOB)
             readbus2 = bus.read_byte_data(DEVICE,GPIOA)
         else:
@@ -2579,7 +2512,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     else:
         event = ''
     keydelay = 0.08
-    if onlykeyboard == False:
+    if i2cbuttons == False:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
         readbus2 = bus.read_byte_data(DEVICE,GPIOA)
     else:
