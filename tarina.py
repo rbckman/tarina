@@ -37,25 +37,6 @@ import secrets
 #import shlex
 from blessed import Terminal
 
-#if buttons are installed
-try:
-    bus = smbus.SMBus(11) # Rev 2 Pi uses 1
-    DEVICE = 0x20 # Device address (A0-A2)
-    IODIRB = 0x0d # Pin pullups B-side
-    IODIRA = 0x00 # Pin pullups A-side 0x0c
-    IODIRApullup = 0x0c # Pin pullups A-side 0x0c
-    GPIOB  = 0x13 # Register B-side for inputs
-    GPIOA  = 0x12 # Register A-side for inputs
-    OLATA  = 0x14 # Register for outputs
-    bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-    bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
-    bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
-    bus.write_byte_data(DEVICE,OLATA,0x4)
-    onlykeyboard = False
-except:
-    onlykeyboard = True
-    print("could not find buttons!! running in only keyboard mode")
-
 #Lets bless the code!
 term = Terminal()
 
@@ -63,7 +44,7 @@ term = Terminal()
 
 def main():
     global tarinafolder, screen, loadfilmsettings, debianversion
-
+    i2cbuttons()
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -816,13 +797,10 @@ def main():
         if buttonpressed == True or recording == True or rendermenu == True:
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
             writemenu(menu,settings,selected,'')
-            #Rerender menu five times to be able to se picamera settings change
-            if rerendermenu < 10:
-                rerendermenu = rerendermenu + 1
+            #Rerender menu if picamera settings change
+            if settings != oldsettings:
                 rendermenu = True
-            else:
-                rerendermenu = 0
-                rendermenu = False
+            settingsold = settings
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
@@ -838,6 +816,29 @@ class logger():
         print(term.yellow(info))
     def warning(warning):
         print('Warning: ' + warning)
+
+
+#-------------i2c buttons-------------
+
+def i2cbuttons()
+    #if buttons are installed
+    try:
+        bus = smbus.SMBus(11) # Rev 2 Pi uses 1
+        DEVICE = 0x20 # Device address (A0-A2)
+        IODIRB = 0x0d # Pin pullups B-side
+        IODIRA = 0x00 # Pin pullups A-side 0x0c
+        IODIRApullup = 0x0c # Pin pullups A-side 0x0c
+        GPIOB  = 0x13 # Register B-side for inputs
+        GPIOA  = 0x12 # Register A-side for inputs
+        OLATA  = 0x14 # Register for outputs
+        bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
+        bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
+        bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
+        bus.write_byte_data(DEVICE,OLATA,0x4)
+        onlykeyboard = False
+    except:
+        onlykeyboard = True
+        print("could not find buttons!! running in only keyboard mode")
 
 #--------------Save settings-----------------
 
