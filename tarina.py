@@ -17,7 +17,7 @@
 
 # peace brothers & sisters!
 
-import picamera
+import picamerax as picamera
 import numpy as np
 import string
 import os

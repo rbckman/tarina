@@ -43,9 +43,9 @@ apt-get update
 apt-get upgrade -y
 if [ "$version" = "buster" ]
 then
-    apt-get -y install git python3-pip python-configparser ffmpeg mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
+    apt-get -y install git python3-pip python-configparser ffmpeg mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount python3-numpy python3-pil python3-smbus
 else
-    apt-get -y install git python3-pip python-configparser libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount
+    apt-get -y install git python3-pip python-configparser libav-tools mediainfo gpac omxplayer sox cpufrequtils apache2 libapache2-mod-wsgi-py3 libdbus-glib-1-dev dbus libdbus-1-dev usbmount python3-numpy python3-pil python3-smbus
 fi
 echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
@@ -53,6 +53,7 @@ echo "installing blessed..."
 sudo pip3 install blessed
 echo "installing secret..."
 sudo pip3 install secret
+sudo pip3 install numpy
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 #sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade
 sudo pip3 install --upgrade picamerax
@@ -89,6 +90,7 @@ dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
 force_turbo=1
 boot_delay=1
+dtparam=i2c_arm=on
 # dtparam=sd_overclock=90
 # Disable the ACT LED.
 dtparam=act_led_trigger=none
