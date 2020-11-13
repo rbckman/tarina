@@ -1135,7 +1135,8 @@ def getfilms(filmfolder):
 
 #-------------Load tarina config---------------
 
-def getconfig(version):
+def getconfig():
+    version = camera.revision
     home = os.path.expanduser('~')
     configfile = home + '/.tarina/config.ini'
     configdir = os.path.dirname(configfile)
@@ -2632,8 +2633,7 @@ def startcamera(lens):
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
     #camera.framerate = 24.999
-    v = camera.revision
-    camera_model, camera_revision = getconfig(v)
+    camera_model, camera_revision = getconfig()
     # v1 = 'ov5647'
     # v2 = ? 
     logger.info("picamera version is: " + camera_model + ' ' + camera_revision)
