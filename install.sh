@@ -52,9 +52,10 @@ sudo pip3 install omxplayer-wrapper
 echo "installing blessed..."
 sudo pip3 install blessed
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
-sudo pip3 --no-cache-dir install https://github.com/rbckman/picamera/archive/master.zip --upgrade
+#sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade
+sudo pip3 install --upgrade picamerax
 echo "installing web.py for the tarina webserver..."
-sudo pip3 install web.py==0.40-dev1
+sudo pip3 install web.py==0.61
 
 if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
 then
@@ -122,7 +123,10 @@ then
 echo "Debian Buster Alsa config"
 cat <<'EOF' > /etc/modprobe.d/alsa-base.conf
 #set index value
-options snd_usb_audio index=-2
+options snd-usb-audio index=0
+options snd_bcm2835 index=1
+#reorder
+options snd slots=snd_usb_audio, snd_bcm2835
 EOF
 else
 echo "Debian Stretch Alsa config"
@@ -147,7 +151,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py
+ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py default
 User=pi
 Restart=on-failure
 StandardInput=tty-force
