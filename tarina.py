@@ -1135,7 +1135,7 @@ def getfilms(filmfolder):
 
 #-------------Load tarina config---------------
 
-def getconfig():
+def getconfig(camera):
     version = camera.revision
     home = os.path.expanduser('~')
     configfile = home + '/.tarina/config.ini'
@@ -2407,7 +2407,7 @@ def copytousb(filmfolder):
                 except:
                     writemessage('Updating existing film ' + filmname)
                 try:
-                    run_command('rsync -avr -P ' + filmfolder + filmname ' /media/usb0/tarinafilms/' + filmname)
+                    run_command('rsync -avr -P ' + filmfolder + filmname + ' /media/usb0/tarinafilms/' + filmname)
                 except:
                     writemessage('couldnt copy film ' + filmname)
                     waitforanykey()
@@ -2633,7 +2633,7 @@ def startcamera(lens):
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
     #camera.framerate = 24.999
-    camera_model, camera_revision = getconfig()
+    camera_model, camera_revision = getconfig(camera)
     # v1 = 'ov5647'
     # v2 = ? 
     logger.info("picamera version is: " + camera_model + ' ' + camera_revision)
