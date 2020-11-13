@@ -151,6 +151,17 @@ This is a good performance card.
 [Aliexpress](https://www.aliexpress.com/item/32676225311.html?spm=a2g0o.productlist.0.0.11ed1b664kPdEf&algo_pvid=d9155fff-7ddc-47bb-9512-f7e686fe69ac&algo_expid=d9155fff-7ddc-47bb-9512-f7e686fe69ac-0&btsid=e2f36205-1c37-47bc-9a94-c006837f0992&ws_ab_test=searchweb0_0,searchweb201602_7,searchweb201603_55)
 
 
+Raspberry Pi High Quality Camera (recommended)
+----------------------------------------------
+Price ~60 eur
+
+This is the recommended camera module for Tarina, 12.3 megapixel Sony IMX477 sensor, 7.9mm diagonal image size, and back-illuminated sensor architecture, with adjustable back focus and support for C- and CS-mount lenses.
+
+**Links**
+**Buy**
+[Raspberry pi](https://www.raspberrypi.org/products/raspberry-pi-high-quality-camera/?resellerType=home)
+
+
 Arducam 5 MP OV5647 camera module with CS lens
 ----------------------------------------------
 Price ~30 eur

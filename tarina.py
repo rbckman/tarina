@@ -2375,28 +2375,28 @@ def copytousb(filmfolder):
             try:
                 p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
                 filesystem = p.decode()
-                print(filesystem)
+                print('filesystem info: ' + filesystem)
             except:
                 writemessage('Oh-no! dont know your filesystem')
                 waitforanykey()
                 return
             for filmname in films:
                 #check filmhash
-                usbpath = 'media/usb0/tarinafilms/'+filmname
+                filmname = filmname[0]
+                usbpath = '/media/usb0/tarinafilms/'+filmname
                 usbfilmhash = ''
                 filmhash = ''
-                subsequentfilm = 1
                 while True:
                     if os.path.exists(usbpath) == False:
                         break
                     try:
-                        with open(filmfolder + filmname + '.videohash', 'r') as f:
+                        with open(filmfolder + filmname + '/.filmhash', 'r') as f:
                             filmhash = f.readline().strip()
                         print('filmhash is: ' + filmhash)
                     except:
                         print('no filmhash found!')
                     try:
-                        with open(usbpath + '.videohash', 'r') as f:
+                        with open(usbpath + '/.filmhash', 'r') as f:
                             usbfilmhash = f.readline().strip()
                         print('usbfilmhash is: ' + usbfilmhash)
                     except:
@@ -2404,15 +2404,18 @@ def copytousb(filmfolder):
                     if usbfilmhash == filmhash:
                         print('same moviefilm found, updating clips...')
                         break
-                    subsequentfilm += 1
-                    usbpath += str(subsequentfilm).zfill(3)
+                    else:
+                        writemessage('Found a subsequent moviefilm...')
+                        print('same film exist with different filmhashes, copying to subsequent film folder')
+                        time.sleep(2)
+                        usbpath += '_new'
                 try:
                     os.makedirs(usbpath)
-                    writemessage('Copying film ' + filmname)
+                    writemessage('Copying film ' + filmname + '...')
                 except:
-                    writemessage('Updating existing film ' + filmname)
+                    writemessage('Found existing ' + filmname + ', copying new files... ')
                 try:
-                    run_command('rsync -avr -P ' + filmfolder + filmname + ' /media/usb0/tarinafilms/' + filmname)
+                    run_command('rsync -avr -P ' + filmfolder + filmname + '/ ' + usbpath)
                 except:
                     writemessage('couldnt copy film ' + filmname)
                     waitforanykey()
