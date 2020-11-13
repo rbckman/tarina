@@ -154,7 +154,7 @@ def main():
     oldtake = take 
 
     #TURN OFF WIFI AND TARINA SERVER
-    if str(sys.argv[0]) == 'default':
+    if sys.argv[1] == 'default':
         serverstate = 'off'
         wifistate = 'off'
         run_command('sudo iwconfig wlan0 txpower off')
