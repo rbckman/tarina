@@ -151,7 +151,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py
+ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py default
 User=pi
 Restart=on-failure
 StandardInput=tty-force
