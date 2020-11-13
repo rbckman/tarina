@@ -33,6 +33,7 @@ from PIL import Image
 import smbus
 import socket
 import configparser
+import secrets
 #import shlex
 from blessed import Terminal
 
@@ -307,6 +308,11 @@ def main():
                     filmname = newfilmname
                     os.makedirs(filmfolder + filmname)
                     writemessage('Good luck with your film ' + filmname + '!')
+                    #make a filmhash
+                    print('making filmhash...')
+                    filmhash = secrets.token_urlsafe(16)
+                    with open(filmfolder + filmname + '.filmhash', 'w') as f:
+                        f.write(filmhash)
                     updatethumb = True
                     updatemenu = True
                     scene = 1
@@ -2345,6 +2351,7 @@ def copytousb(filmfolder):
     buttontime = time.time()
     holdbutton = ''
     writemessage('Searching for usb storage device, middlebutton to cancel')
+    films = getfilms(filmfolder)
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         usbconnected = os.path.ismount('/media/usb0')
@@ -2362,19 +2369,55 @@ def copytousb(filmfolder):
             try:
                 p = subprocess.check_output('stat -f -c %T /media/usb0', shell=True)
                 filesystem = p.decode()
-                writemessage('Copying files...')
-                run_command('rsync -avr -P ' + filmfolder + '* /media/usb0/tarinafilms/')
-                run_command('sync')
-                run_command('pumount /media/usb0')
-                writemessage('all files copied successfully!')
-                waitforanykey()
-                writemessage('You can safely unplug the usb device now')
-                time.sleep(2)
-                return
+                print(filesystem)
             except:
-                writemessage('Nope! something wrong with ur drive :(')
+                writemessage('Oh-no! dont know your filesystem')
                 waitforanykey()
                 return
+            for filmname in films:
+                #check filmhash
+                usbpath = 'media/usb0/tarinafilms/'+filmname
+                usbfilmhash = ''
+                filmhash = ''
+                subsequentfilm = 1
+                while True:
+                    if os.path.exists(usbpath) == False:
+                        break
+                    try:
+                        with open(filmfolder + filmname + '.videohash', 'r') as f:
+                            filmhash = f.readline().strip()
+                        print('filmhash is: ' + filmhash)
+                    except:
+                        print('no filmhash found!')
+                    try:
+                        with open(usbpath + '.videohash', 'r') as f:
+                            usbfilmhash = f.readline().strip()
+                        print('usbfilmhash is: ' + usbfilmhash)
+                    except:
+                        print('no usbfilmhash found!')
+                    if usbfilmhash == filmhash:
+                        print('same moviefilm found, updating clips...')
+                        break
+                    subsequentfilm += 1
+                    usbpath += str(subsequentfilm).zfill(3)
+                try:
+                    os.makedirs(usbpath)
+                    writemessage('Copying film ' + filmname)
+                except:
+                    writemessage('Updating existing film ' + filmname)
+                try:
+                    run_command('rsync -avr -P ' + filmfolder + filmname ' /media/usb0/tarinafilms/' + filmname)
+                except:
+                    writemessage('couldnt copy film ' + filmname)
+                    waitforanykey()
+                    return
+            run_command('sync')
+            run_command('pumount /media/usb0')
+            writemessage('all files copied successfully!')
+            waitforanykey()
+            writemessage('You can safely unplug the usb device now')
+            time.sleep(2)
+            return
 
 #-----------Check for the webz---------
 
@@ -2588,7 +2631,6 @@ def startcamera(lens):
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
-    #table = read_table('lenses/' + lens)
     #camera.framerate = 24.999
     v = camera.revision
     camera_model, camera_revision = getconfig(v)
@@ -2596,8 +2638,12 @@ def startcamera(lens):
     # v2 = ? 
     logger.info("picamera version is: " + camera_model + ' ' + camera_revision)
     if camera_model == 'imx219':
+        table = read_table('lenses/' + lens)
+        camera.lens_shading_table = table
         camera.framerate = 24.999
     if camera_model == 'ov5647':
+        table = read_table('lenses/' + lens)
+        camera.lens_shading_table = table
         # Different versions of ov5647 with different clock speeds, need to make a config file
         # if there's more frames then the video will be longer when converting it to 25 fps,
         # I try to get it as perfect as possible with trial and error.
@@ -2614,7 +2660,6 @@ def startcamera(lens):
     camera.led = False
     #lens_shading_table = np.zeros(camera._lens_shading_table_shape(), dtype=np.uint8) + 32
     #camera.lens_shading_table = lens_shading_table
-    #camera.lens_shading_table = table
     camera.start_preview()
     camera.awb_mode = 'auto'
     return camera
