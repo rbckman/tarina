@@ -718,7 +718,6 @@ def main():
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
-        #wtf is dis?
         if scene == 0:
             scene = 1
         if take == 0:
