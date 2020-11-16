@@ -25,19 +25,47 @@ import sys
 import pickle
 import RPi.GPIO as GPIO
 from PIL import Image
-import smbus
 import socket
 import configparser
 import secrets
+import smbus
 #import shlex
 from blessed import Terminal
 
 # bless the code!
 term = Terminal()
 
+#DEBIAN VERSION
+pipe = subprocess.check_output('lsb_release -c -s', shell=True)
+debianversion = pipe.decode()
+print('running debian ' + debianversion)
+
+#I2CBUTTONS
+try:
+    if debianversion == "stretch":
+        bus = smbus.SMBus(3) # Rev 2 Pi uses 1
+    else:
+        bus = smbus.SMBus(11) # Rev 2 Pi uses 1
+    DEVICE = 0x20 # Device address (A0-A2)
+    IODIRB = 0x0d # Pin pullups B-side
+    IODIRA = 0x00 # Pin pullups A-side 0x0c
+    IODIRApullup = 0x0c # Pin pullups A-side 0x0c
+    GPIOB  = 0x13 # Register B-side for inputs
+    GPIOA  = 0x12 # Register A-side for inputs
+    OLATA  = 0x14 # Register for outputs
+    bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
+    bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
+    bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
+    bus.write_byte_data(DEVICE,OLATA,0x4)
+    print("yes, found em i2c buttons!")
+    i2cbuttons = True
+except:
+    print("could not find i2c buttons!! running in keyboard only mode")
+    i2cbuttons = False
+
+#MAIN
 def main():
     global tarinafolder, screen, loadfilmsettings, debianversion, i2cbuttons
-    i2cbuttons = i2cbuttons()
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -80,6 +108,7 @@ def main():
     updatethumb = False
     delayerr = ''
     loadfilmsettings = True
+    oldsettings = ''
     comp = 1
     yankedscene = ''
     yankedshot = ''
@@ -90,9 +119,7 @@ def main():
     f = open(tarinafolder + '/VERSION')
     tarinaversion = f.readline()
     tarinavername = f.readline()
-    #DEBIAN VERSION
-    pipe = subprocess.check_output('lsb_release -c -s', shell=True)
-    debianversion = pipe.decode()
+
     #SYSTEM CONFIGS (turn off hdmi)
     run_command('tvservice -o')
     #Kernel page cache optimization for sd card
@@ -112,17 +139,18 @@ def main():
     #THUMBNAILCHECKER
     oldscene = scene
     oldshot = shot
-    oldtake = take 
+    oldtake = take
     #TURN OFF WIFI AND TARINA SERVER
-    if sys.argv[1] == 'default':
-        serverstate = 'off'
-        wifistate = 'off'
-        run_command('sudo iwconfig wlan0 txpower off')
-        serverstate = tarinaserver(False)
-    else:
+    try:
+        if sys.argv[1] == 'default':
+            serverstate = 'off'
+            wifistate = 'off'
+            run_command('sudo iwconfig wlan0 txpower off')
+            serverstate = tarinaserver(False)
+    except:
         serverstate = 'off'
         wifistate = 'on'
-        serverstate = tarinaserver(False)
+        #serverstate = tarinaserver(False)
     #TO_BE_OR_NOT_TO_BE 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
     filename = 'take' + str(take).zfill(3)
@@ -691,12 +719,12 @@ def main():
             rendermenu = True
             updatethumb =  True
         #wtf is dis?
-        #if scene == 0:
-        #    scene = 1
-        #if take == 0:
-        #    take = 1
-        #if shot == 0:
-        #    shot = 1
+        if scene == 0:
+            scene = 1
+        if take == 0:
+            take = 1
+        if shot == 0:
+            shot = 1
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
@@ -734,7 +762,7 @@ def main():
             #Rerender menu if picamera settings change
             if settings != oldsettings:
                 rendermenu = True
-            settingsold = settings
+            oldsettings = settings
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
@@ -751,27 +779,6 @@ class logger():
     def warning(warning):
         print('Warning: ' + warning)
 
-#-------------i2c buttons-------------
-
-def i2cbuttons()
-    #check if buttons are in the smbus
-    try:
-        bus = smbus.SMBus(11) # Rev 2 Pi uses 1
-        DEVICE = 0x20 # Device address (A0-A2)
-        IODIRB = 0x0d # Pin pullups B-side
-        IODIRA = 0x00 # Pin pullups A-side 0x0c
-        IODIRApullup = 0x0c # Pin pullups A-side 0x0c
-        GPIOB  = 0x13 # Register B-side for inputs
-        GPIOA  = 0x12 # Register A-side for inputs
-        OLATA  = 0x14 # Register for outputs
-        bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-        bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
-        bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
-        bus.write_byte_data(DEVICE,OLATA,0x4)
-        return True
-    except:
-        return False
-        print("could not find i2c buttons!! running in keyboard only mode")
 
 #--------------Save settings-----------------
 
