@@ -65,7 +65,7 @@ except:
 
 #MAIN
 def main():
-    global tarinafolder, screen, loadfilmsettings, debianversion, i2cbuttons
+    global tarinafolder, screen, loadfilmsettings
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -2495,7 +2495,7 @@ def waitforanykey():
             event = val.name
         elif val:
             event = val
-        if i2cbuttons == False:
+        if i2cbuttons == True:
             readbus = bus.read_byte_data(DEVICE,GPIOB)
             readbus2 = bus.read_byte_data(DEVICE,GPIOA)
         else:
@@ -2518,7 +2518,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     else:
         event = ''
     keydelay = 0.08
-    if i2cbuttons == False:
+    if i2cbuttons == True:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
         readbus2 = bus.read_byte_data(DEVICE,GPIOA)
     else:
