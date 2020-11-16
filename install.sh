@@ -51,8 +51,8 @@ echo "installing python-omxplayer-wrapper..."
 sudo pip3 install omxplayer-wrapper
 echo "installing blessed..."
 sudo pip3 install blessed
-echo "installing secret..."
-sudo pip3 install secret
+echo "installing secrets..."
+sudo pip3 install secrets
 sudo pip3 install numpy
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 #sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade

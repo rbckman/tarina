@@ -37,7 +37,7 @@ term = Terminal()
 
 #DEBIAN VERSION
 pipe = subprocess.check_output('lsb_release -c -s', shell=True)
-debianversion = pipe.decode()
+debianversion = pipe.decode().strip()
 print('running debian ' + debianversion)
 
 #I2CBUTTONS
