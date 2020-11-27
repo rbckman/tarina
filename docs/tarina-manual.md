@@ -54,13 +54,11 @@ With keys up and down you change a specific setting, for example shutter speed. 
 
 Special keys on the keyboard (CAPITAL):
 
-Y = Copy scene/shot
+C = Copy scene/shot
 
 M = Cut (as in cut and paste) scene/shot
 
-P = Paste scene/shot
-
-I = Insert empty scene/shot
+I = Insert empty or copied scene/shot
 
 space / pgup = Rec / Stop
 

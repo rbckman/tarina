@@ -111,6 +111,7 @@ def main():
     oldsettings = ''
     comp = 1
     yankedscene = ''
+    cuttedscene = ''
     yankedshot = ''
     #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
@@ -160,11 +161,17 @@ def main():
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
         if recording == False:
-            #SHUTDOWN
-            if pressed == 'middle' and menu[selected] == 'SHUTDOWN':
-                writemessage('Hold on shutting down...')
-                time.sleep(1)
-                run_command('sudo shutdown -h now')
+            #PEAKING
+            if pressed == 'peak' and recordable == True:
+                if shot > 1:
+                    peakshot = shot - 1
+                    peaktake = counttakes(filmname, filmfolder, scene, peakshot)
+                p_imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(peakshot).zfill(3) + '/take' + str(peaktake).zfill(3) + '.jpeg'
+                overlay = displayimage(camera, p_imagename)
+                while holdbutton == 'peak':
+                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    writemessage('peaking ' + str(peakshot))
+                overlay = removeimage(camera, overlay)
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -303,71 +310,83 @@ def main():
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
-            #YANK(COPY) SHOT
-            elif event == 'Y' and menu[selected] == 'SHOT:' and recordable == False:
+            #(YANK) COPY SHOT
+            elif pressed == 'copy' and menu[selected] == 'SHOT:' and recordable == False:
                 yankedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
-                vumetermessage('Shot ' + str(shot) + ' yanked(copied)')
+                vumetermessage('Shot ' + str(shot) + ' copied! (I)nsert button to place it...')
                 time.sleep(1)
-            #YANK(COPY) SCENE
-            elif event == 'Y' and menu[selected] == 'SCENE:' and recordable == False:
+            #(YANK) COPY SCENE
+            elif pressed == 'copy' and menu[selected] == 'SCENE:' and recordable == False:
                 yankedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
-                vumetermessage('Scene ' + str(scene) + ' yanked(copied)')
+                vumetermessage('Scene ' + str(scene) + ' copied! (I)nsert button to place it...')
+                time.sleep(1)
+            #(CUT) MOVE SHOT
+            elif pressed == 'move' and menu[selected] == 'SHOT:' and recordable == False:
+                cuttedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
+                vumetermessage('Moving shot ' + str(shot) + ' (I)nsert button to place it...')
+                time.sleep(1)
+            #(CUT) MOVE SCENE
+            elif pressed == 'move' and menu[selected] == 'SCENE:' and recordable == False:
+                cuttedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                vumetermessage('Moving scene ' + str(scene) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #PASTE SHOT and PASTE SCENE
-            elif event == 'P':
-                if menu[selected] == 'SHOT:' and yankedshot:
-                    vumetermessage('Pasting shot, please wait...')
-                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
-                    try:
-                        os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
-                    except:
-                        pass
-                    os.system('cp -r ' + yankedshot + ' ' + pasteshot)
-                    add_organize(filmfolder, filmname)
-                    updatethumb = True
-                    vumetermessage('Shot pasted!')
-                    time.sleep(1)
-                elif menu[selected] == 'SCENE:' and yankedscene:
-                    vumetermessage('Pasting scene, please wait...')
-                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
-                    os.system('cp -r ' + yankedscene + ' ' + pastescene)
-                    add_organize(filmfolder, filmname)
-                    shot = countshots(filmname, filmfolder, scene)
-                    updatethumb = True
-                    vumetermessage('Scene pasted!')
-                    time.sleep(1)
+            elif pressed == 'insert' and menu[selected] == 'SHOT:' and yankedshot:
+                vumetermessage('Pasting shot, please wait...')
+                pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
+                try:
+                    os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
+                except:
+                    pass
+                os.system('cp -r ' + yankedshot + ' ' + pasteshot)
+                add_organize(filmfolder, filmname)
+                updatethumb = True
+                yankedshot = ''
+                vumetermessage('Shot pasted!')
+                time.sleep(1)
+            elif pressed == 'insert' and menu[selected] == 'SCENE:' and yankedscene:
+                vumetermessage('Pasting scene, please wait...')
+                pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
+                os.system('cp -r ' + yankedscene + ' ' + pastescene)
+                add_organize(filmfolder, filmname)
+                shot = countshots(filmname, filmfolder, scene)
+                updatethumb = True
+                yankedscene = ''
+                vumetermessage('Scene pasted!')
+                time.sleep(1)
             #MOVE SHOT and MOVE SCENE
-            elif event == 'M':
-                if menu[selected] == 'SHOT:' and yankedshot:
+            elif pressed == 'insert' and menu[selected] == 'SHOT:' and cuttedshot:
                     vumetermessage('Moving shot, please wait...')
                     pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
                     try:
                         os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
                     except:
                        pass
-                    os.system('cp -r ' + yankedshot + ' ' + pasteshot)
-                    os.system('rm -r ' + yankedshot + '/*')
+                    os.system('cp -r ' + cuttedshot + ' ' + pasteshot)
+                    os.system('rm -r ' + cuttedshot + '/*')
                     #Remove hidden placeholder
-                    os.system('rm ' + yankedshot + '/.placeholder')
+                    os.system('rm ' + cuttedshot + '/.placeholder')
                     add_organize(filmfolder, filmname)
                     organize(filmfolder, filmname)
+                    cuttedshot = ''
                     updatethumb = True
                     vumetermessage('Shot moved!')
                     time.sleep(1)
-                elif menu[selected] == 'SCENE:' and yankedscene:
+            elif pressed == 'insert' and menu[selected] == 'SCENE:' and cuttedscene:
                     vumetermessage('Moving scene, please wait...')
                     pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
-                    os.system('cp -r ' + yankedscene + ' ' + pastescene)
-                    os.system('rm -r ' + yankedscene + '/*')
-                    os.system('rm ' + yankedscene + '/.placeholder')
+                    os.system('cp -r ' + cuttedscene + ' ' + pastescene)
+                    os.system('rm -r ' + cuttedscene + '/*')
+                    os.system('rm ' + cuttedscene + '/.placeholder')
                     add_organize(filmfolder, filmname)
                     organize(filmfolder, filmname)
                     shot = countshots(filmname, filmfolder, scene)
+                    cuttedscene = ''
                     updatethumb = True
                     vumetermessage('Scene moved!')
                     time.sleep(1)
             #INSERT SHOT
-            elif event == 'I' and menu[selected] == 'SHOT:' and recordable == False:
+            elif pressed == 'insert' and menu[selected] == 'SHOT:' and recordable == False:
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 os.makedirs(insertshot)
                 add_organize(filmfolder, filmname)
@@ -376,7 +395,7 @@ def main():
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
             #INSERT SCENE
-            elif event == 'I' and menu[selected] == 'SCENE:' and recordable == False:
+            elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False:
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
                 logger.info("inserting scene")
                 os.makedirs(insertscene)
@@ -440,6 +459,7 @@ def main():
                     loadfilmsettings = True
                     updatethumb = True
                     time.sleep(0.5)
+            
         #RECORD AND PAUSE
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 3600:
             overlay = removeimage(camera, overlay)
@@ -2521,6 +2541,10 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if i2cbuttons == True:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
         readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+        if readbus != 255:
+            print('i2cbutton pressed: ' + str(readbus))
+        if readbus2 != 247:
+            print('i2cbutton pressed: ' + str(readbus2))
     else:
         readbus = 255
         readbus2 = 247
@@ -2528,30 +2552,38 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if buttonpressed == False:
         if event == 27:
             pressed = 'quit'
-        elif event == 'KEY_ENTER' or event == 10 or event == 13 or readbus == 247:
+        elif event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
             pressed = 'middle'
-        elif event == 'KEY_UP' or readbus == 191: 
+        elif event == 'KEY_UP' or (readbus == 191 and readbus2 == 247):
             pressed = 'up'
-        elif event == 'KEY_DOWN' or readbus == 254:
+        elif event == 'KEY_DOWN' or (readbus == 254 and readbus2 == 247):
             pressed = 'down'
-        elif event == 'KEY_LEFT' or readbus == 239:
+        elif event == 'KEY_LEFT' or (readbus == 239 and readbus2 == 247):
             pressed = 'left'
-        elif event == 'KEY_RIGHT' or readbus == 251:
+        elif event == 'KEY_RIGHT' or (readbus == 251 and readbus2 == 247):
             pressed = 'right'
-        elif event == 'KEY_PGUP' or event == ' ' or readbus == 127:
+        elif event == 'KEY_PGUP' or event == ' ' or (readbus == 127 and readbus2 == 247):
             pressed = 'record'
-        elif event == 'KEY_PGDOWN' or readbus == 253:
+        elif event == 'KEY_PGDOWN' or (readbus == 253 and readbus2 == 247):
             pressed = 'retake'
-        elif event == 'KEY_TAB' or readbus == 223:
+        elif event == 'KEY_TAB' or (readbus == 223 and readbus2 == 247):
             pressed = 'view'
         elif event == 'KEY_DELETE' or readbus2 == 246:
             pressed = 'remove'
+        elif event == 'P' or (readbus2 == 245 and readbus == 191):
+            pressed = 'peak'
+        elif event == 'I' or (readbus2 == 244 and readbus == 255):
+            pressed = 'insert'
+        elif event == 'C' or (readbus2 == 245 and readbus == 254):
+            pressed = 'copy'
+        elif event == 'M' or (readbus2 == 245 and readbus == 253):
+            pressed = 'move'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
-    if readbus == 255 and readbus2 == 247 and event == '':
+    if readbus == 255 and event == '':
         buttonpressed = False
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown' or holdbutton == 'remove':
