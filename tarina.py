@@ -161,8 +161,13 @@ def main():
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         #event = screen.getch()
         if recording == False:
+            #SHUTDOWN
+            if pressed == 'middle' and menu[selected] == 'SHUTDOWN':
+                writemessage('Hold on shutting down...')
+                time.sleep(1)
+                run_command('sudo shutdown -h now')
             #PEAKING
-            if pressed == 'peak' and recordable == True:
+            elif pressed == 'peak' and recordable == True:
                 if shot > 1:
                     peakshot = shot - 1
                     peaktake = counttakes(filmname, filmfolder, scene, peakshot)
