@@ -43,8 +43,10 @@ print('running debian ' + debianversion)
 #I2CBUTTONS
 try:
     if debianversion == "stretch":
+        os.system('sudo modprobe i2c-dev')
         bus = smbus.SMBus(3) # Rev 2 Pi uses 1
     else:
+        os.system('sudo modprobe i2c-dev')
         bus = smbus.SMBus(11) # Rev 2 Pi uses 1
     DEVICE = 0x20 # Device address (A0-A2)
     IODIRB = 0x0d # Pin pullups B-side
