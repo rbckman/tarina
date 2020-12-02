@@ -54,6 +54,7 @@ sudo pip3 install blessed
 echo "installing secrets..."
 sudo pip3 install secrets
 sudo pip3 install numpy
+sudo pip3 install RPi.GPIO
 echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
 #sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade
 sudo pip3 install --upgrade picamerax
