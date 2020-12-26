@@ -893,6 +893,7 @@ def countlast(filmname, filmfolder):
     scenes = 0
     shots = 0
     takes = 0
+    duplicate = ''
     try:
         allfiles = os.listdir(filmfolder + filmname)
     except:
@@ -951,6 +952,7 @@ def countshots(filmname, filmfolder, scene):
 
 def counttakes(filmname, filmfolder, scene, shot):
     takes = 0
+    duplicate = ''
     try:
         allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
     except:
@@ -1454,6 +1456,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 
 def organize(filmfolder, filmname):
     scenes = next(os.walk(filmfolder + filmname))[1]
+    duplicate = ''
     for i in scenes:
         if 'scene' not in i:
             scenes.remove(i)
@@ -1470,6 +1473,7 @@ def organize(filmfolder, filmname):
                 if '.mp4' in s or '.h264' in s:
                     #print(s)
                     unorganized_nr = int(s[4:7])
+                    takename = filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                     if organized_nr == unorganized_nr:
                         #print('correct')
                         pass
@@ -1480,7 +1484,18 @@ def organize(filmfolder, filmname):
                         run_command(mv + '.h264 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.h264')
                         run_command(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
-                    organized_nr += 1
+                    #check if same video has both h246 and mp4 and render and remove h264
+                    if '.mp4' in s:
+                        duplicate = s.strip('.mp4')
+                        logger.info('Found mp4 video')
+                    elif '.h264' in s:
+                        duplicate = s.strip('.h264')
+                        logger.info('Found h264 video')
+                    if duplicate == s.strip('.h264'):
+                        logger.info('Found both mp4 and h264 of same video!')
+                        compileshot(takename)
+                    else:
+                        organized_nr += 1
 
     # Shots
     for i in sorted(scenes):
@@ -1583,11 +1598,11 @@ def add_organize(filmfolder, filmname):
 
 def compileshot(filename):
     #Check if file already converted
-    if os.path.isfile(filename + '.mp4'):
-        writemessage('Already playable')
-        return
-    else:
+    if os.path.isfile(filename + '.h264'):
+        logger.info('Video not converted!')
         writemessage('Converting to playable video')
+        #remove old mp4
+        os.system('rm ' + filename + '.mp4')
         run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
         delayerr = audiodelay(filename)
         os.system('rm ' + filename + '.h264')
@@ -2282,6 +2297,7 @@ def audiodelay(filename):
         #    time.sleep(10)
         delayerr = 'A' + str(audiosync)
     else:
+        audiosync = int(videolenght) - int(audiolenght)
         #calculate difference
         #audiosyncs = videos - audios
         #audiosyncms = videoms - audioms
