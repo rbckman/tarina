@@ -298,7 +298,7 @@ def main():
                     #make a filmhash
                     print('making filmhash...')
                     filmhash = secrets.token_urlsafe(16)
-                    with open(filmfolder + filmname + '.filmhash', 'w') as f:
+                    with open(filmfolder + filmname + '/.filmhash', 'w') as f:
                         f.write(filmhash)
                     updatethumb = True
                     updatemenu = True
@@ -1487,10 +1487,8 @@ def organize(filmfolder, filmname):
                     #check if same video has both h246 and mp4 and render and remove h264
                     if '.mp4' in s:
                         duplicate = s.strip('.mp4')
-                        logger.info('Found mp4 video')
                     elif '.h264' in s:
                         duplicate = s.strip('.h264')
-                        logger.info('Found h264 video')
                     if duplicate == s.strip('.h264'):
                         logger.info('Found both mp4 and h264 of same video!')
                         compileshot(takename)
