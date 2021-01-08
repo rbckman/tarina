@@ -893,7 +893,6 @@ def countlast(filmname, filmfolder):
     scenes = 0
     shots = 0
     takes = 0
-    duplicate = ''
     try:
         allfiles = os.listdir(filmfolder + filmname)
     except:
@@ -952,7 +951,6 @@ def countshots(filmname, filmfolder, scene):
 
 def counttakes(filmname, filmfolder, scene, shot):
     takes = 0
-    duplicate = ''
     try:
         allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
     except:
@@ -1456,7 +1454,6 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 
 def organize(filmfolder, filmname):
     scenes = next(os.walk(filmfolder + filmname))[1]
-    duplicate = ''
     for i in scenes:
         if 'scene' not in i:
             scenes.remove(i)
@@ -1485,10 +1482,9 @@ def organize(filmfolder, filmname):
                         run_command(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     #check if same video has both h246 and mp4 and render and remove h264
+                    duplicate = ''
                     if '.mp4' in s:
                         duplicate = s.strip('.mp4')
-                    elif '.h264' in s:
-                        duplicate = s.strip('.h264')
                     if duplicate == s.strip('.h264'):
                         logger.info('Found both mp4 and h264 of same video!')
                         compileshot(takename)
