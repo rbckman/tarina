@@ -114,6 +114,7 @@ def main():
     comp = 1
     yankedscene = ''
     cuttedscene = ''
+    cuttedshot = ''
     yankedshot = ''
     #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
