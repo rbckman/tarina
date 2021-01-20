@@ -41,29 +41,35 @@ debianversion = pipe.decode().strip()
 print('running debian ' + debianversion)
 
 #I2CBUTTONS
-try:
-    if debianversion == "stretch":
-        os.system('sudo modprobe i2c-dev')
-        bus = smbus.SMBus(3) # Rev 2 Pi uses 1
-    else:
-        os.system('sudo modprobe i2c-dev')
-        bus = smbus.SMBus(11) # Rev 2 Pi uses 1
-    DEVICE = 0x20 # Device address (A0-A2)
-    IODIRB = 0x0d # Pin pullups B-side
-    IODIRA = 0x00 # Pin pullups A-side 0x0c
-    IODIRApullup = 0x0c # Pin pullups A-side 0x0c
-    GPIOB  = 0x13 # Register B-side for inputs
-    GPIOA  = 0x12 # Register A-side for inputs
-    OLATA  = 0x14 # Register for outputs
-    bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
-    bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
-    bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
-    bus.write_byte_data(DEVICE,OLATA,0x4)
-    print("yes, found em i2c buttons!")
-    i2cbuttons = True
-except:
-    print("could not find i2c buttons!! running in keyboard only mode")
-    i2cbuttons = False
+probei2c = 0
+while probei2c < 10:
+    try:
+        if debianversion == "stretch":
+            os.system('sudo modprobe i2c-dev')
+            bus = smbus.SMBus(3) # Rev 2 Pi uses 1
+        else:
+            os.system('sudo modprobe i2c-dev')
+            bus = smbus.SMBus(11) # Rev 2 Pi uses 1
+        DEVICE = 0x20 # Device address (A0-A2)
+        IODIRB = 0x0d # Pin pullups B-side
+        IODIRA = 0x00 # Pin pullups A-side 0x0c
+        IODIRApullup = 0x0c # Pin pullups A-side 0x0c
+        GPIOB  = 0x13 # Register B-side for inputs
+        GPIOA  = 0x12 # Register A-side for inputs
+        OLATA  = 0x14 # Register for outputs
+        bus.write_byte_data(DEVICE,IODIRB,0xFF) # set all gpiob to input
+        bus.write_byte_data(DEVICE,IODIRApullup,0xF3) # set two pullup inputs and two outputs 
+        bus.write_byte_data(DEVICE,IODIRA,0xF3) # set two inputs and two outputs 
+        bus.write_byte_data(DEVICE,OLATA,0x4)
+        print("yes, found em i2c buttons!")
+        i2cbuttons = True
+        break
+    except:
+        print("could not find i2c buttons!! running in keyboard only mode")
+        print("trying again...")
+        i2cbuttons = False
+        probei2c += 1
+        time.sleep(1)
 
 #MAIN
 def main():
