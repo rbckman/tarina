@@ -27,7 +27,7 @@ import RPi.GPIO as GPIO
 from PIL import Image
 import socket
 import configparser
-import secrets
+import shortuuid
 import smbus
 #import shlex
 from blessed import Terminal
@@ -298,7 +298,7 @@ def main():
                     writemessage('Good luck with your film ' + filmname + '!')
                     #make a filmhash
                     print('making filmhash...')
-                    filmhash = secrets.token_urlsafe(16)
+                    filmhash = shortuuid.uuid()
                     with open(filmfolder + filmname + '/.filmhash', 'w') as f:
                         f.write(filmhash)
                     updatethumb = True
