@@ -107,6 +107,8 @@ def main():
     filmname = ''
     beeps = 0
     flip = 'no'
+    between = 30
+    duration = 0.2
     lenses = os.listdir('lenses/')
     lens = lenses[0]
     buttontime = time.time()
@@ -195,7 +197,7 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                renderedfilename = timelapse(beeps,camera,foldername,filename)
+                renderedfilename, between, duration = timelapse(beeps,camera,foldername,filename,between,duration)
                 if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
@@ -742,7 +744,21 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp = filmsettings
+                camera.brightness = filmsettings[0]
+                camera.contrast = filmsettings[1]
+                camera.saturation = filmsettings[2]
+                camera.shutter_speed = filmsettings[3]
+                camera.iso = filmsettings[4]
+                camera.awb_mode = filmsettings[5]
+                camera.awb_gains = filmsettings[6]
+                awb_lock = filmsettings[7]
+                miclevel = filmsettings[8]
+                headphoneslevel = filmsettings[9]
+                beeps = filmsettings[10]
+                flip = filmsettings[11]
+                comp = filmsettings[12]
+                between = filmsettings[13]
+                duration = filmsettings[14]
                 time.sleep(0.2)
             except:
                 logger.warning('could not load film settings')
@@ -803,7 +819,8 @@ def main():
             #save settings if menu has been updated and 5 seconds passed
             if recording == False and buttonpressed == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    savesettings(filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp)
+                    settings_to_save = filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration
+                    savesettings(settings_to_save)
                     pausetime = time.time()
             #writemessage(pressed)
         time.sleep(keydelay)
@@ -819,8 +836,7 @@ class logger():
 
 #--------------Save settings-----------------
 
-def savesettings(filmfolder, filmname, brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp):
-    settings = brightness, contrast, saturation, shutter_speed, iso, awb_mode, awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp
+def savesettings(settings):
     try:
         pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
         logger.info("settings saved")
@@ -1281,32 +1297,30 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,foldername,filename):
+def timelapse(beeps,camera,foldername,filename,between,duration):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     sound = False
-    between = 3
-    duration = 0.2
     selected = 0
     header = 'Adjust how many seconds between and filming'
-    menu = 'BETWEEN:', 'DURATION:', 'START', 'BACK'
+    menu = 'DELAY:', 'DURATION:', 'START', 'BACK'
     while True:
         settings = str(round(between,2)), str(round(duration,2)), '', ''
         writemenu(menu,settings,selected,header)
         seconds = (3600 / between) * duration
-        vumetermessage('1 h timelapse filming equals ' + str(int(seconds)) + ' second clip   ')
+        vumetermessage('1 h timelapse filming equals ' + str(round(seconds,2)) + ' second clip   ')
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-        if pressed == 'up' and menu[selected] == 'BETWEEN:':
-            between = between + 0.1
-        elif pressed == 'down' and menu[selected] == 'BETWEEN:':
-            if between > 0.1:
-                between = between - 0.1
+        if pressed == 'up' and menu[selected] == 'DELAY:':
+            between = between + 1
+        elif pressed == 'down' and menu[selected] == 'DELAY:':
+            if between > 1:
+                between = between - 1
         elif pressed == 'up' and menu[selected] == 'DURATION:':
             duration = duration + 0.1
         elif pressed == 'down' and menu[selected] == 'DURATION:':
-            if duration > 0.2:
+            if duration > 0.3:
                 duration = duration - 0.1
         elif pressed == 'up' or pressed == 'down' and menu[selected] == 'SOUND:':
             if sound == False:
@@ -1332,6 +1346,7 @@ def timelapse(beeps,camera,foldername,filename):
                 while True:
                     t = time.time() - starttime
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    vumetermessage('Timelapse lenght is now ' + str(round(n * duration,2)) + ' second clip   ')
                     if recording == False and t > between:
                         if beeps > 0:
                             buzz(150)
@@ -1397,12 +1412,12 @@ def timelapse(beeps,camera,foldername,filename):
                         #cleanup
                         #os.system('rm -r ' + foldername + 'timelapse')
                         vumetermessage('timelapse done! ;)')
-                        return renderfilename
-                    time.sleep(0.0555)
+                        return renderfilename, between, duration
+                    time.sleep(keydelay)
             if menu[selected] == 'BACK':
                 vumetermessage('ok!')
-                return ''
-        time.sleep(0.02)
+                return '', between, duration
+        time.sleep(keydelay)
 
 #------------Remove-----------------------
 
