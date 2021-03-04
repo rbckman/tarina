@@ -2159,6 +2159,8 @@ def playdub(filename, dub, headphoneslevel):
     buttontime = time.time()
     holdbutton = ''
     playing = False
+    pause = False
+    trim = False
     if video == True:
         try:
             player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
@@ -2179,14 +2181,10 @@ def playdub(filename, dub, headphoneslevel):
             a += 1
         player.seek(0)
         player.pause()
-    if dub == False:
+
         writemessage('Starting omxplayer')
-        menu = 'STOP', 'PLAY FROM START', 'PHONES:'
         clipduration = player.duration()
-    else: 
-        writemessage('Get ready dubbing!!')
-        menu = 'STOP', 'DUB FROM START', 'PHONES:'
-        clipduration = 360000
+
     #omxplayer hack to play really short videos.
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
@@ -2208,12 +2206,23 @@ def playdub(filename, dub, headphoneslevel):
         return
     starttime = time.time()
     selected = 0
-    while clipduration > t:
+    while True:
+        if trim == True:
+            menu = 'CANCEL', 'FROM BEGINNING', 'FROM END'
+            settings = '','',''
+        elif pause == True:
+            menu = 'BACK', 'PLAY', 'REPLAY', 'TRIM'
+            settings = '','','',''
+        elif dub == True: 
+            menu = 'BACK', 'REDUB', 'PHONES:'
+            settings = '', '', str(headphoneslevel)
+        else:
+            menu = 'BACK', 'PAUSE', 'REPLAY', 'PHONES:'
+            settings = '', '', '', str(headphoneslevel)
         if dub == True:
             header = 'Dubbing ' + str(round(t,1))
         else:
             header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
-        settings = '', '', str(headphoneslevel)
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
@@ -2232,7 +2241,7 @@ def playdub(filename, dub, headphoneslevel):
                 run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
         elif pressed == 'middle':
             time.sleep(0.2)
-            if menu[selected] == 'STOP' or player.playback_status() == "Stopped":
+            if menu[selected] == 'BACK' or player.playback_status() == "Stopped":
                 try:
                     if video == True:
                         player.stop()
@@ -2246,7 +2255,7 @@ def playdub(filename, dub, headphoneslevel):
                     os.system('pkill arecord')
                     time.sleep(0.2)
                 return
-            elif selected == 1:
+            elif menu[selected] == 'REPLAY' or menu[selected] == 'REDUB':
                 try:
                     os.system('pkill aplay')
                     if dub == True:
@@ -2267,8 +2276,24 @@ def playdub(filename, dub, headphoneslevel):
                 except:
                     pass
                 starttime = time.time()
+            elif menu[selected] == 'PAUSE':
+                player.pause()
+                pause = True
+            elif menu[selected] == 'PLAY':
+                player.play()
+                pause = False
+            elif menu[selected] == 'TRIM':
+                selected = 1
+                trim = True
+            elif menu[selected] == 'CANCEL':
+                selected = 1
+                trim = False
         time.sleep(0.02)
-        t = time.time() - starttime
+        if pause == False:
+            try:
+                t = player.position()
+            except:
+                return
     if video == True:
         player.quit()
     #os.system('pkill dbus-daemon')
