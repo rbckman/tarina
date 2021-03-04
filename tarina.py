@@ -211,7 +211,7 @@ def main():
                     #Check if rendered video exist
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, False, headphoneslevel)
+                    playdub(renderfilename, headphoneslevel, 'scene')
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -220,7 +220,7 @@ def main():
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp)
-                    playdub(renderfilename, False, headphoneslevel)
+                    playdub(renderfilename, headphoneslevel, 'film')
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -232,7 +232,11 @@ def main():
                     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename)
-                    playdub(foldername + filename, False, headphoneslevel)
+                    trim = playdub(foldername + filename, headphoneslevel, 'shot')
+                    if trim:
+                        trim_filename = foldername + 'take' + str(take + 1).zfill(3)
+                        videotrim(foldername + filename, trim_filename, trim[0], trim[1])
+                        take = take + 1
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
                     camera.start_preview()
@@ -242,7 +246,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, True, headphoneslevel)
+                    playdub(renderfilename, headphoneslevel, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
@@ -253,7 +257,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp)
-                    playdub(renderfilename, True, headphoneslevel)
+                    playdub(renderfilename, headphoneslevel, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
@@ -512,7 +516,7 @@ def main():
                 updatethumb = True
                 #compileshot(foldername + filename)
                 os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
-                #delayerr = audiodelay(foldername,filename)
+                #delayerr = audiotrim(foldername,filename)
                 if beeps > 0:
                     buzz(300)
             #if not in last shot or take then go to it
@@ -761,9 +765,8 @@ def main():
                 duration = filmsettings[16]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
-            except Exception as e:
+            except:
                 logger.warning('could not load film settings')
-                logger.warning(e)
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
@@ -1394,7 +1397,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         for f in files:
                             if sound == True:
                                 compileshot(f)
-                                audiodelay(foldername + 'timelapse/', filename + '_' + str(n).zfill(3))
+                                audiotrim(foldername + 'timelapse/', filename + '_' + str(n).zfill(3), 'end')
                             else:
                                 videomerge.append('-cat')
                                 videomerge.append(f + '.h264')
@@ -1626,7 +1629,7 @@ def compileshot(filename):
         #remove old mp4
         os.system('rm ' + filename + '.mp4')
         run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
-        delayerr = audiodelay(filename)
+        delayerr = audiotrim(filename, 'end')
         os.system('rm ' + filename + '.h264')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
@@ -2144,8 +2147,12 @@ def clipsettings(filmfolder, filmname, scene):
 
 #---------------Play & DUB--------------------
 
-def playdub(filename, dub, headphoneslevel):
+def playdub(filename, headphoneslevel, player_menu):
     video = True
+    if player_menu == 'dub':
+        dub = True
+    else:
+        dub = False
     if not os.path.isfile(filename + '.mp4'):
         #should probably check if its not a corrupted video file
         logger.info("no file to play")
@@ -2163,24 +2170,12 @@ def playdub(filename, dub, headphoneslevel):
     trim = False
     if video == True:
         try:
-            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'])
-        except:
+            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+        except Exception as e:
             writemessage('Something wrong with omxplayer')
+            logger.warning(e)
             time.sleep(2)
             return
-        a = 0
-        while playing != True:
-            try:
-                playing = player.is_playing()
-            except:
-                time.sleep(0.01)
-            if a > 100:
-                writemessage('Something wrong with the clip!')
-                time.sleep(2)
-                return
-            a += 1
-        player.seek(0)
-        player.pause()
 
         writemessage('Starting omxplayer')
         clipduration = player.duration()
@@ -2199,10 +2194,11 @@ def playdub(filename, dub, headphoneslevel):
         if video == True:
             player.play()
         run_command('aplay -D plughw:0 ' + filename + '.wav &')
-        if dub == True:
+        if player_menu == 'dub':
             run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
-    except:
+    except Exception as e:
         logger.info('something wrong with omxplayer')
+        logger.warning(e)
         return
     starttime = time.time()
     selected = 0
@@ -2211,9 +2207,13 @@ def playdub(filename, dub, headphoneslevel):
             menu = 'CANCEL', 'FROM BEGINNING', 'FROM END'
             settings = '','',''
         elif pause == True:
-            menu = 'BACK', 'PLAY', 'REPLAY', 'TRIM'
-            settings = '','','',''
-        elif dub == True: 
+            if player_menu == 'shot':
+                menu = 'BACK', 'PLAY', 'REPLAY', 'TRIM'
+                settings = '','','',''
+            else:
+                menu = 'BACK', 'PLAY', 'REPLAY'
+                settings = '','',''
+        elif player_menu == 'dub': 
             menu = 'BACK', 'REDUB', 'PHONES:'
             settings = '', '', str(headphoneslevel)
         else:
@@ -2256,6 +2256,7 @@ def playdub(filename, dub, headphoneslevel):
                     time.sleep(0.2)
                 return
             elif menu[selected] == 'REPLAY' or menu[selected] == 'REDUB':
+                pause = False
                 try:
                     os.system('pkill aplay')
                     if dub == True:
@@ -2288,6 +2289,14 @@ def playdub(filename, dub, headphoneslevel):
             elif menu[selected] == 'CANCEL':
                 selected = 1
                 trim = False
+            elif menu[selected] == 'FROM BEGINNING':
+                trim = ['beginning', player.position()]
+                player.quit()
+                return trim
+            elif menu[selected] == 'FROM END':
+                trim = ['end', player.position()]
+                player.quit()
+                return trim
         time.sleep(0.02)
         if pause == False:
             try:
@@ -2311,10 +2320,29 @@ def viewfilm(filmfolder, filmname):
         scene = scene + 1
     return filmfiles
 
-#--------------Audiodelay--------------------
-# make audio file same lenght as video file
+#---------------Video Trim--------------------
 
-def audiodelay(filename):
+def videotrim(filename, trim_filename, where, s):
+    #theres two different ways of non-rerendering mp4 cut techniques that i know MP4Box and ffmpeg
+    if where == 'beginning':
+        logger.info('trimming clip from beginning')
+        #run_command('ffmpeg -ss ' + str(s) + ' -i ' + filename + '.mp4 -c copy ' + trim_filename + '.mp4')
+        run_command('MP4Box ' + filename + '.mp4 -splitx ' + str(s) + ':end -out ' + trim_filename + '.mp4')
+        run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
+        audiotrim(trim_filename, 'beginning')
+    if where == 'end':
+        logger.info('trimming clip from end')
+        #run_command('ffmpeg -to ' + str(s) + ' -i ' + filename + '.mp4 -c copy ' + trim_filename + '.mp4')
+        run_command('MP4Box ' + filename + '.mp4 -splitx 0:' + str(s) + ' -out ' + trim_filename + '.mp4')
+        run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
+        audiotrim(trim_filename, 'end')
+    #take last frame 
+    run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:340 ' + trim_filename + '.jpeg')
+    return
+
+#--------------Audio Trim--------------------
+# make audio file same lenght as video file
+def audiotrim(filename, where):
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
@@ -2334,8 +2362,11 @@ def audiodelay(filename):
         audiosync = int(audiolenght) - int(videolenght)
         newaudiolenght = int(audiolenght) - audiosync
         logger.info('Audiofile is: ' + str(audiosync) + 'ms longer')
-        #trim from end and put a 0.01 in- and outfade
-        run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
+        #trim from end or beginning and put a 0.01 in- and outfade
+        if where == 'end':
+            run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
+        if where == 'beginning':
+            run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim ' + str(int(audiosync)/1000))
         run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         os.remove(filename + '_temp.wav')
         #if int(audiosync) > 400:
