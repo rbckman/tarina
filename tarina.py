@@ -744,24 +744,26 @@ def main():
         if loadfilmsettings == True:
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
-                camera.brightness = filmsettings[0]
-                camera.contrast = filmsettings[1]
-                camera.saturation = filmsettings[2]
-                camera.shutter_speed = filmsettings[3]
-                camera.iso = filmsettings[4]
-                camera.awb_mode = filmsettings[5]
-                camera.awb_gains = filmsettings[6]
-                awb_lock = filmsettings[7]
-                miclevel = filmsettings[8]
-                headphoneslevel = filmsettings[9]
-                beeps = filmsettings[10]
-                flip = filmsettings[11]
-                comp = filmsettings[12]
-                between = filmsettings[13]
-                duration = filmsettings[14]
+                camera.brightness = filmsettings[2]
+                camera.contrast = filmsettings[3]
+                camera.saturation = filmsettings[4]
+                camera.shutter_speed = filmsettings[5]
+                camera.iso = filmsettings[6]
+                camera.awb_mode = filmsettings[7]
+                camera.awb_gains = filmsettings[8]
+                awb_lock = filmsettings[9]
+                miclevel = filmsettings[10]
+                headphoneslevel = filmsettings[11]
+                beeps = filmsettings[12]
+                flip = filmsettings[13]
+                comp = filmsettings[14]
+                between = filmsettings[15]
+                duration = filmsettings[16]
+                logger.info('film settings loaded & applied')
                 time.sleep(0.2)
-            except:
+            except Exception as e:
                 logger.warning('could not load film settings')
+                logger.warning(e)
             if flip == "yes":
                 camera.vflip = True
                 camera.hflip = True
@@ -781,7 +783,7 @@ def main():
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
-                logger.info('okey something has changed')
+                logger.info('film:' + filmname + ' scene:' + str(scene) + ' shot:' + str(shot) + ' take:' + str(take))
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
@@ -815,14 +817,15 @@ def main():
             #Rerender menu if picamera settings change
             if settings != oldsettings:
                 rendermenu = True
-            oldsettings = settings
-            #save settings if menu has been updated and 5 seconds passed
-            if recording == False and buttonpressed == False:
-                if time.time() - pausetime > savesettingsevery: 
-                    settings_to_save = filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration
-                    savesettings(settings_to_save)
-                    pausetime = time.time()
+                #save settings if menu has been updated and x seconds passed
+                if recording == False:
+                    if time.time() - pausetime > savesettingsevery: 
+                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration]
+                        print('saving settings')
+                        savesettings(settings_to_save, filmname, filmfolder)
+                        pausetime = time.time()
             #writemessage(pressed)
+            oldsettings = settings
         time.sleep(keydelay)
 
 #--------------Logger-----------------------
@@ -836,13 +839,16 @@ class logger():
 
 #--------------Save settings-----------------
 
-def savesettings(settings):
+def savesettings(settings, filmname, filmfolder):
+    print(settings)
     try:
-        pickle.dump(settings, open(filmfolder + filmname + "/settings.p", "wb"))
-        logger.info("settings saved")
-    except:
-        return
+        with open(filmfolder + filmname + "/settings.p", "wb") as f:
+            pickle.dump(settings, f)
+            logger.info("settings saved")
+    except Exception as e:
         logger.warning("could not save settings")
+        logger.warning(e)
+    return
 
 #--------------Load film settings--------------
 
