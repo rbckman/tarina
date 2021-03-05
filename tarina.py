@@ -145,7 +145,7 @@ def main():
     #LOAD FILM AND SCENE SETTINGS
     try:
         filmname = getfilms(filmfolder)[0][0]
-    except Exception as e:
+    except:
         print(e)
         filmname = ''
     #THUMBNAILCHECKER
@@ -229,7 +229,7 @@ def main():
                 if takes > 0:
                     removeimage(camera, overlay)
                     camera.stop_preview()
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename)
                     trim = playdub(foldername + filename, headphoneslevel, 'shot')
@@ -276,7 +276,8 @@ def main():
                             stopinterface(camera)
                             try:
                                 run_command(cmd)
-                            except Exception as e: logger.warning(e)
+                            except:
+                                logger.warning('uploadfilm bugging')
                             startinterface()
                             camera = startcamera(lens)
                             loadfilmsettings = True
@@ -848,9 +849,9 @@ def savesettings(settings, filmname, filmfolder):
         with open(filmfolder + filmname + "/settings.p", "wb") as f:
             pickle.dump(settings, f)
             logger.info("settings saved")
-    except Exception as e:
+    except:
         logger.warning("could not save settings")
-        logger.warning(e)
+        #logger.warning(e)
     return
 
 #--------------Load film settings--------------
@@ -1688,10 +1689,10 @@ def rendervideo(filmfiles, filename, renderinfo):
 #---------------Render Audio----------------
 
 def renderaudio(audiofiles, filename, dubfiles, dubmix):
-    if len(audiofiles) < 1:
-        writemessage('Nothing here!')
-        time.sleep(2)
-        return None
+    #if len(audiofiles) < 1:
+    #    writemessage('Nothing here!')
+    #    time.sleep(2)
+    #    return None
     print('Rendering audiofiles')
     ##PASTE AUDIO TOGETHER
     writemessage('Hold on, rendering audio...')
@@ -2025,6 +2026,7 @@ def clipsettings(filmfolder, filmname, scene):
     selected = 0
     dubfiles = []
     dubmix = []
+    dubmix_old = []
     if scene:
         header = 'Scene ' + str(scene) + ' dubbing settings'
         filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/dub/'
@@ -2116,7 +2118,6 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'down' and selected == 7:
             if dubmix[dubselected][3] > 0.01:
                 dubmix[dubselected][3] -= 0.1
-
         elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -2131,9 +2132,18 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
+        elif pressed == 'middle' and selected == 5: # mix dub and listen
+            run_command('pkill aplay')
+            dubfiles, dubmix, rerender = getdubs(filmfolder, filmname, scene)
+            if scene:
+                filename = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/scene'
+            else:
+                filename = filmfolder + filmname + '/' + filmname
+            renderaudio('', filename, dubfiles, dubmix)
+            run_command('aplay -D plughw:0 ' + filename + '.wav &')
         time.sleep(0.05)
     #Save dubmix before returning
-    if dubmix:
+    if dubmix != dubmix_old:
         if os.path.isdir(filefolder) == False:
             os.makedirs(filefolder)
         c = 1
@@ -2143,11 +2153,14 @@ def clipsettings(filmfolder, filmname, scene):
                     f.write(str(round(p,1)) + '\n')
                     print(str(round(p,1)))
             c += 1
+        dubmix_old = dubmix
     return dubrecord
 
 #---------------Play & DUB--------------------
 
 def playdub(filename, headphoneslevel, player_menu):
+    #omxplayer hack
+    os.system('rm /tmp/omxplayer*')
     video = True
     if player_menu == 'dub':
         dub = True
@@ -2176,10 +2189,8 @@ def playdub(filename, headphoneslevel, player_menu):
             logger.warning(e)
             time.sleep(2)
             return
-
         writemessage('Starting omxplayer')
         clipduration = player.duration()
-
     #omxplayer hack to play really short videos.
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
@@ -2196,9 +2207,9 @@ def playdub(filename, headphoneslevel, player_menu):
         run_command('aplay -D plughw:0 ' + filename + '.wav &')
         if player_menu == 'dub':
             run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
-    except Exception as e:
+    except:
         logger.info('something wrong with omxplayer')
-        logger.warning(e)
+        #logger.warning(e)
         return
     starttime = time.time()
     selected = 0
@@ -2302,6 +2313,9 @@ def playdub(filename, headphoneslevel, player_menu):
             try:
                 t = player.position()
             except:
+                os.system('pkill aplay') 
+                if dub == True:
+                    os.system('pkill arecord')
                 return
     if video == True:
         player.quit()
