@@ -234,9 +234,9 @@ def main():
                     compileshot(foldername + filename)
                     trim = playdub(foldername + filename, headphoneslevel, 'shot')
                     if trim:
-                        trim_filename = foldername + 'take' + str(take + 1).zfill(3)
+                        take = counttakes(filmname, filmfolder, scene, shot)+1
+                        trim_filename = foldername + 'take' + str(take).zfill(3)
                         videotrim(foldername + filename, trim_filename, trim[0], trim[1])
-                        take = take + 1
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename)
                     camera.start_preview()
