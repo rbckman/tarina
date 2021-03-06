@@ -1314,7 +1314,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
     holdbutton = ''
     sound = False
     selected = 0
-    header = 'Adjust how many seconds between and filming'
+    header = 'Adjust delay in seconds between images'
     menu = 'DELAY:', 'DURATION:', 'START', 'BACK'
     while True:
         settings = str(round(between,2)), str(round(duration,2)), '', ''
