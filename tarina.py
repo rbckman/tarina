@@ -96,6 +96,7 @@ def main():
     miclevel = 50
     recording = False
     retake = False
+    lastmenu = ''
     rendermenu = True
     overlay = None
     reclenght = 0
@@ -784,6 +785,15 @@ def main():
             take = 1
         if shot == 0:
             shot = 1
+        # If menu at SCENE show first shot thumbnail off that scene
+        if menu[selected] == 'FILM:' and lastmenu != menu[selected]:
+            updatethumb = True
+        if menu[selected] == 'SCENE:' and lastmenu != menu[selected]:
+            updatethumb = True
+        if menu[selected] == 'SHOT:' and lastmenu != menu[selected]:
+            updatethumb = True
+        if menu[selected] == 'TAKE:' and lastmenu != menu[selected]:
+            updatethumb = True
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
@@ -792,7 +802,14 @@ def main():
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
                 overlay = removeimage(camera, overlay)
-                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
+                if menu[selected] == 'SCENE:': # display first shot of scene if browsing scenes
+                    p = counttakes(filmname, filmfolder, scene, 1)
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
+                elif menu[selected] == 'FILM:': # display first shot of film
+                    p = counttakes(filmname, filmfolder, 1, 1)
+                    imagename = filmfolder + filmname + '/scene' + str(1).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
+                else:
+                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename)
                 oldscene = scene
                 oldshot = shot
@@ -816,6 +833,7 @@ def main():
 
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
+            lastmenu = menu[selected]
             settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu if picamera settings change
@@ -2556,18 +2574,18 @@ def uploadfilm(filename, filmname):
 
 #-------------Beeps-------------------
 
-def buzzer(beeps):
+def beep():
     buzzerrepetitions = 100
-    pausetime = 1
-    while beeps > 1:
-        buzzerdelay = 0.0001
-        for _ in range(buzzerrepetitions):
-            for value in [0xC, 0x4]:
-                #GPIO.output(1, value)
-                bus.write_byte_data(DEVICE,OLATA,value)
-                time.sleep(buzzerdelay)
-        time.sleep(pausetime)
-        beeps = beeps - 1
+    buzzerdelay = 0.0001
+    for _ in range(buzzerrepetitions):
+        for value in [0xC, 0x4]:
+            #GPIO.output(1, value)
+            bus.write_byte_data(DEVICE,OLATA,value)
+            time.sleep(buzzerdelay)
+    return
+
+def longbeep():
+    buzzerrepetitions = 100
     buzzerdelay = 0.0001
     for _ in range(buzzerrepetitions * 10):
         for value in [0xC, 0x4]:
@@ -2576,7 +2594,6 @@ def buzzer(beeps):
             buzzerdelay = buzzerdelay - 0.00000004
             time.sleep(buzzerdelay)
     bus.write_byte_data(DEVICE,OLATA,0x4)
-    time.sleep(0.1)
     return
 
 def buzz(buzzerlenght):
