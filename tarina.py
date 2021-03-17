@@ -107,6 +107,9 @@ def main():
     take = 1
     filmname = ''
     beeps = 0
+    beepcountdown = 0
+    beeping = False
+    lastbeep = time.time()
     flip = 'no'
     between = 30
     duration = 0.2
@@ -485,19 +488,42 @@ def main():
                     loadfilmsettings = True
                     updatethumb = True
                     time.sleep(0.5)
-            
+
         #RECORD AND PAUSE
-        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght or t > 3600:
+        if beepcountdown > 1:
+            if time.time() - lastbeep  > 1:
+                beep()
+                beepcountdown -= 1
+                lastbeep = time.time()
+                logger.info('beepcountdown: ' + str(beepcountdown))
+                vumetermessage('Filming in ' + str(beepcountdown) + ' seconds, press record again to cancel       ')
+        elif beepcountdown > 0:
+            if time.time() - float(lastbeep) > 0.1:
+                beep()
+                vumetermessage('Get ready!!')
+            if time.time() - lastbeep > 1:
+                longbeep()
+                beepcountdown = 0
+                pressed = 'record'
+                print('exhausted from all beepings')
+        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True:
-                if beeps > 0:
-                    buzzer(beeps)
-                if os.path.isdir(foldername) == False:
-                    os.makedirs(foldername)
-                os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                camera.start_recording(foldername + filename + '.h264', format='h264', quality=26, bitrate=5000000)
-                starttime = time.time()
-                recording = True
+                if beeps > 0 and beeping == False:
+                    beeping = True
+                    beepcountdown = beeps
+                elif beepcountdown == 0:
+                    beeping = False
+                    if os.path.isdir(foldername) == False:
+                        os.makedirs(foldername)
+                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=26, bitrate=5000000)
+                    starttime = time.time()
+                    recording = True
+                elif beepcountdown > 0 and beeping == True:
+                    beeping = False
+                    beepcountdown = 0
+                    vumetermessage('Filming was canceled!!')
             elif recording == True and float(time.time() - starttime) > 0.2:
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
@@ -2576,7 +2602,7 @@ def uploadfilm(filename, filmname):
 
 def beep():
     buzzerrepetitions = 100
-    buzzerdelay = 0.0001
+    buzzerdelay = 0.00001
     for _ in range(buzzerrepetitions):
         for value in [0xC, 0x4]:
             #GPIO.output(1, value)
