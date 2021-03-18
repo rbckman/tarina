@@ -18,7 +18,7 @@ films = []
 
 urls = (
     '/', 'index',
-    '/f/(.*)', 'films'
+    '/f/(.*)?', 'films'
 )
 
 app = web.application(urls, globals())
@@ -38,6 +38,48 @@ def getfilms(filmfolder):
     print(films_sorted)
     return films_sorted
 
+#------------Count scenes--------
+
+def countscenes(filmfolder, filmname):
+    scenes = 0
+    try:
+        allfiles = os.listdir(filmfolder + filmname)
+    except:
+        allfiles = []
+        scenes = 0
+    for a in allfiles:
+        if 'scene' in a:
+            scenes = scenes + 1
+    return scenes
+
+#------------Count shots--------
+
+def countshots(filmname, filmfolder, scene):
+    shots = 0
+    try:
+        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3))
+    except:
+        allfiles = []
+        shots = 0
+    for a in allfiles:
+        if 'shot' in a:
+            shots = shots + 1
+    return shots
+
+#------------Count takes--------
+
+def counttakes(filmname, filmfolder, scene, shot):
+    takes = 0
+    try:
+        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+    except:
+        allfiles = []
+        return takes
+    for a in allfiles:
+        if '.mp4' in a or '.h264' in a:
+            takes = takes + 1
+    return takes
+
 class index:
     def GET(self):
         films = getfilms(filmfolder)
@@ -52,7 +94,12 @@ class index:
 
 class films:
     def GET(self, film):
-        return render.filmpage(film)
+        shots = 0
+        i = web.input(page=None, scene=None, shot=None)
+        if i.scene != None:
+            shots = countshots(film, filmfolder, i.scene)
+        scenes = countscenes(filmfolder, film)
+        return render.filmpage(film, scenes, str, filmfolder, counttakes, shots)
 
 application = app.wsgifunc()
 

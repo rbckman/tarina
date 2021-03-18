@@ -1,5 +1,5 @@
-$def with (film)
-
+$def with (film, scenes, str, filmfolder, counttakes, shots)
+$ s = 0
 <h1>$film</h1>
 
     <p>--------------------------------------------------------------</p>
@@ -10,3 +10,8 @@ $def with (film)
     <p>Copy project to your destination:</p>
     <pre>scp -r pi@tarina.local:~/Videos/$film ~/films/$film </pre>
 
+$for s in range(scenes):
+    $ s += 1
+    $ t = counttakes(film, filmfolder, 1, 1)
+    $ thumbnail_url = '/static/Videos/' + film + '/scene' + str(s).zfill(3) + '/shot001/take001.jpeg'
+    <a href="?scene=$s"><img width="80%" src="$thumbnail_url"/></a><br>
