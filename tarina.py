@@ -17,6 +17,7 @@ import numpy as np
 import string
 import os
 import time
+import multiprocessing as mp
 from subprocess import call
 from subprocess import Popen
 from omxplayer import OMXPlayer
@@ -875,6 +876,7 @@ def main():
             #writemessage(pressed)
             oldsettings = settings
         time.sleep(keydelay)
+
 
 #--------------Logger-----------------------
 
@@ -1858,98 +1860,122 @@ def renderscene(filmfolder, filmname, scene):
 #-------------Render film------------
 
 def renderfilm(filmfolder, filmname, comp):
-    newaudiomix = False
-    #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
-    scenes = countscenes(filmfolder, filmname)
-    for i in range(scenes):
-        scenefilename, audiomix = renderscene(filmfolder, filmname, i + 1)
-        #Check if a scene has a new audiomix
-        print('audiomix of scene ' + str(i + 1) + ' is ' + str(audiomix))
-        if audiomix == True:
-            newaudiomix = True
-    filmfiles = scenefiles(filmfolder, filmname)
-    #Video
-    videohash = ''
-    oldvideohash = ''
-    renderfilename = filmfolder + filmname + '/' + filmname
-    filmdir = filmfolder + filmname + '/'
-    for p in filmfiles:
-        print(p)
-        compileshot(p)
-        videohash += str(int(countsize(p + '.mp4')))
-    print('Videohash of film is: ' + videohash)
-    try:
-        with open(filmdir + '.videohash', 'r') as f:
-            oldvideohash = f.readline().strip()
-        print('oldvideohash is: ' + oldvideohash)
-    except:
-        print('no videohash found, making one...')
-        with open(filmdir + '.videohash', 'w') as f:
-            f.write(videohash)
-    if videohash != oldvideohash:
-        rendervideo(filmfiles, renderfilename, filmname)
-        print('updating video hash')
-        with open(filmdir + '.videohash', 'w') as f:
-            f.write(videohash)
-    #Audio
-    audiohash = ''
-    oldaudiohash = ''
-    for p in filmfiles:
-        print(p)
-        audiohash += str(int(countsize(p + '.wav')))
-    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
-    for p in dubfiles:
-        audiohash += str(int(countsize(p)))
-    print('Audiohash of film is: ' + audiohash)
-    try:
-        with open(filmdir + '.audiohash', 'r') as f:
-            oldaudiohash = f.readline().strip()
-        print('oldaudiohash is: ' + oldaudiohash)
-    except:
-        print('no audiohash found, making one...')
-        with open(filmdir+ '.audiohash', 'w') as f:
-            f.write(audiohash)
-    #This is if the scene has a new audiomix
-    if newaudiomix == True:
-        newmix = True
-    if audiohash != oldaudiohash or newmix == True:
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
-        print('updating audiohash...')
-        with open(filmdir+ '.audiohash', 'w') as f:
-            f.write(audiohash)
-        for i in range(len(dubfiles)):
-            os.system('cp ' + filmdir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + filmdir + '/dub/.rendered' + str(i + 1).zfill(3))
-        print('Audio rendered!')
-        #compressing
-        if comp > 0:
-            writemessage('compressing audio')
-            os.system('mv ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
-            run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
-            os.remove(renderfilename + '_tmp.wav')
-        #muxing mp3 layer to mp4 file
-        #count estimated audio filesize with a bitrate of 320 kb/s
-        audiosize = countsize(renderfilename + '.wav') * 0.453
-        os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-        if debianversion == 'stretch':
-            p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+    def render(q, filmfolder, filmname, comp):
+        newaudiomix = False
+        #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
+        scenes = countscenes(filmfolder, filmname)
+        for i in range(scenes):
+            scenefilename, audiomix = renderscene(filmfolder, filmname, i + 1)
+            #Check if a scene has a new audiomix
+            print('audiomix of scene ' + str(i + 1) + ' is ' + str(audiomix))
+            if audiomix == True:
+                newaudiomix = True
+        filmfiles = scenefiles(filmfolder, filmname)
+        #Video
+        videohash = ''
+        oldvideohash = ''
+        renderfilename = filmfolder + filmname + '/' + filmname
+        filmdir = filmfolder + filmname + '/'
+        for p in filmfiles:
+            print(p)
+            compileshot(p)
+            videohash += str(int(countsize(p + '.mp4')))
+        print('Videohash of film is: ' + videohash)
+        try:
+            with open(filmdir + '.videohash', 'r') as f:
+                oldvideohash = f.readline().strip()
+            print('oldvideohash is: ' + oldvideohash)
+        except:
+            print('no videohash found, making one...')
+            with open(filmdir + '.videohash', 'w') as f:
+                f.write(videohash)
+        if videohash != oldvideohash:
+            rendervideo(filmfiles, renderfilename, filmname)
+            print('updating video hash')
+            with open(filmdir + '.videohash', 'w') as f:
+                f.write(videohash)
+        #Audio
+        audiohash = ''
+        oldaudiohash = ''
+        for p in filmfiles:
+            print(p)
+            audiohash += str(int(countsize(p + '.wav')))
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
+        for p in dubfiles:
+            audiohash += str(int(countsize(p)))
+        print('Audiohash of film is: ' + audiohash)
+        try:
+            with open(filmdir + '.audiohash', 'r') as f:
+                oldaudiohash = f.readline().strip()
+            print('oldaudiohash is: ' + oldaudiohash)
+        except:
+            print('no audiohash found, making one...')
+            with open(filmdir+ '.audiohash', 'w') as f:
+                f.write(audiohash)
+        #This is if the scene has a new audiomix
+        if newaudiomix == True:
+            newmix = True
+        if audiohash != oldaudiohash or newmix == True:
+            renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+            print('updating audiohash...')
+            with open(filmdir+ '.audiohash', 'w') as f:
+                f.write(audiohash)
+            for i in range(len(dubfiles)):
+                os.system('cp ' + filmdir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + filmdir + '/dub/.rendered' + str(i + 1).zfill(3))
+            print('Audio rendered!')
+            #compressing
+            if comp > 0:
+                writemessage('compressing audio')
+                os.system('mv ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
+                run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+                os.remove(renderfilename + '_tmp.wav')
+            #muxing mp3 layer to mp4 file
+            #count estimated audio filesize with a bitrate of 320 kb/s
+            audiosize = countsize(renderfilename + '.wav') * 0.453
+            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+            if debianversion == 'stretch':
+                p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            else:
+                p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            while p.poll() is None:
+                time.sleep(0.2)
+                try:
+                    rendersize = countsize(renderfilename + '.mp3')
+                except:
+                    continue
+                writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
+            ##MERGE AUDIO & VIDEO
+            writemessage('Merging audio & video')
+            #os.remove(renderfilename + '.mp4') 
+            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
+            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+            os.remove(renderfilename + '_tmp.mp4')
+            os.remove(renderfilename + '.mp3')
         else:
-            p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
-        while p.poll() is None:
-            time.sleep(0.2)
-            try:
-                rendersize = countsize(renderfilename + '.mp3')
-            except:
-                continue
-            writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
-        ##MERGE AUDIO & VIDEO
-        writemessage('Merging audio & video')
-        #os.remove(renderfilename + '.mp4') 
-        call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
-        call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
-        os.remove(renderfilename + '_tmp.mp4')
-        os.remove(renderfilename + '.mp3')
-    else:
-        print('Already rendered!')
+            print('Already rendered!')
+        q.put(renderfilename)
+    q = mp.Queue()
+    proc = mp.Process(target=render, args=(q,filmfolder,filmname,comp))
+    proc.start()
+    procdone = False
+    status = ''
+    vumetermessage('press middlebutton to cancel')
+    while True:
+        if proc.is_alive() == False and procdone == False:
+            status = q.get()
+            print(status)
+            procdone = True
+            proc.join()
+            renderfilename = status
+            break
+        if middlebutton() == True:
+            proc.terminate()
+            proc.join()
+            procdone = True
+            os.system('pkill MP4Box')
+            vumetermessage('canceled for now, maybe u want to render later ;)')
+            renderfilename = ''
+            break
     return renderfilename
 
 #-------------Get dub files-----------
@@ -2687,6 +2713,33 @@ def waitforanykey():
             time.sleep(0.05)
             vumetermessage(' ')
             return
+
+def middlebutton():
+    with term.cbreak():
+        val = term.inkey(timeout=0)
+    if val.is_sequence:
+        event = val.name
+        #print(event)
+    elif val:
+        event = val
+        #print(event)
+    else:
+        event = ''
+    if i2cbuttons == True:
+        readbus = bus.read_byte_data(DEVICE,GPIOB)
+        readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+        if readbus != 255:
+            print('i2cbutton pressed: ' + str(readbus))
+        if readbus2 != 247:
+            print('i2cbutton pressed: ' + str(readbus2))
+    else:
+        readbus = 255
+        readbus2 = 247
+    pressed = ''
+    if event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
+        pressed = 'middle'
+        return True
+    return False
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     with term.cbreak():
