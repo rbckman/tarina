@@ -151,7 +151,6 @@ def main():
     try:
         filmname = getfilms(filmfolder)[0][0]
     except:
-        print(e)
         filmname = ''
     #THUMBNAILCHECKER
     oldscene = scene
