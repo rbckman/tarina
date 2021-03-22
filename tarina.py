@@ -579,6 +579,8 @@ def main():
                 camera.awb_mode = 'off'
             else:
                 camera.awb_mode = 'auto'
+        elif pressed == 'middle' and menu[selected] == 'BEEP:':
+            beeps = 0
         #UP
         elif pressed == 'up':
             if menu[selected] == 'BRIGHT:':
@@ -812,13 +814,13 @@ def main():
         if shot == 0:
             shot = 1
         # If menu at SCENE show first shot thumbnail off that scene
-        if menu[selected] == 'FILM:' and lastmenu != menu[selected]:
+        if menu[selected] == 'FILM:' and lastmenu != menu[selected] and recordable == False:
             updatethumb = True
-        if menu[selected] == 'SCENE:' and lastmenu != menu[selected]:
+        if menu[selected] == 'SCENE:' and lastmenu != menu[selected] and recordable == False:
             updatethumb = True
-        if menu[selected] == 'SHOT:' and lastmenu != menu[selected]:
+        if menu[selected] == 'SHOT:' and lastmenu != menu[selected] and recordable == False:
             updatethumb = True
-        if menu[selected] == 'TAKE:' and lastmenu != menu[selected]:
+        if menu[selected] == 'TAKE:' and lastmenu != menu[selected] and recordable == False:
             updatethumb = True
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
