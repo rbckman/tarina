@@ -2360,8 +2360,11 @@ def playdub(filename, headphoneslevel, player_menu):
                     pass
                 starttime = time.time()
             elif menu[selected] == 'PAUSE':
-                player.pause()
-                pause = True
+                try:
+                    player.pause()
+                    pause = True
+                except:
+                    pass
             elif menu[selected] == 'PLAY':
                 player.play()
                 pause = False
