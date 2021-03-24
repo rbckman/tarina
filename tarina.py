@@ -174,6 +174,12 @@ def main():
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if buttonpressed == True:
+            buttonflush = True
+        else:
+            buttonflush = False
+        if buttonflush == True:
+            flushbutton()
         #event = screen.getch()
         if recording == False:
             #SHUTDOWN
@@ -2275,7 +2281,8 @@ def playdub(filename, headphoneslevel, player_menu):
                 p+=1
         if video == True:
             player.play()
-        run_command('aplay -D plughw:0 ' + filename + '.wav &')
+        #run_command('aplay -D plughw:0 ' + filename + '.wav &')
+        run_command('mplayer ' + filename + '.wav &')
         if player_menu == 'dub':
             run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
     except:
@@ -2283,7 +2290,7 @@ def playdub(filename, headphoneslevel, player_menu):
         #logger.warning(e)
         return
     starttime = time.time()
-    selected = 0
+    selected = 1
     while True:
         if trim == True:
             menu = 'CANCEL', 'FROM BEGINNING', 'FROM END'
@@ -2744,6 +2751,14 @@ def middlebutton():
         pressed = 'middle'
         return True
     return False
+
+def flushbutton():
+    with term.cbreak():
+        while True:
+            inp = term.inkey(timeout=0)
+            print('flushing ' + repr(inp))
+            if inp == '':
+                break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     with term.cbreak():
