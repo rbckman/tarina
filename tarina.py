@@ -220,7 +220,8 @@ def main():
                 if len(filmfiles) > 0:
                     #Check if rendered video exist
                     camera.stop_preview()
-                    renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
+                    #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, scene)
                     playdub(renderfilename, headphoneslevel, 'scene')
                     camera.start_preview()
             #VIEW FILM
@@ -229,7 +230,7 @@ def main():
                 writemessage('Loading film...')
                 if len(filmfiles) > 0:
                     camera.stop_preview()
-                    renderfilename = renderfilm(filmfolder, filmname, comp)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, 0)
                     playdub(renderfilename, headphoneslevel, 'film')
                     camera.start_preview()
             #VIEW SHOT OR TAKE
@@ -266,7 +267,7 @@ def main():
                 newdub = clipsettings(filmfolder, filmname, '')
                 if newdub:
                     camera.stop_preview()
-                    renderfilename = renderfilm(filmfolder, filmname, comp)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, 0)
                     playdub(renderfilename, headphoneslevel, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
@@ -280,7 +281,7 @@ def main():
                 if webz_on() == True:
                     filmfiles = viewfilm(filmfolder, filmname)
                     if len(filmfiles) > 0:
-                        renderfilename = renderfilm(filmfolder, filmname, comp)
+                        renderfilename = renderfilm(filmfolder, filmname, comp, 0)
                         cmd = uploadfilm(renderfilename, filmname)
                         if cmd != None:
                             stopinterface(camera)
@@ -376,6 +377,7 @@ def main():
                 os.system('cp -r ' + yankedshot + ' ' + pasteshot)
                 add_organize(filmfolder, filmname)
                 updatethumb = True
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 yankedshot = ''
                 vumetermessage('Shot pasted!')
                 time.sleep(1)
@@ -386,6 +388,7 @@ def main():
                 add_organize(filmfolder, filmname)
                 shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 yankedscene = ''
                 vumetermessage('Scene pasted!')
                 time.sleep(1)
@@ -405,6 +408,7 @@ def main():
                     organize(filmfolder, filmname)
                     cuttedshot = ''
                     updatethumb = True
+                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                     vumetermessage('Shot moved!')
                     time.sleep(1)
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and cuttedscene:
@@ -415,6 +419,7 @@ def main():
                     os.system('rm ' + cuttedscene + '/.placeholder')
                     add_organize(filmfolder, filmname)
                     organize(filmfolder, filmname)
+                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                     shot = countshots(filmname, filmfolder, scene)
                     cuttedscene = ''
                     updatethumb = True
@@ -427,6 +432,7 @@ def main():
                 add_organize(filmfolder, filmname)
                 take = 1
                 updatethumb = True
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
             #INSERT SCENE
@@ -438,6 +444,7 @@ def main():
                 take = 1
                 shot = 1
                 updatethumb = True
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Scene ' + str(scene) + ' inserted')
                 time.sleep(1)
             #HELPME
@@ -468,18 +475,21 @@ def main():
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
                 time.sleep(0.5)
             #shot
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
                 time.sleep(0.5)
             #scene
             elif pressed == 'remove' and menu[selected] == 'SCENE:':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
                 time.sleep(0.5)
@@ -551,17 +561,23 @@ def main():
                 #compileshot(foldername + filename)
                 os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 #delayerr = audiotrim(foldername,filename)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 if beeps > 0:
                     buzz(300)
             #if not in last shot or take then go to it
             if pressed == 'record' and recordable == False:
-                takes = counttakes(filmname, filmfolder, scene, shot)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #take = takes
+                #takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
                     shot = countshots(filmname, filmfolder, scene) + 1
                     take = 1
+                    takes = 0
             if pressed == 'retake' and recordable == False:
-                take = counttakes(filmname, filmfolder, scene, shot)
-                take = take + 1
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #take = takes
+                #takes = counttakes(filmname, filmfolder, scene, shot)
+                take = takes + 1
         #ENTER (auto shutter, iso, awb on/off)
         elif pressed == 'middle' and menu[selected] == 'SHUTTER:':
             if camera.shutter_speed == 0:
@@ -629,9 +645,12 @@ def main():
                     headphoneslevel = headphoneslevel + 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
+                scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
+                takes = take
+                shot = 1
             elif menu[selected] == 'SHOT:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
+                takes = take
             elif menu[selected] == 'TAKE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
             elif menu[selected] == 'RED:':
@@ -722,9 +741,12 @@ def main():
                     headphoneslevel = headphoneslevel - 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
+                scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
+                takes = take
+                shot = 1
             elif menu[selected] == 'SHOT:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
+                takes = take
             elif menu[selected] == 'TAKE:' and recording == False:
                 scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
             elif menu[selected] == 'RED:':
@@ -809,7 +831,11 @@ def main():
             run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             organize(filmfolder, filmname)
-            scene, shot, take = countlast(filmname, filmfolder)
+            scene = 1
+            shot = 1
+            scenes = countscenes(filmfolder, filmname)
+            shots = countshots(filmname, filmfolder, scene)
+            takes = counttakes(filmname, filmfolder, scene, shot)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -831,7 +857,7 @@ def main():
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
-                logger.info('film:' + filmname + ' scene:' + str(scene) + ' shot:' + str(shot) + ' take:' + str(take))
+                logger.info('film:' + filmname + ' scene:' + str(scene) + '/' + str(scenes) + ' shot:' + str(shot) + '/' + str(shots) + ' take:' + str(take) + '/' + str(takes))
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
@@ -868,7 +894,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene), str(shot), str(take), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
             writemenu(menu,settings,selected,'')
             #Rerender menu if picamera settings change
             if settings != oldsettings:
@@ -1104,6 +1130,15 @@ def removeimage(camera, overlay):
         except:
             pass
         return overlay
+
+
+#-------------Browse------------------
+
+def browse(filmname, filmfolder, scene, shot, take):
+    scenes = countscenes(filmfolder, filmname)
+    shots = countshots(filmname, filmfolder, scene)
+    takes = counttakes(filmname, filmfolder, scene, shot)
+    return scenes, shots, takes
 
 #-------------Browse2.0------------------
 
@@ -1866,10 +1901,14 @@ def renderscene(filmfolder, filmname, scene):
 
 #-------------Render film------------
 
-def renderfilm(filmfolder, filmname, comp):
-    def render(q, filmfolder, filmname, comp):
+def renderfilm(filmfolder, filmname, comp, scene):
+    def render(q, filmfolder, filmname, comp, scene):
         newaudiomix = False
         #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
+        if scene > 0:
+            scenefilename, audiomix = renderscene(filmfolder, filmname, scene)
+            q.put(scenefilename)
+            return
         scenes = countscenes(filmfolder, filmname)
         for i in range(scenes):
             scenefilename, audiomix = renderscene(filmfolder, filmname, i + 1)
@@ -1962,7 +2001,7 @@ def renderfilm(filmfolder, filmname, comp):
             print('Already rendered!')
         q.put(renderfilename)
     q = mp.Queue()
-    proc = mp.Process(target=render, args=(q,filmfolder,filmname,comp))
+    proc = mp.Process(target=render, args=(q,filmfolder,filmname,comp,scene))
     proc.start()
     procdone = False
     status = ''
@@ -1974,6 +2013,7 @@ def renderfilm(filmfolder, filmname, comp):
             procdone = True
             proc.join()
             renderfilename = status
+            vumetermessage('')
             break
         if middlebutton() == True:
             proc.terminate()

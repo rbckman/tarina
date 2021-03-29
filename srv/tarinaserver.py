@@ -95,11 +95,15 @@ class index:
 class films:
     def GET(self, film):
         shots = 0
-        i = web.input(page=None, scene=None, shot=None)
+        takes = 0
+        i = web.input(page=None, scene=None, shot=None, take=None)
         if i.scene != None:
             shots = countshots(film, filmfolder, i.scene)
+            takes = counttakes(film, filmfolder, i.scene, i.shot)
+        if i.scene != None and i.shot != None:
+            shots = countshots(film, filmfolder, i.scene)
         scenes = countscenes(filmfolder, film)
-        return render.filmpage(film, scenes, str, filmfolder, counttakes, shots)
+        return render.filmpage(film, scenes, str, filmfolder, counttakes, countshots, shots, i.scene, takes, i.shot, i.take)
 
 application = app.wsgifunc()
 
