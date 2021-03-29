@@ -2258,16 +2258,24 @@ def playdub(filename, headphoneslevel, player_menu):
     playing = False
     pause = False
     trim = False
+    videolag = 0
     if video == True:
         try:
             player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
-        except Exception as e:
+        except:
             writemessage('Something wrong with omxplayer')
-            logger.warning(e)
             time.sleep(2)
             return
         writemessage('Starting omxplayer')
         clipduration = player.duration()
+    #sound
+    try:
+        playerAudio = OMXPlayer(filename + '.wav', args=['-o','alsa'], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
+        time.sleep(0.5)
+    except:
+        writemessage('something wrong with audio player')
+        time.sleep(2)
+        return
     #omxplayer hack to play really short videos.
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
@@ -2282,7 +2290,8 @@ def playdub(filename, headphoneslevel, player_menu):
         if video == True:
             player.play()
         #run_command('aplay -D plughw:0 ' + filename + '.wav &')
-        run_command('mplayer ' + filename + '.wav &')
+        #run_command('mplayer ' + filename + '.wav &')
+        playerAudio.play()
         if player_menu == 'dub':
             run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
     except:
@@ -2314,6 +2323,12 @@ def playdub(filename, headphoneslevel, player_menu):
             header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if buttonpressed == True:
+            buttonflush = True
+        else:
+            buttonflush = False
+        if buttonflush == True:
+            flushbutton()
         if pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -2321,20 +2336,40 @@ def playdub(filename, headphoneslevel, player_menu):
             if selected > 0:
                 selected = selected - 1
         elif pressed == 'up':
-            if headphoneslevel < 100:
-                headphoneslevel = headphoneslevel + 2
-                run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            if menu[selected] == 'PHONES:':
+                if headphoneslevel < 100:
+                    headphoneslevel = headphoneslevel + 2
+                    run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            else:
+                try:
+                    player.set_position(t+2)
+                    playerAudio.set_position(player.position())
+                except:
+                    return
         elif pressed == 'down':
-            if headphoneslevel > 0:
-                headphoneslevel = headphoneslevel - 2
-                run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            if menu[selected] == 'PHONES:':
+                if headphoneslevel > 0:
+                    headphoneslevel = headphoneslevel - 2
+                    run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            else:
+                if t > 1:
+                    try:
+                        player.set_position(t-2)
+                        playerAudio.set_position(player.position())
+                    except:
+                        return
         elif pressed == 'middle':
             time.sleep(0.2)
             if menu[selected] == 'BACK' or player.playback_status() == "Stopped":
                 try:
                     if video == True:
-                        player.stop()
-                        player.quit()
+                        try:
+                            player.stop()
+                            playerAudio.stop()
+                            player.quit()
+                            playerAudio.quit()
+                        except:
+                            return
                     os.system('pkill aplay') 
                 except:
                     #kill it if it dont stop
@@ -2351,16 +2386,25 @@ def playdub(filename, headphoneslevel, player_menu):
                     if dub == True:
                         os.system('pkill arecord')
                     if video == True:
-                        player.pause()
-                        player.set_position(0)
+                        try:
+                            player.pause()
+                            playerAudio.pause()
+                            player.set_position(0)
+                            playerAudio.set_position(0)
+                        except:
+                            return
                     if dub == True:
                         p = 0
                         while p < 3:
                             writemessage('Dubbing in ' + str(3 - p) + 's')
                             time.sleep(1)
                             p+=1
-                    player.play()
-                    run_command('aplay -D plughw:0 ' + filename + '.wav &')
+                    try:
+                        player.play()
+                        playerAudio.play()
+                    except:
+                        return
+                    #run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
                         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
                 except:
@@ -2369,11 +2413,16 @@ def playdub(filename, headphoneslevel, player_menu):
             elif menu[selected] == 'PAUSE':
                 try:
                     player.pause()
+                    playerAudio.pause()
                     pause = True
                 except:
                     pass
             elif menu[selected] == 'PLAY':
-                player.play()
+                try:
+                    player.play()
+                    playerAudio.play()
+                except:
+                    return
                 pause = False
             elif menu[selected] == 'TRIM':
                 selected = 1
@@ -2384,10 +2433,12 @@ def playdub(filename, headphoneslevel, player_menu):
             elif menu[selected] == 'FROM BEGINNING':
                 trim = ['beginning', player.position()]
                 player.quit()
+                playerAudio.quit()
                 return trim
             elif menu[selected] == 'FROM END':
                 trim = ['end', player.position()]
                 player.quit()
+                playerAudio.quit()
                 return trim
         time.sleep(0.02)
         if pause == False:
@@ -2397,9 +2448,9 @@ def playdub(filename, headphoneslevel, player_menu):
                 os.system('pkill aplay') 
                 if dub == True:
                     os.system('pkill arecord')
-                return
-    if video == True:
-        player.quit()
+                break
+    player.quit()
+    playerAudio.quit()
     #os.system('pkill dbus-daemon')
 
 #---------------View Film--------------------
