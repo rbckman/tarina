@@ -574,7 +574,8 @@ def main():
                     take = 1
                     takes = 0
             if pressed == 'retake' and recordable == False:
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 #take = takes
                 #takes = counttakes(filmname, filmfolder, scene, shot)
                 take = takes + 1
@@ -645,14 +646,22 @@ def main():
                     headphoneslevel = headphoneslevel + 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
-                scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
-                takes = take
-                shot = 1
+                if scene <= scenes:
+                    shot = 1
+                    scene += 1
+                    take = counttakes(filmname, filmfolder, scene, shot)
+                #scene, shots, takes = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
+                #shot = 1
             elif menu[selected] == 'SHOT:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
-                takes = take
+                if shot <= shots:
+                    shot += 1
+                    take = counttakes(filmname, filmfolder, scene, shot)
+                #scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, 1)
+                #takes = take
             elif menu[selected] == 'TAKE:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
+                if take <= takes:
+                    take += 1
+                #scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, 1)
             elif menu[selected] == 'RED:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[0]) < 7.98:
@@ -741,14 +750,23 @@ def main():
                     headphoneslevel = headphoneslevel - 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
-                scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
-                takes = take
-                shot = 1
+                if scene > 1:
+                    scene -= 1
+                    shot = 1
+                    take = counttakes(filmname, filmfolder, scene, shot)
+                #scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
+                #takes = take
+                #shot = 1
             elif menu[selected] == 'SHOT:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
-                takes = take
+                if shot > 1:
+                    shot -= 1
+                    take = counttakes(filmname, filmfolder, scene, shot)
+                #scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 1, -1)
+                #takes = take
             elif menu[selected] == 'TAKE:' and recording == False:
-                scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
+                if take > 1:
+                    take -= 1
+                #scene, shot, take = browse2(filmname, filmfolder, scene, shot, take, 2, -1)
             elif menu[selected] == 'RED:':
                 camera.awb_mode = 'off'
                 if float(camera.awb_gains[0]) > 0.02:
@@ -862,19 +880,24 @@ def main():
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
                 overlay = removeimage(camera, overlay)
-                if menu[selected] == 'SCENE:': # display first shot of scene if browsing scenes
+                if menu[selected] == 'SCENE:' and recordable == False: # display first shot of scene if browsing scenes
                     p = counttakes(filmname, filmfolder, scene, 1)
                     imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
-                elif menu[selected] == 'FILM:': # display first shot of film
+                elif menu[selected] == 'FILM:' and recordable == True:
+                    scene, shot, take = countlast(filmname,filmfolder)
+                    shot += 1
+                elif menu[selected] == 'FILM:' and recordable == False: # display first shot of film
                     p = counttakes(filmname, filmfolder, 1, 1)
                     imagename = filmfolder + filmname + '/scene' + str(1).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
-                else:
-                    imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
+                imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
                 overlay = displayimage(camera, imagename, overlay)
                 oldscene = scene
                 oldshot = shot
                 oldtake = take
                 updatethumb = False
+                scenes = countscenes(filmfolder, filmname)
+                shots = countshots(filmname, filmfolder, scene)
+                takes = counttakes(filmname, filmfolder, scene, shot)
         #If auto dont show value show auto (impovement here to show different colors in gui, yes!!?)
         if camera.iso == 0:
             cameraiso = 'auto'
