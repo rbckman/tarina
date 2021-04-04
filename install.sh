@@ -124,17 +124,11 @@ cat <<'EOF' >> /boot/config.txt
 #-----Tarina configuration starts here-------
 #tarina-rpi-configuration-1.0
 #hyperpixel
-dtoverlay=hyperpixel4
-display_rotate=1
-dpi_output_format=0x7f216
-hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
-
 start_x=1
 gpu_mem=256
 disable_splash=1
 force_turbo=1
 boot_delay=1
-dtparam=i2c_arm=on
 # dtparam=sd_overclock=90
 # Disable the ACT LED.
 dtparam=act_led_trigger=none
@@ -142,8 +136,20 @@ dtparam=act_led_activelow=off
 # Disable the PWR LED.
 dtparam=pwr_led_trigger=none
 dtparam=pwr_led_activelow=off
-#--------Tarina configuration end here---------
 
+dtoverlay=hyperpixel4
+overscan_left=0
+overscan_right=0
+overscan_top=0
+overscan_bottom=0
+enable_dpi_lcd=1
+display_default_lcd=1
+display_rotate=1
+dpi_group=2
+dpi_mode=87
+dpi_output_format=0x7f216
+hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
+#--------Tarina configuration end here---------
 EOF
 else
 echo "screen driver already there, to change it remove tarina config in /boot/config.txt"
