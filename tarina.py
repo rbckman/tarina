@@ -193,7 +193,7 @@ def main():
                     peakshot = shot - 1
                     peaktake = counttakes(filmname, filmfolder, scene, peakshot)
                 p_imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(peakshot).zfill(3) + '/take' + str(peaktake).zfill(3) + '.jpeg'
-                overlay = displayimage(camera, p_imagename)
+                overlay = displayimage(camera, p_imagename, overlay)
                 while holdbutton == 'peak':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     writemessage('peaking ' + str(peakshot))
@@ -249,7 +249,7 @@ def main():
                         trim_filename = foldername + 'take' + str(take).zfill(3)
                         videotrim(foldername + filename, trim_filename, trim[0], trim[1])
                     imagename = foldername + filename + '.jpeg'
-                    overlay = displayimage(camera, imagename)
+                    overlay = displayimage(camera, imagename, overlay)
                     camera.start_preview()
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
@@ -870,7 +870,7 @@ def main():
                     imagename = filmfolder + filmname + '/scene' + str(1).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
                 else:
                     imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
-                overlay = displayimage(camera, imagename)
+                overlay = displayimage(camera, imagename, overlay)
                 oldscene = scene
                 oldshot = shot
                 oldtake = take
@@ -1093,13 +1093,14 @@ def run_command(command_line):
 
 #-------------Display jpeg-------------------
 
-def displayimage(camera, filename):
+def displayimage(camera, filename, overlay):
     # Load the arbitrarily sized image
     try:
         img = Image.open(filename)
     except:
         #writemessage('Seems like an empty shot. Hit record!')
-        return
+        overlay = removeimage(camera, overlay)
+        return overlay
     camera.stop_preview()
     # Create an image padded to the required size with
     # mode 'RGB'
