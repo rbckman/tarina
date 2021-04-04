@@ -2,6 +2,8 @@
 
 ROOT_UID=0   # Root has $UID 0.
 
+update=$1
+
 if [ "$UID" -eq "$ROOT_UID" ]
 then
    echo "OK"
@@ -26,9 +28,20 @@ cat <<'EOF'
     +-+ +-+-+-+-+-+-+ +-+-+ +-+-+-+-+-+-+-+-+-+-+
 
 EOF
-sleep 2
+sleep 1
+
+if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
+then
+echo "screen drivers found! remove them in /boot/config.txt"
+else
+echo "Select screen driver to be installed"
+select screen in hyperpixel4 ugeek-hdtft
+do
+echo $screen
+break
+done
+fi
 echo "setting up system for filmmaking flow..."
-sleep 2
 echo "if something goes wrong please submit bug to https://github.com/rbckman/tarina"
 sleep 2
 version="$(lsb_release -c -s)"
@@ -39,6 +52,7 @@ else
     echo "Debian Stretch found"
 fi
 echo "Installing all dependencies..."
+
 apt-get update
 apt-get upgrade -y
 if [ "$version" = "buster" ]
@@ -55,16 +69,16 @@ echo "installing secrets..."
 sudo pip3 install secrets
 sudo pip3 install numpy
 sudo pip3 install RPi.GPIO
-echo "installing rwb27s openflexure microscope fork of picamera with lens shading correction..."
+echo "installing picamerax with lens shading correction..."
 #sudo pip3 --no-cache-dir install https://github.com/chrisruk/picamera/archive/hq-camera-new-framerates.zip --upgrade
 sudo pip3 install --upgrade picamerax
 echo "installing web.py for the tarina webserver..."
 sudo pip3 install web.py==0.61
 
-if grep -q -F '#tarina-rpi-configuration-1.0' /boot/config.txt
+if [ "$screen" = "ugeek-hdtft" ]
 then
+echo "installing ugeek screen drivers"
 echo "Tarina configuration seems to be in order in /boot/config.txt"
-else
 echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
 #-----Tarina configuration starts here-------
@@ -83,11 +97,11 @@ dpi_group=2
 dpi_mode=87
 dpi_output_format=0x6f015
 hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
+dtoverlay=pi3-disable-bt-overlay
+dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 display_rotate=3 
 start_x=1
 gpu_mem=256
-dtoverlay=pi3-disable-bt-overlay
-dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
 disable_splash=1
 force_turbo=1
 boot_delay=1
@@ -101,7 +115,40 @@ dtparam=pwr_led_trigger=none
 dtparam=pwr_led_activelow=off
 #--------Tarina configuration end here---------
 EOF
+elif [ "$screen" = "hyperpixel4" ]
+then
+echo "installing hyperpixel4 screen drivers"
+echo "Tarina configuration seems to be in order in /boot/config.txt"
+echo "Adding to /boot/config.txt"
+cat <<'EOF' >> /boot/config.txt
+#-----Tarina configuration starts here-------
+#tarina-rpi-configuration-1.0
+#hyperpixel
+dtoverlay=hyperpixel4
+display_rotate=1
+dpi_output_format=0x7f216
+hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
+
+start_x=1
+gpu_mem=256
+disable_splash=1
+force_turbo=1
+boot_delay=1
+dtparam=i2c_arm=on
+# dtparam=sd_overclock=90
+# Disable the ACT LED.
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=off
+# Disable the PWR LED.
+dtparam=pwr_led_trigger=none
+dtparam=pwr_led_activelow=off
+#--------Tarina configuration end here---------
+
+EOF
+else
+echo "screen driver already there, to change it remove tarina config in /boot/config.txt"
 fi
+
 
 echo "Change hostname to tarina"
 cat <<'EOF' > /etc/hostname
