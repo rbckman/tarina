@@ -26,6 +26,8 @@ Hunting mushrooms in the middle of the beautiful autumn here in Finland, showcas
 
 Hardware
 --------
+Making default hardware changes! Woking with the [Pimoroni HyperPixel 4.0 screen](https://shop.pimoroni.com/products/hyperpixel-4?variant=12569539706963) and a new more juicy charger powerbooster. Also doing rework on the 3d printable case and microphone.
+
 The parts are built around the world by different manufacturers. They've been chosen on the basis of features, quality, openness, availabilty and price. One of the central ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is all 3d printable with a design that has the key element of flipping the lens 180 (gonzo style). Here's the main components: 
 
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
