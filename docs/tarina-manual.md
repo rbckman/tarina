@@ -8,6 +8,11 @@ MANUAL
 
 This is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
 
+### manual todo
+- new hardware, hyperpixel4, powerbooster charger, 
+- trim feature
+- 
+
 ![Filming with Tarina](tarina-filming-01.jpg)
 
 Contents
@@ -171,8 +176,19 @@ This module and lens gives good hd video quality with the ability to manually fo
 **Buy**
 [ebay](https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018)
 
+Pimoroni Hyperpixel 4 inch screen
+-----------------------------
+Price ~35 eur
 
-Ugeek 3.5 inch 800x480 TFT Screen
+Bright 4 inch responsible screen. Beware when installing the screen, it's quite britle!
+
+**Links**
+[Pimoroni](https://learn.pimoroni.com/tutorial/sandyj/getting-started-with-hyperpixel-4)
+**Buy**
+[Pimoroni](https://shop.pimoroni.com/products/hyperpixel-4)
+[Farnell](https://fi.farnell.com/pimoroni/pim370/hyperpixel-board-raspberry-pi/dp/3401805)
+
+Ugeek 3.5 inch 800x480 TFT screen
 ---------------------------------
 Price ~35 eur
 
@@ -181,7 +197,7 @@ Best 3.5 inch screen that I could find. Features worth mentioning:
 * 800x480 pixels
 * Very responsible 11 ms.
 * High contrast.
-* Sunlight readable.
+* Sunlight readable. (even though it is readable in full power mode, it boots into medium power and to change it yo to push a physical button which isnt really dooable cuz of tha casing. you cant easily change the settings, I am abandoning this screen due to this)
 * I2C Master.
 
 This is not a touchscreen but I dont think touchscreens are good for cameras anyway. 
@@ -219,11 +235,20 @@ Here's a pack with 40 pcs of 2600mAh 3.7V 18650 cells.
 
 [Aliexpress](https://www.aliexpress.com/item/32795814865.html?spm=a2g0s.9042311.0.0.27424c4dUBojcv)
 
+Type-C 5v 2A 3.7V Li-ion battery charger booster module
+-------------------------------------------------------
+Price ~2€
+
+Enough juice in this booster charger to run teh pi 3b without dropping voltage.
+
+**Buy**
+[Ebay](https://www.ebay.com/itm/Type-C-USB-5V-2A-3-7V-18650-Lithium-Li-ion-Battery-Charging-Board-Charger-Module/383717339632?var=652109038482)
+
 Adafruit Powerboost 1000C
 -------------------------
 Price ~23 eur
 
-This is the only power board that I could find with the feature to run the camera and charge it at the same time.
+Seems to be dropping voltage every now and then resulting in dropped frames. Check the Type-C power booster.
 
 **Links**
 [Adafruit](https://www.adafruit.com/product/2465)
