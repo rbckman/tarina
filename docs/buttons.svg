@@ -14,7 +14,7 @@
    viewBox="0 0 63.169353 59.145855"
    version="1.1"
    id="svg4697"
-   inkscape:version="0.92.1 r15371"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="buttons.svg"
    inkscape:export-filename="/home/rbckman/tarina/docs/buttons.png"
    inkscape:export-xdpi="300"
@@ -28,9 +28,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="227.03855"
-     inkscape:cy="-47.995091"
+     inkscape:zoom="1.979899"
+     inkscape:cx="79.719724"
+     inkscape:cy="1.8828399"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -51,7 +51,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -60,6 +60,13 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-77.055948,-88.136392)">
+    <rect
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:0.94174757;fill-rule:nonzero;stroke:none;stroke-width:0.24363048;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       id="rect3587"
+       width="65.347397"
+       height="87.263496"
+       x="75.853233"
+       y="87.146606" />
     <circle
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.40142012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
        id="path4732"
@@ -202,5 +209,41 @@
        id="path5796-0-8-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccccc" />
+    <circle
+       r="6.6980696"
+       cy="-84.004951"
+       cx="164.38751"
+       id="circle4994-5"
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.40142012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       transform="rotate(90)" />
+    <text
+       id="text5008-5"
+       y="165.29613"
+       x="79.785088"
+       style="font-style:normal;font-weight:normal;font-size:11.10875607px;line-height:2.2229178px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.06171531px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         id="tspan5006-0"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.9497807px;line-height:2.2229178px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.06171531px"
+         y="165.29613"
+         x="79.785088"
+         sodipodi:role="line">FUNC</tspan></text>
+    <circle
+       r="6.6980696"
+       cy="-119.41817"
+       cx="164.38751"
+       id="circle4994-5-8"
+       style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.40142012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+       transform="rotate(90)" />
+    <text
+       id="text5008-5-2"
+       y="165.5634"
+       x="115.73283"
+       style="font-style:normal;font-weight:normal;font-size:11.10875607px;line-height:2.2229178px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.06171531px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         id="tspan5006-0-3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.94978094px;line-height:2.2229178px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.06171531px"
+         y="165.5634"
+         x="115.73283"
+         sodipodi:role="line">HELP</tspan></text>
   </g>
 </svg>
