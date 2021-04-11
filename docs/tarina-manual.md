@@ -496,10 +496,15 @@ Wiring
 ======
 
 ![Tarina wiring diagram](wiring.png)
+
 ![3d printed and painted, next up sanding and adding one more paint layer](tarina-build-13.jpg)
+
 ![Fitting everything together](tarina-build-04.jpg)
+
 ![Ready for screen](tarina-build-02.jpg)
+
 ![MCP and buttons](tarina-build-08.jpg)
+
 ![Sound card ready to be soldered](tarina-build-10.jpg)
 
 
