@@ -84,7 +84,7 @@ def main():
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -129,6 +129,8 @@ def main():
     cuttedscene = ''
     cuttedshot = ''
     yankedshot = ''
+    stream = ''
+    live = 'no'
     #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
     savesettingsevery = 10
@@ -604,6 +606,13 @@ def main():
                 camera.awb_mode = 'auto'
         elif pressed == 'middle' and menu[selected] == 'BEEP:':
             beeps = 0
+        elif pressed == 'middle' and menu[selected] == 'LIVE:':
+            if stream == '':
+                stream = startstream(camera, stream)
+                live = 'yes'
+            else:
+                stream = stopstream(camera, stream)
+                live = 'no'
         #UP
         elif pressed == 'up':
             if menu[selected] == 'BRIGHT:':
@@ -917,7 +926,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', ''
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             writemenu(menu,settings,selected,'')
             #Rerender menu if picamera settings change
             if settings != oldsettings:
@@ -2750,6 +2759,28 @@ def uploadfilm(filename, filmname):
             return cmd
         time.sleep(0.02)
 
+
+#-------------Streaming---------------
+
+def startstream(camera, stream):
+    youtube="rtmp://a.rtmp.youtube.com/live2/"
+    with open("/home/pi/.youtube-live") as fp:
+        key = fp.readlines()
+    print('using key: ' + key[0])
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac 1 -i hw:0 -vcodec copy -acodec libmp3lame -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
+    now = time.strftime("%Y-%m-%d-%H:%M:%S") 
+    camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
+    return stream
+
+def stopstream(camera, stream):
+    camera.stop_recording() 
+    os.system('pkill -9 ffmpeg') 
+    print("Camera safely shut down") 
+    print("Good bye")
+    stream = ''
+    return stream
+
 #-------------Beeps-------------------
 
 def beep():
@@ -2765,7 +2796,7 @@ def beep():
 def longbeep():
     buzzerrepetitions = 100
     buzzerdelay = 0.0001
-    for _ in range(buzzerrepetitions * 10):
+    for _ in range(buzzerrepetitions * 5):
         for value in [0xC, 0x4]:
             #GPIO.output(1, value)
             bus.write_byte_data(DEVICE,OLATA,value)
