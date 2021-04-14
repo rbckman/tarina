@@ -84,7 +84,7 @@ def main():
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -131,6 +131,8 @@ def main():
     yankedshot = ''
     stream = ''
     live = 'no'
+    plughw = 0 #default audio device
+    channels = 1 #default mono
     #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
     savesettingsevery = 10
@@ -224,7 +226,7 @@ def main():
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene)
-                    playdub(renderfilename, headphoneslevel, 'scene')
+                    playdub(renderfilename, headphoneslevel, 'scene', plughw, channels)
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -233,7 +235,7 @@ def main():
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0)
-                    playdub(renderfilename, headphoneslevel, 'film')
+                    playdub(renderfilename, headphoneslevel, 'film', plughw, channels)
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -245,7 +247,7 @@ def main():
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename)
-                    trim = playdub(foldername + filename, headphoneslevel, 'shot')
+                    trim = playdub(foldername + filename, headphoneslevel, 'shot', plughw, channels)
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
                         trim_filename = foldername + 'take' + str(take).zfill(3)
@@ -259,7 +261,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, headphoneslevel, 'dub')
+                    playdub(renderfilename, headphoneslevel, 'dub', plughw, channels)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
@@ -270,7 +272,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0)
-                    playdub(renderfilename, headphoneslevel, 'dub')
+                    playdub(renderfilename, headphoneslevel, 'dub', plughw, channels)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
@@ -534,7 +536,7 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
-                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/' + filename + '.wav &') 
+                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
                     camera.start_recording(foldername + filename + '.h264', format='h264', quality=26, bitrate=5000000)
                     starttime = time.time()
                     recording = True
@@ -707,6 +709,14 @@ def main():
             elif menu[selected] == 'COMP:':
                 if comp < 1:
                     comp += 1
+            elif menu[selected] == 'HW:':
+                if plughw < len(getaudiocards())-1:
+                    plughw += 1
+                vumetermessage(getaudiocards()[plughw])
+            elif menu[selected] == 'CH:':
+                if channels == 1:
+                    channels = 2
+
         #LEFT
         elif pressed == 'left':
             if selected > 0:
@@ -817,6 +827,14 @@ def main():
             elif menu[selected] == 'COMP:':
                 if comp > 0:
                     comp -= 1
+            elif menu[selected] == 'HW:':
+                if plughw > 0:
+                    plughw -= 1
+                vumetermessage(getaudiocards()[plughw])
+            elif menu[selected] == 'CH:':
+                if channels == 2:
+                    channels = 1
+
         #RIGHT
         elif pressed == 'right':
             if selected < len(menu) - 1:
@@ -926,7 +944,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             writemenu(menu,settings,selected,'')
             #Rerender menu if picamera settings change
             if settings != oldsettings:
@@ -1483,7 +1501,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                             buzz(150)
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
                         if sound == True:
-                            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
+                            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f S16_LE -c '+str(channels)+' -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
                         starttime = time.time()
                         recording = True
@@ -2278,7 +2296,7 @@ def clipsettings(filmfolder, filmname, scene):
             if dubfiles:
                 t = os.system('pkill aplay')
                 if t != 0:
-                    run_command('aplay -D plughw:0 ' + dubfiles[dubselected] + '.wav &')
+                    run_command('aplay -D plughw:'+str(plughw)+' ' + dubfiles[dubselected] + '.wav &')
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
@@ -2290,7 +2308,7 @@ def clipsettings(filmfolder, filmname, scene):
             else:
                 filename = filmfolder + filmname + '/' + filmname
             renderaudio('', filename, dubfiles, dubmix)
-            run_command('aplay -D plughw:0 ' + filename + '.wav &')
+            run_command('aplay -D plughw:'+str(plughw)+' ' + filename + '.wav &')
         time.sleep(0.05)
     #Save dubmix before returning
     if dubmix != dubmix_old:
@@ -2308,7 +2326,7 @@ def clipsettings(filmfolder, filmname, scene):
 
 #---------------Play & DUB--------------------
 
-def playdub(filename, headphoneslevel, player_menu):
+def playdub(filename, headphoneslevel, player_menu, plughw, channels):
     #omxplayer hack
     os.system('rm /tmp/omxplayer*')
     video = True
@@ -2343,7 +2361,7 @@ def playdub(filename, headphoneslevel, player_menu):
         clipduration = player.duration()
     #sound
     try:
-        playerAudio = OMXPlayer(filename + '.wav', args=['-o','alsa'], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
+        playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
         time.sleep(0.5)
     except:
         writemessage('something wrong with audio player')
@@ -2366,7 +2384,7 @@ def playdub(filename, headphoneslevel, player_menu):
         #run_command('mplayer ' + filename + '.wav &')
         playerAudio.play()
         if player_menu == 'dub':
-            run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+            run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f S16_LE -c '+str(channels)+' -r44100 -vv /dev/shm/dub.wav &')
     except:
         logger.info('something wrong with omxplayer')
         #logger.warning(e)
@@ -2479,7 +2497,7 @@ def playdub(filename, headphoneslevel, player_menu):
                         return
                     #run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
-                        run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:0 -f S16_LE -c 1 -r44100 -vv /dev/shm/dub.wav &')
+                        run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f S16_LE -c '+str(channels)+' -r44100 -vv /dev/shm/dub.wav &')
                 except:
                     pass
                 starttime = time.time()
@@ -2558,6 +2576,17 @@ def videotrim(filename, trim_filename, where, s):
     #take last frame 
     run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:340 ' + trim_filename + '.jpeg')
     return
+
+#--------------Get Audio cards--------------
+def getaudiocards():
+    with open("/proc/asound/cards") as fp:
+        cards = fp.readlines()
+    audiocards = []
+    for i in cards:
+        if i[1] in ['0','1','2','3']:
+            print('audio card 0: ' + i[22:].rstrip('\n'))
+            audiocards.append(i[22:].rstrip('\n'))
+    return audiocards
 
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
@@ -2767,7 +2796,7 @@ def startstream(camera, stream):
     with open("/home/pi/.youtube-live") as fp:
         key = fp.readlines()
     print('using key: ' + key[0])
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac 1 -i hw:0 -vcodec copy -acodec libmp3lame -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac 1 -i hw:0 -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
     now = time.strftime("%Y-%m-%d-%H:%M:%S") 
     camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
