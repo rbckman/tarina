@@ -610,7 +610,7 @@ def main():
             beeps = 0
         elif pressed == 'middle' and menu[selected] == 'LIVE:':
             if stream == '':
-                stream = startstream(camera, stream)
+                stream = startstream(camera, stream, plughw, channels)
                 live = 'yes'
             else:
                 stream = stopstream(camera, stream)
@@ -2791,12 +2791,12 @@ def uploadfilm(filename, filmname):
 
 #-------------Streaming---------------
 
-def startstream(camera, stream):
+def startstream(camera, stream, plughw, channels):
     youtube="rtmp://a.rtmp.youtube.com/live2/"
     with open("/home/pi/.youtube-live") as fp:
         key = fp.readlines()
     print('using key: ' + key[0])
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac 1 -i hw:0 -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
     now = time.strftime("%Y-%m-%d-%H:%M:%S") 
     camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
