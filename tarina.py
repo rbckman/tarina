@@ -615,6 +615,13 @@ def main():
             else:
                 stream = stopstream(camera, stream)
                 live = 'no'
+        elif pressed == 'middle' and menu[selected] == 'BRIGHT:':
+            camera.brightness = 50
+        elif pressed == 'middle' and menu[selected] == 'CONT:':
+            camera.contrast = 0
+        elif pressed == 'middle' and menu[selected] == 'SAT:':
+            camera.saturation = 0
+
         #UP
         elif pressed == 'up':
             if menu[selected] == 'BRIGHT:':
