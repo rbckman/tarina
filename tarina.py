@@ -74,7 +74,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global tarinafolder, screen, loadfilmsettings
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -225,8 +225,8 @@ def main():
                     #Check if rendered video exist
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    renderfilename = renderfilm(filmfolder, filmname, comp, scene)
-                    playdub(renderfilename, headphoneslevel, 'scene', plughw, channels)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
+                    playdub(renderfilename, 'scene', plughw, channels)
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -234,8 +234,8 @@ def main():
                 writemessage('Loading film...')
                 if len(filmfiles) > 0:
                     camera.stop_preview()
-                    renderfilename = renderfilm(filmfolder, filmname, comp, 0)
-                    playdub(renderfilename, headphoneslevel, 'film', plughw, channels)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
+                    playdub(renderfilename, 'film', plughw, channels)
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -247,7 +247,7 @@ def main():
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename)
-                    trim = playdub(foldername + filename, headphoneslevel, 'shot', plughw, channels)
+                    trim = playdub(foldername + filename, 'shot', plughw, channels)
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
                         trim_filename = foldername + 'take' + str(take).zfill(3)
@@ -257,22 +257,22 @@ def main():
                     camera.start_preview()
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
-                newdub = clipsettings(filmfolder, filmname, scene)
+                newdub = clipsettings(filmfolder, filmname, scene, plughw)
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, headphoneslevel, 'dub', plughw, channels)
+                    playdub(renderfilename, 'dub', plughw, channels)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
-                newdub = clipsettings(filmfolder, filmname, '')
+                newdub = clipsettings(filmfolder, filmname, '', plughw)
                 if newdub:
                     camera.stop_preview()
-                    renderfilename = renderfilm(filmfolder, filmname, comp, 0)
-                    playdub(renderfilename, headphoneslevel, 'dub', plughw, channels)
+                    renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
+                    playdub(renderfilename, 'dub', plughw, channels)
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
@@ -285,7 +285,7 @@ def main():
                 if webz_on() == True:
                     filmfiles = viewfilm(filmfolder, filmname)
                     if len(filmfiles) > 0:
-                        renderfilename = renderfilm(filmfolder, filmname, comp, 0)
+                        renderfilename = renderfilm(filmfolder, filmname, comp, True)
                         cmd = uploadfilm(renderfilename, filmname)
                         if cmd != None:
                             stopinterface(camera)
@@ -1962,7 +1962,7 @@ def renderscene(filmfolder, filmname, scene):
 
 #-------------Render film------------
 
-def renderfilm(filmfolder, filmname, comp, scene):
+def renderfilm(filmfolder, filmname, comp, scene, muxing):
     def render(q, filmfolder, filmname, comp, scene):
         newaudiomix = False
         #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
@@ -2036,28 +2036,29 @@ def renderfilm(filmfolder, filmname, comp, scene):
                 os.system('mv ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
                 run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
                 os.remove(renderfilename + '_tmp.wav')
-            #muxing mp3 layer to mp4 file
-            #count estimated audio filesize with a bitrate of 320 kb/s
-            audiosize = countsize(renderfilename + '.wav') * 0.453
-            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-            if debianversion == 'stretch':
-                p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
-            else:
-                p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
-            while p.poll() is None:
-                time.sleep(0.2)
-                try:
-                    rendersize = countsize(renderfilename + '.mp3')
-                except:
-                    continue
-                writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
-            ##MERGE AUDIO & VIDEO
-            writemessage('Merging audio & video')
-            #os.remove(renderfilename + '.mp4') 
-            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
-            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
-            os.remove(renderfilename + '_tmp.mp4')
-            os.remove(renderfilename + '.mp3')
+            if muxing == True:
+                #muxing mp3 layer to mp4 file
+                #count estimated audio filesize with a bitrate of 320 kb/s
+                audiosize = countsize(renderfilename + '.wav') * 0.453
+                os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+                if debianversion == 'stretch':
+                    p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                else:
+                    p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                while p.poll() is None:
+                    time.sleep(0.2)
+                    try:
+                        rendersize = countsize(renderfilename + '.mp3')
+                    except:
+                        continue
+                    writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
+                ##MERGE AUDIO & VIDEO
+                writemessage('Merging audio & video')
+                #os.remove(renderfilename + '.mp4') 
+                call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
+                call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+                os.remove(renderfilename + '_tmp.mp4')
+                os.remove(renderfilename + '.mp3')
         else:
             print('Already rendered!')
         q.put(renderfilename)
@@ -2196,7 +2197,7 @@ def removedub(dubfolder, dubnr):
 
 #-------------Clip settings---------------
 
-def clipsettings(filmfolder, filmname, scene):
+def clipsettings(filmfolder, filmname, scene, plughw):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -2255,7 +2256,7 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'down' and selected == 3:
             if newdub[3] > 0.01:
                 newdub[3] -= 0.1
-        elif pressed == 'middle' and selected == 1:
+        elif pressed == 'record' and selected == 1:
             dubmix.append(newdub)
             dubrecord = filefolder + 'dub' + str(len(dubmix)).zfill(3) + '.wav'
             break
@@ -2310,7 +2311,7 @@ def clipsettings(filmfolder, filmname, scene):
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
-        elif pressed == 'middle' and selected == 5: # mix dub and listen
+        elif pressed == 'record' and selected == 5: # mix dub and listen
             run_command('pkill aplay')
             dubfiles, dubmix, rerender = getdubs(filmfolder, filmname, scene)
             if scene:
@@ -2336,7 +2337,8 @@ def clipsettings(filmfolder, filmname, scene):
 
 #---------------Play & DUB--------------------
 
-def playdub(filename, headphoneslevel, player_menu, plughw, channels):
+def playdub(filename, player_menu, plughw, channels):
+    global headphoneslevel, miclevel
     #omxplayer hack
     os.system('rm /tmp/omxplayer*')
     video = True
@@ -2413,8 +2415,8 @@ def playdub(filename, headphoneslevel, player_menu, plughw, channels):
                 menu = 'BACK', 'PLAY', 'REPLAY'
                 settings = '','',''
         elif player_menu == 'dub': 
-            menu = 'BACK', 'REDUB', 'PHONES:'
-            settings = '', '', str(headphoneslevel)
+            menu = 'BACK', 'REDUB', 'PHONES:', 'MIC:'
+            settings = '', '', str(headphoneslevel), str(miclevel)
         else:
             menu = 'BACK', 'PAUSE', 'REPLAY', 'PHONES:'
             settings = '', '', '', str(headphoneslevel)
@@ -2441,6 +2443,10 @@ def playdub(filename, headphoneslevel, player_menu, plughw, channels):
                 if headphoneslevel < 100:
                     headphoneslevel = headphoneslevel + 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            elif menu[selected] == 'MIC:':
+                if miclevel < 100:
+                    miclevel = miclevel + 2
+                    run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             else:
                 try:
                     player.set_position(t+2)
@@ -2452,6 +2458,10 @@ def playdub(filename, headphoneslevel, player_menu, plughw, channels):
                 if headphoneslevel > 0:
                     headphoneslevel = headphoneslevel - 2
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
+            elif menu[selected] == 'MIC:':
+                if miclevel > 0:
+                    miclevel = miclevel - 2
+                    run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             else:
                 if t > 1:
                     try:
