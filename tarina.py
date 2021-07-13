@@ -262,6 +262,8 @@ def main():
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
+                else:
+                    vumetermessage('see ya around!')
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
                 newdub = clipsettings(filmfolder, filmname, '', plughw)
@@ -273,6 +275,8 @@ def main():
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
+                else:
+                    vumetermessage('see ya around!')
             #BACKUP
             elif pressed == 'middle' and menu[selected] == 'BACKUP':
                 copytousb(filmfolder)
@@ -2194,6 +2198,7 @@ def removedub(dubfolder, dubnr):
 #-------------Clip settings---------------
 
 def clipsettings(filmfolder, filmname, scene, plughw):
+    vumetermessage('press record, view or retake to be dubbing')
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -2299,11 +2304,6 @@ def clipsettings(filmfolder, filmname, scene, plughw):
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif pressed == 'view' and selected == 4:
-            if dubfiles:
-                t = os.system('pkill aplay')
-                if t != 0:
-                    run_command('aplay -D plughw:'+str(plughw)+' ' + dubfiles[dubselected] + '.wav &')
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
@@ -2314,10 +2314,8 @@ def clipsettings(filmfolder, filmname, scene, plughw):
                 filename = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/scene'
             else:
                 filename = filmfolder + filmname + '/' + filmname
-            renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
+            renderfilename = renderfilm(filmfolder, filmname, 0, 0, False)
             playdub(renderfilename, 'film')
-
-un_command('aplay -D plughw:'+str(plughw)+' ' + filename + '.wav &')
         time.sleep(0.05)
     #Save dubmix before returning
     if dubmix != dubmix_old:
