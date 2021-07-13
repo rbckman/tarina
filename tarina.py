@@ -74,7 +74,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -179,10 +179,6 @@ def main():
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
-            buttonflush = True
-        else:
-            buttonflush = False
-        if buttonflush == True:
             flushbutton()
         #event = screen.getch()
         if recording == False:
@@ -226,7 +222,7 @@ def main():
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
-                    playdub(renderfilename, 'scene', plughw, channels)
+                    playdub(renderfilename, 'scene')
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -235,7 +231,7 @@ def main():
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
-                    playdub(renderfilename, 'film', plughw, channels)
+                    playdub(renderfilename, 'film')
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -247,7 +243,7 @@ def main():
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename)
-                    trim = playdub(foldername + filename, 'shot', plughw, channels)
+                    trim = playdub(foldername + filename, 'shot')
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
                         trim_filename = foldername + 'take' + str(take).zfill(3)
@@ -261,7 +257,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, 'dub', plughw, channels)
+                    playdub(renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
@@ -272,7 +268,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
-                    playdub(renderfilename, 'dub', plughw, channels)
+                    playdub(renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
@@ -2274,7 +2270,7 @@ def clipsettings(filmfolder, filmname, scene, plughw):
             dubselected = len(dubfiles) - 1
             if len(dubfiles) == 0:
                 selected = 0
-        elif pressed == 'middle' and selected == 4:
+        elif pressed == 'record' and selected == 4:
             dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
             break
         elif pressed == 'up' and selected == 5:
@@ -2303,7 +2299,7 @@ def clipsettings(filmfolder, filmname, scene, plughw):
         elif pressed == 'left':
             if selected > 0:
                 selected = selected - 1
-        elif pressed == 'view' and selected == 2:
+        elif pressed == 'view' and selected == 4:
             if dubfiles:
                 t = os.system('pkill aplay')
                 if t != 0:
@@ -2311,15 +2307,17 @@ def clipsettings(filmfolder, filmname, scene, plughw):
         elif pressed == 'middle' and menu[selected] == 'BACK':
             os.system('pkill aplay')
             break
-        elif pressed == 'record' and selected == 5: # mix dub and listen
+        elif pressed == 'view': # mix dub and listen
             run_command('pkill aplay')
             dubfiles, dubmix, rerender = getdubs(filmfolder, filmname, scene)
             if scene:
                 filename = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/scene'
             else:
                 filename = filmfolder + filmname + '/' + filmname
-            renderaudio('', filename, dubfiles, dubmix)
-            run_command('aplay -D plughw:'+str(plughw)+' ' + filename + '.wav &')
+            renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
+            playdub(renderfilename, 'film')
+
+un_command('aplay -D plughw:'+str(plughw)+' ' + filename + '.wav &')
         time.sleep(0.05)
     #Save dubmix before returning
     if dubmix != dubmix_old:
@@ -2337,8 +2335,8 @@ def clipsettings(filmfolder, filmname, scene, plughw):
 
 #---------------Play & DUB--------------------
 
-def playdub(filename, player_menu, plughw, channels):
-    global headphoneslevel, miclevel
+def playdub(filename, player_menu):
+    global headphoneslevel, miclevel, plughw, channels
     #omxplayer hack
     os.system('rm /tmp/omxplayer*')
     video = True
@@ -2427,10 +2425,6 @@ def playdub(filename, player_menu, plughw, channels):
         writemenu(menu,settings,selected,header)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
-            buttonflush = True
-        else:
-            buttonflush = False
-        if buttonflush == True:
             flushbutton()
         if pressed == 'right':
             if selected < (len(settings) - 1):
