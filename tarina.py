@@ -285,7 +285,7 @@ def main():
                 if webz_on() == True:
                     filmfiles = viewfilm(filmfolder, filmname)
                     if len(filmfiles) > 0:
-                        renderfilename = renderfilm(filmfolder, filmname, comp, True)
+                        renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
                         cmd = uploadfilm(renderfilename, filmname)
                         if cmd != None:
                             stopinterface(camera)
