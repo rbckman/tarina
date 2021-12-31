@@ -180,19 +180,19 @@ int main(void)
                             render_subtitle(img, line, text_size, row1, y_offset2, color);
                             row1 += read * space + morespace;
                         }
-                        if (linenr >= 7 && linenr <= 10){
+                        if (linenr >= 7 && linenr <= 12){
                             render_subtitle(img, line, text_size, row2, y_offset3, color);
                             row2 += read * space + morespace;
                         }
-                        if (linenr >= 11 && linenr <= 16){
+                        if (linenr >= 13 && linenr <= 20){
                             render_subtitle(img, line, text_size, row3, y_offset4, color);
                             row3 += read * space + morespace;
                         }
-                        if (linenr >= 17 && linenr <= 23){
+                        if (linenr >= 21 && linenr <= 27){
                             render_subtitle(img, line, text_size, row4, y_offset5, color);
                             row4 += read * space + morespace;
                         }
-                        if (linenr >= 24 && linenr <= 40){
+                        if (linenr >= 28 && linenr <= 40){
                             render_subtitle(img, line, text_size, row5, y_offset6, color);
                             row5 += read * space + morespace;
                         }

@@ -84,7 +84,7 @@ def main():
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -93,6 +93,8 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
+    fps = 24.999
+    quality = 26
     headphoneslevel = 40
     miclevel = 50
     recording = False
@@ -150,7 +152,7 @@ def main():
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
     #START INTERFACE
     startinterface()
-    camera = startcamera(lens)
+    camera = startcamera(lens,fps)
     #LOAD FILM AND SCENE SETTINGS
     try:
         filmname = getfilms(filmfolder)[0][0]
@@ -251,9 +253,22 @@ def main():
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename, overlay)
                     camera.start_preview()
+            #DUB SHOT
+            elif pressed == 'middle' and menu[selected] == 'SHOT:':
+                newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
+                if newdub:
+                    camera.stop_preview()
+                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
+                    playdub(renderfilename, 'dub')
+                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    vumetermessage('new scene dubbing made!')
+                    camera.start_preview()
+                    time.sleep(1)
+                else:
+                    vumetermessage('see ya around!')
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
-                newdub = clipsettings(filmfolder, filmname, scene, plughw)
+                newdub = clipsettings(filmfolder, filmname, scene, 0, plughw)
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
@@ -266,7 +281,7 @@ def main():
                     vumetermessage('see ya around!')
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
-                newdub = clipsettings(filmfolder, filmname, '', plughw)
+                newdub = clipsettings(filmfolder, filmname, 0, 0, plughw)
                 if newdub:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
@@ -294,7 +309,7 @@ def main():
                             except:
                                 logger.warning('uploadfilm bugging')
                             startinterface()
-                            camera = startcamera(lens)
+                            camera = startcamera(lens,fps)
                             loadfilmsettings = True
                         selectedaction = 0
             #LOAD FILM
@@ -307,7 +322,7 @@ def main():
                     stopinterface(camera)
                     tarinaversion, tarinavername = update(tarinaversion, tarinavername)
                     startinterface()
-                    camera = startcamera(lens)
+                    camera = startcamera(lens,fps)
                     loadfilmsettings = True
                     selectedaction = 0
             #WIFI
@@ -315,7 +330,7 @@ def main():
                 stopinterface(camera)
                 run_command('wicd-curses')
                 startinterface()
-                camera = startcamera(lens)
+                camera = startcamera(lens,fps)
                 loadfilmsettings = True
             #NEW FILM
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
@@ -460,7 +475,7 @@ def main():
                         run_command('reset')
                         run_command('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
                         startinterface()
-                        camera = startcamera(lens)
+                        camera = startcamera(lens,fps)
                         loadfilmsettings = True
                     except:
                         writemessage('sry! no rob help installed')
@@ -470,7 +485,7 @@ def main():
                     stopinterface(camera)
                     code.interact(local=locals())
                     startinterface()
-                    camera = startcamera(lens)
+                    camera = startcamera(lens,fps)
                     loadfilmsetings = True
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
@@ -537,7 +552,7 @@ def main():
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=26, bitrate=5000000)
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality)
                     starttime = time.time()
                     recording = True
                 elif beepcountdown > 0 and beeping == True:
@@ -726,6 +741,13 @@ def main():
             elif menu[selected] == 'CH:':
                 if channels == 1:
                     channels = 2
+            elif menu[selected] == 'FPS:':
+                if fps < 49:
+                    fps += 1
+                    camera.framerate = fps
+            elif menu[selected] == 'Q:':
+                if quality < 39:
+                    quality += 1
 
         #LEFT
         elif pressed == 'left':
@@ -844,6 +866,13 @@ def main():
             elif menu[selected] == 'CH:':
                 if channels == 2:
                     channels = 1
+            elif menu[selected] == 'FPS:':
+                if fps > 1:
+                    fps -= 1
+                    camera.framerate = fps
+            elif menu[selected] == 'Q:':
+                if quality > 10:
+                    quality -= 1
 
         #RIGHT
         elif pressed == 'right':
@@ -954,7 +983,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             writemenu(menu,settings,selected,'')
             #Rerender menu if picamera settings change
             if settings != oldsettings:
@@ -1848,10 +1877,11 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     audiomerge = ['sox']
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
-    for f in audiofiles:
-        audiomerge.append(f + '.wav')
-    audiomerge.append(filename + '.wav')
-    call(audiomerge, shell=False)
+    if len(audiofiles) > 1:
+        for f in audiofiles:
+            audiomerge.append(f + '.wav')
+        audiomerge.append(filename + '.wav')
+        call(audiomerge, shell=False)
     #DUBBING
     p = 1
     for i, d in zip(dubmix, dubfiles):
@@ -1883,6 +1913,76 @@ def scenefiles(filmfolder, filmname):
     #time.sleep(2)
     return files
 
+#-------------Render Shot-------------
+
+def rendershot(filmfolder, filmname, scene, shot):
+    #This function checks and calls rendervideo & renderaudio if something has changed in the film
+    #Video
+    videohash = ''
+    oldvideohash = ''
+    take = counttakes(filmname, filmfolder, scene, shot)
+    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
+    filmfiles = [renderfilename]
+    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+    # Check if video corrupt
+    renderfix = False
+    try:
+        pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + renderfilename + '.mp4', shell=True)
+        videolenght = pipe.decode().strip()
+    except:
+        videolenght = ''
+    print('Shot lenght ' + videolenght)
+    if videolenght == '':
+        print('Okey, shot file not found or is corrupted')
+        # For backwards compatibility remove old rendered scene files
+        run_command('rm ' + renderfilename + '*')
+        renderfix = True
+    # Video Hash
+    for p in filmfiles:
+        compileshot(p)
+        videohash = videohash + str(int(countsize(p + '.mp4')))
+    print('Videohash of shot is: ' + videohash)
+    try:
+        with open(scenedir + '.videohash', 'r') as f:
+            oldvideohash = f.readline().strip()
+        print('oldvideohash is: ' + oldvideohash)
+    except:
+        print('no videohash found, making one...')
+        with open(scenedir + '.videohash', 'w') as f:
+            f.write(videohash)
+
+    #Audio
+    audiohash = ''
+    oldaudiohash = ''
+    newaudiomix = False
+    for p in filmfiles:
+        audiohash += str(int(countsize(p + '.wav')))
+    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
+    for p in dubfiles:
+        audiohash += str(int(countsize(p)))
+    print('Audiohash of scene is: ' + audiohash)
+    try:
+        with open(scenedir + '.audiohash', 'r') as f:
+            oldaudiohash = f.readline().strip()
+        print('oldaudiohash is: ' + oldaudiohash)
+    except:
+        print('no audiohash found, making one...')
+        with open(scenedir + '.audiohash', 'w') as f:
+            f.write(audiohash)
+    if audiohash != oldaudiohash or newmix == True or renderfix == True:
+        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        print('updating audiohash...')
+        with open(scenedir + '.audiohash', 'w') as f:
+            f.write(audiohash)
+        for i in range(len(dubfiles)):
+            os.system('cp ' + scenedir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + scenedir + '/dub/.rendered' + str(i + 1).zfill(3))
+        print('Audio rendered!')
+        newaudiomix = True
+    else:
+        print('Already rendered!')
+    return renderfilename, newaudiomix
+
+
 #-------------Render Scene-------------
 
 def renderscene(filmfolder, filmname, scene):
@@ -1893,7 +1993,6 @@ def renderscene(filmfolder, filmname, scene):
     filmfiles = shotfiles(filmfolder, filmname, scene)
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene'
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
-
     # Check if video corrupt
     renderfix = False
     try:
@@ -1907,7 +2006,6 @@ def renderscene(filmfolder, filmname, scene):
         # For backwards compatibility remove old rendered scene files
         run_command('rm ' + renderfilename + '*')
         renderfix = True
-
     # Video Hash
     for p in filmfiles:
         compileshot(p)
@@ -1935,7 +2033,7 @@ def renderscene(filmfolder, filmname, scene):
     newaudiomix = False
     for p in filmfiles:
         audiohash += str(int(countsize(p + '.wav')))
-    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
+    dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, 0)
     for p in dubfiles:
         audiohash += str(int(countsize(p)))
     print('Audiohash of scene is: ' + audiohash)
@@ -1965,6 +2063,8 @@ def renderscene(filmfolder, filmname, scene):
 def renderfilm(filmfolder, filmname, comp, scene, muxing):
     def render(q, filmfolder, filmname, comp, scene):
         newaudiomix = False
+        if comp == 1:
+            newaudiomix = True
         #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
         if scene > 0:
             scenefilename, audiomix = renderscene(filmfolder, filmname, scene)
@@ -2007,7 +2107,7 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
         for p in filmfiles:
             print(p)
             audiohash += str(int(countsize(p + '.wav')))
-        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, 0, 0)
         for p in dubfiles:
             audiohash += str(int(countsize(p)))
         print('Audiohash of film is: ' + audiohash)
@@ -2089,14 +2189,16 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
 
 #-------------Get dub files-----------
 
-def getdubs(filmfolder, filmname, scene):
+def getdubs(filmfolder, filmname, scene, shot):
     #search for dub files
     print('getting scene dubs')
     dubfiles = []
     dubmix = []
     rerender = False
-    if scene:
+    if scene > 0 and shot == 0:
         filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/dub/'
+    elif scene > 0 and shot > 0:
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/dub/'
     else:
         filefolder = filmfolder + filmname + '/dub/'
     try:
@@ -2197,7 +2299,7 @@ def removedub(dubfolder, dubnr):
 
 #-------------Clip settings---------------
 
-def clipsettings(filmfolder, filmname, scene, plughw):
+def clipsettings(filmfolder, filmname, scene, shot, plughw):
     vumetermessage('press record, view or retake to be dubbing')
     pressed = ''
     buttonpressed = ''
@@ -2207,14 +2309,18 @@ def clipsettings(filmfolder, filmname, scene, plughw):
     dubfiles = []
     dubmix = []
     dubmix_old = []
-    if scene:
+    if scene > 0 and shot == 0:
         header = 'Scene ' + str(scene) + ' dubbing settings'
         filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/dub/'
-        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, 0)
+    elif scene > 0 and shot > 0:
+        header = 'Scene ' + str(scene) + ' shot ' + str(shot) + ' dubbing settings'
+        filefolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/dub/'
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
     else:
         header = 'Film ' + filmname + ' dubbing settings'
         filefolder = filmfolder + filmname + '/dub/'
-        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, '')
+        dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, 0, 0)
     newdub = [1.0, 1.0, 0.1, 0.1]
     dubselected = len(dubfiles) - 1
     dubrecord = ''
@@ -2271,7 +2377,7 @@ def clipsettings(filmfolder, filmname, scene, plughw):
                 dubselected = dubselected - 1
         elif pressed == 'remove' and selected == 4:
             removedub(filefolder, dubselected + 1)
-            dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene)
+            dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
             dubselected = len(dubfiles) - 1
             if len(dubfiles) == 0:
                 selected = 0
@@ -2309,7 +2415,7 @@ def clipsettings(filmfolder, filmname, scene, plughw):
             break
         elif pressed == 'view': # mix dub and listen
             run_command('pkill aplay')
-            dubfiles, dubmix, rerender = getdubs(filmfolder, filmname, scene)
+            dubfiles, dubmix, rerender = getdubs(filmfolder, filmname, scene, shot)
             if scene:
                 filename = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/scene'
             else:
@@ -3030,7 +3136,7 @@ def stopinterface(camera):
     os.system('pkill tarinagui')
     run_command('sudo systemctl stop apache2')
 
-def startcamera(lens):
+def startcamera(lens, fps):
     camera = picamera.PiCamera()
     camera.resolution = (1920, 816) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
     #lensshade = ''
@@ -3058,7 +3164,7 @@ def startcamera(lens):
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
     else:
-        camera.framerate = 24.999
+        camera.framerate = fps
     camera.crop = (0, 0, 1.0, 1.0)
     camera.video_stabilization = True
     camera.led = False
