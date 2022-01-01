@@ -74,7 +74,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -224,7 +224,14 @@ def main():
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
-                    playdub(renderfilename, 'scene')
+                    remove_shots = playdub(renderfilename, 'scene')
+                    if remove_shots != []:
+                        for i in remove_shots:
+                            remove(filmfolder, filmname, scene, i, take, 'shot')
+                            organize(filmfolder, filmname)
+                            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                            updatethumb = True
+                            time.sleep(0.5)
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -1900,6 +1907,23 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         p += 1
     return
 
+#-------------Fast Edit-----------------
+def fastedit(filmfolder, filmname, filmfiles, scene):
+    scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+    totlenght = 0
+    try:
+        os.remove(scenedir + '.fastedit')
+    except:
+        print('no fastedit file')
+    for f in filmfiles:
+        pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + f + '.mp4', shell=True)
+        videolenght = pipe.decode().strip()
+        totlenght = int(videolenght) + totlenght
+        print('writing shot lenghts for fastedit mode')
+        with open(scenedir + '.fastedit', 'a') as f:
+            f.write(str(totlenght)+'\n')
+    
+
 #-------------Get scene files--------------
 
 def scenefiles(filmfolder, filmname):
@@ -2025,6 +2049,7 @@ def renderscene(filmfolder, filmname, scene):
     # Render if needed
     if videohash != oldvideohash or renderfix == True:
         rendervideo(filmfiles, renderfilename, 'scene ' + str(scene))
+        fastedit(filmfolder, filmname, filmfiles, scene)
         print('updating videohash...')
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
@@ -2442,7 +2467,17 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
 #---------------Play & DUB--------------------
 
 def playdub(filename, player_menu):
-    global headphoneslevel, miclevel, plughw, channels
+    global headphoneslevel, miclevel, plughw, channels, filmname, filmfolder, scene
+    #read fastedit file
+    if player_menu == 'scene':
+        scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
+        try:
+            with open(scenedir + '.fastedit', 'r') as f:
+                fastedit = f.read().splitlines()
+                print(fastedit)
+        except:
+            print('no fastedit file found')
+            fastedit = 9999999
     #omxplayer hack
     os.system('rm /tmp/omxplayer*')
     video = True
@@ -2466,6 +2501,7 @@ def playdub(filename, player_menu):
     pause = False
     trim = False
     videolag = 0
+    remove_shots = []
     if video == True:
         try:
             player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
@@ -2508,6 +2544,18 @@ def playdub(filename, player_menu):
     starttime = time.time()
     selected = 1
     while True:
+        if player_menu == 'scene':
+            fastedit_shot = 1
+            for i in fastedit:
+                if int(t) > float(int(i)/1000):
+                    fastedit_shot = fastedit_shot + 1
+            if not remove_shots:
+                vumetermessage('shot ' + str(fastedit_shot))
+            else:
+                p = ''
+                for i in remove_shots:
+                    p = p + str(i) + ','
+                vumetermessage('shot ' + str(fastedit_shot) + ' remove:' + p)
         if trim == True:
             menu = 'CANCEL', 'FROM BEGINNING', 'FROM END'
             settings = '','',''
@@ -2532,7 +2580,13 @@ def playdub(filename, player_menu):
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
             flushbutton()
-        if pressed == 'right':
+        if pressed == 'remove':
+            time.sleep(0.2)
+            if fastedit_shot in remove_shots:
+                remove_shots.remove(fastedit_shot)
+            else:
+                remove_shots.append(fastedit_shot)
+        elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
         elif pressed == 'left':
@@ -2552,7 +2606,7 @@ def playdub(filename, player_menu):
                     player.set_position(t+2)
                     playerAudio.set_position(player.position())
                 except:
-                    return
+                    return remove_shots
         elif pressed == 'down':
             if menu[selected] == 'PHONES:':
                 if headphoneslevel > 0:
@@ -2568,7 +2622,7 @@ def playdub(filename, player_menu):
                         player.set_position(t-2)
                         playerAudio.set_position(player.position())
                     except:
-                        return
+                        return remove_shots
         elif pressed == 'middle':
             time.sleep(0.2)
             if menu[selected] == 'BACK' or player.playback_status() == "Stopped":
@@ -2580,7 +2634,7 @@ def playdub(filename, player_menu):
                             player.quit()
                             playerAudio.quit()
                         except:
-                            return
+                            return remove_shots
                     os.system('pkill aplay') 
                 except:
                     #kill it if it dont stop
@@ -2589,7 +2643,7 @@ def playdub(filename, player_menu):
                 if dub == True:
                     os.system('pkill arecord')
                     time.sleep(0.2)
-                return
+                return remove_shots
             elif menu[selected] == 'REPLAY' or menu[selected] == 'REDUB':
                 pause = False
                 try:
