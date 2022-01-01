@@ -225,13 +225,16 @@ def main():
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
                     remove_shots = playdub(renderfilename, 'scene')
-                    if remove_shots != []:
-                        for i in remove_shots:
-                            remove(filmfolder, filmname, scene, i, take, 'shot')
+                    try:
+                        if remove_shots != []:
+                            for i in remove_shots:
+                                remove(filmfolder, filmname, scene, i, take, 'shot')
                             organize(filmfolder, filmname)
                             scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                             updatethumb = True
                             time.sleep(0.5)
+                    except:
+                        print('nothing to remove')
                     camera.start_preview()
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
@@ -2713,7 +2716,7 @@ def playdub(filename, player_menu):
                 os.system('pkill aplay') 
                 if dub == True:
                     os.system('pkill arecord')
-                break
+                return remove_shots
     player.quit()
     playerAudio.quit()
     #os.system('pkill dbus-daemon')
