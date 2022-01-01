@@ -1819,6 +1819,7 @@ def compileshot(filename):
 def shotfiles(filmfolder, filmname, scene):
     files = []
     shots = countshots(filmname,filmfolder,scene)
+    print("shots"+str(shots))
     shot = 1
     while shot <= shots:
         takes = counttakes(filmname,filmfolder,scene,shot)
@@ -1826,6 +1827,7 @@ def shotfiles(filmfolder, filmname, scene):
             folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
             filename = 'take' + str(takes).zfill(3)
             files.append(folder + filename)
+            print(files)
         shot = shot + 1
     #writemessage(str(len(shotfiles)))
     #time.sleep(2)
@@ -1877,7 +1879,7 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     audiomerge = ['sox']
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
-    if len(audiofiles) > 1:
+    if len(audiofiles) > 0:
         for f in audiofiles:
             audiomerge.append(f + '.wav')
         audiomerge.append(filename + '.wav')
