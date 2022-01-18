@@ -12,6 +12,8 @@ If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(film
 Films made with Tarina
 ----------------------
 
+### [A new years medley](https://youtu.be/BYojmnD-1eU)
+
 ### [Landing Down Under](https://www.youtube.com/watch?v=Lbi9_f0KrKA)
 
 Beatiful pictures and sounds from a bushcamp in Australia.
