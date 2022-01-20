@@ -80,6 +80,7 @@ def main():
     if rundir != '':
         os.chdir(rundir)
     filmfolder = "/home/pi/Videos/"
+    picfolder = "/home/pi/Pictures/"
     if os.path.isdir(filmfolder) == False:
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
@@ -108,6 +109,7 @@ def main():
     scene = 1
     shot = 1
     take = 1
+    pic = 1
     filmname = ''
     beeps = 0
     beepcountdown = 0
@@ -494,6 +496,18 @@ def main():
                 try:
                     stopinterface(camera)
                     code.interact(local=locals())
+                    startinterface()
+                    camera = startcamera(lens,fps)
+                    loadfilmsetings = True
+                except:
+                    writemessage('hmm.. couldnt enter developer mode')
+            #DEVELOP
+            elif event == 'J':
+                try:
+                    stopinterface(camera)
+                    run_command('raspistill -ISO 800 -ss 6000000 -o '+picfolder+'test'+str(pic).zfill(3)+'.jpeg')
+                    pic = pic + 1
+                    #os.system('scp '+picfolder/+'test.jpeg user@10.42.0.1:~/pic.jpeg')
                     startinterface()
                     camera = startcamera(lens,fps)
                     loadfilmsetings = True
@@ -2969,11 +2983,13 @@ def uploadfilm(filename, filmname):
 #-------------Streaming---------------
 
 def startstream(camera, stream, plughw, channels):
-    youtube="rtmp://a.rtmp.youtube.com/live2/"
-    with open("/home/pi/.youtube-live") as fp:
-        key = fp.readlines()
-    print('using key: ' + key[0])
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    #youtube
+    #youtube="rtmp://a.rtmp.youtube.com/live2/"
+    #with open("/home/pi/.youtube-live") as fp:
+    #    key = fp.readlines()
+    #print('using key: ' + key[0])
+    #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
@@ -3188,12 +3204,16 @@ def startinterface():
     call(['./startinterface.sh &'], shell = True)
 
 def stopinterface(camera):
-    camera.stop_preview()
-    camera.close()
+    try:
+        camera.stop_preview()
+        camera.close()
+    except:
+        print('no camera to close')
     os.system('pkill arecord')
     os.system('pkill startinterface')
     os.system('pkill tarinagui')
     run_command('sudo systemctl stop apache2')
+    return camera
 
 def startcamera(lens, fps):
     camera = picamera.PiCamera()
