@@ -95,7 +95,7 @@ def main():
     awbx = 0
     awb_lock = 'no'
     fps = 24.999
-    quality = 26
+    quality = 25
     headphoneslevel = 40
     miclevel = 50
     recording = False
@@ -215,7 +215,7 @@ def main():
                 if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
-                    #run_command('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:340 ' + foldername + filename + '.jpeg')
+                    #run_command('avconv -i ' + foldername + filename  + '.mp4 -frames 1 -vf scale=800:460 ' + foldername + filename + '.jpeg')
                     updatethumb =  True
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
@@ -594,7 +594,8 @@ def main():
                     buzz(150)
                 #camera.capture(foldername + filename + '.jpeg', resize=(800,341))
                 try:
-                    camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                    #camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                    camera.capture(foldername + filename + '.jpeg', resize=(800,460), use_video_port=True)
                 except:
                     logger.warning('something wrong with camera jpeg capture')
                 t = 0
@@ -1587,7 +1588,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                             camera.stop_recording()
                         #create thumbnail
                         try:
-                            camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                            camera.capture(foldername + filename + '.jpeg', resize=(800,460), use_video_port=True)
                         except:
                             logger.warning('something wrong with camera jpeg capture')
                         writemessage('Compiling timelapse')
@@ -2107,8 +2108,8 @@ def renderscene(filmfolder, filmname, scene):
 def renderfilm(filmfolder, filmname, comp, scene, muxing):
     def render(q, filmfolder, filmname, comp, scene):
         newaudiomix = False
-        if comp == 1:
-            newaudiomix = True
+        #if comp == 1:
+        #    newaudiomix = True
         #This function checks and calls renderscene first then rendervideo & renderaudio if something has changed in the film
         if scene > 0:
             scenefilename, audiomix = renderscene(filmfolder, filmname, scene)
@@ -2521,7 +2522,8 @@ def playdub(filename, player_menu):
     remove_shots = []
     if video == True:
         try:
-            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            #player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--no-osd', '--win', '0,0,800,460','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
         except:
             writemessage('Something wrong with omxplayer')
             time.sleep(2)
@@ -2765,7 +2767,7 @@ def videotrim(filename, trim_filename, where, s):
         run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
         audiotrim(trim_filename, 'end')
     #take last frame 
-    run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:340 ' + trim_filename + '.jpeg')
+    run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:460 ' + trim_filename + '.jpeg')
     return
 
 #--------------Get Audio cards--------------
@@ -3218,7 +3220,7 @@ def stopinterface(camera):
 
 def startcamera(lens, fps):
     camera = picamera.PiCamera()
-    camera.resolution = (1920, 816) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
+    camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']

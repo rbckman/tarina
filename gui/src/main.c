@@ -91,7 +91,7 @@ int main(void)
 {
     GRAPHICS_RESOURCE_HANDLE img;
     uint32_t width, height;
-    int LAYER=1;
+    int LAYER=10;
     bcm_host_init();
     int s;
 
@@ -109,7 +109,7 @@ int main(void)
 
     graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 1);
 
-    uint32_t text_size = 16;
+    uint32_t text_size = 15;
     FILE * fp;
     FILE * fp2;
     FILE * fp3;
@@ -122,7 +122,6 @@ int main(void)
     char newread[500];
     char oldread[500];
     char vumeter[130];
-    //graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0xff));
     while (1) {
         // char ch;
         linenr = 0;
@@ -143,7 +142,7 @@ int main(void)
             uint32_t y_offset4 = 42;
             uint32_t y_offset5 = 421;
             uint32_t y_offset6 = 442;
-            graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0xff));
+            graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0x00));
             // blue, at the top (y=40)
             // selected 0 1 2 3 4 5 6 7 8
             int space = 10;
