@@ -95,7 +95,7 @@ def main():
     awbx = 0
     awb_lock = 'no'
     fps = 24.999
-    quality = 25
+    quality = 27
     headphoneslevel = 40
     miclevel = 50
     recording = False
@@ -114,6 +114,7 @@ def main():
     beeps = 0
     beepcountdown = 0
     beeping = False
+    backlight = True
     lastbeep = time.time()
     flip = 'no'
     between = 30
@@ -501,7 +502,7 @@ def main():
                     loadfilmsetings = True
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
-            #DEVELOP
+            #PICTURE
             elif event == 'J':
                 try:
                     stopinterface(camera)
@@ -513,6 +514,14 @@ def main():
                     loadfilmsetings = True
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
+            elif pressed == 'screen':
+                if backlight == False:
+                    # requires wiringpi installed
+                    run_command('gpio -g pwm 19 1023')
+                    backlight = True
+                elif backlight == True:
+                    run_command('gpio -g pwm 19 0')
+                    backlight = False
             #REMOVE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
@@ -3178,9 +3187,11 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'view'
         elif event == 'KEY_DELETE' or readbus2 == 246:
             pressed = 'remove'
-        elif event == 'P' or (readbus2 == 245 and readbus == 191):
+        elif (readbus2 == 245 and readbus == 191):
             pressed = 'peak'
-        elif event == 'I' or (readbus2 == 244 and readbus == 255):
+        elif (readbus2 == 245 and readbus == 223):
+            pressed = 'screen'
+        elif event == 'I' or event == 'P' or (readbus2 == 244 and readbus == 255):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
             pressed = 'copy'
@@ -3188,6 +3199,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'move'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
+        if pressed != '':
+            print(pressed)
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
