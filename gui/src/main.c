@@ -44,21 +44,29 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
     graphics_get_resource_size(img, &img_w, &img_h);
 
     // split now points to last line of text. split-text = length of initial text. text_length-(split-text) is length of last line
+    if (fontcolor == 7) {
+    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
+                                     GRAPHICS_RESOURCE_WIDTH,
+                                     GRAPHICS_RESOURCE_HEIGHT,
+                                     GRAPHICS_RGBA32(255,255,255,100), /* fg */
+                                     GRAPHICS_RGBA32(20,20,20,200), /* bg */
+                                     text, 90, text_size);
+        }
     if (fontcolor == 6) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(225,255,255,0), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,0), /* bg */
-                                     text, 80, text_size);
+                                     text, 90, text_size);
         }
     if (fontcolor == 5) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
-                                     GRAPHICS_RGBA32(225,255,255,0xff), /* fg */
+                                     GRAPHICS_RGBA32(255,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,150), /* bg */
-                                     text, 80, text_size);
+                                     text, 90, text_size);
         }
     if (fontcolor == 4) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -66,7 +74,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,150), /* bg */
-                                     text, 80, text_size);
+                                     text, 90, text_size);
         }
     if (fontcolor == 3) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -74,7 +82,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,30,255,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,150), /* bg */
-                                     text, 80, text_size);
+                                     text, 90, text_size);
         }
     if (fontcolor == 2) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
@@ -82,15 +90,15 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,30,0xff), /* fg */
                                      GRAPHICS_RGBA32(0,0,0,150), /* bg */
-                                     text, 80, text_size);
+                                     text, 90, text_size);
         }
     if (fontcolor == 1) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* fg */
-                                     GRAPHICS_RGBA32(200,200,200,0xff), /* bg */
-                                     text, 80, text_size);
+                                     GRAPHICS_RGBA32(30,255,255,0xff), /* bg */
+                                     text, 90, 16);
         }
     return 0;
     }
@@ -171,6 +179,7 @@ int main(void)
                     //line = b;
                     read = read - 1; //don't count the selected line
                     line[read] = '\0'; //remove return char
+                    //strcat(line, " ");
                     //printf("%s",line);
                     if (linenr == 0)
                         selected = atoi(line);
@@ -178,11 +187,14 @@ int main(void)
                         showmenu = atoi(line);
                     if (linenr == selected + 2 + menuadd)
                         color = 1; //selected color
-                    else
+                    else {
                         if (showmenu == 1)
                             color = 5; //unselected;
-                        else
+                        if (showmenu == 2)
+                            color = 7;
+                        if (showmenu == 0)
                             color = 6;
+                        };
                     if ((linenr == 1 + menuadd) && (read > 0))
                         header = 1; //write header menu
                     if ((linenr == 1 + menuadd) && (read == 0))
@@ -193,7 +205,7 @@ int main(void)
                         }
                         if (linenr >= 2 + menuadd && linenr <= 5 + menuadd){
                             if (color == 6)
-                                color = 2;
+                                color = 5;
                             render_subtitle(img, line, text_size, row1, y_offset2, color);
                             row1 += read * space + morespace;
                         }
@@ -233,8 +245,8 @@ int main(void)
         //graphics_update_displayed_resource(img, 0, 0, 0, 0);
         }
         uint32_t y_offset = 463;
-        char s_vol1 = vumeter[75];
-        char s_vol2 = vumeter[76];
+        char s_vol1 = vumeter[85];
+        char s_vol2 = vumeter[86];
         char s_vol[1];
         s_vol[0] = s_vol1;
         s_vol[1] = s_vol2;
@@ -243,9 +255,9 @@ int main(void)
         //printf("%s", s_vol);
         if (vol >= 0 && vol < 35)
             vucolor = 4;
-        if (vol >= 35 && vol < 90)
+        if (vol >= 35 && vol < 99)
             vucolor = 2;
-        if (vol >= 90)
+        if (vol >= 99)
             vucolor = 3;
         render_subtitle(img, vumeter, text_size, 0, y_offset, vucolor);
         graphics_update_displayed_resource(img, 0, 0, 0, 0);
