@@ -104,6 +104,7 @@ def main():
     lastmenu = ''
     rendermenu = True
     showmenu = 1
+    showmenu_settings = True
     overlay = None
     underlay = None
     reclenght = 0
@@ -533,8 +534,10 @@ def main():
                 if showmenu == 1:
                     # requires wiringpi installed
                     showmenu = 0
+                    showmenu_settings = False
                 elif showmenu == 0:
                     showmenu = 1
+                    showmenu_settings = True
             #REMOVE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
@@ -610,7 +613,8 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
-                showmenu = 1
+                if showmenu_settings == True:
+                    showmenu = 1
                 camera.stop_recording()
                 #time.sleep(0.005) #get audio at least 0.1 longer
                 os.system('pkill arecord')
@@ -954,6 +958,8 @@ def main():
                 comp = filmsettings[14]
                 between = filmsettings[15]
                 duration = filmsettings[16]
+                showmenu_settings = filmsettings[17]
+                quality = filsettings[18]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
@@ -1040,7 +1046,7 @@ def main():
                 #save settings if menu has been updated and x seconds passed
                 if recording == False:
                     if time.time() - pausetime > savesettingsevery: 
-                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration]
+                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality]
                         print('saving settings')
                         savesettings(settings_to_save, filmname, filmfolder)
                         pausetime = time.time()
@@ -3275,7 +3281,7 @@ def stopinterface(camera):
 
 def startcamera(lens, fps):
     camera = picamera.PiCamera()
-    camera.resolution = (2028, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
+    camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
     #Background image
     underlay = None
     bakgimg = tarinafolder + '/extras/bakg.jpg'
