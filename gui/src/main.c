@@ -44,12 +44,20 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
     graphics_get_resource_size(img, &img_w, &img_h);
 
     // split now points to last line of text. split-text = length of initial text. text_length-(split-text) is length of last line
+    if (fontcolor == 6) {
+    graphics_resource_render_text_ext(img, x_offset, y_offset-height,
+                                     GRAPHICS_RESOURCE_WIDTH,
+                                     GRAPHICS_RESOURCE_HEIGHT,
+                                     GRAPHICS_RGBA32(225,255,255,0), /* fg */
+                                     GRAPHICS_RGBA32(0,0,0,0), /* bg */
+                                     text, 80, text_size);
+        }
     if (fontcolor == 5) {
     graphics_resource_render_text_ext(img, x_offset, y_offset-height,
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(225,255,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
                                      text, 80, text_size);
         }
     if (fontcolor == 4) {
@@ -57,7 +65,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
                                      text, 80, text_size);
         }
     if (fontcolor == 3) {
@@ -65,7 +73,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,30,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
                                      text, 80, text_size);
         }
     if (fontcolor == 2) {
@@ -73,7 +81,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,30,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,0xff), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
                                      text, 80, text_size);
         }
     if (fontcolor == 1) {
@@ -119,6 +127,8 @@ int main(void)
     ssize_t read = 0;
     int linenr = 0;
     int selected;
+    int showmenu;
+    int menuadd = 1;
     char newread[500];
     char oldread[500];
     char vumeter[130];
@@ -147,7 +157,7 @@ int main(void)
             // selected 0 1 2 3 4 5 6 7 8
             int space = 10;
             int morespace = 12;
-            int color = 5;
+            int color = 3;
             int row1 = 0;
             int row2 = 0;
             int row3 = 0;
@@ -164,42 +174,50 @@ int main(void)
                     //printf("%s",line);
                     if (linenr == 0)
                         selected = atoi(line);
-                    if (linenr == selected + 2)
+                    if (linenr == 1)
+                        showmenu = atoi(line);
+                    if (linenr == selected + 2 + menuadd)
                         color = 1; //selected color
                     else
-                        color = 5; //unselected
-                    if ((linenr == 1) && (read > 0))
+                        if (showmenu == 1)
+                            color = 5; //unselected;
+                        else
+                            color = 6;
+                    if ((linenr == 1 + menuadd) && (read > 0))
                         header = 1; //write header menu
-                    if ((linenr == 1) && (read == 0))
+                    if ((linenr == 1 + menuadd) && (read == 0))
                         header = 0; //write normal menu
                     if (header == 0) {
-                        if ((linenr == 6) && (read > 0)) //show recording time if there is any
-                            render_subtitle(img, line, text_size, 700, y_offset3, 3);
-                        if (linenr >= 2 && linenr <= 5){
+                        if ((linenr == 6 + menuadd) && (read > 0)){ //show recording time if there is any
+                            render_subtitle(img, line, text_size, 700, y_offset2, 3);
+                        }
+                        if (linenr >= 2 + menuadd && linenr <= 5 + menuadd){
+                            if (color == 6)
+                                color = 2;
                             render_subtitle(img, line, text_size, row1, y_offset2, color);
                             row1 += read * space + morespace;
                         }
-                        if (linenr >= 7 && linenr <= 12){
+                        if (linenr >= 7+menuadd && linenr <= 12+menuadd){
                             render_subtitle(img, line, text_size, row2, y_offset3, color);
                             row2 += read * space + morespace;
                         }
-                        if (linenr >= 13 && linenr <= 20){
+                        if (linenr >= 13+menuadd && linenr <= 20+menuadd){
                             render_subtitle(img, line, text_size, row3, y_offset4, color);
                             row3 += read * space + morespace;
                         }
-                        if (linenr >= 21 && linenr <= 27){
+                        if (linenr >= 21+menuadd && linenr <= 27+menuadd){
                             render_subtitle(img, line, text_size, row4, y_offset5, color);
                             row4 += read * space + morespace;
                         }
-                        if (linenr >= 28 && linenr <= 40){
+                        if (linenr >= 28+menuadd && linenr <= 40+menuadd){
                             render_subtitle(img, line, text_size, row5, y_offset6, color);
                             row5 += read * space + morespace;
                         }
                     }
                     if (header == 1) {
-                        if (linenr == 1)
+                        if (linenr == 1+menuadd)
                             render_subtitle(img, line, text_size, 0, y_offset2, 5);
-                        if (linenr > 1) {
+                        if (linenr > 1+menuadd) {
                             render_subtitle(img, line, text_size, row1, y_offset3, color);
                             row1 += read * space + morespace;
                         }

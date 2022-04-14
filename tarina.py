@@ -74,7 +74,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -84,6 +84,7 @@ def main():
     if os.path.isdir(filmfolder) == False:
         os.makedirs(filmfolder)
     tarinafolder = os.getcwd()
+
     #MENUS
     menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
@@ -102,7 +103,9 @@ def main():
     retake = False
     lastmenu = ''
     rendermenu = True
+    showmenu = 1
     overlay = None
+    underlay = None
     reclenght = 0
     t = 0
     rectime = ''
@@ -150,12 +153,16 @@ def main():
     run_command('tvservice -o')
     #Kernel page cache optimization for sd card
     run_command('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
+    #Make screen shut off work and run full brightness
+    run_command('gpio -g mode 19 pwm ')
+    run_command('gpio -g pwm 19 1023')
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
     #START INTERFACE
     startinterface()
     camera = startcamera(lens,fps)
+
     #LOAD FILM AND SCENE SETTINGS
     try:
         filmname = getfilms(filmfolder)[0][0]
@@ -198,7 +205,7 @@ def main():
                     peakshot = shot - 1
                     peaktake = counttakes(filmname, filmfolder, scene, peakshot)
                 p_imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(peakshot).zfill(3) + '/take' + str(peaktake).zfill(3) + '.jpeg'
-                overlay = displayimage(camera, p_imagename, overlay)
+                overlay = displayimage(camera, p_imagename, overlay, 3)
                 while holdbutton == 'peak':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     writemessage('peaking ' + str(peakshot))
@@ -264,7 +271,7 @@ def main():
                         trim_filename = foldername + 'take' + str(take).zfill(3)
                         videotrim(foldername + filename, trim_filename, trim[0], trim[1])
                     imagename = foldername + filename + '.jpeg'
-                    overlay = displayimage(camera, imagename, overlay)
+                    overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
             #DUB SHOT
             elif pressed == 'middle' and menu[selected] == 'SHOT:':
@@ -522,6 +529,12 @@ def main():
                 elif backlight == True:
                     run_command('gpio -g pwm 19 0')
                     backlight = False
+            elif pressed == 'showmenu':
+                if showmenu == 1:
+                    # requires wiringpi installed
+                    showmenu = 0
+                elif showmenu == 0:
+                    showmenu = 1
             #REMOVE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
@@ -585,9 +598,10 @@ def main():
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality)
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality, level='4.2')
                     starttime = time.time()
                     recording = True
+                    showmenu = 0
                 elif beepcountdown > 0 and beeping == True:
                     beeping = False
                     beepcountdown = 0
@@ -596,6 +610,7 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
+                showmenu = 1
                 camera.stop_recording()
                 #time.sleep(0.005) #get audio at least 0.1 longer
                 os.system('pkill arecord')
@@ -990,7 +1005,7 @@ def main():
                     p = counttakes(filmname, filmfolder, 1, 1)
                     imagename = filmfolder + filmname + '/scene' + str(1).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
                 imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) + '.jpeg'
-                overlay = displayimage(camera, imagename, overlay)
+                overlay = displayimage(camera, imagename, overlay, 3)
                 oldscene = scene
                 oldshot = shot
                 oldtake = take
@@ -1018,7 +1033,7 @@ def main():
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
             settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
-            writemenu(menu,settings,selected,'')
+            writemenu(menu,settings,selected,'',showmenu)
             #Rerender menu if picamera settings change
             if settings != oldsettings:
                 rendermenu = True
@@ -1069,9 +1084,10 @@ def loadsettings(filmfolder, filmname):
 
 #--------------Write the menu layer to dispmanx--------------
 
-def writemenu(menu,settings,selected,header):
+def writemenu(menu,settings,selected,header,showmenu):
     menudone = ''
     menudone += str(selected) + '\n'
+    menudone += str(showmenu) + '\n'
     menudone += header + '\n'
     for i, s in zip(menu, settings):
         menudone += i + s + '\n'
@@ -1214,9 +1230,33 @@ def run_command(command_line):
         logger.info('Process finished')
     return True
 
+#-------------Display bakg-------------------
+
+def displaybakg(camera, filename, underlay, layer):
+    # Load the arbitrarily sized image
+    img = Image.open(filename)
+    # Create an image padded to the required size with
+    # mode 'RGB'
+    pad = Image.new('RGB', (
+        ((img.size[0] + 31) // 32) * 32,
+        ((img.size[1] + 15) // 16) * 16,
+        ))
+    # Paste the original image into the padded one
+    pad.paste(img, (0, 0))
+
+    # Add the overlay with the padded image as the source,
+    # but the original image's dimensions
+    underlay = camera.add_overlay(pad.tobytes(), size=img.size)
+    # By default, the overlay is in layer 0, beneath the
+    # preview (which defaults to layer 2). Here we make
+    # the new overlay semi-transparent, then move it above
+    # the preview
+    underlay.alpha = 255
+    underlay.layer = layer
+
 #-------------Display jpeg-------------------
 
-def displayimage(camera, filename, overlay):
+def displayimage(camera, filename, overlay, layer):
     # Load the arbitrarily sized image
     try:
         img = Image.open(filename)
@@ -1242,7 +1282,7 @@ def displayimage(camera, filename, overlay):
     # the new overlay semi-transparent, then move it above
     # the preview
     overlay.alpha = 255
-    overlay.layer = 3
+    overlay.layer = layer
     return overlay
 
 def removeimage(camera, overlay):
@@ -1385,7 +1425,7 @@ def getconfig(camera):
         menu = 'rev.C', 'rev.D', 'hq-camera'
         while True:
             settings = '', '', ''
-            writemenu(menu,settings,selected,header)
+            writemenu(menu,settings,selected,header,showmenu)
             pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
             if pressed == 'right':
                 if selected < (len(settings) - 1):
@@ -1419,7 +1459,7 @@ def loadfilm(filmname, filmfolder):
     menu = 'FILM:', 'BACK'
     while True:
         settings = films[selectedfilm][0], ''
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
             if selectedfilm < filmstotal:
@@ -1530,7 +1570,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
     menu = 'DELAY:', 'DURATION:', 'START', 'BACK'
     while True:
         settings = str(round(between,2)), str(round(duration,2)), '', ''
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         seconds = (3600 / between) * duration
         vumetermessage('1 h timelapse filming equals ' + str(round(seconds,2)) + ' second clip   ')
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1656,7 +1696,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     settings = 'NO', 'YES'
     selected = 0
     while True:
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(settings) - 1):
@@ -2309,7 +2349,7 @@ def removedub(dubfolder, dubnr):
     menu = 'NO', 'YES'
     settings = '', ''
     while True:
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(menu) - 1):
@@ -2393,7 +2433,7 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
         else:
             menu = 'BACK', 'ADD:', '', ''
             settings = '', 'd:' + str(nmix) + '/o:' + str(ndub), 'in:' + str(nfadein), 'out:' + str(nfadeout)
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
 
         #NEW DUB SETTINGS
@@ -2604,7 +2644,7 @@ def playdub(filename, player_menu):
             header = 'Dubbing ' + str(round(t,1))
         else:
             header = 'Playing ' + str(round(t,1)) + ' of ' + str(clipduration) + ' s'
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
             flushbutton()
@@ -2975,7 +3015,7 @@ def uploadfilm(filename, filmname):
     selected = 0
     while True:
         header = 'Where do you want to upload?'
-        writemenu(menu,settings,selected,header)
+        writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'right':
             if selected < (len(menu) - 1):
@@ -3191,6 +3231,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'peak'
         elif (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
+        elif (readbus2 == 245 and readbus == 247):
+            pressed = 'showmenu'
         elif event == 'I' or event == 'P' or (readbus2 == 244 and readbus == 255):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
@@ -3233,7 +3275,11 @@ def stopinterface(camera):
 
 def startcamera(lens, fps):
     camera = picamera.PiCamera()
-    camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232
+    camera.resolution = (2028, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
+    #Background image
+    underlay = None
+    bakgimg = tarinafolder + '/extras/bakg.jpg'
+    displaybakg(camera, bakgimg, underlay, 2)
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
