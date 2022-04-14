@@ -1648,8 +1648,8 @@ static void suspend(void)
 
 static void print_vu_meter_mono(int perc, int maxperc)
 {
-	const int bar_length = 72;
-	char line[130];
+	const int bar_length = 82;
+	char line[140];
 	int val;
 
 	for (val = 0; val <= perc * bar_length / 100 && val < bar_length; val++)
