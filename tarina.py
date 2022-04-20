@@ -601,7 +601,7 @@ def main():
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality, level='4.2')
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality)
                     starttime = time.time()
                     recording = True
                     showmenu = 0
@@ -1108,7 +1108,7 @@ def writemenu(menu,settings,selected,header,showmenu):
 
 def writemessage(message):
     menudone = ""
-    menudone += '0' + '\n'
+    menudone += '420' + '\n'
     menudone += message + '\n'
     #menudone += 'EOF'
     #clear = 500

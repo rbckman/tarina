@@ -171,7 +171,6 @@ int main(void)
             int row3 = 0;
             int row4 = 0;
             int row5 = 0;
-            int header = 0;
             // draw the text if updated
             fp2 = fopen("/dev/shm/interface", "r");
             if (fp2 != NULL){
@@ -195,12 +194,16 @@ int main(void)
                         if (showmenu == 0)
                             color = 6;
                         };
-                    if ((linenr == 1 + menuadd) && (read > 0))
-                        header = 1; //write header menu
-                    if ((linenr == 1 + menuadd) && (read == 0))
-                        header = 0; //write normal menu
-                    if (header == 0) {
-                        if ((linenr == 6 + menuadd) && (read > 0)){ //show recording time if there is any
+                    if (selected == 420){
+                        if (linenr == 1)
+                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
+                        if (linenr > 1) {
+                            render_subtitle(img, line, text_size, row1, y_offset3, 5);
+                            row1 += read * space + morespace;
+                        }
+                    }
+                    if (selected < 420){
+                        if ((linenr == 6+menuadd) && (read > 0)){ //show recording time if there is any
                             render_subtitle(img, line, text_size, 700, y_offset2, 3);
                         }
                         if (linenr >= 2 + menuadd && linenr <= 5 + menuadd){
@@ -224,14 +227,6 @@ int main(void)
                         if (linenr >= 28+menuadd && linenr <= 40+menuadd){
                             render_subtitle(img, line, text_size, row5, y_offset6, color);
                             row5 += read * space + morespace;
-                        }
-                    }
-                    if (header == 1) {
-                        if (linenr == 1+menuadd)
-                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
-                        if (linenr > 1+menuadd) {
-                            render_subtitle(img, line, text_size, row1, y_offset3, color);
-                            row1 += read * space + morespace;
                         }
                     }
                     linenr += 1;
