@@ -623,7 +623,7 @@ def main():
                 #camera.capture(foldername + filename + '.jpeg', resize=(800,341))
                 try:
                     #camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
-                    camera.capture(foldername + filename + '.jpeg', resize=(800,460), use_video_port=True)
+                    camera.capture(foldername + filename + '.jpeg', resize=(800,450), use_video_port=True)
                 except:
                     logger.warning('something wrong with camera jpeg capture')
                 t = 0
@@ -1643,7 +1643,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                             camera.stop_recording()
                         #create thumbnail
                         try:
-                            camera.capture(foldername + filename + '.jpeg', resize=(800,460), use_video_port=True)
+                            camera.capture(foldername + filename + '.jpeg', resize=(800,450), use_video_port=True)
                         except:
                             logger.warning('something wrong with camera jpeg capture')
                         writemessage('Compiling timelapse')
@@ -2578,7 +2578,7 @@ def playdub(filename, player_menu):
     if video == True:
         try:
             #player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
-            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--no-osd', '--win', '0,0,800,460','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
         except:
             writemessage('Something wrong with omxplayer')
             time.sleep(2)
@@ -2822,7 +2822,7 @@ def videotrim(filename, trim_filename, where, s):
         run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
         audiotrim(trim_filename, 'end')
     #take last frame 
-    run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:460 ' + trim_filename + '.jpeg')
+    run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:450 ' + trim_filename + '.jpeg')
     return
 
 #--------------Get Audio cards--------------
