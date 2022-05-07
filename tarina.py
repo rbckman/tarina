@@ -74,7 +74,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -97,6 +97,7 @@ def main():
     awb_lock = 'no'
     fps = 24.999
     quality = 27
+    profilelevel='4.2'
     headphoneslevel = 40
     miclevel = 50
     recording = False
@@ -601,7 +602,7 @@ def main():
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality)
+                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality, level=profilelevel)
                     starttime = time.time()
                     recording = True
                     showmenu = 0
@@ -1618,7 +1619,8 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                     if recording == False and t > between:
                         if beeps > 0:
                             buzz(150)
-                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
+                        #camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
+                        camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=quality, level=profilelevel)
                         if sound == True:
                             os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f S16_LE -c '+str(channels)+' -r 44100 -vv /dev/shm/' + filename + '_' + str(n).zfill(3) + '.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
