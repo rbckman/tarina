@@ -136,6 +136,7 @@ int main(void)
     int linenr = 0;
     int selected;
     int showmenu;
+    int header;
     int menuadd = 1;
     char newread[500];
     char oldread[500];
@@ -194,6 +195,10 @@ int main(void)
                         if (showmenu == 0)
                             color = 6;
                         };
+                    if ((linenr == 2) && (read == 0))
+                        header = 0;
+                    if ((linenr == 2) && (read > 0))
+                        header = 1;
                     if (selected == 420){
                         if (linenr == 1)
                             render_subtitle(img, line, text_size, 0, y_offset2, 5);
@@ -202,31 +207,41 @@ int main(void)
                             row1 += read * space + morespace;
                         }
                     }
-                    if (selected < 420){
-                        if ((linenr == 6+menuadd) && (read > 0)){ //show recording time if there is any
-                            render_subtitle(img, line, text_size, 700, y_offset2, 3);
+                    if (header == 0){ //check if normal menu or header menu
+                        if (selected < 420){
+                            if ((linenr == 6+menuadd) && (read > 0)){ //show recording time if there is any
+                                render_subtitle(img, line, text_size, 700, y_offset2, 3);
+                            }
+                            if (linenr >= 2+menuadd && linenr <= 5+menuadd){
+                                if (color == 6)
+                                    color = 5;
+                                render_subtitle(img, line, text_size, row1, y_offset2, color);
+                                row1 += read * space + morespace;
+                            }
+                            if (linenr >= 7+menuadd && linenr <= 12+menuadd){
+                                render_subtitle(img, line, text_size, row2, y_offset3, color);
+                                row2 += read * space + morespace;
+                            }
+                            if (linenr >= 13+menuadd && linenr <= 20+menuadd){
+                                render_subtitle(img, line, text_size, row3, y_offset4, color);
+                                row3 += read * space + morespace;
+                            }
+                            if (linenr >= 21+menuadd && linenr <= 27+menuadd){
+                                render_subtitle(img, line, text_size, row4, y_offset5, color);
+                                row4 += read * space + morespace;
+                            }
+                            if (linenr >= 28+menuadd && linenr <= 40+menuadd){
+                                render_subtitle(img, line, text_size, row5, y_offset6, color);
+                                row5 += read * space + morespace;
+                            }
                         }
-                        if (linenr >= 2 + menuadd && linenr <= 5 + menuadd){
-                            if (color == 6)
-                                color = 5;
-                            render_subtitle(img, line, text_size, row1, y_offset2, color);
+                    }
+                    else { // header menu
+                        if (linenr == 1+menuadd)
+                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
+                        if (linenr > 1+menuadd){
+                            render_subtitle(img, line, text_size, row1, y_offset3, color);
                             row1 += read * space + morespace;
-                        }
-                        if (linenr >= 7+menuadd && linenr <= 12+menuadd){
-                            render_subtitle(img, line, text_size, row2, y_offset3, color);
-                            row2 += read * space + morespace;
-                        }
-                        if (linenr >= 13+menuadd && linenr <= 20+menuadd){
-                            render_subtitle(img, line, text_size, row3, y_offset4, color);
-                            row3 += read * space + morespace;
-                        }
-                        if (linenr >= 21+menuadd && linenr <= 27+menuadd){
-                            render_subtitle(img, line, text_size, row4, y_offset5, color);
-                            row4 += read * space + morespace;
-                        }
-                        if (linenr >= 28+menuadd && linenr <= 40+menuadd){
-                            render_subtitle(img, line, text_size, row5, y_offset6, color);
-                            row5 += read * space + morespace;
                         }
                     }
                     linenr += 1;

@@ -276,7 +276,7 @@ def main():
                     overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
             #DUB SHOT
-            elif pressed == 'middle' and menu[selected] == 'SHOT:':
+            elif pressed == 'middle' and menu[selected] == 'SHOT, not so fast:':
                 newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
                 if newdub:
                     camera.stop_preview()
@@ -2036,7 +2036,7 @@ def rendershot(filmfolder, filmname, scene, shot):
     if videolenght == '':
         print('Okey, shot file not found or is corrupted')
         # For backwards compatibility remove old rendered scene files
-        run_command('rm ' + renderfilename + '*')
+        # run_command('rm ' + renderfilename + '*')
         renderfix = True
     # Video Hash
     for p in filmfiles:
@@ -2105,7 +2105,7 @@ def renderscene(filmfolder, filmname, scene):
     if videolenght == '':
         print('Okey, scene file not found or is corrupted')
         # For backwards compatibility remove old rendered scene files
-        run_command('rm ' + renderfilename + '*')
+        #run_command('rm ' + renderfilename + '*')
         renderfix = True
     # Video Hash
     for p in filmfiles:
