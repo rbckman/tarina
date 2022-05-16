@@ -73,7 +73,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,0), /* bg */
                                      text, 90, text_size);
         }
     if (fontcolor == 3) {
@@ -81,7 +81,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,30,255,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,0), /* bg */
                                      text, 90, text_size);
         }
     if (fontcolor == 2) {
@@ -89,7 +89,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_WIDTH,
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(30,255,30,0xff), /* fg */
-                                     GRAPHICS_RGBA32(0,0,0,150), /* bg */
+                                     GRAPHICS_RGBA32(0,0,0,0), /* bg */
                                      text, 90, text_size);
         }
     if (fontcolor == 1) {
@@ -254,14 +254,14 @@ int main(void)
             }
         //graphics_update_displayed_resource(img, 0, 0, 0, 0);
         }
-        uint32_t y_offset = 463;
+        uint32_t y_offset = 466;
         char s_vol1 = vumeter[85];
         char s_vol2 = vumeter[86];
         char s_vol[1];
         s_vol[0] = s_vol1;
         s_vol[1] = s_vol2;
         int vol = atoi(s_vol);
-        int vucolor = 5;
+        int vucolor = 6;
         //printf("%s", s_vol);
         if (vol >= 0 && vol < 35)
             vucolor = 4;
