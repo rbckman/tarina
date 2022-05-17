@@ -2704,21 +2704,19 @@ def playdub(filename, player_menu):
             if menu[selected] == 'BACK' or player.playback_status() == "Stopped":
                 try:
                     if video == True:
-                        try:
-                            player.stop()
-                            playerAudio.stop()
-                            player.quit()
-                            playerAudio.quit()
-                        except:
-                            return remove_shots
-                    os.system('pkill aplay') 
+                        #player.stop()
+                        #playerAudio.stop()
+                        player.quit()
+                        playerAudio.quit()
+                    #os.system('pkill -9 aplay') 
                 except:
                     #kill it if it dont stop
-                    os.system('pkill dbus-daemon')
-                    os.system('pkill omxplayer')
+                    print('OMG! kill dbus-daemon')
                 if dub == True:
                     os.system('pkill arecord')
                     time.sleep(0.2)
+                os.system('pkill -9 omxplayer')
+                #os.system('pkill -9 dbus-daemon')
                 return remove_shots
             elif menu[selected] == 'REPLAY' or menu[selected] == 'REDUB':
                 pause = False
