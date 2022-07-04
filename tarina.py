@@ -997,7 +997,7 @@ def main():
         #Check if scene, shot, or take changed and update thumbnail
         if oldscene != scene or oldshot != shot or oldtake != take or updatethumb == True:
             if recording == False:
-                logger.info('film:' + filmname + ' scene:' + str(scene) + '/' + str(scenes) + ' shot:' + str(shot) + '/' + str(shots) + ' take:' + str(take) + '/' + str(takes))
+                #logger.info('film:' + filmname + ' scene:' + str(scene) + '/' + str(scenes) + ' shot:' + str(shot) + '/' + str(shots) + ' take:' + str(take) + '/' + str(takes))
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
                 recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
@@ -1040,19 +1040,20 @@ def main():
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
             settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
-            writemenu(menu,settings,selected,'',showmenu)
             #Rerender menu if picamera settings change
-            if settings != oldsettings:
+            if settings != oldsettings or selected != oldselected:
+                writemenu(menu,settings,selected,'',showmenu)
                 rendermenu = True
                 #save settings if menu has been updated and x seconds passed
                 if recording == False:
                     if time.time() - pausetime > savesettingsevery: 
                         settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality]
-                        print('saving settings')
+                        #print('saving settings')
                         savesettings(settings_to_save, filmname, filmfolder)
                         pausetime = time.time()
             #writemessage(pressed)
             oldsettings = settings
+            oldselected = selected
         time.sleep(keydelay)
 
 
@@ -1068,11 +1069,11 @@ class logger():
 #--------------Save settings-----------------
 
 def savesettings(settings, filmname, filmfolder):
-    print(settings)
+    #print(settings)
     try:
         with open(filmfolder + filmname + "/settings.p", "wb") as f:
             pickle.dump(settings, f)
-            logger.info("settings saved")
+            #logger.info("settings saved")
     except:
         logger.warning("could not save settings")
         #logger.warning(e)
@@ -1093,11 +1094,21 @@ def loadsettings(filmfolder, filmname):
 
 def writemenu(menu,settings,selected,header,showmenu):
     menudone = ''
+    menudoneprint = ''
     menudone += str(selected) + '\n'
     menudone += str(showmenu) + '\n'
     menudone += header + '\n'
+    n = 0
     for i, s in zip(menu, settings):
         menudone += i + s + '\n'
+        if n == selected:
+            menudoneprint += i + ' : ' + s + ' <<<<<<<<< ' 
+        else:
+            menudoneprint += i + ' : ' + s + ' | '
+        n += 1
+    print(term.clear)
+    print(menudoneprint)
+    print(term.home)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
     #menudone += 'EOF'
@@ -3041,13 +3052,14 @@ def uploadfilm(filename, filmname):
 
 def startstream(camera, stream, plughw, channels):
     #youtube
-    #youtube="rtmp://a.rtmp.youtube.com/live2/"
-    #with open("/home/pi/.youtube-live") as fp:
-    #    key = fp.readlines()
-    #print('using key: ' + key[0])
-    #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    youtube="rtmp://a.rtmp.youtube.com/live2/"
+    with open("/home/pi/.youtube-live") as fp:
+        key = fp.readlines()
+    print('using key: ' + key[0])
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    #
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://172.168.27.125:5000'
+    #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://172.168.27.125:5000'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
@@ -3185,7 +3197,7 @@ def flushbutton():
     with term.cbreak():
         while True:
             inp = term.inkey(timeout=0)
-            print('flushing ' + repr(inp))
+            #print('flushing ' + repr(inp))
             if inp == '':
                 break
 
@@ -3247,8 +3259,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'move'
         #elif readbus2 == 247:
         #    pressed = 'shutdown'
-        if pressed != '':
-            print(pressed)
+        #if pressed != '':
+            #print(pressed)
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
