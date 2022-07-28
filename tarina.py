@@ -1107,8 +1107,8 @@ def writemenu(menu,settings,selected,header,showmenu):
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
     print(term.clear)
-    print(menudoneprint)
     print(term.home)
+    print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
     #menudone += 'EOF'
@@ -3052,14 +3052,14 @@ def uploadfilm(filename, filmname):
 
 def startstream(camera, stream, plughw, channels):
     #youtube
-    youtube="rtmp://a.rtmp.youtube.com/live2/"
-    with open("/home/pi/.youtube-live") as fp:
-        key = fp.readlines()
-    print('using key: ' + key[0])
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
+    #youtube="rtmp://a.rtmp.youtube.com/live2/"
+    #with open("/home/pi/.youtube-live") as fp:
+    #    key = fp.readlines()
+    #print('using key: ' + key[0])
+    #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     #
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
-    #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://172.168.27.125:5000'
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://10.42.0.24:5000'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
