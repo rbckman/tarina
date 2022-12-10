@@ -216,6 +216,11 @@ def main():
                     pressed="record"
             elif nextstatus=="PLACEHOLDER":
                 pressed="insert"
+            elif nextstatus=="NEWSCENE":
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                scene=scenes+1
+                shot=1
+                take=1
             elif nextstatus=="RETAKE":
                 pressed="retake"
             print(nextstatus)
