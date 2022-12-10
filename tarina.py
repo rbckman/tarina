@@ -492,13 +492,15 @@ def main():
                     vumetermessage('Scene moved!')
                     time.sleep(1)
             #INSERT SHOT
-            elif pressed == 'insert' and menu[selected] != 'SCENE:' and recordable == False:
+            elif pressed == 'insert' and menu[selected] != 'SCENE:':
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
-                os.makedirs(insertshot)
+                try:
+                    os.makedirs(insertshot)
+                except:
+                    print('is there already prob')
                 add_organize(filmfolder, filmname)
-                take = 1
-                updatethumb = True
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                shot=shots+1
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 time.sleep(1)
             #INSERT SCENE
@@ -642,7 +644,7 @@ def main():
                     beepcountdown = 0
                     vumetermessage('Filming was canceled!!')
             elif recording == True and float(time.time() - starttime) > 0.2:
-                print(term.clear+term.home)
+                #print(term.clear+term.home)
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
