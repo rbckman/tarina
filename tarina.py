@@ -619,6 +619,12 @@ def main():
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True:
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                if pressed == "record":
+                    #shot = shots+1
+                    take = takes+1
+                elif pressed == "retake":
+                    take = takes+1
                 if beeps > 0 and beeping == False:
                     beeping = True
                     beepcountdown = beeps
@@ -660,21 +666,25 @@ def main():
                 #compileshot(foldername + filename)
                 os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 #delayerr = audiotrim(foldername,filename)
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                if pressed == "record":
+                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                    shot=shots+1
+                    take=1
+                elif pressed == "retake":
+                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                    take=takes+1
                 if beeps > 0:
                     buzz(300)
             #if not in last shot or take then go to it
             if pressed == 'record' and recordable == False:
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                shot=shots+1
+                take=1
                 #take = takes
                 #takes = counttakes(filmname, filmfolder, scene, shot)
-                if takes > 0:
-                    shot = countshots(filmname, filmfolder, scene) + 1
-                    take = 1
-                    takes = 0
             if pressed == 'retake' and recordable == False:
                 #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                take = counttakes(filmname, filmfolder, scene, shot)
+                takes = counttakes(filmname, filmfolder, scene, shot)
                 #take = takes
                 #takes = counttakes(filmname, filmfolder, scene, shot)
                 take = takes + 1
@@ -997,9 +1007,10 @@ def main():
             run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             organize(filmfolder, filmname)
-            scene = countscenes(filmfolder, filmname)
-            shot = countshots(filmname, filmfolder, scene)
-            take = counttakes(filmname, filmfolder, scene, shot)
+            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+            scene = scenes
+            shot = shots+1
+            take = takes+1
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
