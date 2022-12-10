@@ -636,6 +636,7 @@ def main():
                     beepcountdown = 0
                     vumetermessage('Filming was canceled!!')
             elif recording == True and float(time.time() - starttime) > 0.2:
+                print(term.clear+term.home)
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
