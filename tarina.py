@@ -21,6 +21,7 @@ import multiprocessing as mp
 from subprocess import call
 from subprocess import Popen
 from omxplayer import OMXPlayer
+from multiprocessing import Process, Queue
 import subprocess
 import sys
 import pickle
@@ -169,7 +170,8 @@ def main():
     try:
         filmname = getfilms(filmfolder)[0][0]
     except:
-        filmname = ''
+        filmname = '' 
+
     #THUMBNAILCHECKER
     oldscene = scene
     oldshot = shot
@@ -189,12 +191,35 @@ def main():
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
     filename = 'take' + str(take).zfill(3)
     recordable = not os.path.isfile(foldername + filename + '.mp4') and not os.path.isfile(foldername + filename + '.h264')
+
+    #--------------Tarina Controller over socket ports --------#
+    port = 55555
+    que = Queue()
+    process = Process(target=listenforclients, args=("0.0.0.0", port, que))
+    process.start()
+
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
             flushbutton()
         #event = screen.getch()
+        #Check controller
+        if process.is_alive() == False:
+            nextstatus = que.get()
+            process = Process(target=listenforclients, args=("0.0.0.0", port, que))
+            process.start()
+            if nextstatus=="REC":
+                pressed="record"
+            elif nextstatus=="STOP":
+                if recording == True:
+                    pressed="record"
+            elif nextstatus=="PLACEHOLDER":
+                pressed="insert"
+            elif nextstatus=="RETAKE":
+                pressed="retake"
+            print(nextstatus)
+            nextstatus=''
         if recording == False:
             #SHUTDOWN
             if pressed == 'middle' and menu[selected] == 'SHUTDOWN':
@@ -467,7 +492,7 @@ def main():
                     vumetermessage('Scene moved!')
                     time.sleep(1)
             #INSERT SHOT
-            elif pressed == 'insert' and menu[selected] == 'SHOT:' and recordable == False:
+            elif pressed == 'insert' and menu[selected] != 'SCENE:' and recordable == False:
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 os.makedirs(insertshot)
                 add_organize(filmfolder, filmname)
@@ -971,11 +996,9 @@ def main():
             run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             organize(filmfolder, filmname)
-            scene = 1
-            shot = 1
-            scenes = countscenes(filmfolder, filmname)
-            shots = countshots(filmname, filmfolder, scene)
-            takes = counttakes(filmname, filmfolder, scene, shot)
+            scene = countscenes(filmfolder, filmname)
+            shot = countshots(filmname, filmfolder, scene)
+            take = counttakes(filmname, filmfolder, scene, shot)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -1090,6 +1113,45 @@ def loadsettings(filmfolder, filmname):
         logger.info("couldnt load settings")
         return ''
 
+##---------------Send to server----------------------------------------------
+
+def sendtoserver(host, port, data):
+    for xhost in host:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while True:
+            try:
+                s.connect((xhost, port))
+                s.send(data)
+                break
+            except:
+                continue
+        s.close()
+
+##--------------Listen for Clients-----------------------
+
+def listenforclients(host, port, q):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host,port))
+    #s.settimeout(0)
+    try:
+        print("listening on port "+str(port))
+        s.listen(1)
+        c, addr = s.accept()
+        while True:
+                data = c.recv(1024)
+                if not data:
+                    print("no data")
+                    break
+                nextstatus = data.decode()
+                print("got data:"+nextstatus)
+                c.close()
+                q.put(nextstatus)
+                break
+    except:
+        print("somthin wrong")
+        q.put('')
+
 #--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header,showmenu):
@@ -1106,8 +1168,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         else:
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
-    print(term.clear)
-    print(term.home)
+
     print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
@@ -3059,7 +3120,7 @@ def startstream(camera, stream, plughw, channels):
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     #
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://10.42.0.24:5000'
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -acodec mp2 -b:a 128k -ar 44100 -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://192.168.0.100:5000'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
@@ -3229,14 +3290,19 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'quit'
         elif event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
             pressed = 'middle'
+            print(term.clear+term.home)
         elif event == 'KEY_UP' or (readbus == 191 and readbus2 == 247):
             pressed = 'up'
+            print(term.clear+term.home)
         elif event == 'KEY_DOWN' or (readbus == 254 and readbus2 == 247):
             pressed = 'down'
+            print(term.clear+term.home)
         elif event == 'KEY_LEFT' or (readbus == 239 and readbus2 == 247):
             pressed = 'left'
+            print(term.clear+term.home)
         elif event == 'KEY_RIGHT' or (readbus == 251 and readbus2 == 247):
             pressed = 'right'
+            print(term.clear+term.home)
         elif event == 'KEY_PGUP' or event == ' ' or (readbus == 127 and readbus2 == 247):
             pressed = 'record'
         elif event == 'KEY_PGDOWN' or (readbus == 253 and readbus2 == 247):
