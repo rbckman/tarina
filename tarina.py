@@ -216,6 +216,14 @@ def main():
                     pressed="record"
             elif nextstatus=="PLACEHOLDER":
                 pressed="insert"
+            elif "SYNCIP:" in nextstatus:
+                ip = nextstatus.split(':')[1]
+                stopinterface(camera)
+                run_command('rsync -avr -P '+filmfolder+filmname+' pi@'+ip+':'+filmfolder+filmname)
+                run_command('rsync -avr -P pi@'+ip+':'+filmfolder+filmname+' '+filmfolder+filmname)
+                startinterface()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             elif nextstatus=="NEWSCENE":
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 scene=scenes+1
