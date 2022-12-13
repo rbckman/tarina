@@ -177,16 +177,9 @@ def main():
     oldshot = shot
     oldtake = take
     #TURN OFF WIFI AND TARINA SERVER
-    try:
-        if sys.argv[1] == 'default':
-            serverstate = 'off'
-            wifistate = 'off'
-            run_command('sudo iwconfig wlan0 txpower off')
-            serverstate = tarinaserver(False)
-    except:
-        serverstate = 'off'
-        wifistate = 'on'
-        #serverstate = tarinaserver(False)
+    serverstate = 'off'
+    wifistate = 'off'
+    #serverstate = tarinaserver(False)
     #TO_BE_OR_NOT_TO_BE 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
     filename = 'take' + str(take).zfill(3)
@@ -198,12 +191,27 @@ def main():
     process = Process(target=listenforclients, args=("0.0.0.0", port, que))
     process.start()
 
+    serverstate_old='off'
+    wifistate_old='off'
+
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if buttonpressed == True:
             flushbutton()
         #event = screen.getch()
+        if wifistate != wifistate_old:
+            if wifistate == 'on':
+                run_command('sudo iwconfig wlan0 txpower auto')
+            elif wifistate == 'off':
+                run_command('sudo iwconfig wlan0 txpower off')
+            wifistate_old = wifistate
+        if serverstate != serverstate_old:
+            if serverstate == 'on':
+                tarinaserver(True)
+            elif serverstate == 'off':
+                tarinaserver(False)
+            serverstate_old=serverstate
         #Check controller
         if process.is_alive() == False:
             nextstatus = que.get()
@@ -813,8 +821,10 @@ def main():
                     camera.awb_gains = (round(camera.awb_gains[0],2), round(camera.awb_gains[1],2) + 0.02)
             elif menu[selected] == 'SRV:':
                 if serverstate == 'on':
+                    serverstate = 'false'
                     serverstate = tarinaserver(False)
                 elif serverstate == 'off':
+                    serverstate = 'on'
                     serverstate = tarinaserver(True)
             elif menu[selected] == 'WIFI:':
                 if wifistate == 'on':
@@ -1011,7 +1021,9 @@ def main():
                 between = filmsettings[15]
                 duration = filmsettings[16]
                 showmenu_settings = filmsettings[17]
-                quality = filsettings[18]
+                quality = filmsettings[18]
+                wifistate = filmsettings[19]
+                serverstate=filmsettings[20]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
@@ -1097,7 +1109,7 @@ def main():
                 #save settings if menu has been updated and x seconds passed
                 if recording == False:
                     if time.time() - pausetime > savesettingsevery: 
-                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality]
+                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate]
                         #print('saving settings')
                         savesettings(settings_to_save, filmname, filmfolder)
                         pausetime = time.time()
