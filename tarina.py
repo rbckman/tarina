@@ -227,8 +227,8 @@ def main():
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('rsync -avrz pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-                run_command('rsync -avrz '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                run_command('scp -r pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
@@ -1103,16 +1103,16 @@ def main():
             lastmenu = menu[selected]
             settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             #Rerender menu if picamera settings change
-            if settings != oldsettings or selected != oldselected:
-                writemenu(menu,settings,selected,'',showmenu)
-                rendermenu = True
-                #save settings if menu has been updated and x seconds passed
-                if recording == False:
-                    if time.time() - pausetime > savesettingsevery: 
-                        settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate]
-                        #print('saving settings')
-                        savesettings(settings_to_save, filmname, filmfolder)
-                        pausetime = time.time()
+            #if settings != oldsettings or selected != oldselected:
+            writemenu(menu,settings,selected,'',showmenu)
+            rendermenu = True
+            #save settings if menu has been updated and x seconds passed
+            if recording == False:
+                if time.time() - pausetime > savesettingsevery: 
+                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate]
+                    #print('saving settings')
+                    savesettings(settings_to_save, filmname, filmfolder)
+                    pausetime = time.time()
             #writemessage(pressed)
             oldsettings = settings
             oldselected = selected
@@ -1207,7 +1207,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         else:
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
-
+    print(term.clear+term.home)
     print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
@@ -3329,19 +3329,14 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'quit'
         elif event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
             pressed = 'middle'
-            print(term.clear+term.home)
         elif event == 'KEY_UP' or (readbus == 191 and readbus2 == 247):
             pressed = 'up'
-            print(term.clear+term.home)
         elif event == 'KEY_DOWN' or (readbus == 254 and readbus2 == 247):
             pressed = 'down'
-            print(term.clear+term.home)
         elif event == 'KEY_LEFT' or (readbus == 239 and readbus2 == 247):
             pressed = 'left'
-            print(term.clear+term.home)
         elif event == 'KEY_RIGHT' or (readbus == 251 and readbus2 == 247):
             pressed = 'right'
-            print(term.clear+term.home)
         elif event == 'KEY_PGUP' or event == ' ' or (readbus == 127 and readbus2 == 247):
             pressed = 'record'
         elif event == 'KEY_PGDOWN' or (readbus == 253 and readbus2 == 247):
