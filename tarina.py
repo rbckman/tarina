@@ -116,6 +116,7 @@ def main():
     shot = 1
     take = 1
     pic = 1
+    onlysound=False
     filmname = ''
     beeps = 0
     beepcountdown = 0
@@ -222,12 +223,16 @@ def main():
             elif nextstatus=="STOP":
                 if recording == True:
                     pressed="record"
+            elif nextstatus=="RECSOUND":
+                if recording==False:
+                    pressed="record"
+                    onlysound=True
             elif nextstatus=="PLACEHOLDER":
                 pressed="insert"
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('scp -r pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                run_command('rsync -avr --ignore-existing pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
@@ -655,8 +660,9 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
-                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &') 
-                    camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality, level=profilelevel)
+                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f S16_LE -c ' + str(channels) + ' -r44100 -vv /dev/shm/' + filename + '.wav &')
+                    if onlysound != True:
+                        camera.start_recording(foldername + filename + '.h264', format='h264', quality=quality, level=profilelevel)
                     starttime = time.time()
                     recording = True
                     showmenu = 0
@@ -671,24 +677,19 @@ def main():
                 recording = False
                 if showmenu_settings == True:
                     showmenu = 1
-                camera.stop_recording()
-                #time.sleep(0.005) #get audio at least 0.1 longer
+                if onlysound != True:
+                    camera.stop_recording()
                 os.system('pkill arecord')
-                if beeps > 0:
-                    buzz(150)
+                #time.sleep(0.005) #get audio at least 0.1 longer
                 #camera.capture(foldername + filename + '.jpeg', resize=(800,341))
-                try:
-                    #camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
-                    camera.capture(foldername + filename + '.jpeg', resize=(800,450), use_video_port=True)
-                except:
-                    logger.warning('something wrong with camera jpeg capture')
-                t = 0
-                rectime = ''
-                vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
-                updatethumb = True
-                #compileshot(foldername + filename)
-                os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
+                if onlysound != True:
+                    try:
+                        #camera.capture(foldername + filename + '.jpeg', resize=(800,340), use_video_port=True)
+                        camera.capture(foldername + filename + '.jpeg', resize=(800,450), use_video_port=True)
+                    except:
+                        logger.warning('something wrong with camera jpeg capture')
                 #delayerr = audiotrim(foldername,filename)
+                onlysound = False
                 if pressed == "record":
                     scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                     shot=shots+1
@@ -698,6 +699,14 @@ def main():
                     take=takes+1
                 if beeps > 0:
                     buzz(300)
+                #compileshot(foldername + filename)
+                os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
+                if beeps > 0:
+                    buzz(150)
+                t = 0
+                rectime = ''
+                vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
+                updatethumb = True
             #if not in last shot or take then go to it
             if pressed == 'record' and recordable == False:
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
@@ -1103,9 +1112,9 @@ def main():
             lastmenu = menu[selected]
             settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             #Rerender menu if picamera settings change
-            #if settings != oldsettings or selected != oldselected:
-            writemenu(menu,settings,selected,'',showmenu)
-            rendermenu = True
+            if settings != oldsettings or selected != oldselected:
+                writemenu(menu,settings,selected,'',showmenu)
+                rendermenu = True
             #save settings if menu has been updated and x seconds passed
             if recording == False:
                 if time.time() - pausetime > savesettingsevery: 
@@ -1207,7 +1216,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         else:
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
-    print(term.clear+term.home)
+    #print(term.clear+term.home)
     print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
@@ -1885,14 +1894,12 @@ def organize(filmfolder, filmname):
                         run_command(mv + '.wav ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.wav')
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     #check if same video has both h246 and mp4 and render and remove h264
-                    duplicate = ''
-                    if '.mp4' in s:
-                        duplicate = s.strip('.mp4')
-                    if duplicate == s.strip('.h264'):
-                        logger.info('Found both mp4 and h264 of same video!')
-                        compileshot(takename)
-                    else:
-                        organized_nr += 1
+                    for t in sorted(takes):
+                        if t.strip('.mp4') == s.strip('.h264') or s.strip('.mp4') == t.strip('.h264'):
+                            logger.info('Found both mp4 and h264 of same video!')
+                            compileshot(takename)
+                            organized_nr -= 1
+                    organized_nr += 1
 
     # Shots
     for i in sorted(scenes):
@@ -2992,11 +2999,12 @@ def audiotrim(filename, where):
         #    audiosyncms = 1000 + audiosyncms
         logger.info('Videofile is: ' + str(audiosync) + 'ms longer')
         #make fade
-        run_command('sox -V0 -G ' + filename + '.wav ' + filename + '_temp.wav fade 0.01 0 0.01')
         #make delay file
+        print(str(int(audiosync)/1000))
         run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
         #add silence to end
-        run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav ' + filename + '.wav')
+        run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
+        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         os.remove(filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
@@ -3325,6 +3333,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         readbus2 = 247
     pressed = ''
     if buttonpressed == False:
+        if event != '':
+            print(term.clear+term.home)
         if event == 27:
             pressed = 'quit'
         elif event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
