@@ -1164,16 +1164,16 @@ def loadsettings(filmfolder, filmname):
 ##---------------Send to server----------------------------------------------
 
 def sendtoserver(host, port, data):
-    for xhost in host:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        while True:
-            try:
-                s.connect((xhost, port))
-                s.send(data)
-                break
-            except:
-                continue
-        s.close()
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while True:
+        try:
+            print('sending data to '+host+':'+str(port))
+            s.connect((host, port))
+            s.send(str.encode(data))
+            break
+        except:
+            continue
+    s.close()
 
 ##--------------Listen for Clients-----------------------
 
@@ -1191,11 +1191,15 @@ def listenforclients(host, port, q):
                 if not data:
                     print("no data")
                     break
-                nextstatus = data.decode()
-                print("got data:"+nextstatus)
-                c.close()
-                q.put(nextstatus)
-                break
+                else:
+                    if addr:
+                        print(addr[0],' sending back')
+                        sendtoserver(addr[0],port,str(time.time()))
+                        nextstatus = data.decode()
+                        print("got data:"+nextstatus)
+                        c.close()
+                        q.put(nextstatus)
+                        break
     except:
         print("somthin wrong")
         q.put('')
