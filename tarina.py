@@ -232,7 +232,7 @@ def main():
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('rsync -avr --ignore-existing pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                run_command('rsync -avr --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
@@ -1033,6 +1033,8 @@ def main():
                 quality = filmsettings[18]
                 wifistate = filmsettings[19]
                 serverstate=filmsettings[20]
+                plughw=filmsettings[21]
+                channels=filmsettings[22]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
@@ -1118,7 +1120,7 @@ def main():
             #save settings if menu has been updated and x seconds passed
             if recording == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate]
+                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels]
                     #print('saving settings')
                     savesettings(settings_to_save, filmname, filmfolder)
                     pausetime = time.time()
@@ -2961,6 +2963,8 @@ def getaudiocards():
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
 def audiotrim(filename, where):
+    global channels
+    print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
@@ -3005,10 +3009,11 @@ def audiotrim(filename, where):
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -n -r 44100 -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
         #add silence to end
-        run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
-        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
+        #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
+        run_command('cp '+filename+'.wav '+filename+'_temp.wav')
+        run_command('sox -V0 -G ' + filename + '_temp.wav /dev/shm/silence.wav ' + filename + '.wav')
         os.remove(filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
@@ -3021,6 +3026,7 @@ def audiotrim(filename, where):
 # make an empty audio file as long as a video file
 
 def audiosilence(foldername,filename):
+    global channels
     writemessage('Creating audiosilence..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + foldername + filename + '.mp4', shell=True)
     videolenght = pipe.decode()
@@ -3029,7 +3035,7 @@ def audiosilence(foldername,filename):
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
     logger.info('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    run_command('sox -V0 -n -r 44100 -c 1 /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    run_command('sox -V0 -n -r 44100 -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(videos))
     os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
     os.system('rm /dev/shm/silence.wav')
 
