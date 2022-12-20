@@ -3105,7 +3105,7 @@ def copytousb(filmfolder):
                 except:
                     writemessage('Found existing ' + filmname + ', copying new files... ')
                 try:
-                    run_command('rsync -avr -P ' + filmfolder + filmname + '/ ' + usbpath)
+                    run_command('rsync -avr -P ' + filmfolder + filmname + ' ' + usbpath)
                 except:
                     writemessage('couldnt copy film ' + filmname)
                     waitforanykey()
