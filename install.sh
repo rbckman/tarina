@@ -263,7 +263,7 @@ apt-get -y install ntfs-3g exfat-fuse
 #sed -i '/FS_MOUNTOPTIONS=/c\FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"' /etc/usbmount/usbmount.conf
 #sed -i '/FILESYSTEMS=/c\FILESYSTEMS="vfat ext2 ext3 ext4 hfsplus ntfs fuseblk vfat"' /etc/usbmount/usbmount.conf
 
-cat <<'EOF' > /etc/usbmount/usbmount.conf
+cat <<'EOF' >> /etc/usbmount/usbmount.conf
 FS_MOUNTOPTIONS="-fstype=ntfs-3g,nls=utf8,umask=007,gid=46 -fstype=fuseblk,nls=utf8,umask=007,gid=46 -fstype=vfat,gid=1000,uid=1000,umask=007"
 FILESYSTEMS="vfat ext2 ext3 ext4 hfsplus ntfs fuseblk vfat"
 EOF

@@ -1222,7 +1222,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         else:
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
-    #print(term.clear+term.home)
+    print(term.clear+term.home)
     print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
