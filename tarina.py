@@ -1209,6 +1209,7 @@ def listenforclients(host, port, q):
 #--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header,showmenu):
+    #global oldmenu
     menudone = ''
     menudoneprint = ''
     menudone += str(selected) + '\n'
