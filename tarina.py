@@ -1166,10 +1166,10 @@ def loadsettings(filmfolder, filmname):
 ##---------------Send to server----------------------------------------------
 
 def sendtoserver(host, port, data):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
             print('sending data to '+host+':'+str(port))
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(str.encode(data))
             break
@@ -1180,33 +1180,31 @@ def sendtoserver(host, port, data):
 ##--------------Listen for Clients-----------------------
 
 def listenforclients(host, port, q):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host,port))
     #s.settimeout(0)
-    print("listening on port "+str(port))
-    while True:
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((host,port))
-            s.listen(5)
-            c, addr = s.accept()
-            data = c.recv(1024).decode()
-            if not data:
-                print("no data")
-                c.close()
-                q.put('')
-                break
-            else:
-                if addr:
-                    print(addr[0],' sending back')
-                    sendtoserver(addr[0],port,str(time.time()))
-                    nextstatus = data
-                    print("got data:"+nextstatus)
-                    c.close()
-                    q.put(nextstatus)
+    try:
+        print("listening on port "+str(port))
+        s.listen(5)
+        c, addr = s.accept()
+        while True:
+                data = c.recv(1024).decode()
+                if not data:
+                    print("no data")
                     break
-        except:
-            print("somthin wrong")
-            s = ''
+                else:
+                    if addr:
+                        print(addr[0],' sending back')
+                        sendtoserver(addr[0],port,str(time.time()))
+                        nextstatus = data
+                        print("got data:"+nextstatus)
+                        c.close()
+                        q.put(nextstatus)
+                        break
+    except:
+        print("somthin wrong")
+        q.put('')
 
 #--------------Write the menu layer to dispmanx--------------
 
