@@ -228,6 +228,7 @@ def main():
                     pressed="record"
                     onlysound=True
             elif nextstatus=="PLACEHOLDER":
+                selected=2
                 pressed="insert"
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
@@ -1167,15 +1168,15 @@ def loadsettings(filmfolder, filmname):
 
 def sendtoserver(host, port, data):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    while True:
-        try:
+    try:
+        while True:
             print('sending data to '+host+':'+str(port))
             s.connect((host, port))
             s.send(str.encode(data))
+            s.close()
             break
-        except:
-            continue
-    s.close()
+    except:
+        print('sometin rong')
 
 ##--------------Listen for Clients-----------------------
 
