@@ -1184,27 +1184,26 @@ def listenforclients(host, port, q):
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host,port))
     #s.settimeout(0)
-    try:
-        print("listening on port "+str(port))
-        s.listen(5)
-        c, addr = s.accept()
-        while True:
-                data = c.recv(1024).decode()
-                if not data:
-                    print("no data")
+    print("listening on port "+str(port))
+    s.listen(5)
+    c, addr = s.accept()
+    while True:
+        try:
+            data = c.recv(1024).decode()
+            if not data:
+                print("no data")
+                break
+            else:
+                if addr:
+                    print(addr[0],' sending back')
+                    sendtoserver(addr[0],port,str(time.time()))
+                    nextstatus = data
+                    print("got data:"+nextstatus)
+                    c.close()
+                    q.put(nextstatus)
                     break
-                else:
-                    if addr:
-                        print(addr[0],' sending back')
-                        sendtoserver(addr[0],port,str(time.time()))
-                        nextstatus = data
-                        print("got data:"+nextstatus)
-                        c.close()
-                        q.put(nextstatus)
-                        break
-    except:
-        print("somthin wrong")
-        q.put('')
+        except:
+            print("somthin wrong")
 
 #--------------Write the menu layer to dispmanx--------------
 
