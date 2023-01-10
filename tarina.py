@@ -1110,23 +1110,23 @@ def main():
             camerablue = str(float(camera.awb_gains[1]))[:4]
 
         #Check if menu is changed and save settings / sec
-        if buttonpressed == True or recording == True or rendermenu == True:
-            lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
-            #Rerender menu if picamera settings change
-            if settings != oldsettings or selected != oldselected:
-                writemenu(menu,settings,selected,'',showmenu)
-                rendermenu = True
-            #save settings if menu has been updated and x seconds passed
-            if recording == False:
-                if time.time() - pausetime > savesettingsevery: 
-                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels]
-                    #print('saving settings')
-                    savesettings(settings_to_save, filmname, filmfolder)
-                    pausetime = time.time()
-            #writemessage(pressed)
-            oldsettings = settings
-            oldselected = selected
+        #if buttonpressed == True or recording == True or rendermenu == True:
+        lastmenu = menu[selected]
+        settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+        #Rerender menu if picamera settings change
+        #if settings != oldsettings or selected != oldselected:
+        writemenu(menu,settings,selected,'',showmenu)
+        #rendermenu = True
+        #save settings if menu has been updated and x seconds passed
+        if recording == False:
+            if time.time() - pausetime > savesettingsevery: 
+                settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels]
+                #print('saving settings')
+                savesettings(settings_to_save, filmname, filmfolder)
+                pausetime = time.time()
+        #writemessage(pressed)
+        oldsettings = settings
+        oldselected = selected
         time.sleep(keydelay)
 
 
@@ -1209,6 +1209,7 @@ def listenforclients(host, port, q):
 #--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header,showmenu):
+    #global oldmenu
     menudone = ''
     menudoneprint = ''
     menudone += str(selected) + '\n'
@@ -1222,7 +1223,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         else:
             menudoneprint += i + ' : ' + s + ' | '
         n += 1
-    #print(term.clear+term.home)
+    print(term.clear+term.home)
     print(menudoneprint)
     spaces = len(menudone) - 500
     menudone += spaces * ' '
