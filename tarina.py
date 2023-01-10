@@ -1186,7 +1186,7 @@ def listenforclients(host, port, q):
     #s.settimeout(0)
     try:
         print("listening on port "+str(port))
-        s.listen(1)
+        s.listen(5)
         c, addr = s.accept()
         while True:
                 data = c.recv(1024)
