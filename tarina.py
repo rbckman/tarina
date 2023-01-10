@@ -1181,7 +1181,7 @@ def sendtoserver(host, port, data):
 
 def listenforclients(host, port, q):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host,port))
     #s.settimeout(0)
     try:
@@ -1189,7 +1189,7 @@ def listenforclients(host, port, q):
         s.listen(5)
         c, addr = s.accept()
         while True:
-                data = c.recv(1024)
+                data = c.recv(1024).decode()
                 if not data:
                     print("no data")
                     break
@@ -1197,7 +1197,7 @@ def listenforclients(host, port, q):
                     if addr:
                         print(addr[0],' sending back')
                         sendtoserver(addr[0],port,str(time.time()))
-                        nextstatus = data.decode()
+                        nextstatus = data
                         print("got data:"+nextstatus)
                         c.close()
                         q.put(nextstatus)
