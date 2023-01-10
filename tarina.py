@@ -1180,13 +1180,13 @@ def sendtoserver(host, port, data):
 ##--------------Listen for Clients-----------------------
 
 def listenforclients(host, port, q):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((host,port))
     #s.settimeout(0)
     print("listening on port "+str(port))
     while True:
         try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((host,port))
             s.listen(5)
             c, addr = s.accept()
             data = c.recv(1024).decode()
@@ -1206,6 +1206,7 @@ def listenforclients(host, port, q):
                     break
         except:
             print("somthin wrong")
+            s = ''
 
 #--------------Write the menu layer to dispmanx--------------
 
