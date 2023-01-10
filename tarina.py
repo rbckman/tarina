@@ -1185,13 +1185,15 @@ def listenforclients(host, port, q):
     s.bind((host,port))
     #s.settimeout(0)
     print("listening on port "+str(port))
-    s.listen(5)
-    c, addr = s.accept()
     while True:
         try:
+            s.listen(5)
+            c, addr = s.accept()
             data = c.recv(1024).decode()
             if not data:
                 print("no data")
+                c.close()
+                q.put('')
                 break
             else:
                 if addr:
