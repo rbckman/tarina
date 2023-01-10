@@ -1166,10 +1166,10 @@ def loadsettings(filmfolder, filmname):
 ##---------------Send to server----------------------------------------------
 
 def sendtoserver(host, port, data):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
             print('sending data to '+host+':'+str(port))
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((host, port))
             s.send(str.encode(data))
             break
