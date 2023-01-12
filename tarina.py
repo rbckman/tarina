@@ -233,7 +233,7 @@ def main():
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('rsync -avr --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                run_command('rsync -avr --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
@@ -3453,6 +3453,7 @@ def startcamera(lens, fps):
     #camera.lens_shading_table = lens_shading_table
     camera.start_preview()
     camera.awb_mode = 'auto'
+    time.sleep(1)
     return camera
 
 def tarinaserver(state):
