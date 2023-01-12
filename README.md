@@ -90,7 +90,7 @@ Mail rob(at)tarina.org
 
 Support
 -------
-Bitcoin: 15JRxab5tMg9JeXbtpQsiPSCUmoYucjyYs
+https://shop.tarina.org
 
 Very much appreciated!
 
