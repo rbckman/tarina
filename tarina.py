@@ -3391,7 +3391,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown' or holdbutton == 'remove':
             pressed = holdbutton
-            keydelay = 0.06
+            keydelay = 0.02
     if time.time() - buttontime > 2 and buttonpressed == True:
         keydelay = 0.02
     if time.time() - buttontime > 4 and buttonpressed == True:
