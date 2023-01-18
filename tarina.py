@@ -229,7 +229,7 @@ def main():
                     onlysound=True
             elif nextstatus=="PLACEHOLDER":
                 selected=2
-                pressed="insert"
+                pressed="insert_shot"
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
@@ -519,7 +519,7 @@ def main():
                     vumetermessage('Scene moved!')
                     time.sleep(1)
             #INSERT SHOT
-            elif pressed == 'insert' and menu[selected] != 'SCENE:':
+            elif pressed == 'insert' and menu[selected] != 'SCENE:' or pressed == 'insert_shot':
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 try:
                     os.makedirs(insertshot)
