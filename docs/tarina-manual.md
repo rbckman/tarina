@@ -540,7 +540,7 @@ python3 tarina.py
 ```
 Happy filming!
 
-![Should be looking like this once finnished](tarina-leone.jpg)
+![Should be looking like this once finnished](tarina-promo.jpg)
 
 
 Tested lenses

@@ -1,9 +1,9 @@
 Tarina
 ======
 
-![Tarina Leone, one done & one in post processing stage](docs/tarina-leone.jpg)
+![Tarina Leone, one done & one in post processing stage](docs/tarina-promo.jpg)
 
-A video camera that organizes takes, shots & scenes and glues your film together. 
+A video camera packed with features and organizes takes, shots & scenes and glues your film together.
 
 Experience filmmaking flow
 ------------------------------
@@ -12,7 +12,13 @@ If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(film
 Films made with Tarina
 ----------------------
 
+### [The Year Of Tarina](https://youtu.be/DVoRsRQtudk)
+
+### [Robins Trägård](https://youtu.be/IOZAHCIN6U0)
+
 ### [A new years medley](https://youtu.be/BYojmnD-1eU)
+
+2022 New Years Medley
 
 ### [Landing Down Under](https://www.youtube.com/watch?v=Lbi9_f0KrKA)
 
