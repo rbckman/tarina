@@ -133,7 +133,6 @@ def main():
     buttonpressed = False
     holdbutton = ''
     updatethumb = False
-    delayerr = ''
     loadfilmsettings = True
     oldsettings = ''
     comp = 1
@@ -2016,7 +2015,7 @@ def compileshot(filename):
         #remove old mp4
         os.system('rm ' + filename + '.mp4')
         run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
-        delayerr = audiotrim(filename, 'end')
+        audiotrim(filename, 'end')
         os.system('rm ' + filename + '.h264')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
@@ -2970,8 +2969,12 @@ def audiotrim(filename, where):
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
-    pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
-    audiolenght = pipe.decode().strip()
+    try:
+        pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
+        audiolenght = pipe.decode().strip()
+    except:
+        audiosilence('',filename)
+        audiolenght=videolenght
     #if there is no audio lenght
     logger.info('audio is:' + audiolenght)
     if not audiolenght.strip():
@@ -2998,7 +3001,8 @@ def audiotrim(filename, where):
         #    vumetermessage('Consider changing to a faster microsd card.')
         #    time.sleep(10)
         delayerr = 'A' + str(audiosync)
-    else:
+        print(delayerr)
+    elif int(audiolenght) < int(videolenght):
         audiosync = int(videolenght) - int(audiolenght)
         #calculate difference
         #audiosyncs = videos - audios
@@ -3019,8 +3023,9 @@ def audiotrim(filename, where):
         os.remove(filename + '_temp.wav')
         os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
+        print(delayerr)
     #os.remove('/dev/shm/' + filename + '.wav')
-    return delayerr
+    return
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
 
