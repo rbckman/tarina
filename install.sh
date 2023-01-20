@@ -210,7 +210,7 @@ Conflicts=getty@tty1.service
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/python3 /home/pi/tarina/tarina.py default
+ExecStart=/usr/bin/nohup /usr/bin/python3 /home/pi/tarina/tarina.py default
 User=pi
 Restart=on-failure
 StandardInput=tty-force
@@ -226,6 +226,10 @@ CPUSchedulingPriority=99
 [Install]
 WantedBy=local-fs.target
 EOF
+
+#thanx systemd for making me search for years to make this all workd like a normal programd.
+loginctl enable-linger
+loginctl enable-linger pi
 
 chmod +x /home/pi/tarina/tarina.py
 systemctl enable tarina.service
