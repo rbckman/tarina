@@ -75,7 +75,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -3332,6 +3332,7 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
+    global i2cbuttons
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
@@ -3346,6 +3347,10 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     if i2cbuttons == True:
         readbus = bus.read_byte_data(DEVICE,GPIOB)
         readbus2 = bus.read_byte_data(DEVICE,GPIOA)
+        if readbus == 0:
+            readbus = 255
+        if readbus2 == 0:
+            readbus2 = 247
         if readbus != 255:
             print('i2cbutton pressed: ' + str(readbus))
         if readbus2 != 247:
