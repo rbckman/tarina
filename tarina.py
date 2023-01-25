@@ -237,7 +237,7 @@ def main():
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
                 run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-                sendtoserver(tarinactrl_ip,port,'SYNCDONE'))
+                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
