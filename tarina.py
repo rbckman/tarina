@@ -215,6 +215,10 @@ def main():
         #Check controller
         if process.is_alive() == False:
             nextstatus = que.get()
+            if "*" in nextstatus:
+                tarinactrl_ip = nextstatus.split('*')[1]
+                nextstatus = nextstatus.split('*')[0]
+            print('tarinactrl ip:' + tarinactrl_ip)
             process = Process(target=listenforclients, args=("0.0.0.0", port, que))
             process.start()
             if nextstatus=="REC":
@@ -232,7 +236,8 @@ def main():
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('rsync -avr --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                sendtoserver(tarinactrl_ip,port,'SYNCDONE'))
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
@@ -1200,7 +1205,7 @@ def listenforclients(host, port, q):
                         nextstatus = data
                         print("got data:"+nextstatus)
                         c.close()
-                        q.put(nextstatus)
+                        q.put(nextstatus+'*'+addr[0])
                         break
     except:
         print("somthin wrong")
