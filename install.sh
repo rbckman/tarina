@@ -122,7 +122,7 @@ apt-get -y install curl
 echo "installing hyperpixel4 screen drivers"
 curl -sSL get.pimoroni.com/hyperpixel4-legacy | bash
 cat <<'EOF' >> /etc/udev/rules.d/98-hyperpixel4-calibration.rules
-ATTRS{name}=="Goodix Capacitive TouchScreen", ENV{LIBINPUT_CALIBRATION_MATRIX}="-1 0 1 0 -1 1"
+ATTRS{name}=="Goodix Capacitive TouchScreen", ENV{LIBINPUT_CALIBRATION_MATRIX}="0 1 0 -1 0 1"
 EOF
 echo "Tarina configuration seems to be in order in /boot/config.txt"
 echo "Adding to /boot/config.txt"
