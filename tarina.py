@@ -222,6 +222,14 @@ def main():
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
                 run_command('sudo shutdown -h now')
+            #PICTURE
+            elif pressed == 'picture':
+                if os.path.isdir(foldername) == False:
+                    os.makedirs(foldername)
+                picture = foldername +'picture' + str(shot).zfill(3) + '.jpeg'
+                print('taking picture')
+                camera.capture(picture,format="jpeg",use_video_port=True)
+            #INSERT SCENE
             #PEAKING
             elif pressed == 'peak' and recordable == True:
                 if shot > 1:
@@ -1152,9 +1160,9 @@ def sendtoserver(host, port, data):
 def listenforclients(host, port, q):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((host,port))
     #s.settimeout(0)
     try:
+        s.bind((host,port))
         print("listening on port "+str(port))
         s.listen(5)
         c, addr = s.accept()
@@ -3311,7 +3319,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         print('tarinactrl ip:' + tarinactrl_ip)
         process = Process(target=listenforclients, args=("0.0.0.0", port, que))
         process.start()
-        if nextstatus=="UP":
+        if nextstatus=="PICTURE":
+            pressed="picture"
+        elif nextstatus=="UP":
             pressed="up"
         elif nextstatus=="DOWN":
             pressed="down"

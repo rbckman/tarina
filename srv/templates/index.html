@@ -1,4 +1,4 @@
-$def with (renderedfilms, unrenderedfilms, cameras, menu, selected)
+$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash)
 $var renderedfilms = renderedfilms
 $var unrenderedfilms = unrenderedfilms
 <script>
@@ -21,16 +21,21 @@ $for m in menu[3:]:
         $m
     $ y+=1
 </div>
+$ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
+<img width="80%" src="$picture"/><br>
 <br>
 <a href="/?func=view">VIEW</a> <a href="/?func=up">__UP__</a> <a href="/?func=record">RECORD</a><br>
 <a href="/?func=left">LEFT</a> <a href="/?func=middle">MIDDLE</a> <a href="/?func=right">RIGHT</a><br>
 <a href="/?func=delete">DELETE</a> <a href="/?func=down">DOWN</a> <a href="/?func=retake">RETAKE</a><br>
+<br>
+<a href="/?func=picture">PICTURE</a>
+<br>
 <h1>FILMS</h1>
 
 $for i in renderedfilms:
     <p>--------------------------------------------------------------</p>
     <h2>$i</h2>
-    <a href="static/Videos/$i/${i}.mp4"><img width="80%" src="static/Videos/$i/scene001/shot001/take001.jpeg"/></a><br>
+    <a href="static/Videos/$i/${i}.mp4"><img width="80%" src="static/Videos/$i/scene001/shot001/take001.jpeg?$randhash"/></a><br>
     <p>Copy project to your destination:</p>
     <pre>scp -r pi@tarina.local:~/Videos/$i ~/films/$i</pre>
 <h1>Films unrendered</h1>

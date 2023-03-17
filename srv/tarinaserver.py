@@ -6,7 +6,8 @@ import socket
 import ifaddr
 import sys
 import time
-
+import random
+import hashlib
 
 # Get path of the current dir, then use it as working directory:
 rundir = os.path.dirname(__file__)
@@ -147,6 +148,10 @@ class index:
         interface=open('/dev/shm/interface','r')
         menu=interface.readlines()
         selected=int(menu[0])
+        name=menu[3].split(':')[1]
+        scene=menu[4].split(':')[1].split('/')[0]
+        shot=menu[5].split(':')[1].split('/')[0]
+        take=menu[6].split(':')[1].split('/')[0]
         films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
@@ -181,16 +186,23 @@ class index:
             sendtocamera(ip,port,'MIDDLE')
         elif i.func == 'delete':
             sendtocamera(ip,port,'DELETE')
+        elif i.func == 'picture':
+            sendtocamera(ip,port,'PICTURE')
+            session.reload = 1
         if i.func != None:
             session.reload = 1
             raise web.seeother('/')
         if session.reload == 1:
-            time.sleep(0.35)
+            time.sleep(0.5)
             interface=open('/dev/shm/interface','r')
             menu=interface.readlines()
             selected=int(menu[0])
+            scene=menu[4].split(':')[1].split('/')[0]
+            shot=menu[5].split(':')[1].split('/')[0]
+            take=menu[6].split(':')[1].split('/')[0]
             session.reload = 0
-        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected)
+        randhash = hashlib.md5(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
+        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,randhash)
 
 class films:
     def GET(self, film):
