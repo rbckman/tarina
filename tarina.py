@@ -226,7 +226,7 @@ def main():
             elif pressed == 'picture':
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
-                picture = foldername +'picture' + str(shot).zfill(3) + '.jpeg'
+                picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
                 print('taking picture')
                 camera.capture(picture,format="jpeg",use_video_port=True)
             #INSERT SCENE

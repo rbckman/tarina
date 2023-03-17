@@ -147,11 +147,26 @@ class index:
     def GET(self):
         interface=open('/dev/shm/interface','r')
         menu=interface.readlines()
-        selected=int(menu[0])
-        name=menu[3].split(':')[1]
-        scene=menu[4].split(':')[1].split('/')[0]
-        shot=menu[5].split(':')[1].split('/')[0]
-        take=menu[6].split(':')[1].split('/')[0]
+        try:
+            selected=int(menu[0])
+        except:
+            selected=0
+        try:
+            name=menu[3].split(':')[1]
+        except:
+            name=''
+        try:
+            scene=menu[4].split(':')[1].split('/')[0]
+        except:
+            scene=1
+        try:
+            shot=menu[5].split(':')[1].split('/')[0]
+        except:
+            shot=1
+        try:
+            take=menu[6].split(':')[1].split('/')[0]
+        except:
+            take=1
         films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
@@ -196,11 +211,27 @@ class index:
             time.sleep(0.5)
             interface=open('/dev/shm/interface','r')
             menu=interface.readlines()
-            selected=int(menu[0])
-            scene=menu[4].split(':')[1].split('/')[0]
-            shot=menu[5].split(':')[1].split('/')[0]
-            take=menu[6].split(':')[1].split('/')[0]
-            session.reload = 0
+            try:
+                selected=int(menu[0])
+            except:
+                selected=0
+            try:
+                name=menu[3].split(':')[1]
+            except:
+                name=''
+            try:
+                scene=menu[4].split(':')[1].split('/')[0]
+            except:
+                scene=1
+            try:
+                shot=menu[5].split(':')[1].split('/')[0]
+            except:
+                shot=1
+            try:
+                take=menu[6].split(':')[1].split('/')[0]
+            except:
+                take=1
+                session.reload = 0
         randhash = hashlib.md5(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
         return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,randhash)
 
