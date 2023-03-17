@@ -1,4 +1,4 @@
-$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash)
+$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash,thumb)
 $var renderedfilms = renderedfilms
 $var unrenderedfilms = unrenderedfilms
 <script>
@@ -6,12 +6,15 @@ function timedRefresh(timeoutPeriod) {
     setTimeout("location.reload(true);",timeoutPeriod);
 }
 </script>
-
 connected 
 $for i in cameras:
     $i
 <br>
-<br>
+<a href="/?func=view">VIEW</a> <a href="/?func=up">__UP__</a> <a href="/?func=record">RECORD</a><br>
+<a href="/?func=left">LEFT</a> <a href="/?func=middle">MIDDLE</a> <a href="/?func=right">RIGHT</a><br>
+<a href="/?func=delete">DELETE</a> <a href="/?func=down">DOWN</a> <a href="/?func=retake">RETAKE</a><br>
+<a href="/?func=picture">PICTURE</a>
+<a href="/?func=search">SEARCH</a>
 <div id="menu" style="margin:0 auto; width:80%">
 $ y=0
 $for m in menu[3:]:
@@ -21,17 +24,11 @@ $for m in menu[3:]:
         $m
     $ y+=1
 </div>
-$ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
+$if thumb:
+    $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
+$else:
+    $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
 <img width="80%" src="$picture?$randhash"/><br>
-<br>
-TARINACNTRL
-<br>
-<br>
-<a href="/?func=view">VIEW</a> <a href="/?func=up">__UP__</a> <a href="/?func=record">RECORD</a><br>
-<a href="/?func=left">LEFT</a> <a href="/?func=middle">MIDDLE</a> <a href="/?func=right">RIGHT</a><br>
-<a href="/?func=delete">DELETE</a> <a href="/?func=down">DOWN</a> <a href="/?func=retake">RETAKE</a><br>
-<br>
-<a href="/?func=picture">PICTURE</a>
 <br>
 <h1>FILMS</h1>
 

@@ -3308,7 +3308,7 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip
     #Check controller
     pressed = ''
     if process.is_alive() == False and serverstate == 'on':
@@ -3316,7 +3316,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         if "*" in nextstatus:
             tarinactrl_ip = nextstatus.split('*')[1]
             nextstatus = nextstatus.split('*')[0]
-        print('tarinactrl ip:' + tarinactrl_ip)
+            print('tarinactrl ip:' + tarinactrl_ip)
         process = Process(target=listenforclients, args=("0.0.0.0", port, que))
         process.start()
         if nextstatus=="PICTURE":

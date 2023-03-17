@@ -46,12 +46,13 @@ app = web.application(urls, globals())
 render = web.template.render('templates/', base="base")
 web.config.debug=False
 store = web.session.DiskStore(basedir + '/sessions')
-session = web.session.Session(app,store,initializer={'login': 0, 'user': '', 'backurl': '', 'bildsida': 0, 'cameras': [], 'reload': 0})
+session = web.session.Session(app,store,initializer={'login': 0, 'user': '', 'backurl': '', 'bildsida': 0, 'cameras': [], 'reload': 0, 'randhash':''})
 
 port=55555
 ip='0.0.0.0'
 cameras=[]
 
+session.randhash = hashlib.md5(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
 
 ##---------------Connection----------------------------------------------
 
@@ -203,6 +204,7 @@ class index:
             sendtocamera(ip,port,'DELETE')
         elif i.func == 'picture':
             sendtocamera(ip,port,'PICTURE')
+            session.randhash = hashlib.md5(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
             session.reload = 1
         if i.func != None:
             session.reload = 1
@@ -232,8 +234,11 @@ class index:
             except:
                 take=1
                 session.reload = 0
-        randhash = hashlib.md5(str(random.getrandbits(256)).encode('utf-8')).hexdigest()
-        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,randhash)
+
+        thumb="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
+        if os.path.exists(thumb) == False:
+            thumb=''
+        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb)
 
 class films:
     def GET(self, film):
