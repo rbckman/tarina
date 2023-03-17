@@ -1,7 +1,30 @@
-$def with (renderedfilms, unrenderedfilms)
+$def with (renderedfilms, unrenderedfilms, cameras, menu, selected)
 $var renderedfilms = renderedfilms
 $var unrenderedfilms = unrenderedfilms
+<script>
+function timedRefresh(timeoutPeriod) {
+    setTimeout("location.reload(true);",timeoutPeriod);
+}
+</script>
 
+connected 
+$for i in cameras:
+    $i
+<br>
+<br>
+<div id="menu" style="margin:0 auto; width:80%">
+$ y=0
+$for m in menu[3:]:
+    $if selected == y:
+        <b><a>$m</a></b>
+    $else:
+        $m
+    $ y+=1
+</div>
+<br>
+<a href="/?func=view">VIEW</a> <a href="/?func=up">__UP__</a> <a href="/?func=record">RECORD</a><br>
+<a href="/?func=left">LEFT</a> <a href="/?func=middle">MIDDLE</a> <a href="/?func=right">RIGHT</a><br>
+<a href="/?func=delete">DELETE</a> <a href="/?func=down">DOWN</a> <a href="/?func=retake">RETAKE</a><br>
 <h1>FILMS</h1>
 
 $for i in renderedfilms:

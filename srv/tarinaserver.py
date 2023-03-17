@@ -2,6 +2,11 @@
 
 import web
 import os
+import socket
+import ifaddr
+import sys
+import time
+
 
 # Get path of the current dir, then use it as working directory:
 rundir = os.path.dirname(__file__)
@@ -10,19 +15,76 @@ if rundir != '':
 
 filmfolder = '/home/pi/Videos/'
 
+basedir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(basedir)
+
 # Link video directory to static dir
 if os.path.isfile('static/Videos') == False:
     os.system("ln -s -t static/ " + filmfolder)
 
 films = []
 
+#NETWORKS
+
+networks=[]
+adapters = ifaddr.get_adapters()
+for adapter in adapters:
+    print("IPs of network adapter " + adapter.nice_name)
+    for ip in adapter.ips:
+        if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+            print(ip.ip)
+            networks.append(ip.ip)
+network=networks[0]
+
 urls = (
-    '/', 'index',
+    '/?', 'index',
     '/f/(.*)?', 'films'
 )
 
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="base")
+web.config.debug=False
+store = web.session.DiskStore(basedir + '/sessions')
+session = web.session.Session(app,store,initializer={'login': 0, 'user': '', 'backurl': '', 'bildsida': 0, 'cameras': [], 'reload': 0})
+
+port=55555
+ip='0.0.0.0'
+cameras=[]
+
+
+##---------------Connection----------------------------------------------
+
+def pingtocamera(host, port, data):
+    print("Sending to "+host+" on port "+str(port)+" DATA:"+data)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.01)
+    try:
+        while True:
+            s.connect((host, port))
+            s.send(str.encode(data))
+            if host not in cameras and host not in networks:
+                session.cameras.append(host)
+                print("Found camera! "+host)
+            print("Sent to server..")
+            break
+    except:
+        ('did not connect')
+    s.close()
+
+def sendtocamera(host, port, data):
+    print("Sending to "+host+" on port "+str(port)+" DATA:"+data)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.1)
+    try:
+        while True:
+            s.connect((host, port))
+            s.send(str.encode(data))
+            print("Sent to server..")
+            break
+    except:
+        ('did not connect')
+    s.close()
+
 
 def getfilms(filmfolder):
     #get a list of films, in order of settings.p file last modified
@@ -82,15 +144,53 @@ def counttakes(filmname, filmfolder, scene, shot):
 
 class index:
     def GET(self):
+        interface=open('/dev/shm/interface','r')
+        menu=interface.readlines()
+        selected=int(menu[0])
         films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
-        for i in films:
-            if os.path.isfile('static/Videos/' + i[0] + '/' + i[0] + '.mp4') == True:
-                renderedfilms.append(i[0])
+        for f in films:
+            if os.path.isfile('static/Videos/' + f[0] + '/' + f[0] + '.mp4') == True:
+                renderedfilms.append(f[0])
             else:
-                unrenderedfilms.append(i[0])
-        return render.index(renderedfilms, unrenderedfilms)
+                unrenderedfilms.append(f[0])
+        i=web.input(func=None)
+        if i.func == 'search':
+            session.cameras=[]
+            # ping ip every 10 sec while not recording to connect cameras
+            pingip=0
+            while pingip < 255 :
+                pingip+=1
+                pingtocamera(network[:-3]+str(pingip),port,'PING')
+        elif i.func == 'rec':
+            sendtocamera(ip,port,'REC')
+        elif i.func == 'retake':
+            sendtocamera(ip,port,'RETAKE')
+        elif i.func == 'up':
+            sendtocamera(ip,port,'UP')
+        elif i.func == 'down':
+            sendtocamera(ip,port,'DOWN')
+        elif i.func == 'left':
+            sendtocamera(ip,port,'LEFT')
+        elif i.func == 'right':
+            sendtocamera(ip,port,'RIGHT')
+        elif i.func == 'view':
+            sendtocamera(ip,port,'VIEW')
+        elif i.func == 'middle':
+            sendtocamera(ip,port,'MIDDLE')
+        elif i.func == 'delete':
+            sendtocamera(ip,port,'DELETE')
+        if i.func != None:
+            session.reload = 1
+            raise web.seeother('/')
+        if session.reload == 1:
+            time.sleep(0.35)
+            interface=open('/dev/shm/interface','r')
+            menu=interface.readlines()
+            selected=int(menu[0])
+            session.reload = 0
+        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected)
 
 class films:
     def GET(self, film):

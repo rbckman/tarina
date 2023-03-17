@@ -75,7 +75,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -193,6 +193,7 @@ def main():
     que = Queue()
     process = Process(target=listenforclients, args=("0.0.0.0", port, que))
     process.start()
+    nextstatus = ''
 
     serverstate_old='off'
     wifistate_old='off'
@@ -215,45 +216,6 @@ def main():
             elif serverstate == 'off':
                 tarinaserver(False)
             serverstate_old=serverstate
-        #Check controller
-        if process.is_alive() == False:
-            nextstatus = que.get()
-            if "*" in nextstatus:
-                tarinactrl_ip = nextstatus.split('*')[1]
-                nextstatus = nextstatus.split('*')[0]
-            print('tarinactrl ip:' + tarinactrl_ip)
-            process = Process(target=listenforclients, args=("0.0.0.0", port, que))
-            process.start()
-            if nextstatus=="REC":
-                pressed="record"
-            elif nextstatus=="STOP":
-                if recording == True:
-                    pressed="record"
-            elif nextstatus=="RECSOUND":
-                if recording==False:
-                    pressed="record"
-                    onlysound=True
-            elif nextstatus=="PLACEHOLDER":
-                selected=2
-                pressed="insert_shot"
-            elif "SYNCIP:" in nextstatus:
-                ip = nextstatus.split(':')[1]
-                stopinterface(camera)
-                run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
-                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-                startinterface()
-                camera = startcamera(lens,fps)
-                loadfilmsettings = True
-            elif nextstatus=="NEWSCENE":
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                scene=scenes+1
-                shot=1
-                take=1
-            elif nextstatus=="RETAKE":
-                pressed="retake"
-            print(nextstatus)
-            nextstatus=''
         if recording == False:
             #SHUTDOWN
             if pressed == 'middle' and menu[selected] == 'SHUTDOWN':
@@ -3338,7 +3300,61 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons
+    global i2cbuttons, serverstate, nextstatus, process, que
+    #Check controller
+    pressed = ''
+    if process.is_alive() == False and serverstate == 'on':
+        nextstatus = que.get()
+        if "*" in nextstatus:
+            tarinactrl_ip = nextstatus.split('*')[1]
+            nextstatus = nextstatus.split('*')[0]
+        print('tarinactrl ip:' + tarinactrl_ip)
+        process = Process(target=listenforclients, args=("0.0.0.0", port, que))
+        process.start()
+        if nextstatus=="UP":
+            pressed="up"
+        elif nextstatus=="DOWN":
+            pressed="down"
+        elif nextstatus=="LEFT":
+            pressed="left"
+        elif nextstatus=="RIGHT":
+            pressed="right"
+        elif nextstatus=="VIEW":
+            pressed="view"
+        elif nextstatus=="MIDDLE":
+            pressed="middle"
+        elif nextstatus=="DELETE":
+            pressed="remove"
+        elif nextstatus=="REC":
+            pressed="record"
+        elif nextstatus=="STOP":
+            if recording == True:
+                pressed="record"
+        elif nextstatus=="RECSOUND":
+            if recording==False:
+                pressed="record"
+                onlysound=True
+        elif nextstatus=="PLACEHOLDER":
+            selected=2
+            pressed="insert_shot"
+        elif "SYNCIP:" in nextstatus:
+            ip = nextstatus.split(':')[1]
+            stopinterface(camera)
+            run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+            sendtoserver(tarinactrl_ip,port,'SYNCDONE')
+            #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+            startinterface()
+            camera = startcamera(lens,fps)
+            loadfilmsettings = True
+        elif nextstatus=="NEWSCENE":
+            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+            scene=scenes+1
+            shot=1
+            take=1
+        elif nextstatus=="RETAKE":
+            pressed="retake"
+        print(nextstatus)
+        nextstatus=''
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
@@ -3364,7 +3380,6 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     else:
         readbus = 255
         readbus2 = 247
-    pressed = ''
     if buttonpressed == False:
         if event != '':
             print(term.clear+term.home)
