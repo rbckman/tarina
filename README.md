@@ -12,7 +12,7 @@ If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(film
 Films made with Tarina
 ----------------------
 
-### [The Year Of Tarina](https://youtu.be/DVoRsRQtudk)
+### [Mancherok](https://youtu.be/jmy0W6rA10Q)
 
 ### [Robins Trägård](https://youtu.be/IOZAHCIN6U0)
 
@@ -44,7 +44,7 @@ The parts are built around the world by different manufacturers. They've been ch
 [3.5 inch 800x480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)<br>
 [USB via vt1620a Sound card](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB)<br>
 [3.7v 7800mAh li-ion Battery](https://www.aliexpress.com/item/3-7v-9000mAh-capacity-18650-Rechargeable-lithium-battery-pack-18650-jump-starter/32619902319.html?spm=2114.13010608.0.0.XcKleV)<br>
-[Adafruit Powerboost 1000C](https://www.ebay.com/itm/Adafruit-PowerBoost-1000-Charger-Rechargeable-5V-Lipo-USB-Boost-1A-1000C-A/282083284436?epid=2256108887&hash=item41ad7955d4%3Ag%3ALesAAOSwkQZbYXrn&_sacat=0&_nkw=powerboost+1000c&_from=R40&rt=nc&_trksid=m570.l1313)<br>
+[Type-C 5v 2A 3.7V Li-ion battery charger booster module](https://www.ebay.com/itm/Type-C-USB-5V-2A-3-7V-18650-Lithium-Li-ion-Battery-Charging-Board-Charger-Module/383717339632?var=652109038482)
 [Buttons](http://www.ebay.com/itm/151723036469?_trksid=p2057872.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT) connected to a [MCP23017-E/SP DIP-28 16 Bit I / O Expander I2C](http://www.ebay.com/sch/sis.html?_nkw=5Pcs+MCP23017+E+SP+DIP+28+16+Bit+I+O+Expander+I2C+TOP+GM&_trksid=p2047675.m4100)
 
 Check [MANUAL](docs/tarina-manual.md) for complete part list & build instructions
@@ -53,11 +53,11 @@ Check [MANUAL](docs/tarina-manual.md) for complete part list & build instruction
 
 Software
 --------
-The interface focuses on presenting the essentials for film making in one menu that is present and accessible all the time. You can control the interface with a keyboard or with 9 physical buttons; Enter, Up, Down, Left, Right, Record, Retake, View and Remove.
+A filmmaking dedicated video camera that focus on all tools to make a film from start to finnish, just with and within the camera. That means alot of features. Key features is to glue clips together, timelapse, voiceover and or music track recording on scenes, cut and copy and move clips around in your film. Backup to usb harddrive or to your own server. Auto correction is kept as a minimal guide. *Operator* is in control manually of shutter, iso, colors, audio levels and so on. Connect with silent physical buttons, keyboard, http, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
 
 Installing
 ----------
-Download latest [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
+Download [Raspbian buster (not the latest!)](https://www.raspberrypi.org/downloads/raspbian/) and follow [install instructions | a simple install script should take care of it all!](https://www.raspberrypi.org/documentation/installation/installing-images/README.md).
 [Ssh into](https://www.raspberrypi.org/documentation/remote-access/ssh/) Raspberry Pi and run:
 ```
 sudo apt-get install git
@@ -79,9 +79,9 @@ python3 tarina.py
 
 Why
 ---
-There are several reasons why, will write a longer story why but heres some fundamentals that has kept me going.
+There are several reasons why.
 
-- be able to repair if something breaks
+- be able to repair if something breaks (this has been prooven as a very nice feature)
 - be able to expand / build on it / make modifications
 - be able to connect to it / program it to do things
 - do a film on the fly without the need of another computer
