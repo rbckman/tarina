@@ -15,7 +15,7 @@ $for i in cameras:
 <a href="/?func=delete">DELETE</a> <a href="/?func=down">DOWN</a> <a href="/?func=retake">RETAKE</a><br>
 <a href="/?func=picture">PICTURE</a>
 <a href="/?func=search">SEARCH</a>
-<div id="menu" style="margin:0 auto; width:80%">
+<div id="menu" style="margin:0 auto; width:99%">
 $ y=0
 $for m in menu[3:]:
     $if selected == y:
@@ -24,11 +24,11 @@ $for m in menu[3:]:
         $m
     $ y+=1
 </div>
-$if thumb:
-    $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
-$else:
+$if thumb != '':
     $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
-<img width="80%" src="$picture?$randhash"/><br>
+$else:
+    $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
+<img width="99%" src="$picture?$randhash"/><br>
 <br>
 <h1>FILMS</h1>
 
