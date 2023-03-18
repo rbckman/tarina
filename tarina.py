@@ -75,7 +75,7 @@ while probei2c < 10:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -3308,7 +3308,7 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound
     #Check controller
     pressed = ''
     if process.is_alive() == False and serverstate == 'on':
