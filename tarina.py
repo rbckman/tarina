@@ -87,7 +87,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'SLOMO:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -96,7 +96,7 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
-    fps = 24.999
+    fps = 25.010
     quality = 27
     profilelevel='4.2'
     headphoneslevel = 40
@@ -1206,7 +1206,10 @@ def writemenu(menu,settings,selected,header,showmenu):
     menudone += spaces * ' '
     if oldmenu != menudone:
         print(term.clear+term.home)
-        print(menudoneprint)
+        if showmenu == 1:
+            print(menudoneprint)
+        else:
+            print(term.red+menudoneprint)
         #menudone += 'EOF'
         f = open('/dev/shm/interface', 'w')
         f.write(menudone)
@@ -2996,7 +2999,7 @@ def audiotrim(filename, where):
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -n -r '+audiorate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
         #add silence to end
         #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
         run_command('cp '+filename+'.wav '+filename+'_temp.wav')
@@ -3023,7 +3026,7 @@ def audiosilence(foldername,filename):
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
     logger.info('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    run_command('sox -V0 -n -r '+audiorate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(videos))
     os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
     os.system('rm /dev/shm/silence.wav')
 
@@ -3165,7 +3168,7 @@ def startstream(camera, stream, plughw, channels):
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     #
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
-    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar '+audiorate+' -acodec mp2 -b:a 128k -ar '+audiorate+' -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://192.168.0.100:5000'
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar '+soundrate+' -acodec mp2 -b:a 128k -ar '+soundrate+' -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://192.168.0.100:5000'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, format='h264', bitrate = 2000000)
