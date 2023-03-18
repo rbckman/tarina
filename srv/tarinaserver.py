@@ -184,7 +184,7 @@ class index:
             while pingip < 255 :
                 pingip+=1
                 pingtocamera(network[:-3]+str(pingip),port,'PING')
-        elif i.func == 'rec':
+        elif i.func == 'record':
             sendtocamera(ip,port,'REC')
         elif i.func == 'retake':
             sendtocamera(ip,port,'RETAKE')

@@ -31,6 +31,7 @@ import socket
 import configparser
 import shortuuid
 import smbus
+import ifaddr
 #import shlex
 from blessed import Terminal
 
@@ -73,9 +74,21 @@ while probei2c < 10:
         probei2c += 1
         time.sleep(1)
 
+#NETWORKS
+
+networks=[]
+adapters = ifaddr.get_adapters()
+for adapter in adapters:
+    print("IPs of network adapter " + adapter.nice_name)
+    for ip in adapter.ips:
+        if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+            print(ip.ip)
+            networks.append(ip.ip)
+network=networks[0]
+
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -96,7 +109,8 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
-    fps = 25.010
+    camera_model=''
+    fps = ''
     quality = 27
     profilelevel='4.2'
     headphoneslevel = 40
@@ -1102,6 +1116,8 @@ def main():
                 #print('saving settings')
                 savesettings(settings_to_save, filmname, filmfolder)
                 pausetime = time.time()
+                vumetermessage('filming with '+camera_model +' ip:'+ network + ' ')
+                print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' ')
         #writemessage(pressed)
         oldsettings = settings
         oldselected = selected
@@ -1206,10 +1222,10 @@ def writemenu(menu,settings,selected,header,showmenu):
     menudone += spaces * ' '
     if oldmenu != menudone:
         print(term.clear+term.home)
-        if showmenu == 1:
-            print(menudoneprint)
-        else:
+        if showmenu == 0:
             print(term.red+menudoneprint)
+        else:
+            print(menudoneprint)
         #menudone += 'EOF'
         f = open('/dev/shm/interface', 'w')
         f.write(menudone)
@@ -3463,6 +3479,7 @@ def stopinterface(camera):
     return camera
 
 def startcamera(lens, fps):
+    global camera_model
     camera = picamera.PiCamera()
     camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
     #Background image
@@ -3472,7 +3489,9 @@ def startcamera(lens, fps):
     #lensshade = ''
     #npzfile = np.load('lenses/' + lens)
     #lensshade = npzfile['lens_shading_table']
-    #camera.framerate = 24.999
+    #
+    #camera frame rate sync to audio clock
+    #
     camera_model, camera_revision = getconfig(camera)
     # v1 = 'ov5647'
     # v2 = ? 
@@ -3481,7 +3500,7 @@ def startcamera(lens, fps):
         table = read_table('lenses/' + lens)
         camera.lens_shading_table = table
         camera.framerate = 24.999
-    if camera_model == 'ov5647':
+    elif camera_model == 'ov5647':
         table = read_table('lenses/' + lens)
         camera.lens_shading_table = table
         # Different versions of ov5647 with different clock speeds, need to make a config file
@@ -3493,6 +3512,8 @@ def startcamera(lens, fps):
         # ov5647 Rev D"
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
+    elif camera_model == 'imx477':
+        camera.framerate = 24.985
     else:
         camera.framerate = fps
     camera.crop = (0, 0, 1.0, 1.0)
