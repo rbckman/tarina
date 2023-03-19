@@ -91,7 +91,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, filmname, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -103,7 +103,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'SLOMO:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -113,7 +113,8 @@ def main():
     awbx = 0
     awb_lock = 'no'
     camera_model=''
-    fps = ''
+    fps = 25
+    fps_selected=2
     quality = 27
     profilelevel='4.2'
     headphoneslevel = 40
@@ -694,7 +695,8 @@ def main():
                     take=takes+1
                 if beeps > 0:
                     buzz(300)
-                #compileshot(foldername + filename)
+                if fps != 25:
+                    compileshot(foldername + filename)
                 #os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 if beeps > 0:
                     buzz(150)
@@ -861,9 +863,12 @@ def main():
                 if channels == 1:
                     channels = 2
             elif menu[selected] == 'FPS:':
-                if fps < 49:
-                    fps += 1
-                    camera.framerate = fps
+                if camera_model == 'imx477':
+                    if fps_selected < len(fps_selection)-1:
+                        fps_selected+=1
+                        fps_selection=[8,15,24.985,35,49]
+                        fps=fps_selection[fps_selected]
+                        camera.framerate = fps
             elif menu[selected] == 'Q:':
                 if quality < 39:
                     quality += 1
@@ -986,9 +991,12 @@ def main():
                 if channels == 2:
                     channels = 1
             elif menu[selected] == 'FPS:':
-                if fps > 1:
-                    fps -= 1
-                    camera.framerate = fps
+                if camera_model == 'imx477':
+                    if fps_selected > 0:
+                        fps_selected-=1
+                        fps_selection=[5,15,24.985,35,49]
+                        fps=fps_selection[fps_selected]
+                        camera.framerate = fps
             elif menu[selected] == 'Q:':
                 if quality > 10:
                     quality -= 1
@@ -1107,7 +1115,7 @@ def main():
         #Check if menu is changed and save settings / sec
         #if buttonpressed == True or recording == True or rendermenu == True:
         lastmenu = menu[selected]
-        settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(camera.framerate), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+        settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
         #Rerender menu if picamera settings change
         #if settings != oldsettings or selected != oldselected:
         writemenu(menu,settings,selected,'',showmenu)
@@ -2021,6 +2029,33 @@ def add_organize(filmfolder, filmname):
         organized_nr -= 1
     return
 
+
+#-------------Stretch Audio--------------
+
+def stretchaudio(filename):
+    global fps
+    fps_rounded=round(fps)
+    if fps_rounded != 25:
+        pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
+        videolenght = pipe.decode().strip()
+        try:
+            pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
+            audiolenght = pipe.decode().strip()
+        except:
+            audiosilence('',filename)
+            audiolenght=videolenght
+        #if there is no audio lenght
+        logger.info('audio is:' + audiolenght)
+        if not audiolenght.strip():
+            audiolenght = 0
+        ratio = int(audiolenght)/int(videolenght)
+        print(str(ratio))
+        run_command('cp '+filename+'.wav '+filename+'_temp.wav')
+        run_command('ffmpeg -y -i ' + filename + '_temp.wav -filter:a atempo="'+str(ratio) + '" ' + filename + '.wav')
+        os.remove(filename + '_temp.wav')
+    time.sleep(5)
+    return
+
 #-------------Compile Shot--------------
 
 def compileshot(filename):
@@ -2031,11 +2066,13 @@ def compileshot(filename):
         #remove old mp4
         os.system('rm ' + filename + '.mp4')
         run_command('MP4Box -fps 25 -add ' + filename + '.h264 ' + filename + '.mp4')
+        stretchaudio(filename)
         audiotrim(filename, 'end')
         os.system('rm ' + filename + '.h264')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
         #run_command('aplay ' + foldername + filename + '.wav')
+    return
 
 #-------------Get shot files--------------
 
@@ -2980,7 +3017,7 @@ def getaudiocards():
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
 def audiotrim(filename, where):
-    global channels
+    global channels, fps
     print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
@@ -3000,7 +3037,7 @@ def audiotrim(filename, where):
     #audioms = int(audiolenght) % 1000
     #videos = int(videolenght) / 1000
     #audios = int(audiolenght) / 1000
-    if int(audiolenght) > int(videolenght):
+    elif int(audiolenght) > int(videolenght):
         #calculate difference
         audiosync = int(audiolenght) - int(videolenght)
         newaudiolenght = int(audiolenght) - audiosync
@@ -3010,7 +3047,8 @@ def audiotrim(filename, where):
             run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
         if where == 'beginning':
             run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim ' + str(int(audiosync)/1000))
-        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
+        else:
+            run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         os.remove(filename + '_temp.wav')
         #if int(audiosync) > 400:
         #    writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
@@ -3495,7 +3533,7 @@ def stopinterface(camera):
     return camera
 
 def startcamera(lens, fps):
-    global camera_model
+    global camera_model, fps_selection, fps_selected
     camera = picamera.PiCamera()
     camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
     #Background image
@@ -3529,7 +3567,9 @@ def startcamera(lens, fps):
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
     elif camera_model == 'imx477':
-        camera.framerate = 24.975
+        fps_selection=[5,15,24.985,35,49]
+        fps=fps_selection[fps_selected]
+        camera.framerate = fps 
     else:
         camera.framerate = fps
     camera.crop = (0, 0, 1.0, 1.0)
