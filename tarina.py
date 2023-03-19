@@ -141,7 +141,7 @@ def main():
     take = 1
     pic = 1
     onlysound=False
-    filmname = ''
+    filmname = 'onthefloor'
     beeps = 0
     beepcountdown = 0
     beeping = False
@@ -170,7 +170,7 @@ def main():
     channels = 1 #default mono
     #SAVE SETTINGS FREQUENCY IN SECS
     pausetime = time.time()
-    savesettingsevery = 10
+    savesettingsevery = 5
     #TARINA VERSION
     f = open(tarinafolder + '/VERSION')
     tarinaversion = f.readline()
@@ -196,11 +196,11 @@ def main():
     try:
         filmname = getfilms(filmfolder)[0][0]
     except:
-        filmname = '' 
+        filmname = filmname 
     try:
         filmname_back = getfilms(filmfolder)[0][1]
     except:
-        filmname_back = '' 
+        filmname_back = filmname 
 
     #THUMBNAILCHECKER
     oldscene = scene
@@ -419,6 +419,7 @@ def main():
                 if filmname != newfilmname:
                     filmname = newfilmname
                     os.makedirs(filmfolder + filmname)
+                    os.makedirs(filmfolder + filmname + '/.videos')
                     writemessage('Good luck with your film ' + filmname + '!')
                     #make a filmhash
                     print('making filmhash...')
@@ -439,6 +440,7 @@ def main():
                 if filmname != newfilmname:
                     os.system('mv ' + filmfolder + filmname + ' ' + filmfolder + newfilmname)
                     filmname = newfilmname
+                    db = get_film_files(filmname,filmfolder)
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
@@ -784,6 +786,7 @@ def main():
             if menu[selected] == 'FILM:':
                 if filmname == 'onthefloor':
                     filmname = getfilms(filmfolder)[1][0]
+                    filename_back = 'onthefloor'
                     loadfilmsettings = True
             if menu[selected] == 'BRIGHT:':
                 camera.brightness = min(camera.brightness + 1, 99)
@@ -908,8 +911,8 @@ def main():
         #DOWN
         elif pressed == 'down':
             if menu[selected] == 'FILM:':
-                filmname_back = filmname
                 filmname = 'onthefloor'
+                filmname_back = filmname
                 filmname = loadfilm(filmname, filmfolder)
                 loadfilmsettings = True
             elif menu[selected] == 'BRIGHT:':
@@ -1203,15 +1206,17 @@ class logger():
 #-------------get film db files---
 
 def get_film_files(filmname,filmfolder):
+    if not os.path.isdir(filmfolder+filmname):
+        os.makedirs(filmfolder+filmname)
     filmdb = filmfolder+filmname+'/'+filmname+'.db'
     db = web.database(dbn='sqlite', db=filmdb)
     try:
         db.select('videos')
         return db
     except:
-        db.query("CREATE TABLE videos (id integer PRIMARY KEY, tid DATETIME, filename TEXT, foldername TEXT, filmname TEXT, scene INT, shot INT, take INT, audiolenght FLOAT, videolenght FLOAT);")[0]
-        db.select('videos')
-        return db
+        db.query("CREATE TABLE videos (id integer PRIMARY KEY, tid DATETIME, filename TEXT, foldername TEXT, filmname TEXT, scene INT, shot INT, take INT, audiolenght FLOAT, videolenght FLOAT);")
+    db.select('videos')
+    return db
 
 #--------------Save settings-----------------
 
@@ -1721,6 +1726,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
             message = 'New film name: ' + filmname
         else:
             message = 'Edit film name: ' + filmname
+        print(term.clear+term.home)
+        print(message+cursor)
         writemessage(message + cursor)
         vumetermessage(helpmessage)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1928,37 +1935,54 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                 selected = selected - 1
         elif pressed == 'middle':
             if selected == 1:
-                if sceneshotortake == 'take':
-                    onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3) + '/take' + str(999).zfill(3) 
-                    onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
-                    if os.path.isdir(onthefloor_folder) == False:
+                if filmname == 'onthefloor':
+                    if sceneshotortake == 'take':
+                        os.system('rm ' + foldername + filename + '.h264')
+                        os.system('rm ' + foldername + filename + '.mp4')
+                        os.system('rm ' + foldername + filename + '.wav')
+                        os.system('rm ' + foldername + filename + '.jpeg')
+                    elif sceneshotortake == 'shot' and shot > 0:
+                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+                        os.system('rm -r ' + foldername)
+                    elif sceneshotortake == 'scene':
+                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                        os.system('rm -r ' + foldername)
+                        scene = countscenes(filmfolder, filmname)
+                        shot=1
+                        take=1
+                    return
+                else:
+                    if sceneshotortake == 'take':
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3) + '/take' + str(999).zfill(3) 
+                        onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
+                        if os.path.isdir(onthefloor_folder) == False:
+                            os.makedirs(onthefloor)
+                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.h264')
+                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.mp4')
+                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.wav')
+                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.jpeg')
+                        take = take - 1
+                        if take == 0:
+                            take = 1
+                    elif sceneshotortake == 'shot' and shot > 0:
+                        writemessage('Removing shot ' + str(shot))
+                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
                         os.makedirs(onthefloor)
-                    os.system('mv ' + foldername + filename + ' ' + onthefloor + '.h264')
-                    os.system('mv ' + foldername + filename + ' ' + onthefloor + '.mp4')
-                    os.system('mv ' + foldername + filename + ' ' + onthefloor + '.wav')
-                    os.system('mv ' + foldername + filename + ' ' + onthefloor + '.jpeg')
-                    take = take - 1
-                    if take == 0:
+                        os.system('mv ' + foldername +' '+onthefloor)
+                        take = counttakes(filmname, filmfolder, scene, shot)
+                    elif sceneshotortake == 'scene':
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(999).zfill(3)
+                        os.makedirs(onthefloor)
+                        writemessage('Throwing clips on the floor ' + str(scene))
+                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                        os.system('mv ' + foldername + '/* ' + onthefloor+'/' )
+                        scene = countscenes(filmfolder, filmname)
+                        shot = 1
                         take = 1
-                elif sceneshotortake == 'shot' and shot > 0:
-                    writemessage('Removing shot ' + str(shot))
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                    onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
-                    os.makedirs(onthefloor)
-                    os.system('mv ' + foldername +' '+onthefloor)
-                    take = counttakes(filmname, filmfolder, scene, shot)
-                elif sceneshotortake == 'scene':
-                    onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(999).zfill(3)
-                    os.makedirs(onthefloor)
-                    writemessage('Throwing clips on the floor ' + str(scene))
-                    foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
-                    os.system('mv ' + foldername + '/* ' + onthefloor+'/' )
-                    scene = countscenes(filmfolder, filmname)
-                    shot = 1
-                    take = 1
-                elif sceneshotortake == 'film':
-                    foldername = filmfolder + filmname
-                    os.system('rm -r ' + foldername)
+                    elif sceneshotortake == 'film':
+                        foldername = filmfolder + filmname
+                        os.system('rm -r ' + foldername)
                 return
             elif selected == 0:
                 return
