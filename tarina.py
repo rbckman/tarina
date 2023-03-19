@@ -84,7 +84,10 @@ for adapter in adapters:
         if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
             print(ip.ip)
             networks.append(ip.ip)
-network=networks[0]
+if networks != []:
+    network=networks[0]
+else:
+    network=''
 
 #MAIN
 def main():
@@ -1116,6 +1119,19 @@ def main():
                 #print('saving settings')
                 savesettings(settings_to_save, filmname, filmfolder)
                 pausetime = time.time()
+                #NETWORKS
+                networks=[]
+                adapters = ifaddr.get_adapters()
+                for adapter in adapters:
+                    print("IPs of network adapter " + adapter.nice_name)
+                    for ip in adapter.ips:
+                        if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+                            print(ip.ip)
+                            networks.append(ip.ip)
+                if networks != []:
+                    network=networks[0]
+                else:
+                    network='not connected'
                 vumetermessage('filming with '+camera_model +' ip:'+ network + ' ')
                 print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' ')
         #writemessage(pressed)
@@ -3513,7 +3529,7 @@ def startcamera(lens, fps):
         if camera_revision == 'rev.D':
             camera.framerate = 23.15
     elif camera_model == 'imx477':
-        camera.framerate = 24.985
+        camera.framerate = 24.975
     else:
         camera.framerate = fps
     camera.crop = (0, 0, 1.0, 1.0)
