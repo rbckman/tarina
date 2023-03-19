@@ -784,10 +784,10 @@ def main():
         #UP
         elif pressed == 'up':
             if menu[selected] == 'FILM:':
-                if filmname == 'onthefloor':
-                    filmname = getfilms(filmfolder)[1][0]
-                    filename_back = 'onthefloor'
-                    loadfilmsettings = True
+                filmname = 'onthefloor'
+                filmname_back = filmname
+                filmname = loadfilm(filmname, filmfolder)
+                loadfilmsettings = True
             if menu[selected] == 'BRIGHT:':
                 camera.brightness = min(camera.brightness + 1, 99)
             elif menu[selected] == 'CONT:':
@@ -911,10 +911,13 @@ def main():
         #DOWN
         elif pressed == 'down':
             if menu[selected] == 'FILM:':
-                filmname = 'onthefloor'
-                filmname_back = filmname
-                filmname = loadfilm(filmname, filmfolder)
-                loadfilmsettings = True
+                if filmname == 'onthefloor':
+                    filmname = getfilms(filmfolder)[1][0]
+                    filename_back = 'onthefloor'
+                    loadfilmsettings = True
+                else:
+                    filmname = 'onthefloor'
+                    loadfilmsettings = True
             elif menu[selected] == 'BRIGHT:':
                 camera.brightness = max(camera.brightness - 1, 0)
             elif menu[selected] == 'CONT:':
@@ -1950,6 +1953,10 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                         scene = countscenes(filmfolder, filmname)
                         shot=1
                         take=1
+                    elif sceneshotortake == 'film':
+                        foldername = filmfolder + filmname
+                        os.system('rm -r ' + foldername)
+                        os.makedirs(filmfolder+'onthefloor')
                     return
                 else:
                     if sceneshotortake == 'take':
