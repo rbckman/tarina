@@ -222,7 +222,7 @@ class index:
         if os.path.isfile(basedir+thumb) == False:
             print(basedir+thumb)
             thumb=''
-        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb,vumetermessage)
+        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb,vumetermessage,i.func)
 
 class films:
     def GET(self, film):

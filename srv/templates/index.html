@@ -1,4 +1,4 @@
-$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash,thumb,vumetermessage)
+$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash,thumb,vumetermessage,func)
 $var renderedfilms = renderedfilms
 $var unrenderedfilms = unrenderedfilms
 <script>
@@ -34,26 +34,27 @@ $else:
 
 $ take_link="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".mp4"
 $ scene_link="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/scene.mp4"
-$ film_link="static/Videos/" + name + "/scene/" +name+ ".mp4"
+$ film_link="static/Videos/" + name + "/" +name+ ".mp4"
 $if selected == 0:
     <a href='$film_link'><img width="99%" src="$picture?$randhash"/></a><br>
-$if selected == 1:
+$elif selected == 1:
     <a href='$scene_link'><img width="99%" src="$picture?$randhash"/></a><br>
-$else:
+$elif selected > 1:
     <a href='$take_link'><img width="99%" src="$picture?$randhash"/></a><br>
 <br>
-<h1>FILMS</h1>
+$if func=='show_all_films':
+    <h1>FILMS</h1>
 
-$for i in renderedfilms:
-    <p>--------------------------------------------------------------</p>
-    <h2>$i</h2>
-    <a href="static/Videos/$i/${i}.mp4"><img width="80%" src="static/Videos/$i/scene001/shot001/take001.jpeg?$randhash"/></a><br>
-    <p>Copy project to your destination:</p>
-    <pre>scp -r pi@tarina.local:~/Videos/$i ~/films/$i</pre>
-<h1>Films unrendered</h1>
+    $for i in renderedfilms:
+        <p>--------------------------------------------------------------</p>
+        <h2>$i</h2>
+        <a href="static/Videos/$i/${i}.mp4"><img width="80%" src="static/Videos/$i/scene001/shot001/take001.jpeg?$randhash"/></a><br>
+        <p>Copy project to your destination:</p>
+        <pre>scp -r pi@tarina.local:~/Videos/$i ~/films/$i</pre>
+    <h1>Films unrendered</h1>
 
-$for i in unrenderedfilms:
-    <h2>$i </h2>
-    <p>Copy project to your destination:</p>
-    <pre>scp -r pi@tarina.local:~/Videos/$i ~/films/$i</pre>
+    $for i in unrenderedfilms:
+        <h2>$i </h2>
+        <p>Copy project to your destination:</p>
+        <pre>scp -r pi@tarina.local:~/Videos/$i ~/films/$i</pre>
 
