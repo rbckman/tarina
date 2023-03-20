@@ -1,36 +1,13 @@
 Tarina
 ======
 
-![Tarina Leone, one done & one in post processing stage](docs/tarina-promo.jpg)
+![Two buddies](docs/tarina-promo.jpg)
 
-A video camera packed with features and organizes takes, shots & scenes and glues your film together.
+A film camera by filmmakers for filmmakers.
 
 Experience filmmaking flow
 ------------------------------
-If you don't like how your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) flows, retake. Once you "get it" there’s no need for editing. The camera is designed with a "hackers/makers philosophy" and is easy to take apart. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
-
-Films made with Tarina
-----------------------
-
-### [Mancherok](https://youtu.be/jmy0W6rA10Q)
-
-### [Robins Trägård](https://youtu.be/IOZAHCIN6U0)
-
-### [A new years medley](https://youtu.be/BYojmnD-1eU)
-
-2022 New Years Medley
-
-### [Landing Down Under](https://www.youtube.com/watch?v=Lbi9_f0KrKA)
-
-Beatiful pictures and sounds from a bushcamp in Australia.
-
-### [Building Tarina](https://youtu.be/7dhCiDPssR4)
-
-A how to build Tarina film. 
-
-### [Mushroom Season](https://youtu.be/ggehzyUThZk)
-
-Hunting mushrooms in the middle of the beautiful autumn here in Finland, showcasing the colors of the Picamera sensor in Tarina. Also trying out double mics connected with a audio cable y-splitter.
+Retake your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) on the spot so it flows. Once you get it there’s no need for editing later. Designed with a "hackers/makers philosophy", easy to take apart and to mod. It's built using the Raspberry pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
 
 Hardware
 --------
@@ -53,7 +30,7 @@ Check [MANUAL](docs/tarina-manual.md) for complete part list & build instruction
 
 Software
 --------
-A filmmaking dedicated video camera that focus on all tools to make a film from start to finnish, just with and within the camera. That means alot of features. Key features is to glue clips together, timelapse, voiceover and or music track recording on scenes, cut and copy and move clips around in your film. Backup to usb harddrive or to your own server. Auto correction is kept as a minimal guide. *Operator* is in control manually of shutter, iso, colors, audio levels and so on. Connect with silent physical buttons, keyboard, http, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
+A filmmaking dedicated video camera that focus on all tools to make a film from start to finnish, just with and within the camera. That means alot of features. Key features is to glue the selected clips together, making timelapses, voiceover and or music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where ever. Auto correction is only kept as a minimal guide so *operator* is in full control of shutter, iso, colors, audio levels and so on. Connect with silent physical buttons, keyboard, http, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
 
 Installing
 ----------
@@ -108,3 +85,18 @@ This whole project has only been possible because of the people behind the free 
 [Python programming language](https://python.org), Dave Jones's [Picamera python module](https://github.com/waveform80/picamera), rwb27 for lens shading correction! Check out the 3d printable microscope [Openflexure](https://github.com/rwb27/openflexure_microscope), [FFmpeg](https://ffmpeg.org/), [Libav-tools](https://libav.org/), [GPac library with MP4Box](https://gpac.wp.imt.fr/mp4box/), [Blender](http://blender.org), [aplay the awesome wav player/recorder with VU meter](http://alsa.opensrc.org/Aplay), [Popcornmix's Omxplayer](https://github.com/popcornmix/omxplayer), [Will Price's Python-omxplayer-wrapper](https://github.com/willprice/python-omxplayer-wrapper), [SoX - Sound eXchange](http://sox.sourceforge.net/), [The Dispmanx library](https://github.com/raspberrypi/userland/tree/master/host_applications/linux/apps/hello_pi), [Blessed](http://blessed.readthedocs.io/),  [web.py](http://webpy.org), [Tokland's youtube-upload](https://github.com/tokland/youtube-upload)
 
 ![Tarina and Leon](docs/tarina-filming-01.jpg)
+
+Some films made with Tarina
+----------------------
+
+### [Mancherok](https://youtu.be/jmy0W6rA10Q)
+
+### [Robins Trägård](https://youtu.be/IOZAHCIN6U0)
+
+### [A new years medley](https://youtu.be/BYojmnD-1eU)
+
+### [Landing Down Under](https://www.youtube.com/watch?v=Lbi9_f0KrKA)
+
+### [Building Tarina](https://youtu.be/7dhCiDPssR4)
+
+### [Mushroom Season](https://youtu.be/ggehzyUThZk)
