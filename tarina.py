@@ -723,7 +723,7 @@ def main():
                     take=takes+1
                 if beeps > 0:
                     buzz(300)
-                if fps != 25:
+                if round(fps) != 25:
                     compileshot(foldername + filename,filmfolder,filmname)
                 #os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 if beeps > 0:
@@ -918,7 +918,10 @@ def main():
         elif pressed == 'down':
             if menu[selected] == 'FILM:':
                 if filmname == 'onthefloor':
-                    filmname = getfilms(filmfolder)[1][0]
+                    try:
+                        filmname = getfilms(filmfolder)[1][0]
+                    except:
+                        filmname='onthefloor'
                     filename_back = 'onthefloor'
                     loadfilmsettings = True
                 else:
@@ -1223,9 +1226,9 @@ class logger():
 #-------------get film db files---
 
 def get_film_files(filmname,filmfolder):
-    if not os.path.isdir(filmfolder+filmname):
-        os.makedirs(filmfolder+filmname)
-    filmdb = filmfolder+filmname+'/'+filmname+'.db'
+    if not os.path.isdir(filmfolder+'.videos/'):
+        os.makedirs(filmfolder+'.videos/')
+    filmdb = filmfolder+'.videos/tarina.db'
     db = web.database(dbn='sqlite', db=filmdb)
     try:
         db.select('videos')
@@ -1625,11 +1628,12 @@ def getfilms(filmfolder):
     films_sorted = []
     films = next(os.walk(filmfolder))[1]
     for i in films:
-        if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
-            lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
-            films_sorted.append((i,lastupdate))
-        else:
-            films_sorted.append((i,0))
+        if not '.videos' in i:
+            if os.path.isfile(filmfolder + i + '/' + 'settings.p') == True:
+                lastupdate = os.path.getmtime(filmfolder + i + '/' + 'settings.p')
+                films_sorted.append((i,lastupdate))
+            else:
+                films_sorted.append((i,0))
     films_sorted = sorted(films_sorted, key=lambda tup: tup[1], reverse=True)
     logger.info('*-- Films --*')
     for p in films_sorted:
@@ -2157,10 +2161,9 @@ def add_organize(filmfolder, filmname):
 
 #-------------Stretch Audio--------------
 
-def stretchaudio(filename):
-    global fps
+def stretchaudio(filename,fps):
     fps_rounded=round(fps)
-    if fps_rounded != 25:
+    if int(fps_rounded) != 25:
         pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
         videolenght = pipe.decode().strip()
         try:
@@ -2184,6 +2187,7 @@ def stretchaudio(filename):
 #-------------Compile Shot--------------
 
 def compileshot(filename,filmfolder,filmname):
+    global fps
     #Check if file already converted
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
@@ -2193,7 +2197,7 @@ def compileshot(filename,filmfolder,filmname):
         video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -s '+video_origins+'.mp4 '+filename+'.mp4')
-        stretchaudio(filename)
+        stretchaudio(filename,fps)
         audiotrim(filename, 'end')
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
@@ -2323,6 +2327,7 @@ def scenefiles(filmfolder, filmname):
 #-------------Render Shot-------------
 
 def rendershot(filmfolder, filmname, scene, shot):
+    global fps
     #This function checks and calls rendervideo & renderaudio if something has changed in the film
     #Video
     videohash = ''
@@ -2392,6 +2397,7 @@ def rendershot(filmfolder, filmname, scene, shot):
 #-------------Render Scene-------------
 
 def renderscene(filmfolder, filmname, scene):
+    global fps
     #This function checks and calls rendervideo & renderaudio if something has changed in the film
     #Video
     videohash = ''
@@ -2468,6 +2474,7 @@ def renderscene(filmfolder, filmname, scene):
 #-------------Render film------------
 
 def renderfilm(filmfolder, filmname, comp, scene, muxing):
+    global fps
     def render(q, filmfolder, filmname, comp, scene):
         newaudiomix = False
         #if comp == 1:
