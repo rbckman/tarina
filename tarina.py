@@ -295,7 +295,7 @@ def main():
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
-                    remove_shots = playdub(renderfilename, 'scene')
+                    remove_shots = playdub(filmname,renderfilename, 'scene')
                     try:
                         if remove_shots != []:
                             for i in remove_shots:
@@ -314,7 +314,7 @@ def main():
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
-                    playdub(renderfilename, 'film')
+                    playdub(filmname,renderfilename, 'film')
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -326,7 +326,7 @@ def main():
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     compileshot(foldername + filename,filmfolder,filmname)
-                    trim = playdub(foldername + filename, 'shot')
+                    trim = playdub(filmname,foldername + filename, 'shot')
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
                         trim_filename = foldername + 'take' + str(take).zfill(3)
@@ -340,7 +340,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
-                    playdub(renderfilename, 'dub')
+                    playdub(filmname,renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
@@ -353,7 +353,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    playdub(renderfilename, 'dub')
+                    playdub(filmname,renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
@@ -366,7 +366,7 @@ def main():
                 if newdub:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
-                    playdub(renderfilename, 'dub')
+                    playdub(filmname,renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
@@ -415,11 +415,15 @@ def main():
                 loadfilmsettings = True
             #NEW FILM
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
+                filmname_exist=False
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
-                if filmname != newfilmname:
+                allfilm = getfilms(filmfolder)
+                for i in allfilm:
+                    if i[0] == newfilmname:
+                        filmname_exist=True
+                if filmname != newfilmname and filmname_exist==False:
                     filmname = newfilmname
                     os.makedirs(filmfolder + filmname)
-                    os.makedirs(filmfolder + filmname + '/.videos')
                     writemessage('Good luck with your film ' + filmname + '!')
                     #make a filmhash
                     print('making filmhash...')
@@ -433,7 +437,9 @@ def main():
                     take = 1
                     selectedaction = 0
                 else:
-                    vumetermessage('')
+                    print(term.clear)
+                    vumetermessage('film already exist!')
+                    logger.info('film already exist!')
             #EDIT FILM NAME
             elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
@@ -679,7 +685,7 @@ def main():
                         os.makedirs(foldername)
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
                     if onlysound != True:
-                        camera.start_recording(filmfolder + filmname + '/.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
+                        camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
                     starttime = time.time()
                     recording = True
                     showmenu = 0
@@ -692,7 +698,7 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
-                os.system('ln -s '+filmfolder+filmname+'/.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
+                os.system('ln -s '+filmfolder+'.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
                 if showmenu_settings == True:
                     showmenu = 1
                 if onlysound != True:
@@ -1089,14 +1095,20 @@ def main():
             run_command('amixer -c 0 sset Mic ' + str(miclevel) + '% unmute')
             run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             origin_videos=organize(filmfolder, filmname)
+            print('ORIGIN')
+            print(origin_videos)
             print('total of videos: '+str(len(origin_videos)))
-            if not os.path.isdir(filmfolder + filmname+'/.videos/'):
-                os.makedirs(filmfolder + filmname+'/.videos/')
-            allfiles = os.listdir(filmfolder + filmname+'/.videos/')
+            if not os.path.isdir(filmfolder+'.videos/'):
+                os.makedirs(filmfolder+'.videos/')
+            allfiles = os.listdir(filmfolder+'.videos/')
+            print(allfiles)
+            print('alll')
             for origin in origin_videos:
-                if origin not in allfiles:
+                if origin in allfiles:
                     try:
-                        os.remove(origin)
+                        #os.remove(origin)
+                        print('ORIGIN VIDEO FOLDER NOT IN SYNC' + origin)
+                        time.sleep(5)
                     except:
                         print('not exist')
             organize(filmfolder,'onthefloor')
@@ -1267,10 +1279,10 @@ def listenforclients(host, port, q):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host,port))
-    #s.settimeout(1)
+    #s.settimeout(0.1)
     try:
         print("listening on port "+str(port))
-        s.listen(100)
+        s.listen(5)
         c, addr = s.accept()
         while True:
                 data = c.recv(1024).decode()
@@ -2022,6 +2034,7 @@ def organize(filmfolder, filmname):
                     if '.mp4' in s:
                         origin=os.path.realpath(takename+'.mp4')
                         if origin != os.path.abspath(takename+'.mp4'):
+                            print('appending: '+origin)
                             origin_files.append(origin)
                     elif '.h264' in s:
                         origin=os.path.realpath(takename+'.h264')
@@ -2344,7 +2357,6 @@ def rendershot(filmfolder, filmname, scene, shot):
         print('no videohash found, making one...')
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
-
     #Audio
     audiohash = ''
     oldaudiohash = ''
@@ -2816,7 +2828,7 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
             else:
                 filename = filmfolder + filmname + '/' + filmname
             renderfilename = renderfilm(filmfolder, filmname, 0, 0, False)
-            playdub(renderfilename, 'film')
+            playdub(filmname,renderfilename, 'film')
         time.sleep(0.05)
     #Save dubmix before returning
     if dubmix != dubmix_old:
@@ -2834,8 +2846,8 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
 
 #---------------Play & DUB--------------------
 
-def playdub(filename, player_menu):
-    global headphoneslevel, miclevel, plughw, channels, filmname, filmfolder, scene, soundrate, soundformat
+def playdub(filmname, filename, player_menu):
+    global headphoneslevel, miclevel, plughw, channels, filmfolder, scene, soundrate, soundformat
     #read fastedit file
     if player_menu == 'scene':
         scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
@@ -3496,12 +3508,11 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected, camera, loadfilmsettings
     #Check controller
     pressed = ''
     nextstatus = ''
     if process.is_alive() == False and serverstate == 'on':
-        buttonpressed = True
         nextstatus = que.get()
         if "*" in nextstatus:
             tarinactrl_ip = nextstatus.split('*')[1]

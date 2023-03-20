@@ -147,7 +147,6 @@ def counttakes(filmname, filmfolder, scene, shot):
 
 class index:
     def GET(self):
-        session.reload=1
         films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
@@ -189,38 +188,39 @@ class index:
         if i.func != None:
             session.reload = 1
             raise web.seeother('/')
-        if session.reload == 1:
-            time.sleep(1)
-            interface=open('/dev/shm/interface','r')
-            menu=interface.readlines()
-            try:
-                selected=int(menu[0])
-            except:
-                selected=0
-            try:
-                name=menu[3].split(':')[1]
-                name=name.rstrip('\n')
-            except:
-                name=''
-            try:
-                scene=menu[4].split(':')[1].split('/')[0]
-            except:
-                scene=1
-            try:
-                shot=menu[5].split(':')[1].split('/')[0]
-            except:
-                shot=1
-            try:
-                take=menu[6].split(':')[1].split('/')[0]
-            except:
-                take=1
-                session.reload = 0
+        interface=open('/dev/shm/interface','r')
+        vumeter=open('/dev/shm/vumeter','r')
+        menu=interface.readlines()
+        vumetermessage=vumeter.readlines()[0].rstrip('\n')
+        try:
+            selected=int(menu[0])
+        except:
+            selected=0
+        try:
+            name=menu[3].split(':')[1]
+            name=name.rstrip('\n')
+        except:
+            name=''
+        try:
+            scene=menu[4].split(':')[1].split('/')[0]
+        except:
+            scene=1
+        try:
+            shot=menu[5].split(':')[1].split('/')[0]
+        except:
+            shot=1
+        try:
+            take=menu[6].split(':')[1].split('/')[0]
+        except:
+            take=1
+            session.reload = 0
+        time.sleep(1)
         thumb="/static/Videos/"+name+"/scene"+str(scene).zfill(3)+"/shot"+str(shot).zfill(3)+"/take"+str(take).zfill(3)+".jpeg"
         print(thumb)
         if os.path.isfile(basedir+thumb) == False:
             print(basedir+thumb)
             thumb=''
-        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb)
+        return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb,vumetermessage)
 
 class films:
     def GET(self, film):

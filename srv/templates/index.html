@@ -1,4 +1,4 @@
-$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash,thumb)
+$def with (renderedfilms, unrenderedfilms, cameras, menu, selected,name,scene,shot,take,str,randhash,thumb,vumetermessage)
 $var renderedfilms = renderedfilms
 $var unrenderedfilms = unrenderedfilms
 <script>
@@ -23,12 +23,14 @@ $for m in menu[3:]:
     $else:
         $m
     $ y+=1
+<br>
+$vumetermessage
 </div>
 $if thumb != '':
     $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
 $else:
     $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
-<img width="99%" src="$picture?$randhash"/><br>
+<a href='static/Videos/$name.mp4'<img width="99%" src="$picture?$randhash"/><br>
 <br>
 <h1>FILMS</h1>
 
