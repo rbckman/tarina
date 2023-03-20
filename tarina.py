@@ -1963,7 +1963,6 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                         os.system('rm ' + foldername + filename + '.wav')
                         os.system('rm ' + foldername + filename + '.jpeg')
                     elif sceneshotortake == 'shot' and shot > 0:
-                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
                         os.system('rm -r ' + foldername)
                     elif sceneshotortake == 'scene':
                         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
@@ -1978,23 +1977,24 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     return
                 else:
                     if sceneshotortake == 'take':
+                        writemessage('Throwing take on the floor' + str(shot))
                         onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3) + '/take' + str(999).zfill(3) 
                         onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
                         if os.path.isdir(onthefloor_folder) == False:
                             os.makedirs(onthefloor)
-                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.h264')
-                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.mp4')
-                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.wav')
-                        os.system('mv ' + foldername + filename + ' ' + onthefloor + '.jpeg')
+                        os.system('mv ' + foldername + filename + '.h264 ' + onthefloor + '.h264')
+                        os.system('mv ' + foldername + filename + '.mp4 ' + onthefloor + '.mp4')
+                        os.system('mv ' + foldername + filename + '.wav ' + onthefloor + '.wav')
+                        os.system('mv ' + foldername + filename + '.jpeg ' + onthefloor + '.jpeg')
                         take = take - 1
                         if take == 0:
                             take = 1
                     elif sceneshotortake == 'shot' and shot > 0:
-                        writemessage('Removing shot ' + str(shot))
-                        foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
+                        writemessage('Throwing shot on the floor' + str(shot))
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3)+'/'
                         os.makedirs(onthefloor)
-                        os.system('mv ' + foldername +' '+onthefloor)
+                        os.system('cp -r '+foldername+'* '+onthefloor)
+                        os.system('rm -r '+foldername)
                         take = counttakes(filmname, filmfolder, scene, shot)
                     elif sceneshotortake == 'scene':
                         onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(999).zfill(3)
