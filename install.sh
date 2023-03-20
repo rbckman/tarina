@@ -161,7 +161,6 @@ else
 echo "screen driver already there, to change it remove tarina config in /boot/config.txt"
 fi
 
-
 echo "Change hostname to tarina"
 cat <<'EOF' > /etc/hostname
 tarina
@@ -250,10 +249,19 @@ echo "systemd configuration done!"
 
 echo "Installing tarina apache server configuration"
 cp extras/tarina.conf /etc/apache2/sites-available/
-ln -s -t /var/www/ /home/pi/tarina/srv/
+#ln -s -t /var/www/ /home/pi/tarina/srv/
 a2dissite 000-default.conf
 a2ensite tarina.conf
+echo "configure srv path to /home/pi/tarina/srv'
+cat <<'EOF' >> /etc/apache2/apache2.conf
+<Directory /home/pi/tarina/srv>
+	Options Indexes FollowSymLinks
+	AllowOverride None
+	Require all granted
+</Directory>
+EOF
 systemctl reload apache2
+
 
 echo 'Dont do sync while copying to usb drives, does increase speed alöt!'
 sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
