@@ -252,7 +252,8 @@ cp extras/tarina.conf /etc/apache2/sites-available/
 #ln -s -t /var/www/ /home/pi/tarina/srv/
 a2dissite 000-default.conf
 a2ensite tarina.conf
-echo "configure srv path to /home/pi/tarina/srv'
+echo "configure srv path to /home/pi/tarina/srv"
+
 cat <<'EOF' >> /etc/apache2/apache2.conf
 <Directory /home/pi/tarina/srv>
 	Options Indexes FollowSymLinks
@@ -261,7 +262,6 @@ cat <<'EOF' >> /etc/apache2/apache2.conf
 </Directory>
 EOF
 systemctl reload apache2
-
 
 echo 'Dont do sync while copying to usb drives, does increase speed alöt!'
 sed -i '/MOUNTOPTIONS=/c\MOUNTOPTIONS="noexec,nodev,noatime,nodiratime"' /etc/usbmount/usbmount.conf
