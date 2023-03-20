@@ -1095,8 +1095,10 @@ def main():
             allfiles = os.listdir(filmfolder + filmname+'/.videos/')
             for origin in origin_videos:
                 if origin not in allfiles:
-                    os.remove(origin)
-                    time.sleep(2)
+                    try:
+                        os.remove(origin)
+                    except:
+                        print('not exist')
             organize(filmfolder,'onthefloor')
             scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
             scene = scenes
@@ -1263,12 +1265,12 @@ def sendtoserver(host, port, data):
 
 def listenforclients(host, port, q):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    #s.settimeout(0)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host,port))
+    #s.settimeout(1)
     try:
-        s.bind((host,port))
         print("listening on port "+str(port))
-        s.listen(5)
+        s.listen(100)
         c, addr = s.accept()
         while True:
                 data = c.recv(1024).decode()
@@ -2017,9 +2019,14 @@ def organize(filmfolder, filmname):
                     #print(s)
                     unorganized_nr = int(s[4:7])
                     takename = filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
-                    origin=os.path.realpath(takename+'.mp4')
-                    if origin != os.path.abspath(takename+'.mp4'):
-                        origin_files.append(origin)
+                    if '.mp4' in s:
+                        origin=os.path.realpath(takename+'.mp4')
+                        if origin != os.path.abspath(takename+'.mp4'):
+                            origin_files.append(origin)
+                    elif '.h264' in s:
+                        origin=os.path.realpath(takename+'.h264')
+                        if origin != os.path.abspath(takename+'.h264'):
+                            origin_files.append(origin)
                     if organized_nr == unorganized_nr:
                         #print('correct')
                         pass
@@ -3489,10 +3496,12 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected
     #Check controller
     pressed = ''
+    nextstatus = ''
     if process.is_alive() == False and serverstate == 'on':
+        buttonpressed = True
         nextstatus = que.get()
         if "*" in nextstatus:
             tarinactrl_ip = nextstatus.split('*')[1]
@@ -3544,8 +3553,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             take=1
         elif nextstatus=="RETAKE":
             pressed="retake"
-        print(nextstatus)
-        nextstatus=''
+        #print(nextstatus)
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
@@ -3613,7 +3621,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         buttontime = time.time()
         holdbutton = pressed
         buttonpressed = True
-    if readbus == 255 and event == '':
+    if readbus == 255 and event == '' and nextstatus == '' :
         buttonpressed = False
     if float(time.time() - buttontime) > 0.2 and buttonpressed == True:
         if holdbutton == 'up' or holdbutton == 'down' or holdbutton == 'right' or holdbutton == 'left' or holdbutton == 'shutdown' or holdbutton == 'remove':

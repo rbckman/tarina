@@ -45,7 +45,8 @@ urls = (
 app = web.application(urls, globals())
 render = web.template.render('templates/', base="base")
 web.config.debug=False
-store = web.session.DiskStore(basedir + '/sessions')
+os.system('rm '+basedir+'/sessions/*')
+store = web.session.DiskStore(basedir + '/sessions/')
 session = web.session.Session(app,store,initializer={'login': 0, 'user': '', 'backurl': '', 'bildsida': 0, 'cameras': [], 'reload': 0, 'randhash':''})
 
 port=55555
@@ -146,28 +147,7 @@ def counttakes(filmname, filmfolder, scene, shot):
 
 class index:
     def GET(self):
-        interface=open('/dev/shm/interface','r')
-        menu=interface.readlines()
-        try:
-            selected=int(menu[0])
-        except:
-            selected=0
-        try:
-            name=menu[3].split(':')[1]
-        except:
-            name=''
-        try:
-            scene=menu[4].split(':')[1].split('/')[0]
-        except:
-            scene=1
-        try:
-            shot=menu[5].split(':')[1].split('/')[0]
-        except:
-            shot=1
-        try:
-            take=menu[6].split(':')[1].split('/')[0]
-        except:
-            take=1
+        session.reload=1
         films = getfilms(filmfolder)
         renderedfilms = []
         unrenderedfilms = []
@@ -210,7 +190,7 @@ class index:
             session.reload = 1
             raise web.seeother('/')
         if session.reload == 1:
-            time.sleep(0.5)
+            time.sleep(1)
             interface=open('/dev/shm/interface','r')
             menu=interface.readlines()
             try:
@@ -219,6 +199,7 @@ class index:
                 selected=0
             try:
                 name=menu[3].split(':')[1]
+                name=name.rstrip('\n')
             except:
                 name=''
             try:
@@ -234,9 +215,10 @@ class index:
             except:
                 take=1
                 session.reload = 0
-
-        thumb="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
-        if os.path.exists(thumb) == False:
+        thumb="/static/Videos/"+name+"/scene"+str(scene).zfill(3)+"/shot"+str(shot).zfill(3)+"/take"+str(take).zfill(3)+".jpeg"
+        print(thumb)
+        if os.path.isfile(basedir+thumb) == False:
+            print(basedir+thumb)
             thumb=''
         return render.index(renderedfilms, unrenderedfilms, session.cameras, menu, selected,name,scene,shot,take,str,session.randhash,thumb)
 
