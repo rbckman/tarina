@@ -94,7 +94,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -3515,7 +3515,7 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected, camera, loadfilmsettings
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected, camera, loadfilmsettings, selected
     #Check controller
     pressed = ''
     nextstatus = ''
@@ -3527,6 +3527,11 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             print('tarinactrl ip:' + tarinactrl_ip)
         process = Process(target=listenforclients, args=("0.0.0.0", port, que))
         process.start()
+        if 'SELECTED' in nextstatus:
+            try:
+                selected=int(nextstatus.split(':')[1])
+            except:
+                print('wtf?')
         if nextstatus=="PICTURE":
             pressed="picture"
         elif nextstatus=="UP":

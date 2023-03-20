@@ -16,21 +16,31 @@ $for i in cameras:
 <a href="/?func=picture">PICTURE</a>
 <a href="/?func=search">SEARCH</a>
 <div id="menu" style="margin:0 auto; width:99%">
+$vumetermessage
+<br>
 $ y=0
 $for m in menu[3:]:
     $if selected == y:
-        <b><a>$m</a></b>
+        <b>$m[:-1]</b>
     $else:
-        $m
+        <a href="?selected=$y">$m[:-1]</a>
     $ y+=1
 <br>
-$vumetermessage
 </div>
 $if thumb != '':
     $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".jpeg"
 $else:
     $ picture="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/picture" + str(take).zfill(3) + ".jpeg"
-<a href='static/Videos/$name.mp4'<img width="99%" src="$picture?$randhash"/><br>
+
+$ take_link="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/shot" + str(shot).zfill(3) + "/take" + str(take).zfill(3) + ".mp4"
+$ scene_link="static/Videos/" + name + "/scene" + str(scene).zfill(3) + "/scene.mp4"
+$ film_link="static/Videos/" + name + "/scene/" +name+ ".mp4"
+$if selected == 0:
+    <a href='$film_link'><img width="99%" src="$picture?$randhash"/></a><br>
+$if selected == 1:
+    <a href='$scene_link'><img width="99%" src="$picture?$randhash"/></a><br>
+$else:
+    <a href='$take_link'><img width="99%" src="$picture?$randhash"/></a><br>
 <br>
 <h1>FILMS</h1>
 

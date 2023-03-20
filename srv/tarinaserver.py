@@ -155,7 +155,9 @@ class index:
                 renderedfilms.append(f[0])
             else:
                 unrenderedfilms.append(f[0])
-        i=web.input(func=None)
+        i=web.input(func=None,selected=None)
+        if i.selected != None:
+            sendtocamera(ip,port,'SELECTED:'+i.selected)
         if i.func == 'search':
             session.cameras=[]
             # ping ip every 10 sec while not recording to connect cameras
@@ -188,6 +190,7 @@ class index:
         if i.func != None:
             session.reload = 1
             raise web.seeother('/')
+        time.sleep(1)
         interface=open('/dev/shm/interface','r')
         vumeter=open('/dev/shm/vumeter','r')
         menu=interface.readlines()
@@ -214,7 +217,6 @@ class index:
         except:
             take=1
             session.reload = 0
-        time.sleep(1)
         thumb="/static/Videos/"+name+"/scene"+str(scene).zfill(3)+"/shot"+str(shot).zfill(3)+"/take"+str(take).zfill(3)+".jpeg"
         print(thumb)
         if os.path.isfile(basedir+thumb) == False:
