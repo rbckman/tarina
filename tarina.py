@@ -714,13 +714,7 @@ def main():
                         logger.warning('something wrong with camera jpeg capture')
                 #delayerr = audiotrim(foldername,filename)
                 onlysound = False
-                if pressed == "record":
-                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                    shot=shots+1
-                    take=1
-                elif pressed == "retake":
-                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                    take=takes+1
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 if beeps > 0:
                     buzz(300)
                 if round(fps) != 25:
