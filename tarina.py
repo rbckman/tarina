@@ -854,6 +854,8 @@ def main():
                     camera.awb_gains = (round(camera.awb_gains[0],2), round(camera.awb_gains[1],2) + 0.02)
             elif menu[selected] == 'SRV:':
                 if serverstate == 'on':
+                    os.makedirs(tarinafolder+'/srv/sessions')
+                    os.system('chown www-data '+tarinafolder+'/srv/sessions')
                     serverstate = 'false'
                     serverstate = tarinaserver(False)
                 elif serverstate == 'off':
@@ -990,6 +992,8 @@ def main():
                     camera.awb_gains = (round(camera.awb_gains[0],2), round(camera.awb_gains[1],2) - 0.02)
             elif menu[selected] == 'SRV:':
                 if serverstate == 'on':
+                    os.makedirs(tarinafolder+'/srv/sessions')
+                    os.system('chown www-data '+tarinafolder+'/srv/sessions')
                     serverstate = tarinaserver(False)
                 elif serverstate == 'off':
                     serverstate = tarinaserver(True)
