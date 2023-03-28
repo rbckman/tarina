@@ -2190,7 +2190,7 @@ def stretchaudio(filename,fps):
 #-------------Compile Shot--------------
 
 def compileshot(filename,filmfolder,filmname):
-    global fps
+    global fps, soundrate, channels
     videolenght=0
     audiolenght=0
     #Check if file already converted
@@ -2205,12 +2205,16 @@ def compileshot(filename,filmfolder,filmname):
         video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -s '+video_origins+'.mp4 '+filename+'.mp4')
+        #add audio/video start delay sync
+        run_command('sox -V0 '+filename+'.wav /dev/shm/temp.wav trim 0.08')
+        run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
         origin=os.path.realpath(filename+'.mp4')
         db.update('videos', where='filename="'+origin+'"', videolenght=videolenght/1000, audiolenght=audiolenght/1000, audiosync=audiosync)
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
+        os.system('rm /dev/shm/temp.wav')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
         #run_command('aplay ' + foldername + filename + '.wav')
@@ -2902,7 +2906,7 @@ def playdub(filmname, filename, player_menu):
     if video == True:
         try:
             #player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
-            player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            player = OMXPlayer(filename + '.mp4', args=['--adev', 'alsa:hw:'+str(plughw), '--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
         except:
             writemessage('Something wrong with omxplayer')
             time.sleep(2)
@@ -2910,35 +2914,35 @@ def playdub(filmname, filename, player_menu):
         writemessage('Starting omxplayer')
         clipduration = player.duration()
     #sound
-    try:
-        playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
-        time.sleep(0.5)
-    except:
-        writemessage('something wrong with audio player')
-        time.sleep(2)
-        return
-    #omxplayer hack to play really short videos.
+    if player_menu != 'film':
+        try:
+            playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
+            time.sleep(0.1)
+        except:
+            writemessage('something wrong with audio player')
+            time.sleep(2)
+            return
+        #omxplayer hack to play really short videos.
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
         player.previous()
-    try:
         if dub == True:
             p = 0
             while p < 3:
                 writemessage('Dubbing in ' + str(3 - p) + 's')
                 time.sleep(1)
                 p+=1
-        if video == True:
-            player.play()
+    if video == True:
+        player.play()
         #run_command('aplay -D plughw:0 ' + filename + '.wav &')
         #run_command('mplayer ' + filename + '.wav &')
+    if player_menu == 'dub':
+        run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
+    try:
         playerAudio.play()
-        if player_menu == 'dub':
-            run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
     except:
-        logger.info('something wrong with omxplayer')
+        logger.info('something wrong with omxplayer audio or playing film mp4 audio')
         #logger.warning(e)
-        return
     starttime = time.time()
     selected = 1
     while True:
@@ -3004,7 +3008,7 @@ def playdub(filmname, filename, player_menu):
                     player.set_position(t+2)
                     playerAudio.set_position(player.position())
                 except:
-                    return remove_shots
+                    print('couldnt set position of player')
         elif pressed == 'down':
             if menu[selected] == 'PHONES:':
                 if headphoneslevel > 0:
@@ -3020,7 +3024,7 @@ def playdub(filmname, filename, player_menu):
                         player.set_position(t-2)
                         playerAudio.set_position(player.position())
                     except:
-                        return remove_shots
+                        print('couldnt set position of player')
         elif pressed == 'middle':
             time.sleep(0.2)
             if menu[selected] == 'BACK' or player.playback_status() == "Stopped":
@@ -3161,7 +3165,7 @@ def getaudiocards():
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
 def audiotrim(filename, where):
-    global channels, fps, db
+    global channels, fps
     audiosync=0
     print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
     writemessage('Audio syncing..')
@@ -3215,7 +3219,7 @@ def audiotrim(filename, where):
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -r '+soundrate+' -c '+str(channels)+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 pad 0 ' + str(int(audiosync)/1000))
         run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         #add silence to end
         #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
@@ -3226,7 +3230,6 @@ def audiotrim(filename, where):
         delayerr = 'V' + str(audiosync)
         print(delayerr)
     #os.remove('/dev/shm/' + filename + '.wav')
-
     return float(audiosync)/1000, int(videolenght), int(audiolenght)
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
