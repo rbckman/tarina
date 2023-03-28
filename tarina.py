@@ -446,7 +446,7 @@ def main():
                 if filmname != newfilmname:
                     os.system('mv ' + filmfolder + filmname + ' ' + filmfolder + newfilmname)
                     filmname = newfilmname
-                    db = get_film_files(filmname,filmfolder)
+                    db = get_film_files(filmname,filmfolder,db)
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
@@ -670,7 +670,7 @@ def main():
                 videos_totalt = db.query("SELECT COUNT(*) AS videos FROM videos")[0]
                 tot = int(videos_totalt.videos)
                 video_origins=datetime.datetime.now().strftime('%Y%d%m')+str(tot).zfill(5)
-                db.insert('videos', tid=datetime.datetime.now(), filename=video_origins+'.h264', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
+                db.insert('videos', tid=datetime.datetime.now(), filename=filmfolder+'.videos/'+video_origins+'.mp4', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
                 if pressed == "record":
                     #shot = shots+1
                     take = takes+1
@@ -683,10 +683,11 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
+                    sound_start = time.time()
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
+                    starttime = time.time()
                     if onlysound != True:
                         camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
-                    starttime = time.time()
                     recording = True
                     showmenu = 0
                 elif beepcountdown > 0 and beeping == True:
@@ -704,6 +705,8 @@ def main():
                 if onlysound != True:
                     camera.stop_recording()
                 os.system('pkill arecord')
+                soundlag=starttime-sound_start
+                db.update('videos', where='filename="'+filmfolder+'.videos/'+video_origins+'.mp4"', soundlag=soundlag)
                 #time.sleep(0.005) #get audio at least 0.1 longer
                 #camera.capture(foldername + filename + '.jpeg', resize=(800,341))
                 if onlysound != True:
@@ -1063,12 +1066,7 @@ def main():
             rectime = time.strftime("%H:%M:%S", time.gmtime(t))
         #Load settings
         if loadfilmsettings == True:
-            db = get_film_files(filmname,filmfolder)
-            try:
-                film_videos = db.select('videos')
-                print(film_videos)
-            except:
-                print('no db found')
+            db = get_film_files(filmname,filmfolder,db)
             try:
                 filmsettings = loadsettings(filmfolder, filmname)
                 camera.brightness = filmsettings[2]
@@ -1229,17 +1227,17 @@ class logger():
 
 #-------------get film db files---
 
-def get_film_files(filmname,filmfolder):
+def get_film_files(filmname,filmfolder,db):
     if not os.path.isdir(filmfolder+'.videos/'):
         os.makedirs(filmfolder+'.videos/')
     filmdb = filmfolder+'.videos/tarina.db'
     db = web.database(dbn='sqlite', db=filmdb)
     try:
-        db.select('videos')
+        videodb=db.select('videos')
         return db
     except:
-        db.query("CREATE TABLE videos (id integer PRIMARY KEY, tid DATETIME, filename TEXT, foldername TEXT, filmname TEXT, scene INT, shot INT, take INT, audiolenght FLOAT, videolenght FLOAT);")
-    db.select('videos')
+        db.query("CREATE TABLE videos (id integer PRIMARY KEY, tid DATETIME, filename TEXT, foldername TEXT, filmname TEXT, scene INT, shot INT, take INT, audiolenght FLOAT, videolenght FLOAT,soundlag FLOAT, audiosync FLOAT);")
+    videodb=db.select('videos')
     return db
 
 #--------------Save settings-----------------
@@ -2020,6 +2018,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
 #------------Remove and Organize----------------
 
 def organize(filmfolder, filmname):
+    global fps, db
     origin_files=[]
     scenes = next(os.walk(filmfolder + filmname))[1]
     for i in scenes:
@@ -2192,17 +2191,24 @@ def stretchaudio(filename,fps):
 
 def compileshot(filename,filmfolder,filmname):
     global fps
+    videolenght=0
+    audiolenght=0
     #Check if file already converted
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
         writemessage('Converting to playable video')
         #remove old mp4
+        video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         os.system('rm ' + filename + '.mp4')
+        os.system('rm ' + video_origins + '.mp4')
+        print(filename+'.mp4 removed!')
         video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -s '+video_origins+'.mp4 '+filename+'.mp4')
         stretchaudio(filename,fps)
-        audiotrim(filename, 'end')
+        audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
+        origin=os.path.realpath(filename+'.mp4')
+        db.update('videos', where='filename="'+origin+'"', videolenght=videolenght/1000, audiolenght=audiolenght/1000, audiosync=audiosync)
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
@@ -3155,11 +3161,13 @@ def getaudiocards():
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
 def audiotrim(filename, where):
-    global channels, fps
+    global channels, fps, db
+    audiosync=0
     print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
     writemessage('Audio syncing..')
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
+    print('videolenght:'+str(videolenght))
     try:
         pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode().strip()
@@ -3207,17 +3215,19 @@ def audiotrim(filename, where):
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         #add silence to end
         #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
-        run_command('cp '+filename+'.wav '+filename+'_temp.wav')
-        run_command('sox -V0 -G ' + filename + '_temp.wav /dev/shm/silence.wav ' + filename + '.wav')
-        os.remove(filename + '_temp.wav')
-        os.remove('/dev/shm/silence.wav')
+        #run_command('cp '+filename+'.wav '+filename+'_temp.wav')
+        #run_command('sox -V0 -G ' + filename + '_temp.wav /dev/shm/silence.wav ' + filename + '.wav')
+        #os.remove(filename + '_temp.wav')
+        #os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
         print(delayerr)
     #os.remove('/dev/shm/' + filename + '.wav')
-    return
+
+    return float(audiosync)/1000, int(videolenght), int(audiolenght)
     #os.system('mv audiosynced.wav ' + filename + '.wav')
     #os.system('rm silence.wav')
 
