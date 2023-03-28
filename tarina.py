@@ -2909,7 +2909,7 @@ def playdub(filmname, filename, player_menu):
             player = OMXPlayer(filename + '.mp4', args=['--adev', 'alsa:hw:'+str(plughw), '--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
         except:
             writemessage('Something wrong with omxplayer')
-            time.sleep(2)
+            time.sleep(0.5)
             return
         writemessage('Starting omxplayer')
         clipduration = player.duration()
@@ -2917,7 +2917,7 @@ def playdub(filmname, filename, player_menu):
     if player_menu != 'film':
         try:
             playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
-            time.sleep(0.1)
+            time.sleep(0.2)
         except:
             writemessage('something wrong with audio player')
             time.sleep(2)
@@ -2938,6 +2938,7 @@ def playdub(filmname, filename, player_menu):
         #run_command('mplayer ' + filename + '.wav &')
     if player_menu == 'dub':
         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
+    time.sleep(0.5)
     try:
         playerAudio.play()
     except:
