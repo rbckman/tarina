@@ -1847,7 +1847,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                 selected = selected - 1
         elif pressed == 'middle':
             if menu[selected] == 'START':
-                if os.path.isdir(foldername+timelapse) == False:
+                if os.path.isdir(foldername+'timelapse') == False:
                     os.makedirs(foldername + 'timelapse')
                 time.sleep(0.02)
                 writemessage('Recording timelapse, middlebutton to stop')
