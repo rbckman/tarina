@@ -683,11 +683,11 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
-                    sound_start = time.time()
                     os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
-                    starttime = time.time()
+                    sound_start = time.time()
                     if onlysound != True:
                         camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
+                        starttime = time.time()
                     recording = True
                     showmenu = 0
                 elif beepcountdown > 0 and beeping == True:
@@ -2206,7 +2206,7 @@ def compileshot(filename,filmfolder,filmname):
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -s '+video_origins+'.mp4 '+filename+'.mp4')
         #add audio/video start delay sync
-        run_command('sox -V0 '+filename+'.wav /dev/shm/temp.wav trim 0.08')
+        run_command('sox -V0 '+filename+'.wav /dev/shm/temp.wav trim 0.013')
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
