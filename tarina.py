@@ -228,6 +228,8 @@ def main():
     serverstate_old='off'
     wifistate_old='off'
 
+    camera_model, camera_revision = getconfig(camera)
+
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1465,7 +1467,7 @@ def run_command(command_line):
     #command_line_args = shlex.split(command_line)
     logger.info('Running: "' + command_line + '"')
     try:
-        process = subprocess.Popen(command_line, shell=True).wait()
+        p = subprocess.Popen(command_line, shell=True).wait()
         # process_output is now a string, not a file,
         # you may want to do:
     except (OSError, CalledProcessError) as exception:
@@ -3537,64 +3539,67 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     #Check controller
     pressed = ''
     nextstatus = ''
-    if process.is_alive() == False and serverstate == 'on':
-        nextstatus = que.get()
-        if "*" in nextstatus:
-            tarinactrl_ip = nextstatus.split('*')[1]
-            nextstatus = nextstatus.split('*')[0]
-            print('tarinactrl ip:' + tarinactrl_ip)
-        process = Process(target=listenforclients, args=("0.0.0.0", port, que))
-        process.start()
-        if 'SELECTED' in nextstatus:
-            try:
-                selected=int(nextstatus.split(':')[1])
-            except:
-                print('wtf?')
-        if nextstatus=="PICTURE":
-            pressed="picture"
-        elif nextstatus=="UP":
-            pressed="up"
-        elif nextstatus=="DOWN":
-            pressed="down"
-        elif nextstatus=="LEFT":
-            pressed="left"
-        elif nextstatus=="RIGHT":
-            pressed="right"
-        elif nextstatus=="VIEW":
-            pressed="view"
-        elif nextstatus=="MIDDLE":
-            pressed="middle"
-        elif nextstatus=="DELETE":
-            pressed="remove"
-        elif nextstatus=="REC":
-            pressed="record"
-        elif nextstatus=="STOP":
-            if recording == True:
+    try:
+        if process.is_alive() == False and serverstate == 'on':
+            nextstatus = que.get()
+            if "*" in nextstatus:
+                tarinactrl_ip = nextstatus.split('*')[1]
+                nextstatus = nextstatus.split('*')[0]
+                print('tarinactrl ip:' + tarinactrl_ip)
+            process = Process(target=listenforclients, args=("0.0.0.0", port, que))
+            process.start()
+            if 'SELECTED' in nextstatus:
+                try:
+                    selected=int(nextstatus.split(':')[1])
+                except:
+                    print('wtf?')
+            if nextstatus=="PICTURE":
+                pressed="picture"
+            elif nextstatus=="UP":
+                pressed="up"
+            elif nextstatus=="DOWN":
+                pressed="down"
+            elif nextstatus=="LEFT":
+                pressed="left"
+            elif nextstatus=="RIGHT":
+                pressed="right"
+            elif nextstatus=="VIEW":
+                pressed="view"
+            elif nextstatus=="MIDDLE":
+                pressed="middle"
+            elif nextstatus=="DELETE":
+                pressed="remove"
+            elif nextstatus=="REC":
                 pressed="record"
-        elif nextstatus=="RECSOUND":
-            if recording==False:
-                pressed="record"
-                onlysound=True
-        elif nextstatus=="PLACEHOLDER":
-            selected=2
-            pressed="insert_shot"
-        elif "SYNCIP:" in nextstatus:
-            ip = nextstatus.split(':')[1]
-            stopinterface(camera)
-            run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-            sendtoserver(tarinactrl_ip,port,'SYNCDONE')
-            #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-            startinterface()
-            camera = startcamera(lens,fps)
-            loadfilmsettings = True
-        elif nextstatus=="NEWSCENE":
-            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-            scene=scenes+1
-            shot=1
-            take=1
-        elif nextstatus=="RETAKE":
-            pressed="retake"
-        #print(nextstatus)
+            elif nextstatus=="STOP":
+                if recording == True:
+                    pressed="record"
+            elif nextstatus=="RECSOUND":
+                if recording==False:
+                    pressed="record"
+                    onlysound=True
+            elif nextstatus=="PLACEHOLDER":
+                selected=2
+                pressed="insert_shot"
+            elif "SYNCIP:" in nextstatus:
+                ip = nextstatus.split(':')[1]
+                stopinterface(camera)
+                run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
+                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                startinterface()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
+            elif nextstatus=="NEWSCENE":
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                scene=scenes+1
+                shot=1
+                take=1
+            elif nextstatus=="RETAKE":
+                pressed="retake"
+            #print(nextstatus)
+    except:
+        print('process not found')
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
