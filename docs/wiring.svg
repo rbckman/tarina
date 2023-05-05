@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -15,7 +13,7 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
    sodipodi:docname="wiring.svg"
    inkscape:export-filename="/home/rbckman/tarina/docs/wiring.png"
    inkscape:export-xdpi="300"
@@ -29,19 +27,20 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.80613815"
-     inkscape:cx="356.82342"
-     inkscape:cy="537.86875"
+     inkscape:zoom="2.280103"
+     inkscape:cx="249.68793"
+     inkscape:cy="926.03436"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      showborder="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1143"
+     inkscape:window-height="1016"
      inkscape:window-x="0"
-     inkscape:window-y="31"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     showguides="true" />
+     showguides="true"
+     inkscape:document-rotation="0" />
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -107,7 +106,7 @@
        sodipodi:nodetypes="cccc" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:13.15678215px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.07309321px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:13.1568px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0730932px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-143.02679"
        y="202.92966"
        id="text4702"
@@ -116,7 +115,7 @@
          id="tspan4700"
          x="-143.02679"
          y="202.92966"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67796612px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.07309321px">SCREEN</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67797px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0730932px">SCREEN</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 207.2024,164.22529 -19.91466,0 v -57.90776 l 19.20501,0"
@@ -125,7 +124,7 @@
        sodipodi:nodetypes="cccc" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:13.15678215px;line-height:2.63273716px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.07309321px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:13.1568px;line-height:2.63274px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0730932px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="188.13419"
        y="123.54318"
        id="text4702-2"><tspan
@@ -133,21 +132,21 @@
          id="tspan4700-7"
          x="188.13419"
          y="123.54318"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67796612px;line-height:2.63273716px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.07309321px">GND</tspan><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67797px;line-height:2.63274px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0730932px">GND</tspan><tspan
          sodipodi:role="line"
          x="188.13419"
          y="128.29312"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67796612px;line-height:2.63273716px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67797px;line-height:2.63274px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0730932px"
          id="tspan4726">3v3</tspan><tspan
          sodipodi:role="line"
          x="188.13419"
          y="133.04306"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67796612px;line-height:2.63273716px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67797px;line-height:2.63274px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0730932px"
          id="tspan4728">SCL</tspan><tspan
          sodipodi:role="line"
          x="188.13419"
          y="137.79301"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67796612px;line-height:2.63273716px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67797px;line-height:2.63274px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0730932px"
          id="tspan4730">SDA</tspan></text>
     <circle
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
@@ -175,7 +174,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.69244766px;line-height:1.93950737px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05384693px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.69245px;line-height:1.93951px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0538469px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-29.304314"
        y="104.99036"
        id="text4702-2-3"
@@ -183,7 +182,7 @@
          sodipodi:role="line"
          x="-29.304314"
          y="104.99036"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620371px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan4730-4">REC</tspan></text>
     <path
        style="fill:#4d4d4d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -229,7 +228,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.63118362px;line-height:1.92724764px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05350659px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.63118px;line-height:1.92725px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0535066px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-45.152287"
        y="104.70853"
        id="text4702-2-3-4"
@@ -237,7 +236,7 @@
          sodipodi:role="line"
          x="-45.152287"
          y="104.70853"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4244206px;line-height:1.92724764px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05350659px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.42442px;line-height:1.92725px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0535066px"
          id="tspan4730-4-8">UP</tspan></text>
     <path
        style="fill:#4d4d4d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -285,11 +284,11 @@
        id="text4876"
        y="104.60672"
        x="-63.868309"
-       style="font-style:normal;font-weight:normal;font-size:8.28558826px;line-height:1.65798771px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04603105px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:8.28559px;line-height:1.65799px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0460311px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        transform="rotate(-90)"><tspan
          id="tspan4874"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.94598699px;line-height:1.65798771px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04603105px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.94599px;line-height:1.65799px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0460311px"
          y="104.60672"
          x="-63.868309"
          sodipodi:role="line">VIEW</tspan></text>
@@ -343,7 +342,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.34999752px;line-height:1.87098074px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05194442px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.35px;line-height:1.87098px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0519444px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-63.922272"
        y="120.56949"
        id="text4898"
@@ -351,7 +350,7 @@
          sodipodi:role="line"
          x="-63.922272"
          y="120.56949"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.3244431px;line-height:1.87098074px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05194442px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.32444px;line-height:1.87098px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0519444px"
          id="tspan4896">LEFT</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -405,13 +404,8 @@
        id="text4920"
        y="-88.944405"
        x="9.8050089"
-       style="font-style:normal;font-weight:normal;font-size:47.625px;line-height:9.52999973px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       xml:space="preserve"><tspan
-         id="tspan4918"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16.93333244px;line-height:9.52999973px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.26458332px"
-         y="-71.808067"
-         x="9.8050089"
-         sodipodi:role="line" /></text>
+       style="font-style:normal;font-weight:normal;font-size:47.625px;line-height:9.53px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve" />
     <path
        sodipodi:nodetypes="ccc"
        inkscape:connector-curvature="0"
@@ -462,7 +456,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-30.016899"
        y="120.44619"
        id="text4942"
@@ -470,7 +464,7 @@
          sodipodi:role="line"
          x="-30.016899"
          y="120.44619"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          id="tspan4940">RIGHT</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -518,11 +512,11 @@
        id="text4964"
        y="135.97502"
        x="-31.417301"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        transform="rotate(-90)"><tspan
          id="tspan4962"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          y="135.97502"
          x="-31.417301"
          sodipodi:role="line">RETAKE</tspan></text>
@@ -570,7 +564,7 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-47.082092"
        y="135.80034"
        id="text4986"
@@ -578,7 +572,7 @@
          sodipodi:role="line"
          x="-47.082092"
          y="135.80034"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          id="tspan4984">DOWN</tspan></text>
     <path
        style="fill:#4d4d4d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -626,11 +620,11 @@
        id="text5008"
        y="135.66016"
        x="-62.827492"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        transform="rotate(-90)"><tspan
          id="tspan5006"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          y="135.66016"
          x="-62.827492"
          sodipodi:role="line">DEL</tspan></text>
@@ -654,7 +648,7 @@
        style="fill:#fbac00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.27625787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:7.92964983px;line-height:1.58676231px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04405363px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.92965px;line-height:1.58676px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0440536px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-47.358608"
        y="120.38124"
        id="text4702-2-3-3"
@@ -662,7 +656,7 @@
          sodipodi:role="line"
          x="-47.358608"
          y="120.38124"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.81943083px;line-height:1.58676231px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04405363px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.81943px;line-height:1.58676px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0440536px"
          id="tspan4730-4-87">ENTER</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#ff00ff;stroke-width:0.82877356;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -738,7 +732,7 @@
        r="1.891539" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.63118362px;line-height:1.92724764px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05350659px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.63118px;line-height:1.92725px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0535066px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-121.15865"
        y="30.398636"
        id="text4702-2-3-4-9"
@@ -746,7 +740,7 @@
          sodipodi:role="line"
          x="-121.15865"
          y="30.398636"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4244206px;line-height:1.92724764px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05350659px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.42442px;line-height:1.92725px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0535066px"
          id="tspan4730-4-8-2">PIEZZO</tspan></text>
     <image
        y="8.5656462"
@@ -786,7 +780,7 @@
        y="219.99669" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:3.70403504px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02057797px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:3.70404px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.020578px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-245.60664"
        y="103.73751"
        id="text4633"
@@ -795,11 +789,11 @@
          id="tspan4631"
          x="-245.60664"
          y="103.73751"
-         style="stroke-width:0.02057797px">power</tspan><tspan
+         style="stroke-width:0.020578px">power</tspan><tspan
          sodipodi:role="line"
          x="-245.60664"
          y="108.36755"
-         style="stroke-width:0.02057797px"
+         style="stroke-width:0.020578px"
          id="tspan4635">button</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.82877356;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -822,14 +816,14 @@
        y="223.52585" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:4.79972792px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02666515px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:4.79973px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0266651px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="123.56652"
        y="229.38275"
        id="text4649"><tspan
          sodipodi:role="line"
          x="123.56652"
          y="229.38275"
-         style="stroke-width:0.02666515px"
+         style="stroke-width:0.0266651px"
          id="tspan4655">gnd  +</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#002e00;stroke-width:0.82877356;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -851,7 +845,7 @@
        sodipodi:nodetypes="ccccc" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:4.32605982px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.02403366px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:4.32606px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:0.0240337px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="70.170502"
        y="162.40079"
        id="text4665"><tspan
@@ -859,10 +853,10 @@
          id="tspan4663"
          x="70.170502"
          y="162.40079"
-         style="fill:#ff0000;fill-opacity:1;stroke-width:0.02403366px">PP1</tspan></text>
+         style="fill:#ff0000;fill-opacity:1;stroke-width:0.0240337px">PP1</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:4.56867647px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#090000;fill-opacity:1;stroke:none;stroke-width:0.02538154px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:4.56868px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#090000;fill-opacity:1;stroke:none;stroke-width:0.0253815px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-197.62897"
        y="84.658401"
        id="text4669"
@@ -870,11 +864,11 @@
          sodipodi:role="line"
          x="-197.62897"
          y="84.658401"
-         style="fill:#090000;fill-opacity:1;stroke-width:0.02538154px"
+         style="fill:#090000;fill-opacity:1;stroke-width:0.0253815px"
          id="tspan4671">PP3</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:16.25736809px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.09031868px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:16.2574px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0903187px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-276.61667"
        y="170.04671"
        id="text4677"
@@ -882,11 +876,11 @@
          sodipodi:role="line"
          x="-276.61667"
          y="170.04671"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Latin Modern Mono Caps';-inkscape-font-specification:'Latin Modern Mono Caps';stroke-width:0.09031868px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Latin Modern Mono Caps';-inkscape-font-specification:'Latin Modern Mono Caps';stroke-width:0.0903187px"
          id="tspan4679">TARINA WIRING</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:3.70403504px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02057797px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:3.70404px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.020578px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-246.12863"
        y="130.80939"
        id="text4633-9"
@@ -894,7 +888,7 @@
          sodipodi:role="line"
          x="-246.12863"
          y="130.80939"
-         style="stroke-width:0.02057797px"
+         style="stroke-width:0.020578px"
          id="tspan4635-9">battery</tspan></text>
     <image
        y="-279.90359"
@@ -906,25 +900,29 @@
        width="60.842419"
        transform="scale(-1)" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#c40000;stroke-width:0.97872257;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 48.921114,257.5022 v 19.27364 H 83.13183 v -14.93707 h 17.18567"
+       style="fill:none;fill-rule:evenodd;stroke:#c40000;stroke-width:0.978723;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 17.709959,254.13432 v 22.64152 l 65.421871,0 v -14.93707 h 17.18567"
        id="path5069"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:0.97872257;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 45.789147,257.26129 v 22.64652 H 85.1395 v -14.85677 h 14.696161"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:0.978723;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 20.908522,254.2855 v 25.62231 l 64.230978,0 v -14.85677 h 14.696161"
        id="path5071"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#00bb00;stroke-width:0.97872257;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 43.219327,257.34159 v 25.53759 H 87.4684 v -15.178 h 12.367261"
+       style="fill:none;fill-rule:evenodd;stroke:#00bb00;stroke-width:0.978723;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 23.278565,254.23797 v 28.64121 l 64.189835,0 v -15.178 h 12.367261"
        id="path5073"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
-       style="fill:none;fill-rule:evenodd;stroke:#bb00ff;stroke-width:0.97872257;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 39.926746,257.26129 v 28.50893 H 89.95792 v -15.57955 h 10.038351"
+       style="fill:none;fill-rule:evenodd;stroke:#bb00ff;stroke-width:0.978723;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 26.601628,254.08832 0,31.72496 63.356292,-0.0431 v -15.57955 h 10.038351"
        id="path5075"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <image
        y="-52.708424"
        x="8.6060266"
@@ -941,91 +939,85 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.69244766px;line-height:1.93950737px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05384693px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.69245px;line-height:1.93951px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0538469px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="46.688305"
        y="66.52356"
        id="text4702-2-3-0"><tspan
          sodipodi:role="line"
          x="46.688305"
          y="66.52356"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan4730-4-7">BAT(-) -&gt; BUTTON</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.69244766px;line-height:1.93950737px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05384693px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.69245px;line-height:1.93951px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0538469px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="46.162003"
        y="71.950424"
        id="text4702-2-3-0-2"><tspan
          sodipodi:role="line"
          x="46.162003"
          y="71.950424"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5241">MINIPLUG LEFT</tspan><tspan
          sodipodi:role="line"
          x="46.162003"
          y="75.449654"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5249" /><tspan
          sodipodi:role="line"
          x="46.162003"
          y="77.38916"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5251" /><tspan
          sodipodi:role="line"
          x="46.162003"
          y="79.328667"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5253"> MINIPLUG GND</tspan><tspan
          sodipodi:role="line"
          x="46.162003"
          y="82.827896"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5255" /><tspan
          sodipodi:role="line"
          x="46.162003"
          y="84.767403"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5257" /><tspan
          sodipodi:role="line"
          x="46.162003"
          y="86.706909"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5259" /><tspan
          sodipodi:role="line"
          x="46.162003"
          y="88.646416"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5167">MINIPLUG RIGHT</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.69244766px;line-height:1.93950737px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05384693px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.69245px;line-height:1.93951px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0538469px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="45.737896"
        y="26.86887"
        id="text4702-2-3-0-1"><tspan
          sodipodi:role="line"
          x="45.737896"
          y="26.86887"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan4730-4-7-0">GND -&gt; BUTTON</tspan><tspan
          sodipodi:role="line"
          x="45.737896"
          y="30.368097"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5203">GND -&gt; MINIPLUG GND</tspan><tspan
          sodipodi:role="line"
          x="45.737896"
          y="33.867325"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5193">VCC -&gt; BAT(+)</tspan><tspan
          sodipodi:role="line"
          x="45.737896"
          y="37.36655"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5199">OUT -&gt; LEFT RIGHT</tspan><tspan
          sodipodi:role="line"
          x="45.737896"
          y="40.86578"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
          id="tspan5195" /></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1056,19 +1048,19 @@
        inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:9.69244766px;line-height:1.93950737px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.05384693px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:9.69245px;line-height:1.93951px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0538469px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="49.778915"
        y="47.957821"
        id="text4702-2-3-0-0"><tspan
          sodipodi:role="line"
          x="49.778915"
          y="47.957821"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan4730-4-7-08">BUTTON is under</tspan><tspan
          sodipodi:role="line"
          x="49.778915"
          y="51.457047"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.44620395px;line-height:1.93950737px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.05384693px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.4462px;line-height:1.93951px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0538469px"
          id="tspan5235">mic board</tspan></text>
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -1118,11 +1110,11 @@
        id="text4964-9"
        y="159.18045"
        x="-59.732586"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        transform="rotate(-90)"><tspan
          id="tspan4962-6"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          y="159.18045"
          x="-59.732586"
          sodipodi:role="line">FUNC</tspan></text>
@@ -1172,11 +1164,11 @@
        id="text4964-9-2"
        y="159.01634"
        x="-40.039932"
-       style="font-style:normal;font-weight:normal;font-size:7.64506149px;line-height:1.52981508px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.04247256px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-weight:normal;font-size:7.64506px;line-height:1.52982px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0424726px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        xml:space="preserve"
        transform="rotate(-90)"><tspan
          id="tspan4962-6-2"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824431px;line-height:1.52981508px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.04247256px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.71824px;line-height:1.52982px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0424726px"
          y="159.01634"
          x="-40.039932"
          sodipodi:role="line">HELP</tspan></text>
@@ -1219,7 +1211,7 @@
        y="168.30754" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783356px;line-height:125%;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.07309321px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783px;line-height:125%;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0730932px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="-186.44258"
        y="130.1996"
        id="text4702-7"
@@ -1227,21 +1219,21 @@
          sodipodi:role="line"
          x="-186.44258"
          y="130.1996"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783356px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.0730932px"
          id="tspan2825">POWER</tspan><tspan
          sodipodi:role="line"
          x="-186.44258"
          y="136.04689"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783356px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.0730932px"
          id="tspan2829">CHARGER</tspan><tspan
          sodipodi:role="line"
          x="-186.44258"
          y="141.89418"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783356px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.07309321px"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.67783px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:0.0730932px"
          id="tspan2831">BOOSTER</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.17499995px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02666515px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0266651px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="133.66492"
        y="199.57402"
        id="text4649-4"><tspan
@@ -1255,7 +1247,7 @@
          y="203.54277">-        +</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944451px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.02666515px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:2.46944px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0266651px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="135.14595"
        y="171.8268"
        id="text4649-4-8"><tspan
