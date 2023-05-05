@@ -11,7 +11,7 @@ Retake your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) on the
 
 Software
 --------
-A video camera that have all tools to make a film from start to finnish, just with and within the camera. That means alot of features. Key features is to glue the selected clips together, cutting, making timelapses, voiceover and or music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where not? Auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels and so on. Use the silent physical buttons or connect through usb-keyboard, https, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
+A video camera that have all tools to make a film within the camera. That means alot of features. Key features is to glue the selected clips together and/or cutting them. Making timelapses, voiceover and or music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where not? Auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels and so on. Use the silent physical buttons or connect through usb-keyboard, https, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
 
 Hardware
 --------
