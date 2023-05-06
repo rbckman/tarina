@@ -3054,24 +3054,20 @@ def playdub(filmname, filename, player_menu):
                     if dub == True:
                         os.system('pkill arecord')
                     if video == True:
-                        try:
-                            player.pause()
+                        player.pause()
+                        player.set_position(0)
+                        if player_menu != 'film':
                             playerAudio.pause()
-                            player.set_position(0)
                             playerAudio.set_position(0)
-                        except:
-                            return
                     if dub == True:
                         p = 0
                         while p < 3:
                             writemessage('Dubbing in ' + str(3 - p) + 's')
                             time.sleep(1)
                             p+=1
-                    try:
-                        player.play()
+                    player.play()
+                    if player_menu != 'film':
                         playerAudio.play()
-                    except:
-                        return
                     #run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
                         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
