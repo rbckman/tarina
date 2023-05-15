@@ -122,7 +122,7 @@ def main():
     profilelevel='4.2'
     headphoneslevel = 40
     miclevel = 50
-    soundformat = 'S32_LE'
+    soundformat = 'S16_LE'
     soundrate = '48000'
     recording = False
     retake = False
@@ -282,7 +282,7 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                renderedfilename, between, duration = timelapse(beeps,camera,foldername,filename,between,duration)
+                renderedfilename, between, duration = timelapse(beeps,camera,filmname,foldername,filename,between,duration)
                 if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
@@ -1810,17 +1810,17 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,foldername,filename,between,duration):
+def timelapse(beeps,camera,filmname,foldername,filename,between,duration):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     sound = False
     selected = 0
-    header = 'Adjust delay in seconds between images'
-    menu = 'DELAY:', 'DURATION:', 'START', 'BACK'
+    header = 'Adjust delay in seconds between videos'
+    menu = 'DELAY:', 'DURATION:', 'SOUND:', 'START', 'BACK'
     while True:
-        settings = str(round(between,2)), str(round(duration,2)), '', ''
+        settings = str(round(between,2)), str(round(duration,2)), str(sound), '', ''
         writemenu(menu,settings,selected,header,showmenu)
         seconds = (3600 / between) * duration
         vumetermessage('1 h timelapse filming equals ' + str(round(seconds,2)) + ' second clip   ')
@@ -1830,6 +1830,10 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
         elif pressed == 'down' and menu[selected] == 'DELAY:':
             if between > 1:
                 between = between - 1
+        if pressed == 'up' and menu[selected] == 'SOUND:':
+            sound = True
+        elif pressed == 'down' and menu[selected] == 'SOUND:':
+            sound = False
         elif pressed == 'up' and menu[selected] == 'DURATION:':
             duration = duration + 0.1
         elif pressed == 'down' and menu[selected] == 'DURATION:':
@@ -1867,7 +1871,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         #camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=quality, level=profilelevel)
                         if sound == True:
-                            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv '+foldername + filename + '_' + str(n).zfill(3) + '.wav &')
+                            os.system(tarinafolder+'/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv '+foldername+'timelapse/'+filename+'_'+str(n).zfill(3)+'.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
                         starttime = time.time()
                         recording = True
@@ -1903,7 +1907,9 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         for f in files:
                             if sound == True:
                                 compileshot(f,filmfolder,filmname)
-                                audiotrim(foldername + 'timelapse/', filename + '_' + str(n).zfill(3), 'end')
+                                audiotrim(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3), 'end')
+                                videomerge.append('-cat')
+                                videomerge.append(f + '.mp4')
                             else:
                                 videomerge.append('-cat')
                                 videomerge.append(f + '.h264')
