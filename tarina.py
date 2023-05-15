@@ -298,15 +298,14 @@ def main():
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
                     remove_shots = playdub(filmname,renderfilename, 'scene')
-                    try:
-                        if remove_shots != []:
-                            for i in remove_shots:
-                                remove(filmfolder, filmname, scene, i, take, 'shot')
-                            organize(filmfolder, filmname)
-                            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                            updatethumb = True
-                            time.sleep(0.5)
-                    except:
+                    if remove_shots != []:
+                        for i in remove_shots:
+                            remove(filmfolder, filmname, scene, i, take, 'shot')
+                        organize(filmfolder, filmname)
+                        updatethumb = True
+                        loadfilmsettings = True
+                        time.sleep(0.5)
+                    else:
                         print('nothing to remove')
                     camera.start_preview()
             #VIEW FILM
@@ -316,7 +315,7 @@ def main():
                 if len(filmfiles) > 0:
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
-                    playdub(filmname,renderfilename, 'film')
+                    remove_shots = playdub(filmname,renderfilename, 'film')
                     camera.start_preview()
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
@@ -615,26 +614,26 @@ def main():
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
-                loadfilmsettings = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #shot
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
-                loadfilmsettings = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #scene
             elif pressed == 'remove' and menu[selected] == 'SCENE:':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                shot = countshots(filmname, filmfolder, scene)
+                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                #shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
-                loadfilmsettings = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #film
             elif pressed == 'remove' and menu[selected] == 'FILM:':
@@ -1949,6 +1948,12 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     menu = '', ''
     settings = 'NO', 'YES'
     selected = 0
+    otf_scene = countscenes(filmfolder, 'onthefloor')
+    otf_scene += 1
+    otf_shot = countshots('onthefloor', filmfolder, otf_scene)
+    otf_shot += 1
+    otf_take = counttakes('onthefloor', filmfolder, otf_scene, otf_shot)
+    otf_take += 1
     while True:
         writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1981,9 +1986,9 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     return
                 else:
                     if sceneshotortake == 'take':
-                        writemessage('Throwing take on the floor' + str(shot))
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3) + '/take' + str(999).zfill(3) 
-                        onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
+                        writemessage('Throwing take on the floor' + str(take))
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3) + '/take' + str(otf_take).zfill(3) 
+                        onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3) + '/'
                         if os.path.isdir(onthefloor_folder) == False:
                             os.makedirs(onthefloor)
                         os.system('mv ' + foldername + filename + '.h264 ' + onthefloor + '.h264')
@@ -1995,13 +2000,13 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                             take = 1
                     elif sceneshotortake == 'shot' and shot > 0:
                         writemessage('Throwing shot on the floor' + str(shot))
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3)+'/'
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3)+'/'
                         os.makedirs(onthefloor)
                         os.system('cp -r '+foldername+'* '+onthefloor)
                         os.system('rm -r '+foldername)
                         take = counttakes(filmname, filmfolder, scene, shot)
                     elif sceneshotortake == 'scene':
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(999).zfill(3)
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3)
                         os.makedirs(onthefloor)
                         writemessage('Throwing clips on the floor ' + str(scene))
                         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
@@ -2986,11 +2991,11 @@ def playdub(filmname, filename, player_menu):
         if buttonpressed == True:
             flushbutton()
         if pressed == 'remove':
-            time.sleep(0.2)
             if fastedit_shot in remove_shots:
                 remove_shots.remove(fastedit_shot)
             else:
                 remove_shots.append(fastedit_shot)
+            time.sleep(0.2)
         elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
