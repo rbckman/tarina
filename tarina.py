@@ -159,7 +159,7 @@ def main():
     updatethumb = False
     loadfilmsettings = True
     oldsettings = ''
-    comp = 1
+    comp = 0
     yankedscene = ''
     cuttedscene = ''
     cuttedshot = ''
@@ -261,7 +261,6 @@ def main():
                 picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
                 print('taking picture')
                 camera.capture(picture,format="jpeg",use_video_port=True)
-            #INSERT SCENE
             #PEAKING
             elif pressed == 'peak' and recordable == True:
                 if shot > 1:
@@ -282,7 +281,7 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                renderedfilename, between, duration = timelapse(beeps,camera,filmname,foldername,filename,between,duration)
+                renderedfilename, between, duration = timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlight)
                 if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
@@ -291,8 +290,8 @@ def main():
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
                 filmfiles = shotfiles(filmfolder, filmname, scene)
-                writemessage('Loading scene...')
                 if len(filmfiles) > 0:
+                    writemessage('Loading scene...')
                     #Check if rendered video exist
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
@@ -308,20 +307,24 @@ def main():
                     else:
                         print('nothing to remove')
                     camera.start_preview()
+                else:
+                    vumetermessage("There's absolutely nothing in this scene! hit rec!")
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 filmfiles = viewfilm(filmfolder, filmname)
-                writemessage('Loading film...')
                 if len(filmfiles) > 0:
+                    writemessage('Loading film...')
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
                     remove_shots = playdub(filmname,renderfilename, 'film')
                     camera.start_preview()
+                else:
+                    vumetermessage('wow, shoot first! there is zero, nada, zip footage to watch now... just hit rec!')
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
                 takes = counttakes(filmname, filmfolder, scene, shot)
-                writemessage('Loading clip...')
                 if takes > 0:
+                    writemessage('Loading clip...')
                     removeimage(camera, overlay)
                     camera.stop_preview()
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
@@ -335,6 +338,8 @@ def main():
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
+                else:
+                    vumetermessage('nothing here! hit rec!')
             #DUB SHOT
             elif pressed == 'middle' and menu[selected] == 'SHOT, not so fast:':
                 newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
@@ -768,6 +773,8 @@ def main():
                 camera.awb_mode = 'auto'
         elif pressed == 'middle' and menu[selected] == 'BEEP:':
             beeps = 0
+        elif pressed == 'middle' and menu[selected] == 'LENGTH:':
+            reclenght = 0
         elif pressed == 'middle' and menu[selected] == 'LIVE:':
             if stream == '':
                 stream = startstream(camera, stream, plughw, channels)
@@ -784,6 +791,10 @@ def main():
             camera.contrast = 0
         elif pressed == 'middle' and menu[selected] == 'SAT:':
             camera.saturation = 0
+        elif pressed == 'middle' and menu[selected] == 'MIC:':
+            miclevel  = 70
+        elif pressed == 'middle' and menu[selected] == 'PHONES:':
+            headphoneslevel = 70
 
         #UP
         elif pressed == 'up':
@@ -1810,7 +1821,7 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,filmname,foldername,filename,between,duration):
+def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlight):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
@@ -1888,7 +1899,15 @@ def timelapse(beeps,camera,filmname,foldername,filename,between,duration):
                         recording = False
                         starttime = time.time()
                         t = 0
-                    if pressed == 'middle' and n > 1:
+                    if pressed == 'screen':
+                        if backlight == False:
+                            # requires wiringpi installed
+                            run_command('gpio -g pwm 19 1023')
+                            backlight = True
+                        elif backlight == True:
+                            run_command('gpio -g pwm 19 0')
+                            backlight = False
+                    elif pressed == 'middle' and n > 1:
                         if recording == True:
                             os.system('pkill arecord')
                             camera.stop_recording()
