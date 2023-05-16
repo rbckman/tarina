@@ -634,6 +634,7 @@ def main():
                 organize(filmfolder, filmname)
                 #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
+                rendermenu = True
                 #loadfilmsettings = True
                 time.sleep(0.5)
             #shot
@@ -642,6 +643,7 @@ def main():
                 organize(filmfolder, filmname)
                 #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 updatethumb = True
+                rendermenu = True
                 #loadfilmsettings = True
                 time.sleep(0.5)
             #scene
@@ -651,6 +653,7 @@ def main():
                 #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 #shot = countshots(filmname, filmfolder, scene)
                 updatethumb = True
+                rendermenu = True
                 #loadfilmsettings = True
                 time.sleep(0.5)
             #film
@@ -663,6 +666,7 @@ def main():
                     scene, shot, take = countlast(filmname, filmfolder)
                     loadfilmsettings = True
                     updatethumb = True
+                    rendermenu = True
                     time.sleep(0.5)
 
         #RECORD AND PAUSE
@@ -857,8 +861,8 @@ def main():
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene <= scenes:
-                    shot = 1
                     scene += 1
+                    shot = countshots(filmname, filmfolder, scene)
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, takes = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                 #shot = 1
@@ -998,7 +1002,7 @@ def main():
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene > 1:
                     scene -= 1
-                    shot = 1
+                    shot = countshots(filmname, filmfolder, scene)
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                 #takes = take
