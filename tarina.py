@@ -272,6 +272,14 @@ def main():
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     writemessage('peaking ' + str(peakshot))
                 overlay = removeimage(camera, overlay)
+            #SHOWHELP
+            elif pressed == 'showhelp':
+                vumetermessage('Button layout')
+                overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
+                while holdbutton == 'showhelp':
+                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    vumetermessage('Button layout')
+                overlay = removeimage(camera, overlay)
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -3680,6 +3688,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'screen'
         elif (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
+        elif (readbus2 == 245 and readbus == 251):
+            pressed = 'showhelp'
         elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 247):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
