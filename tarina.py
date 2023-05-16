@@ -3678,9 +3678,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'peak'
         elif (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
-        elif (readbus2 == 245 and readbus == 247):
+        elif (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
-        elif event == 'I' or event == 'P' or (readbus2 == 244 and readbus == 255):
+        elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 247):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
             pressed = 'copy'
