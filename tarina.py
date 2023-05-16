@@ -94,7 +94,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -310,7 +310,7 @@ def main():
                             remove(filmfolder, filmname, scene, i, take, 'shot')
                         organize(filmfolder, filmname)
                         updatethumb = True
-                        loadfilmsettings = True
+                        #loadfilmsettings = True
                         time.sleep(0.5)
                     else:
                         print('nothing to remove')
@@ -323,11 +323,15 @@ def main():
                 if len(filmfiles) > 0:
                     writemessage('Loading film...')
                     camera.stop_preview()
+                    removeimage(camera, overlay)
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
-                    remove_shots = playdub(filmname,renderfilename, 'film')
+                    if renderfilename != '':
+                        remove_shots = playdub(filmname,renderfilename, 'film')
+                    overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
                 else:
                     vumetermessage('wow, shoot first! there is zero, nada, zip footage to watch now... just hit rec!')
+                rendermenu = True
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
                 takes = counttakes(filmname, filmfolder, scene, shot)
@@ -445,7 +449,7 @@ def main():
                     with open(filmfolder + filmname + '/.filmhash', 'w') as f:
                         f.write(filmhash)
                     updatethumb = True
-                    updatemenu = True
+                    rendermenu = True
                     scene = 1
                     shot = 1
                     take = 1
@@ -1330,7 +1334,7 @@ def listenforclients(host, port, q):
 #--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header,showmenu):
-    global menudone
+    global menudone, rendermenu
     oldmenu=menudone
     menudone = ''
     menudoneprint = ''
@@ -1347,7 +1351,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         n += 1
     spaces = len(menudone) - 500
     menudone += spaces * ' '
-    if oldmenu != menudone:
+    if oldmenu != menudone or rendermenu == True:
         print(term.clear+term.home)
         if showmenu == 0:
             print(term.red+menudoneprint)
@@ -2649,8 +2653,11 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
             proc.terminate()
             proc.join()
             procdone = True
+            q=''
             os.system('pkill MP4Box')
             vumetermessage('canceled for now, maybe u want to render later ;)')
+            writemessage('press any button to continue')
+            print('canceling videorender')
             renderfilename = ''
             break
     return renderfilename
