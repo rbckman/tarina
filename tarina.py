@@ -1482,6 +1482,18 @@ def counttakes(filmname, filmfolder, scene, shot):
             takes = takes + 1
     return takes
 
+def counttakes_mp4(filmname, filmfolder, scene, shot):
+    takes = 0
+    try:
+        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
+    except:
+        allfiles = []
+        return takes
+    for a in allfiles:
+        if '.mp4' in a:
+            takes = takes + 1
+    return takes
+
 #-----------Count videos on floor-----
 
 def countonfloor(filmname, filmfolder):
