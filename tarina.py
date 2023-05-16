@@ -319,15 +319,16 @@ def main():
                     vumetermessage("There's absolutely nothing in this scene! hit rec!")
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
+                organize(filmfolder, filmname)
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
                     writemessage('Loading film...')
                     camera.stop_preview()
-                    removeimage(camera, overlay)
+                    #removeimage(camera, overlay)
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
                     if renderfilename != '':
                         remove_shots = playdub(filmname,renderfilename, 'film')
-                    overlay = displayimage(camera, imagename, overlay, 3)
+                    #overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
                 else:
                     vumetermessage('wow, shoot first! there is zero, nada, zip footage to watch now... just hit rec!')
@@ -1143,8 +1144,8 @@ def main():
             organize(filmfolder,'onthefloor')
             scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
             scene = scenes
-            shot = shots+1
-            take = takes+1
+            shot = shots
+            take = takes
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
