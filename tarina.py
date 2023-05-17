@@ -275,11 +275,13 @@ def main():
             #SHOWHELP
             elif pressed == 'showhelp':
                 vumetermessage('Button layout')
+                overlay = removeimage(camera, overlay)
                 overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
                 while holdbutton == 'showhelp':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     vumetermessage('Button layout')
                 overlay = removeimage(camera, overlay)
+                updatethumb =  True
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -1151,10 +1153,7 @@ def main():
                     except:
                         print('not exist')
             #organize(filmfolder,'onthefloor')
-            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-            scene = scenes
-            shot = shots
-            take = takes
+            scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
