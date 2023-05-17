@@ -297,6 +297,7 @@ def main():
                     updatethumb =  True
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
+                organize(filmfolder, filmname)
                 filmfiles = shotfiles(filmfolder, filmname, scene)
                 if len(filmfiles) > 0:
                     writemessage('Loading scene...')
@@ -335,6 +336,7 @@ def main():
                 rendermenu = True
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
+                organize(filmfolder, filmname)
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
                     writemessage('Loading clip...')
@@ -632,7 +634,8 @@ def main():
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
-                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
@@ -641,7 +644,8 @@ def main():
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
-                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
@@ -650,8 +654,9 @@ def main():
             elif pressed == 'remove' and menu[selected] == 'SCENE:':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
-                #scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                #shot = countshots(filmname, filmfolder, scene)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                shot = countshots(filmname, filmfolder, scene)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
@@ -1145,7 +1150,7 @@ def main():
                         time.sleep(5)
                     except:
                         print('not exist')
-            organize(filmfolder,'onthefloor')
+            #organize(filmfolder,'onthefloor')
             scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
             scene = scenes
             shot = shots
@@ -1479,18 +1484,6 @@ def counttakes(filmname, filmfolder, scene, shot):
         return takes
     for a in allfiles:
         if '.mp4' in a or '.h264' in a:
-            takes = takes + 1
-    return takes
-
-def counttakes_mp4(filmname, filmfolder, scene, shot):
-    takes = 0
-    try:
-        allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
-    except:
-        allfiles = []
-        return takes
-    for a in allfiles:
-        if '.mp4' in a:
             takes = takes + 1
     return takes
 
@@ -2094,9 +2087,12 @@ def organize(filmfolder, filmname):
                 logger.info('no takes in this shot, removing shot..')
                 #os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
+            print(i)
+            print(p)
+            print(sorted(takes))
+            #time.sleep(2)
             for s in sorted(takes):
                 if '.mp4' in s or '.h264' in s:
-                    #print(s)
                     unorganized_nr = int(s[4:7])
                     takename = filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                     if '.mp4' in s:
@@ -2104,7 +2100,7 @@ def organize(filmfolder, filmname):
                         if origin != os.path.abspath(takename+'.mp4'):
                             print('appending: '+origin)
                             origin_files.append(origin)
-                    elif '.h264' in s:
+                    if '.h264' in s:
                         origin=os.path.realpath(takename+'.h264')
                         if origin != os.path.abspath(takename+'.h264'):
                             origin_files.append(origin)
@@ -2112,7 +2108,9 @@ def organize(filmfolder, filmname):
                         #print('correct')
                         pass
                     if organized_nr != unorganized_nr:
-                        #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        print(s)
+                        time.sleep(3)
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                         run_command(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                         run_command(mv + '.h264 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.h264')
@@ -2120,10 +2118,13 @@ def organize(filmfolder, filmname):
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     #check if same video has both h246 and mp4 and render and remove h264
                     for t in sorted(takes):
-                        if t.strip('.mp4') == s.strip('.h264') or s.strip('.mp4') == t.strip('.h264'):
+                        if t.replace('.mp4','') == s.replace('.h264','') or s.replace('.mp4','') == t.replace('.h264',''):
                             logger.info('Found both mp4 and h264 of same video!')
+                            logger.info(t)
+                            logger.info(s)
+                            #time.sleep(5)
                             compileshot(takename,filmfolder,filmname)
-                            organized_nr -= 1
+                            #organized_nr -= 1
                     organized_nr += 1
     # Shots
     for i in sorted(scenes):
