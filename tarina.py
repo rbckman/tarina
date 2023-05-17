@@ -3137,18 +3137,18 @@ def playdub(filmname, filename, player_menu):
                     pass
                 starttime = time.time()
             elif menu[selected] == 'PAUSE':
+                player.pause()
                 try:
-                    player.pause()
                     playerAudio.pause()
-                    pause = True
                 except:
                     pass
+                pause = True
             elif menu[selected] == 'PLAY':
+                player.play()
                 try:
-                    player.play()
                     playerAudio.play()
                 except:
-                    return
+                    pass
                 pause = False
             elif menu[selected] == 'TRIM':
                 selected = 1
