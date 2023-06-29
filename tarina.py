@@ -739,8 +739,7 @@ def main():
                         picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
                         print('taking picture')
                         camera.capture(picture,format="jpeg",use_video_port=True) 
-                        run_command('touch ' + foldername + 'take.mp4' + str(take).zfill(3))
-                        take=take+1
+                        run_command('touch ' + foldername + 'take' + str(take).zfill(3) + '.mp4')
                         basewidth = 800
                         img = Image.open(picture)
                         wpercent = (basewidth/float(img.size[0]))
@@ -748,6 +747,7 @@ def main():
                         img = img.resize((basewidth,hsize), Image.ANTIALIAS)
                         img.save(foldername+'take'+str(take).zfill(3) + '.jpeg')
                         vumetermessage('Great Pic taken!!')
+                        updatethumb = True
                 elif beepcountdown > 0 and beeping == True:
                     beeping = False
                     beepcountdown = 0
