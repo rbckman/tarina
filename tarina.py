@@ -94,7 +94,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -115,6 +115,7 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
+    cammode = 'film'
     camera_model=''
     fps = 25
     fps_selected=2
@@ -254,13 +255,25 @@ def main():
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
                 run_command('sudo shutdown -h now')
+            #MODE
+            elif pressed == 'changemode':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
             #PICTURE
             elif pressed == 'picture':
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
+                run_command('touch ' + foldername + '.placeholder')
                 print('taking picture')
-                camera.capture(picture,format="jpeg",use_video_port=True)
+                camera.capture(picture,format="jpeg",use_video_port=True) 
             #PEAKING
             elif pressed == 'peak' and recordable == True:
                 if shot > 1:
@@ -696,11 +709,7 @@ def main():
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True:
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                videos_totalt = db.query("SELECT COUNT(*) AS videos FROM videos")[0]
-                tot = int(videos_totalt.videos)
-                video_origins=datetime.datetime.now().strftime('%Y%d%m')+str(tot).zfill(5)
-                db.insert('videos', tid=datetime.datetime.now(), filename=filmfolder+'.videos/'+video_origins+'.mp4', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 if pressed == "record":
                     #shot = shots+1
                     take = takes+1
@@ -713,13 +722,32 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
-                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
-                    sound_start = time.time()
-                    if onlysound != True:
-                        camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
-                        starttime = time.time()
-                    recording = True
-                    showmenu = 0
+                    if cammode == 'film':
+                        videos_totalt = db.query("SELECT COUNT(*) AS videos FROM videos")[0]
+                        tot = int(videos_totalt.videos)
+                        video_origins=datetime.datetime.now().strftime('%Y%d%m')+str(tot).zfill(5)
+                        db.insert('videos', tid=datetime.datetime.now(), filename=filmfolder+'.videos/'+video_origins+'.mp4', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
+                        os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
+                        sound_start = time.time()
+                        if onlysound != True:
+                            camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
+                            starttime = time.time()
+                        recording = True
+                        showmenu = 0
+                    if cammode == 'picture':
+                        #picdate=datetime.datetime.now().strftime('%Y%d%m')
+                        picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
+                        print('taking picture')
+                        camera.capture(picture,format="jpeg",use_video_port=True) 
+                        run_command('touch ' + foldername + 'take.mp4' + str(take).zfill(3))
+                        take=take+1
+                        basewidth = 800
+                        img = Image.open(picture)
+                        wpercent = (basewidth/float(img.size[0]))
+                        hsize = int((float(img.size[1])*float(wpercent)))
+                        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+                        img.save(foldername+'take'+str(take).zfill(3) + '.jpeg')
+                        vumetermessage('Great Pic taken!!')
                 elif beepcountdown > 0 and beeping == True:
                     beeping = False
                     beepcountdown = 0
@@ -3677,9 +3705,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         if readbus2 == 0:
             readbus2 = 247
         if readbus != 255:
-            print('i2cbutton pressed: ' + str(readbus))
+            print('i2cbutton readbus pressed: ' + str(readbus))
         if readbus2 != 247:
-            print('i2cbutton pressed: ' + str(readbus2))
+            print('i2cbutton readbus2 pressed: ' + str(readbus2))
     else:
         readbus = 255
         readbus2 = 247
@@ -3714,6 +3742,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'showmenu'
         elif (readbus2 == 245 and readbus == 251):
             pressed = 'showhelp'
+        elif (readbus2 == 244):
+            pressed = 'changemode'
         elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 247):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
@@ -3755,9 +3785,13 @@ def stopinterface(camera):
     return camera
 
 def startcamera(lens, fps):
-    global camera_model, fps_selection, fps_selected
+    global camera_model, fps_selection, fps_selected, cammode
     camera = picamera.PiCamera()
-    camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
+    if cammode == 'film':
+        reso=(1920,1080)
+    elif cammode == 'picture':
+        reso=(4056,3040)
+    camera.resolution = reso #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080, full 4056x3040
     #Background image
     underlay = None
     bakgimg = tarinafolder + '/extras/bakg.jpg'
