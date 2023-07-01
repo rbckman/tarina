@@ -260,14 +260,14 @@ def main():
                 if cammode == 'film':
                     cammode = 'picture'
                     vumetermessage('changing to picture mode')
+
                 elif cammode == 'picture':
                     cammode = 'film'
                     vumetermessage('changing to film mode')
                 camera.stop_preview()
                 camera.close()
                 camera = startcamera(lens,fps)
-                fps=10
-                flip = 'no'
+                loadfilmsettings = True
             #PICTURE
             elif pressed == 'picture':
                 if os.path.isdir(foldername) == False:
@@ -969,7 +969,7 @@ def main():
                 if camera_model == 'imx477':
                     if fps_selected < len(fps_selection)-1:
                         fps_selected+=1
-                        fps_selection=[8,15,24.985,35,49]
+                        fps_selection=[5,8,10,11,12,13,14,15,24.985,35,49]
                         fps=fps_selection[fps_selected]
                         camera.framerate = fps
             elif menu[selected] == 'Q:':
@@ -1113,7 +1113,7 @@ def main():
                 if camera_model == 'imx477':
                     if fps_selected > 0:
                         fps_selected-=1
-                        fps_selection=[5,15,24.985,35,49]
+                        fps_selection=[5,8,10,11,12,13,14,15,24.985,35,49]
                         fps=fps_selection[fps_selected]
                         camera.framerate = fps
             elif menu[selected] == 'Q:':
@@ -1158,6 +1158,7 @@ def main():
                 serverstate=filmsettings[20]
                 plughw=filmsettings[21]
                 channels=filmsettings[22]
+                cammode=filmsettings[23]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
