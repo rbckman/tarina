@@ -266,6 +266,8 @@ def main():
                 camera.stop_preview()
                 camera.close()
                 camera = startcamera(lens,fps)
+                fps=10
+                flip = 'no'
             #PICTURE
             elif pressed == 'picture':
                 if os.path.isdir(foldername) == False:
@@ -633,9 +635,11 @@ def main():
                     # requires wiringpi installed
                     run_command('gpio -g pwm 19 1023')
                     backlight = True
+                    camera.start_preview()
                 elif backlight == True:
                     run_command('gpio -g pwm 19 0')
                     backlight = False
+                    camera.stop_preview()
             elif pressed == 'showmenu':
                 if showmenu == 1:
                     # requires wiringpi installed
