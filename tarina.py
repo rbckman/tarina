@@ -106,7 +106,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -260,7 +260,6 @@ def main():
                 if cammode == 'film':
                     cammode = 'picture'
                     vumetermessage('changing to picture mode')
-
                 elif cammode == 'picture':
                     cammode = 'film'
                     vumetermessage('changing to film mode')
@@ -942,6 +941,17 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'MODE:':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             elif menu[selected] == 'LENS:':
                 s = 0
                 for a in lenses:
@@ -1081,6 +1091,17 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'MODE:':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             elif menu[selected] == 'LENS:':
                 s = 0
                 for a in lenses:
@@ -1250,7 +1271,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
