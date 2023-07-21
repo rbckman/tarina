@@ -94,7 +94,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -106,7 +106,7 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'LENS:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -115,6 +115,7 @@ def main():
     awb = 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'
     awbx = 0
     awb_lock = 'no'
+    cammode = 'film'
     camera_model=''
     fps = 25
     fps_selected=2
@@ -122,7 +123,7 @@ def main():
     profilelevel='4.2'
     headphoneslevel = 40
     miclevel = 50
-    soundformat = 'S32_LE'
+    soundformat = 'S16_LE'
     soundrate = '48000'
     recording = False
     retake = False
@@ -159,7 +160,7 @@ def main():
     updatethumb = False
     loadfilmsettings = True
     oldsettings = ''
-    comp = 1
+    comp = 0
     yankedscene = ''
     cuttedscene = ''
     cuttedshot = ''
@@ -228,6 +229,8 @@ def main():
     serverstate_old='off'
     wifistate_old='off'
 
+    camera_model, camera_revision = getconfig(camera)
+
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -252,14 +255,26 @@ def main():
                 writemessage('Hold on shutting down...')
                 time.sleep(1)
                 run_command('sudo shutdown -h now')
+            #MODE
+            elif pressed == 'changemode':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             #PICTURE
             elif pressed == 'picture':
                 if os.path.isdir(foldername) == False:
                     os.makedirs(foldername)
                 picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
+                run_command('touch ' + foldername + '.placeholder')
                 print('taking picture')
-                camera.capture(picture,format="jpeg",use_video_port=True)
-            #INSERT SCENE
+                camera.capture(picture,format="jpeg",use_video_port=True) 
             #PEAKING
             elif pressed == 'peak' and recordable == True:
                 if shot > 1:
@@ -271,6 +286,16 @@ def main():
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     writemessage('peaking ' + str(peakshot))
                 overlay = removeimage(camera, overlay)
+            #SHOWHELP
+            elif pressed == 'showhelp':
+                vumetermessage('Button layout')
+                overlay = removeimage(camera, overlay)
+                overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
+                while holdbutton == 'showhelp':
+                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                    vumetermessage('Button layout')
+                overlay = removeimage(camera, overlay)
+                updatethumb =  True
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -280,7 +305,7 @@ def main():
                     take = 1
                 foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                 filename = 'take' + str(take).zfill(3)
-                renderedfilename, between, duration = timelapse(beeps,camera,foldername,filename,between,duration)
+                renderedfilename, between, duration = timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlight)
                 if renderedfilename != '':
                     #render thumbnail
                     #writemessage('creating thumbnail')
@@ -288,39 +313,49 @@ def main():
                     updatethumb =  True
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
+                organize(filmfolder, filmname)
                 filmfiles = shotfiles(filmfolder, filmname, scene)
-                writemessage('Loading scene...')
                 if len(filmfiles) > 0:
+                    writemessage('Loading scene...')
                     #Check if rendered video exist
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
                     remove_shots = playdub(filmname,renderfilename, 'scene')
-                    try:
-                        if remove_shots != []:
-                            for i in remove_shots:
-                                remove(filmfolder, filmname, scene, i, take, 'shot')
-                            organize(filmfolder, filmname)
-                            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                            updatethumb = True
-                            time.sleep(0.5)
-                    except:
+                    if remove_shots != []:
+                        for i in remove_shots:
+                            remove(filmfolder, filmname, scene, i, take, 'shot')
+                        organize(filmfolder, filmname)
+                        updatethumb = True
+                        #loadfilmsettings = True
+                        time.sleep(0.5)
+                    else:
                         print('nothing to remove')
                     camera.start_preview()
+                else:
+                    vumetermessage("There's absolutely nothing in this scene! hit rec!")
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
+                organize(filmfolder, filmname)
                 filmfiles = viewfilm(filmfolder, filmname)
-                writemessage('Loading film...')
                 if len(filmfiles) > 0:
+                    writemessage('Loading film...')
                     camera.stop_preview()
+                    #removeimage(camera, overlay)
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
-                    playdub(filmname,renderfilename, 'film')
+                    if renderfilename != '':
+                        remove_shots = playdub(filmname,renderfilename, 'film')
+                    #overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
+                else:
+                    vumetermessage('wow, shoot first! there is zero, nada, zip footage to watch now... just hit rec!')
+                rendermenu = True
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
+                organize(filmfolder, filmname)
                 takes = counttakes(filmname, filmfolder, scene, shot)
-                writemessage('Loading clip...')
                 if takes > 0:
+                    writemessage('Loading clip...')
                     removeimage(camera, overlay)
                     camera.stop_preview()
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
@@ -334,6 +369,8 @@ def main():
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
+                else:
+                    vumetermessage('nothing here! hit rec!')
             #DUB SHOT
             elif pressed == 'middle' and menu[selected] == 'SHOT, not so fast:':
                 newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
@@ -431,7 +468,7 @@ def main():
                     with open(filmfolder + filmname + '/.filmhash', 'w') as f:
                         f.write(filmhash)
                     updatethumb = True
-                    updatemenu = True
+                    rendermenu = True
                     scene = 1
                     shot = 1
                     take = 1
@@ -597,9 +634,11 @@ def main():
                     # requires wiringpi installed
                     run_command('gpio -g pwm 19 1023')
                     backlight = True
+                    camera.start_preview()
                 elif backlight == True:
                     run_command('gpio -g pwm 19 0')
                     backlight = False
+                    camera.stop_preview()
             elif pressed == 'showmenu':
                 if showmenu == 1:
                     # requires wiringpi installed
@@ -614,16 +653,20 @@ def main():
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
-                loadfilmsettings = True
+                rendermenu = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #shot
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
-                loadfilmsettings = True
+                rendermenu = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #scene
             elif pressed == 'remove' and menu[selected] == 'SCENE:':
@@ -631,8 +674,10 @@ def main():
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 shot = countshots(filmname, filmfolder, scene)
+                take = counttakes(filmname, filmfolder, scene, shot)
                 updatethumb = True
-                loadfilmsettings = True
+                rendermenu = True
+                #loadfilmsettings = True
                 time.sleep(0.5)
             #film
             elif pressed == 'remove' and menu[selected] == 'FILM:':
@@ -644,6 +689,7 @@ def main():
                     scene, shot, take = countlast(filmname, filmfolder)
                     loadfilmsettings = True
                     updatethumb = True
+                    rendermenu = True
                     time.sleep(0.5)
 
         #RECORD AND PAUSE
@@ -666,11 +712,7 @@ def main():
         if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True:
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                videos_totalt = db.query("SELECT COUNT(*) AS videos FROM videos")[0]
-                tot = int(videos_totalt.videos)
-                video_origins=datetime.datetime.now().strftime('%Y%d%m')+str(tot).zfill(5)
-                db.insert('videos', tid=datetime.datetime.now(), filename=filmfolder+'.videos/'+video_origins+'.mp4', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 if pressed == "record":
                     #shot = shots+1
                     take = takes+1
@@ -683,13 +725,32 @@ def main():
                     beeping = False
                     if os.path.isdir(foldername) == False:
                         os.makedirs(foldername)
-                    os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
-                    sound_start = time.time()
-                    if onlysound != True:
-                        camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
-                        starttime = time.time()
-                    recording = True
-                    showmenu = 0
+                    if cammode == 'film':
+                        videos_totalt = db.query("SELECT COUNT(*) AS videos FROM videos")[0]
+                        tot = int(videos_totalt.videos)
+                        video_origins=datetime.datetime.now().strftime('%Y%d%m')+str(tot).zfill(5)
+                        db.insert('videos', tid=datetime.datetime.now(), filename=filmfolder+'.videos/'+video_origins+'.mp4', foldername=foldername, filmname=filmname, scene=scene, shot=shot, take=take, audiolenght=0, videolenght=0)
+                        os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:' + str(plughw) + ' -f '+soundformat+' -c ' + str(channels) + ' -r '+soundrate+' -vv '+ foldername + filename + '.wav &')
+                        sound_start = time.time()
+                        if onlysound != True:
+                            camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
+                            starttime = time.time()
+                        recording = True
+                        showmenu = 0
+                    if cammode == 'picture':
+                        #picdate=datetime.datetime.now().strftime('%Y%d%m')
+                        picture = foldername +'picture' + str(take).zfill(3) + '.jpeg'
+                        print('taking picture')
+                        camera.capture(picture,format="jpeg",use_video_port=True) 
+                        run_command('touch ' + foldername + 'take' + str(take).zfill(3) + '.mp4')
+                        basewidth = 800
+                        img = Image.open(picture)
+                        wpercent = (basewidth/float(img.size[0]))
+                        hsize = int((float(img.size[1])*float(wpercent)))
+                        img = img.resize((basewidth,hsize), Image.ANTIALIAS)
+                        img.save(foldername+'take'+str(take).zfill(3) + '.jpeg')
+                        vumetermessage('Great Pic taken!!')
+                        updatethumb = True
                 elif beepcountdown > 0 and beeping == True:
                     beeping = False
                     beepcountdown = 0
@@ -767,6 +828,8 @@ def main():
                 camera.awb_mode = 'auto'
         elif pressed == 'middle' and menu[selected] == 'BEEP:':
             beeps = 0
+        elif pressed == 'middle' and menu[selected] == 'LENGTH:':
+            reclenght = 0
         elif pressed == 'middle' and menu[selected] == 'LIVE:':
             if stream == '':
                 stream = startstream(camera, stream, plughw, channels)
@@ -783,6 +846,10 @@ def main():
             camera.contrast = 0
         elif pressed == 'middle' and menu[selected] == 'SAT:':
             camera.saturation = 0
+        elif pressed == 'middle' and menu[selected] == 'MIC:':
+            miclevel  = 70
+        elif pressed == 'middle' and menu[selected] == 'PHONES:':
+            headphoneslevel = 70
 
         #UP
         elif pressed == 'up':
@@ -832,8 +899,8 @@ def main():
                     run_command('amixer -c 0 sset Speaker ' + str(headphoneslevel) + '%')
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene <= scenes:
-                    shot = 1
                     scene += 1
+                    shot = countshots(filmname, filmfolder, scene)
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, takes = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                 #shot = 1
@@ -874,6 +941,17 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'MODE:':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             elif menu[selected] == 'LENS:':
                 s = 0
                 for a in lenses:
@@ -901,7 +979,7 @@ def main():
                 if camera_model == 'imx477':
                     if fps_selected < len(fps_selection)-1:
                         fps_selected+=1
-                        fps_selection=[8,15,24.985,35,49]
+                        fps_selection=[5,8,10,11,12,13,14,15,24.985,35,49]
                         fps=fps_selection[fps_selected]
                         camera.framerate = fps
             elif menu[selected] == 'Q:':
@@ -973,7 +1051,7 @@ def main():
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene > 1:
                     scene -= 1
-                    shot = 1
+                    shot = countshots(filmname, filmfolder, scene)
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                 #takes = take
@@ -1013,6 +1091,17 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'MODE:':
+                if cammode == 'film':
+                    cammode = 'picture'
+                    vumetermessage('changing to picture mode')
+                elif cammode == 'picture':
+                    cammode = 'film'
+                    vumetermessage('changing to film mode')
+                camera.stop_preview()
+                camera.close()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
             elif menu[selected] == 'LENS:':
                 s = 0
                 for a in lenses:
@@ -1045,7 +1134,7 @@ def main():
                 if camera_model == 'imx477':
                     if fps_selected > 0:
                         fps_selected-=1
-                        fps_selection=[5,15,24.985,35,49]
+                        fps_selection=[5,8,10,11,12,13,14,15,24.985,35,49]
                         fps=fps_selection[fps_selected]
                         camera.framerate = fps
             elif menu[selected] == 'Q:':
@@ -1090,6 +1179,7 @@ def main():
                 serverstate=filmsettings[20]
                 plughw=filmsettings[21]
                 channels=filmsettings[22]
+                cammode=filmsettings[23]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
@@ -1116,11 +1206,8 @@ def main():
                         time.sleep(5)
                     except:
                         print('not exist')
-            organize(filmfolder,'onthefloor')
-            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-            scene = scenes
-            shot = shots+1
-            take = takes+1
+            #organize(filmfolder,'onthefloor')
+            scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -1184,7 +1271,7 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', lens, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
@@ -1310,7 +1397,7 @@ def listenforclients(host, port, q):
 #--------------Write the menu layer to dispmanx--------------
 
 def writemenu(menu,settings,selected,header,showmenu):
-    global menudone
+    global menudone, rendermenu
     oldmenu=menudone
     menudone = ''
     menudoneprint = ''
@@ -1327,7 +1414,7 @@ def writemenu(menu,settings,selected,header,showmenu):
         n += 1
     spaces = len(menudone) - 500
     menudone += spaces * ' '
-    if oldmenu != menudone:
+    if oldmenu != menudone or rendermenu == True:
         print(term.clear+term.home)
         if showmenu == 0:
             print(term.red+menudoneprint)
@@ -1465,7 +1552,7 @@ def run_command(command_line):
     #command_line_args = shlex.split(command_line)
     logger.info('Running: "' + command_line + '"')
     try:
-        process = subprocess.Popen(command_line, shell=True).wait()
+        p = subprocess.Popen(command_line, shell=True).wait()
         # process_output is now a string, not a file,
         # you may want to do:
     except (OSError, CalledProcessError) as exception:
@@ -1809,17 +1896,17 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
 
 #------------Timelapse--------------------------
 
-def timelapse(beeps,camera,foldername,filename,between,duration):
+def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlight):
     pressed = ''
     buttonpressed = ''
     buttontime = time.time()
     holdbutton = ''
     sound = False
     selected = 0
-    header = 'Adjust delay in seconds between images'
-    menu = 'DELAY:', 'DURATION:', 'START', 'BACK'
+    header = 'Adjust delay in seconds between videos'
+    menu = 'DELAY:', 'DURATION:', 'SOUND:', 'START', 'BACK'
     while True:
-        settings = str(round(between,2)), str(round(duration,2)), '', ''
+        settings = str(round(between,2)), str(round(duration,2)), str(sound), '', ''
         writemenu(menu,settings,selected,header,showmenu)
         seconds = (3600 / between) * duration
         vumetermessage('1 h timelapse filming equals ' + str(round(seconds,2)) + ' second clip   ')
@@ -1829,6 +1916,10 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
         elif pressed == 'down' and menu[selected] == 'DELAY:':
             if between > 1:
                 between = between - 1
+        if pressed == 'up' and menu[selected] == 'SOUND:':
+            sound = True
+        elif pressed == 'down' and menu[selected] == 'SOUND:':
+            sound = False
         elif pressed == 'up' and menu[selected] == 'DURATION:':
             duration = duration + 0.1
         elif pressed == 'down' and menu[selected] == 'DURATION:':
@@ -1866,7 +1957,7 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         #camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=quality, level=profilelevel)
                         if sound == True:
-                            os.system(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv '+foldername + filename + '_' + str(n).zfill(3) + '.wav &')
+                            os.system(tarinafolder+'/alsa-utils-1.1.3/aplay/arecord -D hw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv '+foldername+'timelapse/'+filename+'_'+str(n).zfill(3)+'.wav &')
                         files.append(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3))
                         starttime = time.time()
                         recording = True
@@ -1883,7 +1974,15 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         recording = False
                         starttime = time.time()
                         t = 0
-                    if pressed == 'middle' and n > 1:
+                    if pressed == 'screen':
+                        if backlight == False:
+                            # requires wiringpi installed
+                            run_command('gpio -g pwm 19 1023')
+                            backlight = True
+                        elif backlight == True:
+                            run_command('gpio -g pwm 19 0')
+                            backlight = False
+                    elif pressed == 'middle' and n > 1:
                         if recording == True:
                             os.system('pkill arecord')
                             camera.stop_recording()
@@ -1902,7 +2001,9 @@ def timelapse(beeps,camera,foldername,filename,between,duration):
                         for f in files:
                             if sound == True:
                                 compileshot(f,filmfolder,filmname)
-                                audiotrim(foldername + 'timelapse/', filename + '_' + str(n).zfill(3), 'end')
+                                audiotrim(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3), 'end')
+                                videomerge.append('-cat')
+                                videomerge.append(f + '.mp4')
                             else:
                                 videomerge.append('-cat')
                                 videomerge.append(f + '.h264')
@@ -1947,6 +2048,12 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
     menu = '', ''
     settings = 'NO', 'YES'
     selected = 0
+    otf_scene = countscenes(filmfolder, 'onthefloor')
+    otf_scene += 1
+    otf_shot = countshots('onthefloor', filmfolder, otf_scene)
+    otf_shot += 1
+    otf_take = counttakes('onthefloor', filmfolder, otf_scene, otf_shot)
+    otf_take += 1
     while True:
         writemenu(menu,settings,selected,header,showmenu)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -1979,9 +2086,9 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     return
                 else:
                     if sceneshotortake == 'take':
-                        writemessage('Throwing take on the floor' + str(shot))
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3) + '/take' + str(999).zfill(3) 
-                        onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(99).zfill(3) + '/'
+                        writemessage('Throwing take on the floor' + str(take))
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3) + '/take' + str(otf_take).zfill(3) 
+                        onthefloor_folder = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3) + '/'
                         if os.path.isdir(onthefloor_folder) == False:
                             os.makedirs(onthefloor)
                         os.system('mv ' + foldername + filename + '.h264 ' + onthefloor + '.h264')
@@ -1993,13 +2100,13 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                             take = 1
                     elif sceneshotortake == 'shot' and shot > 0:
                         writemessage('Throwing shot on the floor' + str(shot))
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(1).zfill(3) + '/shot' + str(999).zfill(3)+'/'
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3) + '/shot' + str(otf_shot).zfill(3)+'/'
                         os.makedirs(onthefloor)
                         os.system('cp -r '+foldername+'* '+onthefloor)
                         os.system('rm -r '+foldername)
                         take = counttakes(filmname, filmfolder, scene, shot)
                     elif sceneshotortake == 'scene':
-                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(999).zfill(3)
+                        onthefloor = filmfolder + 'onthefloor/' + 'scene' + str(otf_scene).zfill(3)
                         os.makedirs(onthefloor)
                         writemessage('Throwing clips on the floor ' + str(scene))
                         foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
@@ -2033,9 +2140,12 @@ def organize(filmfolder, filmname):
                 logger.info('no takes in this shot, removing shot..')
                 #os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
+            print(i)
+            print(p)
+            print(sorted(takes))
+            #time.sleep(2)
             for s in sorted(takes):
                 if '.mp4' in s or '.h264' in s:
-                    #print(s)
                     unorganized_nr = int(s[4:7])
                     takename = filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                     if '.mp4' in s:
@@ -2043,7 +2153,7 @@ def organize(filmfolder, filmname):
                         if origin != os.path.abspath(takename+'.mp4'):
                             print('appending: '+origin)
                             origin_files.append(origin)
-                    elif '.h264' in s:
+                    if '.h264' in s:
                         origin=os.path.realpath(takename+'.h264')
                         if origin != os.path.abspath(takename+'.h264'):
                             origin_files.append(origin)
@@ -2051,7 +2161,9 @@ def organize(filmfolder, filmname):
                         #print('correct')
                         pass
                     if organized_nr != unorganized_nr:
-                        #print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
+                        print(s)
+                        time.sleep(3)
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                         run_command(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                         run_command(mv + '.h264 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.h264')
@@ -2059,10 +2171,13 @@ def organize(filmfolder, filmname):
                         run_command(mv + '.jpeg ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.jpeg')
                     #check if same video has both h246 and mp4 and render and remove h264
                     for t in sorted(takes):
-                        if t.strip('.mp4') == s.strip('.h264') or s.strip('.mp4') == t.strip('.h264'):
+                        if t.replace('.mp4','') == s.replace('.h264','') or s.replace('.mp4','') == t.replace('.h264',''):
                             logger.info('Found both mp4 and h264 of same video!')
+                            logger.info(t)
+                            logger.info(s)
+                            #time.sleep(5)
                             compileshot(takename,filmfolder,filmname)
-                            organized_nr -= 1
+                            #organized_nr -= 1
                     organized_nr += 1
     # Shots
     for i in sorted(scenes):
@@ -2609,8 +2724,11 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
             proc.terminate()
             proc.join()
             procdone = True
+            q=''
             os.system('pkill MP4Box')
             vumetermessage('canceled for now, maybe u want to render later ;)')
+            writemessage('press any button to continue')
+            print('canceling videorender')
             renderfilename = ''
             break
     return renderfilename
@@ -2984,11 +3102,11 @@ def playdub(filmname, filename, player_menu):
         if buttonpressed == True:
             flushbutton()
         if pressed == 'remove':
-            time.sleep(0.2)
             if fastedit_shot in remove_shots:
                 remove_shots.remove(fastedit_shot)
             else:
                 remove_shots.append(fastedit_shot)
+            time.sleep(0.2)
         elif pressed == 'right':
             if selected < (len(settings) - 1):
                 selected = selected + 1
@@ -3052,24 +3170,20 @@ def playdub(filmname, filename, player_menu):
                     if dub == True:
                         os.system('pkill arecord')
                     if video == True:
-                        try:
-                            player.pause()
+                        player.pause()
+                        player.set_position(0)
+                        if player_menu != 'film':
                             playerAudio.pause()
-                            player.set_position(0)
                             playerAudio.set_position(0)
-                        except:
-                            return
                     if dub == True:
                         p = 0
                         while p < 3:
                             writemessage('Dubbing in ' + str(3 - p) + 's')
                             time.sleep(1)
                             p+=1
-                    try:
-                        player.play()
+                    player.play()
+                    if player_menu != 'film':
                         playerAudio.play()
-                    except:
-                        return
                     #run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
                         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
@@ -3077,18 +3191,18 @@ def playdub(filmname, filename, player_menu):
                     pass
                 starttime = time.time()
             elif menu[selected] == 'PAUSE':
+                player.pause()
                 try:
-                    player.pause()
                     playerAudio.pause()
-                    pause = True
                 except:
                     pass
+                pause = True
             elif menu[selected] == 'PLAY':
+                player.play()
                 try:
-                    player.play()
                     playerAudio.play()
                 except:
-                    return
+                    pass
                 pause = False
             elif menu[selected] == 'TRIM':
                 selected = 1
@@ -3390,10 +3504,17 @@ def startstream(camera, stream, plughw, channels):
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f flv ' + youtube + key[0]
     #
     #stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar 44100 -vcodec copy -acodec libmp3lame -b:a 128k -ar 44100 -map 0:0 -map 1:0 -strict experimental -f mpegts tcp://0.0.0.0:3333\?listen'
+<<<<<<< HEAD
     stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar '+soundrate+' -acodec mp2 -b:a 128k -ar '+soundrate+' -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://10.42.0.169:5000'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
         camera.start_recording(stream.stdin, splitter_port=2, format='h264', bitrate = 55555)
+=======
+    stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar '+soundrate+' -acodec mp2 -b:a 128k -ar '+soundrate+' -vcodec copy -map 0:0 -map 1:0 -g 0 -f mpegts udp://10.42.0.73:5004'
+    try:
+        stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE)
+        camera.start_recording(stream.stdin, format='h264', bitrate = 555555)
+>>>>>>> c7991decc2aa8d0da755b26d40b1cfcd0c63cfca
     except:
         stream = ''
     #now = time.strftime("%Y-%m-%d-%H:%M:%S") 
@@ -3537,64 +3658,67 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
     #Check controller
     pressed = ''
     nextstatus = ''
-    if process.is_alive() == False and serverstate == 'on':
-        nextstatus = que.get()
-        if "*" in nextstatus:
-            tarinactrl_ip = nextstatus.split('*')[1]
-            nextstatus = nextstatus.split('*')[0]
-            print('tarinactrl ip:' + tarinactrl_ip)
-        process = Process(target=listenforclients, args=("0.0.0.0", port, que))
-        process.start()
-        if 'SELECTED' in nextstatus:
-            try:
-                selected=int(nextstatus.split(':')[1])
-            except:
-                print('wtf?')
-        if nextstatus=="PICTURE":
-            pressed="picture"
-        elif nextstatus=="UP":
-            pressed="up"
-        elif nextstatus=="DOWN":
-            pressed="down"
-        elif nextstatus=="LEFT":
-            pressed="left"
-        elif nextstatus=="RIGHT":
-            pressed="right"
-        elif nextstatus=="VIEW":
-            pressed="view"
-        elif nextstatus=="MIDDLE":
-            pressed="middle"
-        elif nextstatus=="DELETE":
-            pressed="remove"
-        elif nextstatus=="REC":
-            pressed="record"
-        elif nextstatus=="STOP":
-            if recording == True:
+    try:
+        if process.is_alive() == False and serverstate == 'on':
+            nextstatus = que.get()
+            if "*" in nextstatus:
+                tarinactrl_ip = nextstatus.split('*')[1]
+                nextstatus = nextstatus.split('*')[0]
+                print('tarinactrl ip:' + tarinactrl_ip)
+            process = Process(target=listenforclients, args=("0.0.0.0", port, que))
+            process.start()
+            if 'SELECTED' in nextstatus:
+                try:
+                    selected=int(nextstatus.split(':')[1])
+                except:
+                    print('wtf?')
+            if nextstatus=="PICTURE":
+                pressed="picture"
+            elif nextstatus=="UP":
+                pressed="up"
+            elif nextstatus=="DOWN":
+                pressed="down"
+            elif nextstatus=="LEFT":
+                pressed="left"
+            elif nextstatus=="RIGHT":
+                pressed="right"
+            elif nextstatus=="VIEW":
+                pressed="view"
+            elif nextstatus=="MIDDLE":
+                pressed="middle"
+            elif nextstatus=="DELETE":
+                pressed="remove"
+            elif nextstatus=="REC":
                 pressed="record"
-        elif nextstatus=="RECSOUND":
-            if recording==False:
-                pressed="record"
-                onlysound=True
-        elif nextstatus=="PLACEHOLDER":
-            selected=2
-            pressed="insert_shot"
-        elif "SYNCIP:" in nextstatus:
-            ip = nextstatus.split(':')[1]
-            stopinterface(camera)
-            run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-            sendtoserver(tarinactrl_ip,port,'SYNCDONE')
-            #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-            startinterface()
-            camera = startcamera(lens,fps)
-            loadfilmsettings = True
-        elif nextstatus=="NEWSCENE":
-            scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-            scene=scenes+1
-            shot=1
-            take=1
-        elif nextstatus=="RETAKE":
-            pressed="retake"
-        #print(nextstatus)
+            elif nextstatus=="STOP":
+                if recording == True:
+                    pressed="record"
+            elif nextstatus=="RECSOUND":
+                if recording==False:
+                    pressed="record"
+                    onlysound=True
+            elif nextstatus=="PLACEHOLDER":
+                selected=2
+                pressed="insert_shot"
+            elif "SYNCIP:" in nextstatus:
+                ip = nextstatus.split(':')[1]
+                stopinterface(camera)
+                run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
+                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                startinterface()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
+            elif nextstatus=="NEWSCENE":
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                scene=scenes+1
+                shot=1
+                take=1
+            elif nextstatus=="RETAKE":
+                pressed="retake"
+            #print(nextstatus)
+    except:
+        print('process not found')
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
@@ -3614,9 +3738,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         if readbus2 == 0:
             readbus2 = 247
         if readbus != 255:
-            print('i2cbutton pressed: ' + str(readbus))
+            print('i2cbutton readbus pressed: ' + str(readbus))
         if readbus2 != 247:
-            print('i2cbutton pressed: ' + str(readbus2))
+            print('i2cbutton readbus2 pressed: ' + str(readbus2))
     else:
         readbus = 255
         readbus2 = 247
@@ -3647,9 +3771,13 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'peak'
         elif (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
-        elif (readbus2 == 245 and readbus == 247):
+        elif (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
-        elif event == 'I' or event == 'P' or (readbus2 == 244 and readbus == 255):
+        elif (readbus2 == 245 and readbus == 251):
+            pressed = 'showhelp'
+        elif (readbus2 == 244):
+            pressed = 'changemode'
+        elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 247):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
             pressed = 'copy'
@@ -3690,9 +3818,13 @@ def stopinterface(camera):
     return camera
 
 def startcamera(lens, fps):
-    global camera_model, fps_selection, fps_selected
+    global camera_model, fps_selection, fps_selected, cammode
     camera = picamera.PiCamera()
-    camera.resolution = (1920, 1080) #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080
+    if cammode == 'film':
+        reso=(1920,1080)
+    elif cammode == 'picture':
+        reso=(4056,3040)
+    camera.resolution = reso #tested modes 1920x816, 1296x552/578, v2 1640x698, 1640x1232, hqbinned 2028x1080, full 4056x3040
     #Background image
     underlay = None
     bakgimg = tarinafolder + '/extras/bakg.jpg'
