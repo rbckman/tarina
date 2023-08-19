@@ -735,6 +735,7 @@ def main():
                         if onlysound != True:
                             camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
                             starttime = time.time()
+                        os.system('ln -s '+filmfolder+'.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
                         recording = True
                         showmenu = 0
                     if cammode == 'picture':
@@ -760,7 +761,6 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
-                os.system('ln -s '+filmfolder+'.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
                 if showmenu_settings == True:
                     showmenu = 1
                 if onlysound != True:
@@ -3508,14 +3508,14 @@ def startstream(camera, stream, plughw, channels):
     stream_cmd = 'ffmpeg -f h264 -r 25 -i - -itsoffset 5.5 -fflags nobuffer -f alsa -ac '+str(channels)+' -i hw:'+str(plughw)+' -ar '+soundrate+' -acodec mp2 -b:a 128k -ar '+soundrate+' -vcodec copy -f mpegts udp://10.42.0.169:5002'
     try:
         stream = subprocess.Popen(stream_cmd, shell=True, stdin=subprocess.PIPE) 
-        camera.start_recording(stream.stdin, format='h264', bitrate = 500000)
+        camera.start_recording(stream.stdin, splitter_port=2, format='h264', bitrate = 55555)
     except:
         stream = ''
     #now = time.strftime("%Y-%m-%d-%H:%M:%S") 
     return stream
 
 def stopstream(camera, stream):
-    camera.stop_recording() 
+    camera.stop_recording(splitter_port=2) 
     os.system('pkill -9 ffmpeg') 
     print("Camera safely shut down") 
     print("Good bye")
