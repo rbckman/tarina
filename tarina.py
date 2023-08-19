@@ -735,6 +735,7 @@ def main():
                         if onlysound != True:
                             camera.start_recording(filmfolder+ '.videos/'+video_origins+'.h264', format='h264', quality=quality, level=profilelevel)
                             starttime = time.time()
+                        os.system('ln -s '+filmfolder+'.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
                         recording = True
                         showmenu = 0
                     if cammode == 'picture':
@@ -760,7 +761,6 @@ def main():
                 disk = os.statvfs(tarinafolder + '/')
                 diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                 recording = False
-                os.system('ln -s '+filmfolder+'.videos/'+video_origins+'.h264 '+foldername+filename+'.h264')
                 if showmenu_settings == True:
                     showmenu = 1
                 if onlysound != True:
