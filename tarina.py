@@ -3758,6 +3758,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif nextstatus=="STOP":
                 if recording == True:
                     pressed="record"
+            elif nextstatus=="STOPRETAKE":
+                if recording == True:
+                    pressed="retake"
             elif nextstatus=="RECSOUND":
                 if recording==False:
                     pressed="record"
