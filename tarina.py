@@ -207,9 +207,9 @@ def main():
     oldscene = scene
     oldshot = shot
     oldtake = take
-    #TURN OFF WIFI AND TARINA SERVER
-    serverstate = 'off'
-    wifistate = 'off'
+    #TURN ON WIFI AND TARINA SERVER
+    serverstate = 'on'
+    wifistate = 'on'
     #serverstate = tarinaserver(False)
     #TO_BE_OR_NOT_TO_BE 
     foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
@@ -284,7 +284,7 @@ def main():
                 overlay = displayimage(camera, p_imagename, overlay, 3)
                 while holdbutton == 'peak':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-                    writemessage('peaking ' + str(peakshot))
+                    #writemessage('peaking ' + str(peakshot))
                 overlay = removeimage(camera, overlay)
             #SHOWHELP
             elif pressed == 'showhelp':
@@ -320,8 +320,8 @@ def main():
                     #Check if rendered video exist
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
-                    renderfilename = renderfilm(filmfolder, filmname, comp, scene, False)
-                    remove_shots = playdub(filmname,renderfilename, 'scene')
+                    renderfilename = renderfilm(filmfolder, filmname, comp, scene, True)
+                    remove_shots = playdub(filmname,renderfilename, 'film')
                     if remove_shots != []:
                         for i in remove_shots:
                             remove(filmfolder, filmname, scene, i, take, 'shot')
@@ -579,8 +579,8 @@ def main():
                     print('is there already prob')
                 add_organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                shot=shots+1
                 vumetermessage('Shot ' + str(shot) + ' inserted')
+                updatethumb = True
                 time.sleep(1)
             #INSERT SCENE
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False:
@@ -594,6 +594,13 @@ def main():
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Scene ' + str(scene) + ' inserted')
                 time.sleep(1)
+            #NEW SCENE
+            elif pressed == 'new_scene':
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                vumetermessage('got new scene')
+                scene=scenes+1
+                shot=1
+                take=1
             #HELPME
             elif event == 'H':
                 if webz_on() == True:
@@ -709,15 +716,23 @@ def main():
                 beepcountdown = 0
                 pressed = 'record'
                 print('exhausted from all beepings')
-        if pressed == 'record' or pressed == 'retake' or reclenght != 0 and t > reclenght:
+        if pressed == 'record' or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
-            if recording == False and recordable == True:
+            if recording == False and recordable == True or recording == False and pressed == 'record_now' or recording == False and pressed == 'retake_now':
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 if pressed == "record":
                     #shot = shots+1
                     take = takes+1
                 elif pressed == "retake":
                     take = takes+1
+                elif pressed == 'record_now':
+                    shot=shots+1
+                    take=1
+                elif pressed == 'retake_now':
+                    takes = counttakes(filmname, filmfolder, scene, shot)
+                    take = takes + 1
+                foldername = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                filename = 'take' + str(take).zfill(3)
                 if beeps > 0 and beeping == False:
                     beeping = True
                     beepcountdown = beeps
@@ -1175,8 +1190,8 @@ def main():
                 duration = filmsettings[16]
                 showmenu_settings = filmsettings[17]
                 quality = filmsettings[18]
-                wifistate = filmsettings[19]
-                serverstate=filmsettings[20]
+                #wifistate = filmsettings[19]
+                #serverstate=filmsettings[20]
                 plughw=filmsettings[21]
                 channels=filmsettings[22]
                 cammode=filmsettings[23]
@@ -1384,7 +1399,7 @@ def listenforclients(host, port, q):
                 else:
                     if addr:
                         print(addr[0],' sending back')
-                        sendtoserver(addr[0],port,str(time.time()))
+                        sendtoserver(addr[0],port,data)
                         nextstatus = data
                         print("got data:"+nextstatus)
                         c.close()
@@ -2326,6 +2341,28 @@ def compileshot(filename,filmfolder,filmname):
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
         origin=os.path.realpath(filename+'.mp4')
+        renderfilename=filename
+        muxing = True
+        if muxing == True:
+            #muxing mp3 layer to mp4 file
+            #count estimated audio filesize with a bitrate of 320 kb/s
+            audiosize = countsize(renderfilename + '.wav') * 0.453
+            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+            p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            while p.poll() is None:
+                time.sleep(0.2)
+                try:
+                    rendersize = countsize(renderfilename + '.mp3')
+                except:
+                    continue
+                writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
+            ##MERGE AUDIO & VIDEO
+            writemessage('Merging audio & video')
+            #os.remove(renderfilename + '.mp4') 
+            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
+            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+            os.remove(renderfilename + '_tmp.mp4')
+            os.remove(renderfilename + '.mp3')
         db.update('videos', where='filename="'+origin+'"', videolenght=videolenght/1000, audiolenght=audiolenght/1000, audiosync=audiosync)
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
@@ -2596,6 +2633,30 @@ def renderscene(filmfolder, filmname, scene):
             os.system('cp ' + scenedir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + scenedir + '/dub/.rendered' + str(i + 1).zfill(3))
         print('Audio rendered!')
         newaudiomix = True
+        muxing = True
+        if muxing == True:
+            #muxing mp3 layer to mp4 file
+            #count estimated audio filesize with a bitrate of 320 kb/s
+            audiosize = countsize(renderfilename + '.wav') * 0.453
+            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+            if debianversion == 'stretch':
+                p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            else:
+                p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            while p.poll() is None:
+                time.sleep(0.2)
+                try:
+                    rendersize = countsize(renderfilename + '.mp3')
+                except:
+                    continue
+                writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
+            ##MERGE AUDIO & VIDEO
+            writemessage('Merging audio & video')
+            #os.remove(renderfilename + '.mp4') 
+            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
+            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+            os.remove(renderfilename + '_tmp.mp4')
+            os.remove(renderfilename + '.mp3')
     else:
         print('Already rendered!')
     return renderfilename, newaudiomix
@@ -2966,8 +3027,8 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
                 filename = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/scene'
             else:
                 filename = filmfolder + filmname + '/' + filmname
-            renderfilename = renderfilm(filmfolder, filmname, 0, 0, False)
-            playdub(filmname,renderfilename, 'film')
+            renderfilename = renderfilm(filmfolder, filmname, 0, scene, False)
+            playdub(filmname,renderfilename, 'scene')
         time.sleep(0.05)
     #Save dubmix before returning
     if dubmix != dubmix_old:
@@ -3022,24 +3083,32 @@ def playdub(filmname, filename, player_menu):
     videolag = 0
     remove_shots = []
     if video == True:
-        try:
+        if player_menu == 'dubbb':
+            try:
+                player = OMXPlayer(filename + '.mp4', args=['-n', '-1', '--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            except:
+                writemessage('Something wrong with omxplayer')
+                time.sleep(0.5)
+                return
+        else:
+            try:
+                player = OMXPlayer(filename + '.mp4', args=['--adev', 'alsa:hw:'+str(plughw), '--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
+            except:
+                writemessage('Something wrong with omxplayer')
+                time.sleep(0.5)
+                return
             #player = OMXPlayer(filename + '.mp4', args=['--fps', '25', '--layer', '3', '--win', '0,70,800,410', '--no-osd', '--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
-            player = OMXPlayer(filename + '.mp4', args=['--adev', 'alsa:hw:'+str(plughw), '--fps', '25', '--layer', '3', '--no-osd', '--win', '0,15,800,475','--no-keys'], dbus_name='org.mpris.MediaPlayer2.omxplayer1', pause=True)
-        except:
-            writemessage('Something wrong with omxplayer')
-            time.sleep(0.5)
-            return
-        writemessage('Starting omxplayer')
+        writemessage('Loading...')
         clipduration = player.duration()
     #sound
-    if player_menu != 'film':
-        try:
-            playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
-            time.sleep(0.2)
-        except:
-            writemessage('something wrong with audio player')
-            time.sleep(2)
-            return
+    #if player_menu != 'film':
+    #    try:
+    #        playerAudio = OMXPlayer(filename + '.wav', args=['--adev','alsa:hw:'+str(plughw)], dbus_name='org.mpris.MediaPlayer2.omxplayer2', pause=True)
+    #        time.sleep(0.2)
+    #    except:
+    #        writemessage('something wrong with audio player')
+    #        time.sleep(2)
+    #        return
         #omxplayer hack to play really short videos.
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
@@ -3057,10 +3126,10 @@ def playdub(filmname, filename, player_menu):
     if player_menu == 'dub':
         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
     time.sleep(0.5)
-    try:
-        playerAudio.play()
-    except:
-        logger.info('something wrong with omxplayer audio or playing film mp4 audio')
+    #try:
+    #    playerAudio.play()
+    #except:
+    #    logger.info('something wrong with omxplayer audio or playing film mp4 audio')
         #logger.warning(e)
     starttime = time.time()
     selected = 1
@@ -3125,7 +3194,7 @@ def playdub(filmname, filename, player_menu):
             else:
                 try:
                     player.set_position(t+2)
-                    playerAudio.set_position(player.position())
+                    #playerAudio.set_position(player.position())
                 except:
                     print('couldnt set position of player')
         elif pressed == 'down':
@@ -3141,7 +3210,7 @@ def playdub(filmname, filename, player_menu):
                 if t > 1:
                     try:
                         player.set_position(t-2)
-                        playerAudio.set_position(player.position())
+                        #playerAudio.set_position(player.position())
                     except:
                         print('couldnt set position of player')
         elif pressed == 'middle':
@@ -3152,7 +3221,7 @@ def playdub(filmname, filename, player_menu):
                         #player.stop()
                         #playerAudio.stop()
                         player.quit()
-                        playerAudio.quit()
+                        #playerAudio.quit()
                     #os.system('pkill -9 aplay') 
                 except:
                     #kill it if it dont stop
@@ -3172,9 +3241,9 @@ def playdub(filmname, filename, player_menu):
                     if video == True:
                         player.pause()
                         player.set_position(0)
-                        if player_menu != 'film':
-                            playerAudio.pause()
-                            playerAudio.set_position(0)
+                        #if player_menu != 'film':
+                            #playerAudio.pause()
+                            #playerAudio.set_position(0)
                     if dub == True:
                         p = 0
                         while p < 3:
@@ -3182,8 +3251,8 @@ def playdub(filmname, filename, player_menu):
                             time.sleep(1)
                             p+=1
                     player.play()
-                    if player_menu != 'film':
-                        playerAudio.play()
+                    #if player_menu != 'film':
+                    #    playerAudio.play()
                     #run_command('aplay -D plughw:0 ' + filename + '.wav &')
                     if dub == True:
                         run_command(tarinafolder + '/alsa-utils-1.1.3/aplay/arecord -D plughw:'+str(plughw)+' -f '+soundformat+' -c '+str(channels)+' -r '+soundrate+' -vv /dev/shm/dub.wav &')
@@ -3192,17 +3261,17 @@ def playdub(filmname, filename, player_menu):
                 starttime = time.time()
             elif menu[selected] == 'PAUSE':
                 player.pause()
-                try:
-                    playerAudio.pause()
-                except:
-                    pass
+                #try:
+                #    playerAudio.pause()
+                #except:
+                #    pass
                 pause = True
             elif menu[selected] == 'PLAY':
                 player.play()
-                try:
-                    playerAudio.play()
-                except:
-                    pass
+                #try:
+                #    playerAudio.play()
+                #except:
+                #    pass
                 pause = False
             elif menu[selected] == 'TRIM':
                 selected = 1
@@ -3213,12 +3282,12 @@ def playdub(filmname, filename, player_menu):
             elif menu[selected] == 'FROM BEGINNING':
                 trim = ['beginning', player.position()]
                 player.quit()
-                playerAudio.quit()
+                #playerAudio.quit()
                 return trim
             elif menu[selected] == 'FROM END':
                 trim = ['end', player.position()]
                 player.quit()
-                playerAudio.quit()
+                #playerAudio.quit()
                 return trim
         time.sleep(0.02)
         if pause == False:
@@ -3230,7 +3299,7 @@ def playdub(filmname, filename, player_menu):
                     os.system('pkill arecord')
                 return remove_shots
     player.quit()
-    playerAudio.quit()
+    #playerAudio.quit()
     #os.system('pkill dbus-daemon')
 
 #---------------View Film--------------------
@@ -3683,7 +3752,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif nextstatus=="DELETE":
                 pressed="remove"
             elif nextstatus=="REC":
-                pressed="record"
+                pressed="record_now"
+            elif nextstatus=="RETAKE":
+                pressed="retake_now"
             elif nextstatus=="STOP":
                 if recording == True:
                     pressed="record"
@@ -3694,6 +3765,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif nextstatus=="PLACEHOLDER":
                 selected=2
                 pressed="insert_shot"
+            elif nextstatus=="NEWSCENE":
+                pressed="new_scene"
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
@@ -3703,13 +3776,6 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
-            elif nextstatus=="NEWSCENE":
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                scene=scenes+1
-                shot=1
-                take=1
-            elif nextstatus=="RETAKE":
-                pressed="retake"
             #print(nextstatus)
     except:
         print('process not found')
@@ -3771,7 +3837,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'showhelp'
         elif (readbus2 == 244):
             pressed = 'changemode'
-        elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 247):
+        elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 239):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 245 and readbus == 254):
             pressed = 'copy'

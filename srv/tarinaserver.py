@@ -217,7 +217,7 @@ class index:
         except:
             take=1
             session.reload = 0
-        thumb="/static/Videos/"+name+"/scene"+str(scene).zfill(3)+"/shot"+str(shot).zfill(3)+"/take"+str(take).zfill(3)+".jpeg"
+        thumb="/static/Videos/"+name+"/scene"+str(scene).zfill(3)+"/shot"+str(shot).zfill(3)+"/picture"+str(take).zfill(3)+".jpeg"
         print(thumb)
         if os.path.isfile(basedir+thumb) == False:
             print(basedir+thumb)
