@@ -94,7 +94,7 @@ else:
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode, newfilmname
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -143,6 +143,7 @@ def main():
     pic = 1
     onlysound=False
     filmname = 'onthefloor'
+    newfilmname = ''
     beeps = 0
     beepcountdown = 0
     beeping = False
@@ -451,9 +452,10 @@ def main():
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
             #NEW FILM
-            elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '':
+            elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '' or pressed == 'new_film':
                 filmname_exist=False
-                newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
+                if newfilmname == '':
+                    newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
                 allfilm = getfilms(filmfolder)
                 for i in allfilm:
                     if i[0] == newfilmname:
@@ -473,8 +475,11 @@ def main():
                     shot = 1
                     take = 1
                     selectedaction = 0
+                    newfilmname = ''
                 else:
                     print(term.clear)
+                    filmname = newfilmname
+                    newfilmname = ''
                     vumetermessage('film already exist!')
                     logger.info('film already exist!')
             #EDIT FILM NAME
@@ -1399,7 +1404,7 @@ def listenforclients(host, port, q):
                 else:
                     if addr:
                         print(addr[0],' sending back')
-                        sendtoserver(addr[0],port,data)
+                        sendtoserver(addr[0],port,'rebounce'+data)
                         nextstatus = data
                         print("got data:"+nextstatus)
                         c.close()
@@ -3717,7 +3722,7 @@ def flushbutton():
                 break
 
 def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
-    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected, camera, loadfilmsettings, selected
+    global i2cbuttons, serverstate, nextstatus, process, que, tarinactrl_ip, recording, onlysound, filmname, filmfolder, scene, shot, take, selected, camera, loadfilmsettings, selected, newfilmname
     #Check controller
     pressed = ''
     nextstatus = ''
@@ -3766,10 +3771,13 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                     pressed="record"
                     onlysound=True
             elif nextstatus=="PLACEHOLDER":
-                selected=2
+                #selected=2
                 pressed="insert_shot"
             elif nextstatus=="NEWSCENE":
                 pressed="new_scene"
+            elif "NEWFILM:" in nextstatus:
+                newfilmname = nextstatus.split(':')[1]
+                pressed="new_film"
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
