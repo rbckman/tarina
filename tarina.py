@@ -463,7 +463,7 @@ def main():
                 if filmname != newfilmname and filmname_exist==False:
                     filmname = newfilmname
                     os.makedirs(filmfolder + filmname)
-                    writemessage('Good luck with your film ' + filmname + '!')
+                    vumetermessage('Good luck with your film ' + filmname + '!')
                     #make a filmhash
                     print('making filmhash...')
                     filmhash = shortuuid.uuid()
@@ -474,7 +474,7 @@ def main():
                     scene = 1
                     shot = 1
                     take = 1
-                    selectedaction = 0
+                    #selectedaction = 0
                     newfilmname = ''
                 else:
                     print(term.clear)
@@ -1257,9 +1257,9 @@ def main():
                 if menu[selected] == 'SCENE:' and recordable == False: # display first shot of scene if browsing scenes
                     p = counttakes(filmname, filmfolder, scene, 1)
                     imagename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
-                elif menu[selected] == 'FILM:' and recordable == True:
-                    scene, shot, take = countlast(filmname,filmfolder)
-                    shot += 1
+                #elif menu[selected] == 'FILM:' and recordable == True:
+                #    scene, shot, take = countlast(filmname,filmfolder)
+                #    shot += 1
                 elif menu[selected] == 'FILM:' and recordable == False: # display first shot of film
                     p = counttakes(filmname, filmfolder, 1, 1)
                     imagename = filmfolder + filmname + '/scene' + str(1).zfill(3) + '/shot' + str(1).zfill(3) + '/take' + str(p).zfill(3) + '.jpeg'
