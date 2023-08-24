@@ -576,7 +576,21 @@ def main():
                     vumetermessage('Scene moved!')
                     time.sleep(1)
             #INSERT SHOT
-            elif pressed == 'insert' and menu[selected] != 'SCENE:' or pressed == 'insert_shot':
+            elif pressed == 'insert' and menu[selected] != 'SCENE:':
+                insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                try:
+                    os.makedirs(insertshot)
+                except:
+                    print('is there already prob')
+                add_organize(filmfolder, filmname)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                vumetermessage('Shot ' + str(shot) + ' inserted')
+                updatethumb = True
+                time.sleep(1)
+            #INSERT SHOT TO LAST SHOT
+            elif pressed == 'insert_shot':
+                shot = countshots(filmname, filmfolder, scene)
+                shot=shot+1
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 try:
                     os.makedirs(insertshot)
