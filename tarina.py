@@ -77,24 +77,9 @@ while probei2c < 10:
         probei2c += 1
         time.sleep(1)
 
-#NETWORKS
-
-networks=[]
-adapters = ifaddr.get_adapters()
-for adapter in adapters:
-    print("IPs of network adapter " + adapter.nice_name)
-    for ip in adapter.ips:
-        if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
-            print(ip.ip)
-            networks.append(ip.ip)
-if networks != []:
-    network=networks[0]
-else:
-    network=''
-
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode, newfilmname
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode, newfilmname, camera_recording
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
@@ -106,7 +91,13 @@ def main():
     tarinafolder = os.getcwd()
 
     #MENUS
-    menu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
+    tarinactrlmenu = "BACK","New FILM","Sync FILM","New SCENE","TARINACTRL","Sync SCENE","Stop","Retake","Search","Snapshot"
+    emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
+    menu = standardmenu
+    showtarinactrl = False
+    recordwithports = False
+    pressagain = ''
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
@@ -221,6 +212,32 @@ def main():
         os.makedirs(onthefloor_folder)
 
     #--------------Tarina Controller over socket ports --------#
+
+    #TARINACTRL
+    camerasconnected=''
+    sleep=0.2
+    cameras = []
+    camerasoff =[]
+    camselected=0
+    newselected=0 
+    mastersound=None
+    camera_recording=None
+    pingip=0
+    searchforcameras='on'
+    #NETWORKS
+    networks=[]
+    adapters = ifaddr.get_adapters()
+    for adapter in adapters:
+        print("IPs of network adapter " + adapter.nice_name)
+        for ip in adapter.ips:
+            if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+                print(ip.ip)
+                networks.append(ip.ip)
+    if networks != []:
+        network=networks[0]
+        if network not in cameras:
+            cameras.append(network)
+
     port = 55555
     que = Queue()
     process = Process(target=listenforclients, args=("0.0.0.0", port, que))
@@ -235,6 +252,9 @@ def main():
     #--------------MAIN LOOP---------------#
     while True:
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if pressagain != '':
+            pressed = pressagain
+            pressagain = ''
         if buttonpressed == True:
             flushbutton()
         #event = screen.getch()
@@ -600,7 +620,7 @@ def main():
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 updatethumb = True
-                time.sleep(1)
+                #time.sleep(1)
             #INSERT SCENE
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False:
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
@@ -717,6 +737,121 @@ def main():
                     updatethumb = True
                     rendermenu = True
                     time.sleep(0.5)
+            elif pressed == 'middle' and menu[selected] == 'BACK':
+                if showtarinactrl == True:
+                    showtarinactrl = False
+                    menu=emptymenu
+                    selected=26
+        #SHOWTARINACTRL
+        if recordwithports: 
+            if pressed == 'middle' and menu[selected] == "New FILM":
+                newfilmname = nameyourfilm(filmfolder, filmname, abc, True)
+                a=0
+                for i in cameras:
+                    if i not in camerasoff:
+                        sendtocamera(i,port,'NEWFILM:'+newfilmname)
+                    a=a+1
+            elif pressed == "retake" or pressed == "middle" and menu[selected] == "Retake":
+                a=0
+                for i in cameras:
+                    if i not in camerasoff:
+                        if a == camselected:
+                            if camera_recording == camselected:
+                                sendtocamera(i,port,'STOPRETAKE')
+                                camera_recording=None
+                            else:
+                                sendtocamera(i,port,'RETAKE')
+                                camera_recording=camselected
+                        else:
+                            if camera_recording != None:
+                                sendtocamera(i,port,'PLACEHOLDER')
+                    a=a+1        
+            elif pressed == "middle" and menu[selected] == "Sync SCENE":
+                #for p in cameras[1:]:
+                #    if p not in camerasoff:
+                #        if camera_recording == None:
+                #            sendtocamera(cameras[0],port,'SYNCIP:'+p)
+                if camselected != 0:
+                    sendtocamera(cameras[0],port,'SYNCIP:'+cameras[camselected])
+            elif pressed == "middle" and menu[selected]=='New SCENE':
+                a=0
+                for i in cameras:
+                    if i not in camerasoff:
+                        sendtocamera(i,port,'NEWSCENE')
+                    a=a+1
+            elif pressed == "record" and camera_recording != None:
+                if camera_recording == 0:
+                    pressed='record_now'
+                else:
+                    sendtocamera(cameras[camera_recording],port,'STOP')
+                camera_recording=None
+            elif pressed == "record" and camera_recording == None:
+                a=0
+                for i in cameras:
+                    if i not in camerasoff:
+                        if a == camselected:
+                            if camselected==0:
+                                pressed='record_now'
+                            else:
+                                sendtocamera(i,port,'REC')
+                            camera_recording=camselected
+                        else:
+                            if a==0:
+                                pressed='insert_shot'
+                            else:
+                                sendtocamera(i,port,'PLACEHOLDER')
+                        a=a+1
+            if event == "0":
+                newselected = 0
+            elif event == "1":
+                if len(cameras) > 1:
+                    newselected = 1
+            elif event == "2":
+                if len(cameras) > 2:
+                    newselected = 2
+            elif event == "3":
+                if len(cameras) > 3:
+                    newselected = 3
+            elif event == "4":
+                if len(cameras) > 4:
+                    newselected = 4
+            elif event == "-":
+                if cameras[camselected] not in camerasoff:
+                    camerasoff.append(cameras[camselected])
+            elif event == "+":
+                if cameras[camselected] in camerasoff:
+                    camerasoff.remove(cameras[camselected])
+            if camselected != newselected:
+                if camera_recording != None:
+                    #change camera
+                    a=0
+                    for c in cameras:
+                        if c not in camerasoff:
+                            print(c)
+                            if a == camselected:
+                                if camselected == 0:
+                                    pressed='record_now'
+                                    pressagain='insert_shot'
+                                else:
+                                    sendtocamera(c,port,'STOP')
+                                    time.sleep(sleep)
+                                    sendtocamera(c,port,'PLACEHOLDER')
+                            elif a == newselected:
+                                if newselected == 0:
+                                    pressed='record_now'
+                                else:
+                                    sendtocamera(c,port,'REC')
+                                camera_recording=newselected
+                            else:
+                                if a == 0:
+                                    pressed='insert_shot'
+                                else:
+                                    sendtocamera(c,port,'PLACEHOLDER')
+                                #time.sleep(2)
+                            a=a+1
+                camselected=newselected
+                vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
+
 
         #RECORD AND PAUSE
         if beepcountdown > 1:
@@ -735,7 +870,7 @@ def main():
                 beepcountdown = 0
                 pressed = 'record'
                 print('exhausted from all beepings')
-        if pressed == 'record' or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' or reclenght != 0 and t > reclenght:
+        if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True or recording == False and pressed == 'record_now' or recording == False and pressed == 'retake_now':
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
@@ -884,6 +1019,11 @@ def main():
             miclevel  = 70
         elif pressed == 'middle' and menu[selected] == 'PHONES:':
             headphoneslevel = 70
+        elif pressed == 'middle' and menu[selected] == 'SRV:':
+            if showtarinactrl == False:
+                menu=tarinactrlmenu
+                selected=0
+                showtarinactrl = True
 
         #UP
         elif pressed == 'up':
@@ -975,6 +1115,11 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'SEARCH:':
+                if searchforcameras == 'on':
+                    searchforcameras = 'off'
+                elif searchforcameras == 'off':
+                    searchforcameras = 'on'
             elif menu[selected] == 'MODE:':
                 if cammode == 'film':
                     cammode = 'picture'
@@ -1125,6 +1270,11 @@ def main():
                 elif wifistate == 'off':
                     run_command('sudo iwconfig wlan0 txpower auto')
                     wifistate = 'on'
+            elif menu[selected] == 'SEARCH:':
+                if searchforcameras == 'on':
+                    searchforcameras = 'off'
+                elif searchforcameras == 'off':
+                    seaarchforcameras = 'on'
             elif menu[selected] == 'MODE:':
                 if cammode == 'film':
                     cammode = 'picture'
@@ -1305,7 +1455,12 @@ def main():
         #Check if menu is changed and save settings / sec
         if buttonpressed == True or recording == True or rendermenu == True:
             lastmenu = menu[selected]
-            settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, wifistate, '', '', '', '', '', '', live
+            if showtarinactrl == False:
+                menu = standardmenu
+                settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, searchforcameras, wifistate, '', '', '', '', '', '', live
+            else:
+                menu = tarinactrlmenu
+                settings = '','','','','','','','','','','','','','',''
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
@@ -1328,15 +1483,43 @@ def main():
                                 networks.append(ip.ip)
                     if networks != []:
                         network=networks[0]
+                        if network not in cameras:
+                            cameras.append(network)
                     else:
                         network='not connected'
-                    vumetermessage('filming with '+camera_model +' ip:'+ network + ' ')
-                    print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' ')
+                    if len(cameras) > 1:
+                        camerasconnected='connected '+str(len(cameras)-1)
+                        recordwithports=True
+                        vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected)+' rec:'+str(camera_recording))
+                    else:
+                        camerasconnected=''
+                        recordwithports=False
+                        if searchforcameras == 'on':
+                            camerasconnected='searching '+str(pingip)
+                        vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
+                    print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
+                    print(camselected,camera_recording,cameras)
             #writemessage(pressed)
             oldsettings = settings
             oldselected = selected
+        #PING TARINAS
+        if searchforcameras == 'on':
+            if camera_recording == None:
+                if pingip < 256:
+                    pingip+=1
+                else:
+                    pingip=0
+                    searchforcameras='off'
+                newcamera=pingtocamera(network[:-3]+str(pingip),port,'PING')
+                if newcamera != '':
+                    if newcamera not in cameras and newcamera not in networks:
+                        cameras.append(newcamera)
+                        print("Found camera! "+newcamera)
+                print('-~-')
+                print('pinging ip: '+network[:-3]+str(pingip))
+            else:
+                searchforcameras = 'off'
         time.sleep(keydelay)
-
 
 #--------------Logger-----------------------
 
@@ -1385,6 +1568,41 @@ def loadsettings(filmfolder, filmname):
         logger.info("couldnt load settings")
         return ''
 
+
+##---------------Connection----------------------------------------------
+def pingtocamera(host, port, data):
+    print("Sending to "+host+" on port "+str(port)+" DATA:"+data)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.05)
+    newcamera=''
+    try:
+        while True:
+            s.connect((host, port))
+            s.send(str.encode(data))
+            newcamera=host
+            print("Sent to server..")
+            break
+    except:
+        print('did not connect')
+    s.close()
+    return newcamera
+
+##---------------Send to server----------------------------------------------
+
+def sendtocamera(host, port, data):
+    print("Sending to "+host+" on port "+str(port)+" DATA:"+data)
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(5)
+    try:
+        while True:
+            s.connect((host, port))
+            s.send(str.encode(data))
+            print("Sent to server..")
+            break
+    except:
+        print('did not connect')
+    s.close()
+
 ##---------------Send to server----------------------------------------------
 
 def sendtoserver(host, port, data):
@@ -1417,8 +1635,8 @@ def listenforclients(host, port, q):
                     break
                 else:
                     if addr:
-                        print(addr[0],' sending back')
-                        sendtoserver(addr[0],port,'rebounce'+data)
+                        #print(addr[0],' sending back')
+                        #sendtoserver(addr[0],port,'rebounce'+data)
                         nextstatus = data
                         print("got data:"+nextstatus)
                         c.close()
