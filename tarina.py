@@ -223,7 +223,7 @@ def main():
     mastersound=None
     camera_recording=None
     pingip=0
-    searchforcameras='on'
+    searchforcameras='off'
     #NETWORKS
     networks=[]
     adapters = ifaddr.get_adapters()
