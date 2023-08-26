@@ -92,7 +92,7 @@ def main():
 
     #MENUS
     standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
-    tarinactrlmenu = "BACK","New FILM","Sync FILM","New SCENE","TARINACTRL","Sync SCENE","Stop","Retake","Search","Snapshot"
+    tarinactrlmenu = "BACK","Add CAMERA","New FILM","Sync FILM","New SCENE","TARINACTRL","Sync SCENE","Stop","Retake","Search","Snapshot"
     emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
     menu = standardmenu
     showtarinactrl = False
@@ -100,6 +100,7 @@ def main():
     pressagain = ''
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
+    numbers_only = '1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
     selectedaction = 0
     selected = 0
@@ -334,10 +335,10 @@ def main():
                     updatethumb =  True
             #VIEW SCENE
             elif pressed == 'view' and menu[selected] == 'SCENE:':
+                writemessage('Loading scene...')
                 organize(filmfolder, filmname)
                 filmfiles = shotfiles(filmfolder, filmname, scene)
                 if len(filmfiles) > 0:
-                    writemessage('Loading scene...')
                     #Check if rendered video exist
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
@@ -357,10 +358,10 @@ def main():
                     vumetermessage("There's absolutely nothing in this scene! hit rec!")
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
+                writemessage('Loading film...')
                 organize(filmfolder, filmname)
                 filmfiles = viewfilm(filmfolder, filmname)
                 if len(filmfiles) > 0:
-                    writemessage('Loading film...')
                     camera.stop_preview()
                     #removeimage(camera, overlay)
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, True)
@@ -373,10 +374,10 @@ def main():
                 rendermenu = True
             #VIEW SHOT OR TAKE
             elif pressed == 'view':
+                writemessage('Loading clip...')
                 organize(filmfolder, filmname)
                 takes = counttakes(filmname, filmfolder, scene, shot)
                 if takes > 0:
-                    writemessage('Loading clip...')
                     removeimage(camera, overlay)
                     camera.stop_preview()
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
@@ -742,6 +743,11 @@ def main():
                     showtarinactrl = False
                     menu=emptymenu
                     selected=26
+            elif pressed == 'middle' and menu[selected] == 'Add CAMERA':
+                newcamera = newcamera_ip(numbers_only, network)
+                if newcamera not in cameras and newcamera not in networks:
+                    cameras.append(newcamera)
+                    vumetermessage("New camera! "+newcamera)
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -766,13 +772,21 @@ def main():
                             if camera_recording != None:
                                 sendtocamera(i,port,'PLACEHOLDER')
                     a=a+1        
-            elif pressed == "middle" and menu[selected] == "Sync SCENE":
+            elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 #for p in cameras[1:]:
                 #    if p not in camerasoff:
                 #        if camera_recording == None:
                 #            sendtocamera(cameras[0],port,'SYNCIP:'+p)
-                if camselected != 0:
-                    sendtocamera(cameras[0],port,'SYNCIP:'+cameras[camselected])
+                if camselected > 0:
+                    #sendtocamera(cameras[0],port,'SYNCIP:'+cameras[camselected])
+                    ip = cameras[camselected]
+                    stopinterface(camera)
+                    run_command('rsync -avr --update -L --progress pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                    #sendtocamera(tarinactrl_ip,port,'SYNCDONE')
+                    #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                    startinterface()
+                    camera = startcamera(lens,fps)
+                    loadfilmsettings = True
             elif pressed == "middle" and menu[selected]=='New SCENE':
                 a=0
                 for i in cameras:
@@ -1509,12 +1523,12 @@ def main():
                     pingip+=1
                 else:
                     pingip=0
-                    searchforcameras='off'
+                    #searchforcameras='off'
                 newcamera=pingtocamera(network[:-3]+str(pingip),port,'PING')
                 if newcamera != '':
                     if newcamera not in cameras and newcamera not in networks:
                         cameras.append(newcamera)
-                        print("Found camera! "+newcamera)
+                        vumetermessage("Found camera! "+newcamera)
                 print('-~-')
                 print('pinging ip: '+network[:-3]+str(pingip))
             else:
@@ -2146,6 +2160,75 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
             pausetime = time.time()
         time.sleep(keydelay)
 
+#-------------New camera----------------
+
+def newcamera_ip(abc, network):
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    abcx = 0
+    helpmessage = 'Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
+    cursor = '_'
+    blinking = True
+    pausetime = time.time()
+    ip_network = network.split('.')[:-1]
+    ip_network = '.'.join(ip_network)+'.'
+    ip = ''
+    while True:
+        message = 'Camera ip: ' + ip_network + ip
+        print(term.clear+term.home)
+        print(message+cursor)
+        writemessage(message + cursor)
+        vumetermessage(helpmessage)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if event == ' ':
+            event = '_'
+        if pressed == 'down':
+            pausetime = time.time()
+            if abcx < (len(abc) - 1):
+                abcx = abcx + 1
+                cursor = abc[abcx]
+        elif pressed == 'up':
+            pausetime = time.time()
+            if abcx > 0:
+                abcx = abcx - 1
+                cursor = abc[abcx]
+        elif pressed == 'right':
+            pausetime = time.time()
+            if len(ip) < 2:
+                ip = ip + abc[abcx]
+                cursor = abc[abcx]
+            else:
+                helpmessage = 'Yo, maximum ip reached bro!'
+        elif pressed == 'left' or pressed == 'remove':
+            pausetime = time.time()
+            if len(ip) > 0:
+                ip = ip[:-1]
+                cursor = abc[abcx]
+        elif pressed == 'middle' or event == 10:
+            if len(ip) > 0:
+                if abc[abcx] != '_':
+                    if int(ip) < 256:
+                        ip = ip + abc[abcx]
+                        logger.info("New camera " + ip_network+ip)
+                        return ip_network+ip
+                    else:
+                        helpmessage = 'in the range of ips 1-256'
+        elif pressed == 'retake':
+            return 
+        elif event in abc:
+            pausetime = time.time()
+            ip = ip + event
+        if time.time() - pausetime > 0.5:
+            if blinking == True:
+                cursor = abc[abcx]
+            if blinking == False:
+                cursor = ' '
+            blinking = not blinking
+            pausetime = time.time()
+        time.sleep(keydelay)
+
 #------------Timelapse--------------------------
 
 def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlight):
@@ -2564,7 +2647,7 @@ def compileshot(filename,filmfolder,filmname):
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
         writemessage('Converting to playable video')
-        #remove old mp4
+        #remove old mp4 if corrupted like if an unpredicted shutdown in middle of converting
         video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         os.system('rm ' + filename + '.mp4')
         os.system('rm ' + video_origins + '.mp4')
