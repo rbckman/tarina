@@ -748,6 +748,21 @@ def main():
                 if newcamera not in cameras and newcamera not in networks:
                     cameras.append(newcamera)
                     vumetermessage("New camera! "+newcamera)
+            elif 'SYNCIP:' in pressed:
+                ip = pressed.split(':')[1]
+                vumetermessage('SYNCING!')
+                stopinterface(camera)
+                organize(filmfolder, filmname)
+                run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/ pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
+                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
+                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
+                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                startinterface()
+                camera = startcamera(lens,fps)
+                loadfilmsettings = True
+            elif 'SYNCDONE' in pressed:
+                loadfilmsettings = True
+                vumetermessage('SYNC DONE!')
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -4091,20 +4106,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                 newfilmname = nextstatus.split(':')[1]
                 pressed="new_film"
             elif "SYNCIP:" in nextstatus:
-                ip = nextstatus.split(':')[1]
-                writevumessage('SYNCING!')
-                #stopinterface(camera)
-                organize(filmfolder, filmname)
-                run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
-                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
-                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
-                #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-                startinterface()
-                #camera = startcamera(lens,fps)
-                loadfilmsettings = True
+                pressed=nextstatus
             elif "SYNCDONE" in nextstatus:
-                loadfilmsettings = True
-                vumetermessage='SYNC DONE!'
+                pressed=nextstatus
             #print(nextstatus)
     except:
         print('process not found')
