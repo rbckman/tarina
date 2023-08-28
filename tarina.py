@@ -92,7 +92,7 @@ def main():
 
     #MENUS
     standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
-    tarinactrlmenu = "BACK","Add CAMERA","New FILM","Sync FILM","New SCENE","TARINACTRL","Sync SCENE","Stop","Retake","Search","Snapshot"
+    tarinactrlmenu = "BACK","Add CAMERA","New FILM","Sync FILM","","New SCENE","Sync SCENE","Stop","Retake","Search","Snapshot"
     emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
     menu = standardmenu
     showtarinactrl = False
@@ -100,7 +100,7 @@ def main():
     pressagain = ''
     #STANDARD VALUES (some of these may not be needed, should do some clean up)
     abc = '_','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','0'
-    numbers_only = '1','2','3','4','5','6','7','8','9','0'
+    numbers_only = ' ','1','2','3','4','5','6','7','8','9','0'
     keydelay = 0.0555
     selectedaction = 0
     selected = 0
@@ -777,16 +777,9 @@ def main():
                 #    if p not in camerasoff:
                 #        if camera_recording == None:
                 #            sendtocamera(cameras[0],port,'SYNCIP:'+p)
-                if camselected > 0:
-                    #sendtocamera(cameras[0],port,'SYNCIP:'+cameras[camselected])
-                    ip = cameras[camselected]
-                    stopinterface(camera)
-                    run_command('rsync -avr --update -L --progress pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
-                    #sendtocamera(tarinactrl_ip,port,'SYNCDONE')
-                    #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-                    startinterface()
-                    camera = startcamera(lens,fps)
-                    loadfilmsettings = True
+                for i in cameras:
+                    if i != cameras[0]:
+                        sendtocamera(i,port,'SYNCIP:'+cameras[0])
             elif pressed == "middle" and menu[selected]=='New SCENE':
                 a=0
                 for i in cameras:
@@ -1474,7 +1467,7 @@ def main():
                 settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, searchforcameras, wifistate, '', '', '', '', '', '', live
             else:
                 menu = tarinactrlmenu
-                settings = '','','','','','','','','','','','','','',''
+                settings = '','','','',rectime,'','','','','','','','','',''
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
@@ -2212,7 +2205,7 @@ def newcamera_ip(abc, network):
                     if int(ip) < 256:
                         ip = ip + abc[abcx]
                         logger.info("New camera " + ip_network+ip)
-                        return ip_network+ip
+                        return (ip_network+ip).strip()
                     else:
                         helpmessage = 'in the range of ips 1-256'
         elif pressed == 'retake':
@@ -2514,6 +2507,10 @@ def organize(filmfolder, filmname):
                             compileshot(takename,filmfolder,filmname)
                             #organized_nr -= 1
                     organized_nr += 1
+        with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'w') as outfile:
+            outfile.write('\n'.join(str(i) for i in origin_files))
+        origin_files=[]
+
     # Shots
     for i in sorted(scenes):
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
@@ -4096,12 +4093,17 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                run_command('rsync -avr --update --progress --exclude="*.wav" pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' '+filmfolder+filmname+'/')
+                organize(filmfolder, filmname):
+                run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
+                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
                 sendtoserver(tarinactrl_ip,port,'SYNCDONE')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
+            elif "SYNCDONE" in nextstatus:
+                loadfilmsettings = True
+                vumetermessage='SYNC DONE!'
             #print(nextstatus)
     except:
         print('process not found')
