@@ -4093,7 +4093,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "SYNCIP:" in nextstatus:
                 ip = nextstatus.split(':')[1]
                 stopinterface(camera)
-                organize(filmfolder, filmname):
+                organize(filmfolder, filmname)
                 run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
                 run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
                 sendtoserver(tarinactrl_ip,port,'SYNCDONE')
