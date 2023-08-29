@@ -2682,16 +2682,13 @@ def compileshot(filename,filmfolder,filmname):
         os.system('rm ' + filename + '.mp4')
         os.system('rm ' + video_origins + '.mp4')
         print(filename+'.mp4 removed!')
-        video_origins = (os.path.realpath(filename+'.h264'))[:-5]
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
-        os.system('ln -s '+video_origins+'.mp4 '+filename+'.mp4')
+        os.system('ln -sf '+video_origins+'.mp4 '+filename+'.mp4')
         #add audio/video start delay sync
         run_command('sox -V0 '+filename+'.wav /dev/shm/temp.wav trim 0.013')
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
-        origin=os.path.realpath(filename+'.mp4')
-        renderfilename=video_origins
         muxing = True
         if muxing == True:
             #muxing mp3 layer to mp4 file
@@ -2708,15 +2705,18 @@ def compileshot(filename,filmfolder,filmname):
             ##MERGE AUDIO & VIDEO
             writemessage('Merging audio & video')
             #os.remove(renderfilename + '.mp4') 
-            call(['MP4Box', '-rem', '2',  renderfilename + '.mp4'], shell=False)
-            call(['MP4Box', '-add', renderfilename + '.mp4', '-add', filename + '.mp3', '-new', renderfilename + '_tmp.mp4'], shell=False)
-            os.system('cp -f ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
-            os.remove(renderfilename + '_tmp.mp4')
+            call(['MP4Box', '-rem', '2',  video_origins + '.mp4'], shell=False)
+            call(['MP4Box', '-fps', '25', '-add', video_origins + '.mp4', '-add', filename + '.mp3', '-new', video_origins + '_tmp.mp4'], shell=False)
+            os.system('cp -f ' + video_origins + '_tmp.mp4 ' + video_origins + '.mp4')
+            os.remove(video_origins + '_tmp.mp4')
             os.remove(filename + '.mp3')
+        origin=os.path.realpath(filename+'.mp4')
         db.update('videos', where='filename="'+origin+'"', videolenght=videolenght/1000, audiolenght=audiolenght/1000, audiosync=audiosync)
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
         os.system('rm /dev/shm/temp.wav')
+        os.system('ln -sf '+video_origins+'.mp4 '+filename+'.mp4')
+        logger.info('compile done!')
         #run_command('omxplayer --layer 3 ' + filmfolder + '/.rendered/' + filename + '.mp4 &')
         #time.sleep(0.8)
         #run_command('aplay ' + foldername + filename + '.wav')
