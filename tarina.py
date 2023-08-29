@@ -752,15 +752,24 @@ def main():
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
+                all_takes = organize(filmfolder, filmname)
+                for i in all_takes:
+                    compileshot(i,filmfolder,filmname):
                 organize(filmfolder, filmname)
-                run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/ pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
-                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
-                sendtoserver(tarinactrl_ip,port,'SYNCDONE')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
+                sendtocamera(ip,port,'SYNCDONE:'+ip)
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
-            elif 'SYNCDONE' in pressed:
+            elif 'SYNCDONE:' in pressed:
+                stopinterface(camera)
+                ip = pressed.split(':')[1]
+                logger.info('SYNCING from ip:'+ip)
+                run_command('ssh-copy-id pi@'+ip)
+                run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
+                run_command('rsync -avr --update --progress --files-from=pi@'+ip+':/+'filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/.origin_videos / /')
+                startinterface()
+                camera = startcamera(lens,fps)
                 loadfilmsettings = True
                 vumetermessage('SYNC DONE!')
         #SHOWTARINACTRL
