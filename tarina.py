@@ -760,6 +760,8 @@ def main():
                     compileshot(i,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
+                run_command('ssh-copy-id pi@'+ip)
+                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+i+'/.origin_videos / pi@'+ip+':/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 sendtocamera(ip,port,'SYNCDONE:'+cameras[0])
                 startinterface()
@@ -771,7 +773,9 @@ def main():
                 logger.info('SYNCING from ip:'+ip)
                 run_command('ssh-copy-id pi@'+ip)
                 run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
-                run_command('rsync -avr --update --progress --files-from=pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos / /')
+                with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'r') as f:
+                    scene_origin_files = [line.rstrip() for line in f]
+                time.sleep(10)
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
