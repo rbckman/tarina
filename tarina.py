@@ -610,6 +610,7 @@ def main():
                 time.sleep(1)
             #INSERT SHOT TO LAST SHOT
             elif pressed == 'insert_shot':
+                logger.info('inserting shot')
                 shot = countshots(filmname, filmfolder, scene)
                 shot=shot+1
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
@@ -757,7 +758,7 @@ def main():
                     compileshot(i,filmfolder,filmname)
                 organize(filmfolder, filmname)
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
-                sendtocamera(ip,port,'SYNCDONE:'+ip)
+                sendtocamera(ip,port,'SYNCDONE:'+cameras[0])
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
@@ -797,10 +798,6 @@ def main():
                                 sendtocamera(i,port,'PLACEHOLDER')
                     a=a+1        
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
-                #for p in cameras[1:]:
-                #    if p not in camerasoff:
-                #        if camera_recording == None:
-                #            sendtocamera(cameras[0],port,'SYNCIP:'+p)
                 for i in cameras:
                     if i != cameras[0]:
                         sendtocamera(i,port,'SYNCIP:'+cameras[0])
@@ -828,11 +825,11 @@ def main():
                             camera_recording=camselected
                         else:
                             if a==0:
-                                pressed='insert_shot'
+                                pressagain='insert_shot'
                             else:
                                 sendtocamera(i,port,'PLACEHOLDER')
                         a=a+1
-            if event == "0":
+            elif event == "0":
                 newselected = 0
             elif event == "1":
                 if len(cameras) > 1:
@@ -852,7 +849,7 @@ def main():
             elif event == "+":
                 if cameras[camselected] in camerasoff:
                     camerasoff.remove(cameras[camselected])
-            if camselected != newselected:
+            elif camselected != newselected:
                 if camera_recording != None:
                     #change camera
                     a=0
