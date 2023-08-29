@@ -775,7 +775,6 @@ def main():
                 run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
                 with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
                     scene_origin_files = [line.rstrip() for line in f]
-                time.sleep(10)
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
