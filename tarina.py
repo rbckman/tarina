@@ -753,10 +753,8 @@ def main():
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
-                organize(filmfolder, filmname)
-                with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
-                    scene_origin_files = [line.rstrip() for line in f]
-                for i in scene_origin_files:
+                video_files=shotfiles(filmfolder, filmname, scene)
+                for i in video_files:
                     compileshot(i,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
