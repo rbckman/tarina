@@ -2698,7 +2698,7 @@ def compileshot(filename,filmfolder,filmname):
             #count estimated audio filesize with a bitrate of 320 kb/s
             audiosize = countsize(renderfilename + '.wav') * 0.453
             os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-            p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            p = Popen(['ffmpeg', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
             while p.poll() is None:
                 time.sleep(0.2)
                 try:
