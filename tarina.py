@@ -755,7 +755,8 @@ def main():
                 stopinterface(camera)
                 all_takes = organize(filmfolder, filmname)
                 for i in all_takes:
-                    compileshot(i,filmfolder,filmname)
+
+                    compileshot(i[,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
@@ -2662,6 +2663,10 @@ def compileshot(filename,filmfolder,filmname):
     videolenght=0
     audiolenght=0
     #Check if file already converted
+    if '.h264' in filename:
+        filename=filename.replace('.h264','')
+    if '.mp4' in filename:
+        filename=filename.replace('.mp4','')
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
         writemessage('Converting to playable video')
