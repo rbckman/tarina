@@ -754,7 +754,9 @@ def main():
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
                 all_takes = organize(filmfolder, filmname)
-                for i in all_takes:
+                with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'r') as f:
+                    scene_origin_files = [line.rstrip() for line in f]
+                for i in scene_origin_files:
                     compileshot(i,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
@@ -2483,6 +2485,7 @@ def organize(filmfolder, filmname):
             scenes.remove(i)
     # Takes
     for i in sorted(scenes):
+        origin_scene_files=[]
         shots = next(os.walk(filmfolder + filmname + '/' + i))[1]
         for p in sorted(shots):
             takes = next(os.walk(filmfolder + filmname + '/' + i + '/' + p))[2]
@@ -2503,10 +2506,12 @@ def organize(filmfolder, filmname):
                         if origin != os.path.abspath(takename+'.mp4'):
                             print('appending: '+origin)
                             origin_files.append(origin)
+                            origin_scene_files.append(origin)
                     if '.h264' in s:
                         origin=os.path.realpath(takename+'.h264')
                         if origin != os.path.abspath(takename+'.h264'):
                             origin_files.append(origin)
+                            origin_scene_files.append(origin)
                     if organized_nr == unorganized_nr:
                         #print('correct')
                         pass
@@ -2530,7 +2535,7 @@ def organize(filmfolder, filmname):
                             #organized_nr -= 1
                     organized_nr += 1
         with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'w') as outfile:
-            outfile.write('\n'.join(str(i) for i in origin_files))
+            outfile.write('\n'.join(str(i) for i in origin_scene_files))
 
     # Shots
     for i in sorted(scenes):
@@ -2683,7 +2688,7 @@ def compileshot(filename,filmfolder,filmname):
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
         origin=os.path.realpath(filename+'.mp4')
-        renderfilename=filename
+        renderfilename=video_origins
         muxing = True
         if muxing == True:
             #muxing mp3 layer to mp4 file
