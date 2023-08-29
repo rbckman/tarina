@@ -756,6 +756,7 @@ def main():
                 all_takes = organize(filmfolder, filmname)
                 for i in all_takes:
                     compileshot(i,filmfolder,filmname)
+                    logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 sendtocamera(ip,port,'SYNCDONE:'+cameras[0])
@@ -2530,7 +2531,6 @@ def organize(filmfolder, filmname):
                     organized_nr += 1
         with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'w') as outfile:
             outfile.write('\n'.join(str(i) for i in origin_files))
-        origin_files=[]
 
     # Shots
     for i in sorted(scenes):
