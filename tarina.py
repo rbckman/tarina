@@ -754,7 +754,7 @@ def main():
                 stopinterface(camera)
                 all_takes = organize(filmfolder, filmname)
                 for i in all_takes:
-                    compileshot(i,filmfolder,filmname):
+                    compileshot(i,filmfolder,filmname)
                 organize(filmfolder, filmname)
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 sendtocamera(ip,port,'SYNCDONE:'+ip)
