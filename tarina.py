@@ -754,14 +754,14 @@ def main():
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
                 all_takes = organize(filmfolder, filmname)
-                with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'r') as f:
+                with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
                     scene_origin_files = [line.rstrip() for line in f]
                 for i in scene_origin_files:
                     compileshot(i,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
                 run_command('ssh-copy-id pi@'+ip)
-                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/'+i+'/.origin_videos / pi@'+ip+':/')
+                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 sendtocamera(ip,port,'SYNCDONE:'+cameras[0])
                 startinterface()
