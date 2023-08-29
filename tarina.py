@@ -2696,23 +2696,23 @@ def compileshot(filename,filmfolder,filmname):
         if muxing == True:
             #muxing mp3 layer to mp4 file
             #count estimated audio filesize with a bitrate of 320 kb/s
-            audiosize = countsize(renderfilename + '.wav') * 0.453
-            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
-            p = Popen(['ffmpeg', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+            audiosize = countsize(filename + '.wav') * 0.453
+            p = Popen(['ffmpeg', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
             while p.poll() is None:
                 time.sleep(0.2)
                 try:
-                    rendersize = countsize(renderfilename + '.mp3')
+                    rendersize = countsize(filename + '.mp3')
                 except:
                     continue
                 writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
             ##MERGE AUDIO & VIDEO
             writemessage('Merging audio & video')
             #os.remove(renderfilename + '.mp4') 
-            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
-            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+            call(['MP4Box', '-rem', '2',  renderfilename + '.mp4'], shell=False)
+            call(['MP4Box', '-add', renderfilename + '.mp4', '-add', filename + '.mp3', '-new', renderfilename + '_tmp.mp4'], shell=False)
+            os.system('cp -f ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
             os.remove(renderfilename + '_tmp.mp4')
-            os.remove(renderfilename + '.mp3')
+            os.remove(filename + '.mp3')
         db.update('videos', where='filename="'+origin+'"', videolenght=videolenght/1000, audiolenght=audiolenght/1000, audiosync=audiosync)
         os.system('rm ' + video_origins + '.h264')
         os.system('rm ' + filename + '.h264')
