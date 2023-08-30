@@ -92,7 +92,7 @@ def main():
 
     #MENUS
     standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
-    tarinactrlmenu = "BACK","Add CAMERA","New FILM","Sync FILM","","New SCENE","Sync SCENE","Stop","Retake","Search","Snapshot"
+    tarinactrlmenu = "BACK","CAMERA:", "Add CAMERA","New FILM","","New SCENE","Sync SCENE","Stop","Retake","Search","Snapshot"
     emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
     menu = standardmenu
     showtarinactrl = False
@@ -739,6 +739,10 @@ def main():
                     updatethumb = True
                     rendermenu = True
                     time.sleep(0.5)
+            elif pressed == 'remove' and menu[selected] == 'CAMERA:':
+                if camselected != 0:
+                    cameras.pop(camselected)
+                    newselected=0
             elif pressed == 'middle' and menu[selected] == 'BACK':
                 if showtarinactrl == True:
                     showtarinactrl = False
@@ -748,6 +752,7 @@ def main():
                 newcamera = newcamera_ip(numbers_only, network)
                 if newcamera not in cameras and newcamera not in networks:
                     cameras.append(newcamera)
+                    rendermenu = True
                     vumetermessage("New camera! "+newcamera)
             elif 'SYNCIP:' in pressed:
                 ip = pressed.split(':')[1]
@@ -758,6 +763,8 @@ def main():
                     compileshot(i,filmfolder,filmname)
                     logger.info('SYNCING:'+i)
                 organize(filmfolder, filmname)
+                if not os.path.isfile('/home/pi/.ssh/id_rsa'):
+                    run_command('ssh-keygen')
                 run_command('ssh-copy-id pi@'+ip)
                 run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
@@ -847,6 +854,21 @@ def main():
             elif event == "4":
                 if len(cameras) > 4:
                     newselected = 4
+            elif event == "5":
+                if len(cameras) > 5:
+                    newselected = 5
+            elif event == "6":
+                if len(cameras) > 6:
+                    newselected = 6
+            elif event == "7":
+                if len(cameras) > 7:
+                    newselected = 7
+            elif event == "8":
+                if len(cameras) > 8:
+                    newselected = 8
+            elif event == "9":
+                if len(cameras) > 9:
+                    newselected = 9
             elif event == "-":
                 if cameras[camselected] not in camerasoff:
                     camerasoff.append(cameras[camselected])
@@ -882,6 +904,7 @@ def main():
                                 #time.sleep(2)
                             a=a+1
                 camselected=newselected
+                rendermenu = True
                 vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
 
 
@@ -905,6 +928,7 @@ def main():
         if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True or recording == False and pressed == 'record_now' or recording == False and pressed == 'retake_now':
+                camera_recording=0
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 if pressed == "record":
                     #shot = shots+1
@@ -1196,6 +1220,10 @@ def main():
             elif menu[selected] == 'Q:':
                 if quality < 39:
                     quality += 1
+            elif menu[selected] == 'CAMERA:':
+                if camselected < len(cameras)-1:
+                    newselected = camselected+1
+                    logger.info('camera selected:'+str(camselected))
 
         #LEFT
         elif pressed == 'left':
@@ -1356,6 +1384,10 @@ def main():
             elif menu[selected] == 'Q:':
                 if quality > 10:
                     quality -= 1
+            elif menu[selected] == 'CAMERA:':
+                if camselected > 0:
+                    newselected = camselected-1
+                    logger.info('camera selected:'+str(camselected))
 
         #RIGHT
         elif pressed == 'right':
@@ -1492,7 +1524,7 @@ def main():
                 settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, searchforcameras, wifistate, '', '', '', '', '', '', live
             else:
                 menu = tarinactrlmenu
-                settings = '','','','',rectime,'','','','','','','','','',''
+                settings = '',str(camselected),'','',rectime,'','','','','','','','','',''
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
@@ -1692,9 +1724,9 @@ def writemenu(menu,settings,selected,header,showmenu):
     for i, s in zip(menu, settings):
         menudone += i + s + '\n'
         if n == selected:
-            menudoneprint += i + ' : ' + s + ' <<<<<<<<< ' 
+            menudoneprint += term.black_on_darkkhaki(i+s) + ' | ' 
         else:
-            menudoneprint += i + ' : ' + s + ' | '
+            menudoneprint += i + ' ' + s + ' | '
         n += 1
     spaces = len(menudone) - 500
     menudone += spaces * ' '
@@ -4154,8 +4186,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
         readbus = 255
         readbus2 = 247
     if buttonpressed == False:
-        if event != '':
-            print(term.clear+term.home)
+        #if event != '':
+        #    print(term.clear+term.home)
         if event == 27:
             pressed = 'quit'
         elif event == 'KEY_ENTER' or event == 10 or event == 13 or (readbus == 247 and readbus2 == 247):
