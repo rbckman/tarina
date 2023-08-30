@@ -883,7 +883,7 @@ def main():
                         if c not in camerasoff:
                             print(c)
                             if a == camselected:
-                                if camselected == 0:
+                                if a == 0:
                                     pressed='record_now'
                                     pressagain='insert_shot'
                                 else:
@@ -891,14 +891,14 @@ def main():
                                     time.sleep(sleep)
                                     sendtocamera(c,port,'PLACEHOLDER')
                             elif a == newselected:
-                                if newselected == 0:
+                                if a == 0:
                                     pressed='record_now'
                                 else:
                                     sendtocamera(c,port,'REC')
                                 camera_recording=newselected
                             else:
                                 if a == 0:
-                                    pressed='insert_shot'
+                                    pressagain='insert_shot'
                                 else:
                                     sendtocamera(c,port,'PLACEHOLDER')
                                 #time.sleep(2)
@@ -2787,7 +2787,7 @@ def rendervideo(filmfiles, filename, renderinfo):
     for f in filmfiles[:]:
         videosize = videosize + countsize(f + '.mp4')
         videomerge.append('-cat')
-        videomerge.append(f + '.mp4')
+        videomerge.append(f + '.mp4#video')
     videomerge.append('-new')
     videomerge.append(filename + '.mp4')
     #videomerge.append(filename + '.h264')
