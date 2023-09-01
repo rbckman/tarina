@@ -782,6 +782,7 @@ def main():
                 vumetermessage('SYNC DONE!')
             elif 'RETAKE:' in pressed:
                 shot=pressed.split(':')[1]
+                shot=int(shot)
                 pressed="retake_now"
         #SHOWTARINACTRL
         if recordwithports: 
@@ -797,7 +798,7 @@ def main():
                 for i in cameras:
                     if i not in camerasoff:
                         if a == camselected:
-                            if camera_recording == camselected:
+                            if camera_recording == a:
                                 if a==0:
                                     pressed="retake_now"
                                     camera_recording=None
@@ -809,9 +810,9 @@ def main():
                                     pressed="retake_now"
                                     camera_recording=0
                                 else:
-                                    sendtocamera(i,port,'RETAKE:'+shot)
+                                    sendtocamera(i,port,'RETAKE:'+str(shot))
                                     camera_recording=camselected
-                            a=a+1        
+                        a=a+1 
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 for i in cameras:
                     if i != cameras[0]:
@@ -932,7 +933,7 @@ def main():
                 beepcountdown = 0
                 pressed = 'record'
                 print('exhausted from all beepings')
-        if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' or reclenght != 0 and t > reclenght:
+        if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' and recordwithports==False or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True or recording == False and pressed == 'record_now' or recording == False and pressed == 'retake_now':
                 camera_recording=0
