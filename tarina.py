@@ -92,7 +92,8 @@ def main():
 
     #MENUS
     standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
-    tarinactrlmenu = "BACK","CAMERA:", "Add CAMERA","New FILM","","New SCENE","Sync SCENE","Stop","Retake","Search","Snapshot"
+    tarinactrlmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'CAMERA:', 'Add CAMERA', 'New FILM', 'Sync FILM', 'Sync SCENE'
+    #tarinactrlmenu = "BACK","CAMERA:", "Add CAMERA","New FILM","","New SCENE","Sync SCENE","Snapshot"
     emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
     menu = standardmenu
     showtarinactrl = False
@@ -743,11 +744,6 @@ def main():
                 if camselected != 0:
                     cameras.pop(camselected)
                     newselected=0
-            elif pressed == 'middle' and menu[selected] == 'BACK':
-                if showtarinactrl == True:
-                    showtarinactrl = False
-                    menu=emptymenu
-                    selected=26
             elif pressed == 'middle' and menu[selected] == 'Add CAMERA':
                 newcamera = newcamera_ip(numbers_only, network)
                 if newcamera not in cameras and newcamera not in networks:
@@ -784,6 +780,9 @@ def main():
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
                 vumetermessage('SYNC DONE!')
+            elif 'RETAKE:' in pressed:
+                shot=pressed.split(':')[1]
+                pressed="retake_now"
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -793,21 +792,26 @@ def main():
                     if i not in camerasoff:
                         sendtocamera(i,port,'NEWFILM:'+newfilmname)
                     a=a+1
-            elif pressed == "retake" or pressed == "middle" and menu[selected] == "Retake":
+            elif pressed == "retake":
                 a=0
                 for i in cameras:
                     if i not in camerasoff:
                         if a == camselected:
                             if camera_recording == camselected:
-                                sendtocamera(i,port,'STOPRETAKE')
+                                if a==0:
+                                    pressed="retake_now"
+                                    camera_recording=None
+                                else:
+                                    sendtocamera(i,port,'STOPRETAKE')
                                 camera_recording=None
                             else:
-                                sendtocamera(i,port,'RETAKE')
-                                camera_recording=camselected
-                        else:
-                            if camera_recording != None:
-                                sendtocamera(i,port,'PLACEHOLDER')
-                    a=a+1        
+                                if a==0:
+                                    pressed="retake_now"
+                                    camera_recording=0
+                                else:
+                                    sendtocamera(i,port,'RETAKE:'+shot)
+                                    camera_recording=camselected
+                            a=a+1        
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 for i in cameras:
                     if i != cameras[0]:
@@ -816,7 +820,10 @@ def main():
                 a=0
                 for i in cameras:
                     if i not in camerasoff:
-                        sendtocamera(i,port,'NEWSCENE')
+                        if a==0:
+                            pressed="new_scene"
+                        else:
+                            sendtocamera(i,port,'NEWSCENE')
                     a=a+1
             elif pressed == "record" and camera_recording != None:
                 if camera_recording == 0:
@@ -1078,8 +1085,11 @@ def main():
         elif pressed == 'middle' and menu[selected] == 'SRV:':
             if showtarinactrl == False:
                 menu=tarinactrlmenu
-                selected=0
+                #selected=0
                 showtarinactrl = True
+            else:
+                menu=standardmenu
+                showtarinactrl=False
 
         #UP
         elif pressed == 'up':
@@ -1523,8 +1533,10 @@ def main():
                 menu = standardmenu
                 settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, searchforcameras, wifistate, '', '', '', '', '', '', live
             else:
+                #tarinactrlmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'CAMERA:', 'Add CAMERA', 'New FILM', 'Sync FILM', 'Sync SCENE'
                 menu = tarinactrlmenu
-                settings = '',str(camselected),'','',rectime,'','','','','','','','','',''
+                #settings = '',str(camselected),'','',rectime,'','','','','','','','','',''
+                settings = filmname, str(scene) + '/' + str(scenes), str(shot) + '/' + str(shots), str(take) + '/' + str(takes), rectime, camerashutter, cameraiso, camerared, camerablue, str(round(camera.framerate)), str(quality), str(camera.brightness), str(camera.contrast), str(camera.saturation), str(flip), str(beeps), str(reclenght), str(plughw), str(channels), str(miclevel), str(headphoneslevel), str(comp), '', cammode, diskleft, '', serverstate, searchforcameras, wifistate, str(camselected), '', '', '', '', '', ''
             #Rerender menu if picamera settings change
             #if settings != oldsettings or selected != oldselected:
             writemenu(menu,settings,selected,'',showmenu)
@@ -4133,8 +4145,6 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                 pressed="remove"
             elif nextstatus=="REC":
                 pressed="record_now"
-            elif nextstatus=="RETAKE":
-                pressed="retake_now"
             elif nextstatus=="STOP":
                 if recording == True:
                     pressed="record"
@@ -4156,6 +4166,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "SYNCIP:" in nextstatus:
                 pressed=nextstatus
             elif "SYNCDONE" in nextstatus:
+                pressed=nextstatus
+            elif "RETAKE:" in nextstatus:
                 pressed=nextstatus
             #print(nextstatus)
     except:
