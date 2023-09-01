@@ -3,19 +3,19 @@ Tarina
 
 ![Two buddies](docs/tarina-promo.jpg)
 
-The Muse of Filmmaking
+for the Love of Filmmaking
 
-Montage flow
-------------------------------
-Retake your [montage](https://en.wikipedia.org/wiki/Montage_(filmmaking)) on the spot so it flows. Once you get it there’s no need for editing later. The camera is designed with a "hackers/makers philosophy", easy to take apart and to mod. It's built using the Raspberry Pi, running on a Gnu/Linux Raspbian distribution and with a python coded interface.
-
+Retake your shots on the spots and see the magic of your montage in the filmmaking OS that runs Tarina.
+ 
 Software
 --------
-A video camera that have all tools to make a film within the camera. That means alot of features. Key features is to glue the selected clips together and/or cutting them. Making timelapses, voiceover and or music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where not? Auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels and so on. Use the silent physical buttons or connect through usb-keyboard, https, ssh, ports, you choose. It's all there. Turn them all ON if so you desire.
+A video camera that with *most of* the tools to make a film within the camera. That means alot of features. So far we have these key features running, glue the selected clips together and/or cutting them. Making timelapses, voiceover, music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where not? Auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels and so on. Connect Tarinas together for multicamera shooting, stream a film a take or a scene through the network. Control it with silent physical buttons or a usb-wireless-keyboard or through https or ssh or ports, you choose. It's all in there. But, where? in the filmmaking OS, that is Tarina.
 
 Hardware
 --------
-The parts are built around the world by different manufacturers. They've been chosen on the basis of features, quality, openness, availabilty and price. One of the central ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is all 3d printable with a design that has the key element of flipping the lens 180 (gonzo style). Here's the main components: 
+The parts have been chosen on the basis of features, quality, openness, availabilty and price. One of the central ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is 3d printable with a flipping gonzo style 180 shooting mode, please take a look [here to get the picture](https://github.com/rbckman/tarina/tree/master/3d)
+
+Here's the main components: 
 
 [Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
 [Raspberry Pi High Quality Camera](https://www.raspberrypi.org/products/raspberry-pi-high-quality-camera/?resellerType=home) or <br>
