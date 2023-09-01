@@ -3,8 +3,8 @@ Tarina
 
 ![Two buddies](docs/tarina-promo.jpg)
 
-for the Love of Filmmaking
-
+For the Love of Filmmaking
+--------------------------
 Retake your shots on the spots and see the magic of your montage in the filmmaking OS that runs Tarina.
  
 Software
