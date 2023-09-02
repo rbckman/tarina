@@ -92,7 +92,7 @@ def main():
 
     #MENUS
     standardmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'UPDATE', 'UPLOAD', 'BACKUP', 'LOAD', 'NEW', 'TITLE', 'LIVE:'
-    tarinactrlmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'CAMERA:', 'Add CAMERA', 'New FILM', 'Sync FILM', 'Sync SCENE'
+    tarinactrlmenu = 'FILM:', 'SCENE:', 'SHOT:', 'TAKE:', '', 'SHUTTER:', 'ISO:', 'RED:', 'BLUE:', 'FPS:', 'Q:', 'BRIGHT:', 'CONT:', 'SAT:', 'FLIP:', 'BEEP:', 'LENGTH:', 'HW:', 'CH:', 'MIC:', 'PHONES:', 'COMP:', 'TIMELAPSE', 'MODE:', 'DSK:', 'SHUTDOWN', 'SRV:', 'SEARCH:', 'WIFI:', 'CAMERA:', 'Add CAMERA', 'New FILM', 'New SCENE', 'Sync SCENE'
     #tarinactrlmenu = "BACK","CAMERA:", "Add CAMERA","New FILM","","New SCENE","Sync SCENE","Snapshot"
     emptymenu='','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','','',''
     menu = standardmenu
@@ -746,10 +746,11 @@ def main():
                     newselected=0
             elif pressed == 'middle' and menu[selected] == 'Add CAMERA':
                 newcamera = newcamera_ip(numbers_only, network)
-                if newcamera not in cameras and newcamera not in networks:
-                    cameras.append(newcamera)
-                    rendermenu = True
-                    vumetermessage("New camera! "+newcamera)
+                if newcamera != '':
+                    if newcamera not in cameras and newcamera not in networks:
+                        cameras.append(newcamera)
+                        rendermenu = True
+                        vumetermessage("New camera! "+newcamera)
             elif 'SYNCIP:' in pressed:
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
@@ -913,7 +914,11 @@ def main():
                             a=a+1
                 camselected=newselected
                 rendermenu = True
-                vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
+                #vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
+                if len(cameras) > 1:
+                    vumetermessage('filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected+' camselected:'+str(camselected)+' rec:'+str(camera_recording))
+                else:
+                    vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected)+' rec:'+str(camera_recording))
 
 
         #RECORD AND PAUSE
@@ -2279,7 +2284,7 @@ def newcamera_ip(abc, network):
                     else:
                         helpmessage = 'in the range of ips 1-256'
         elif pressed == 'retake':
-            return 
+            return '' 
         elif event in abc:
             pausetime = time.time()
             ip = ip + event
