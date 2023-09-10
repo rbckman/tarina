@@ -823,7 +823,7 @@ def main():
                 for i in cameras:
                     if i not in camerasoff:
                         if a==0:
-                            pressed="new_scene"
+                            pressagain="new_scene"
                         else:
                             sendtocamera(i,port,'NEWSCENE')
                     a=a+1
@@ -3778,9 +3778,9 @@ def audiotrim(filename, where):
         if where == 'end':
             run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim 0 -' + str(int(audiosync)/1000))
         if where == 'beginning':
+            logger.info('trimming from beginning at: '+str(int(audiosync)/1000))
             run_command('sox -V0 ' + filename + '.wav ' + filename + '_temp.wav trim ' + str(int(audiosync)/1000))
-        else:
-            run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
+        run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         os.remove(filename + '_temp.wav')
         #if int(audiosync) > 400:
         #    writemessage('WARNING!!! VIDEO FRAMES DROPPED!')
