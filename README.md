@@ -3,13 +3,24 @@ Tarina
 
 ![Two buddies](docs/tarina-promo.jpg)
 
-for the Love of Filmmaking
-
+For the Love of Filmmaking
+--------------------------
 Retake your shots on the spots and see the magic of your montage in the filmmaking OS that runs Tarina.
  
 Software
 --------
-A video camera with *most of* the tools to make a film within the camera. That means alot of features. So far we have these key features running, glue the selected clips together and/or cutting them. Making timelapses, voiceover, music track recording, slo-mo recording, fast-forward recording, cut and copy and move clips around, backup to usb harddrive or your own server. Upload or stream to youtube or where not? Auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels and so on. Connect Tarinas together for multicamera shooting, stream a film a take or a scene through the network. Control it with silent physical buttons or a usb-wireless-keyboard or through https or ssh or ports, you choose. It's all in there. But, where? in the filmmaking OS, that is Tarina.
+A video camera with *most of* the tools to make a film within the camera. That means alot of features. So far we have these key features running.
+- glue the selected clips together and/or cutting them.
+- making timelapses, voiceover, music track recording, slo-mo recording, fast-forward recording
+- cut and copy and move clips around
+- backup to usb harddrive or your own server
+- upload or stream to youtube or your own server
+- auto correction can easily be switched on or off for shutter, iso and colors so *operator* is in full control also for audio levels
+- connect many Tarinas together for multicamera shooting
+- stream a film a take or a scene through the network
+- control the camera with silent physical buttons or a usb-wireless-keyboard or through https or ssh or ports, you choose.
+
+It's all in there. But, where? in the filmmaking OS, that is Tarina.
 
 Hardware
 --------
