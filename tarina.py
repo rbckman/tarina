@@ -870,8 +870,13 @@ def main():
                 a=0
                 for i in cameras:
                     if a!=0:
-                        sendtocamera(i,port,'SCENE:'+str(scene))
-
+                        sendtocamera(i,port,'SCENE:'+str(scene+1))
+                    a=a+1
+            elif pressed == "down" and menu[selected]=='SCENE:':
+                a=0
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'SCENE:'+str(scene-1))
                     a=a+1
             elif event == "0":
                 newselected = 0
