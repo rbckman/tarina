@@ -698,7 +698,7 @@ def main():
                     showmenu_settings = True
             #REMOVE
             #take
-            elif pressed == 'remove' and menu[selected] == 'TAKE:':
+            elif pressed == 'remove' and menu[selected] == 'TAKE:' or pressed=='remove_now':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
@@ -785,6 +785,17 @@ def main():
                 shot=pressed.split(':')[1]
                 shot=int(shot)
                 pressed="retake_now"
+            elif 'SCENE:' in pressed:
+                scene=pressed.split(':')[1]
+                scene=int(scene)
+                shot = countshots(filmname, filmfolder, scene)
+                take = counttakes(filmname, filmfolder, scene, shot)
+            elif 'REMOVE:' in pressed:
+                scene=pressed.split(':')[1]
+                scene=int(scene)
+                shot = countshots(filmname, filmfolder, scene)
+                take = counttakes(filmname, filmfolder, scene, shot)
+                pressed='remove_now'
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -849,6 +860,14 @@ def main():
                             else:
                                 sendtocamera(i,port,'PLACEHOLDER')
                         a=a+1
+            elif pressed == "remove" and menu[selected]=='SCENE:':
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'REMOVE:'+str(scene))
+            elif pressed == "up" and menu[selected]=='SCENE:':
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'SCENE:'+str(scene))
             elif event == "0":
                 newselected = 0
             elif event == "1":
@@ -4174,6 +4193,10 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "SYNCDONE" in nextstatus:
                 pressed=nextstatus
             elif "RETAKE:" in nextstatus:
+                pressed=nextstatus
+            elif "SCENE:" in nextstatus:
+                pressed=nextstatus
+            elif "REMOVE:" in nextstatus:
                 pressed=nextstatus
             #print(nextstatus)
     except:
