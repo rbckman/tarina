@@ -795,7 +795,7 @@ def main():
                 scene=int(scene)
                 shot = countshots(filmname, filmfolder, scene)
                 take = counttakes(filmname, filmfolder, scene, shot)
-                pressed='remove_now'
+                pressagain='remove_now'
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
