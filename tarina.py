@@ -790,6 +790,10 @@ def main():
                 scene=int(scene)
                 shot = countshots(filmname, filmfolder, scene)
                 take = counttakes(filmname, filmfolder, scene, shot)
+            elif 'SHOT:' in pressed:
+                shot=pressed.split(':')[1]
+                shot=int(shot)
+                take = counttakes(filmname, filmfolder, scene, shot)
             elif 'REMOVE:' in pressed:
                 scene=pressed.split(':')[1]
                 scene=int(scene)
@@ -877,6 +881,18 @@ def main():
                 for i in cameras:
                     if a!=0:
                         sendtocamera(i,port,'SCENE:'+str(scene-1))
+                    a=a+1
+            elif pressed == "up" and menu[selected]=='SHOT:':
+                a=0
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'SHOT:'+str(shot+1))
+                    a=a+1
+            elif pressed == "down" and menu[selected]=='SHOT:':
+                a=0
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'SHOT:'+str(shot-1))
                     a=a+1
             elif event == "0":
                 newselected = 0
@@ -4205,6 +4221,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "RETAKE:" in nextstatus:
                 pressed=nextstatus
             elif "SCENE:" in nextstatus:
+                pressed=nextstatus
+            elif "SHOT:" in nextstatus:
                 pressed=nextstatus
             elif "REMOVE:" in nextstatus:
                 pressed=nextstatus
