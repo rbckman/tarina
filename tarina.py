@@ -861,13 +861,18 @@ def main():
                                 sendtocamera(i,port,'PLACEHOLDER')
                         a=a+1
             elif pressed == "remove" and menu[selected]=='SCENE:':
+                a=0
                 for i in cameras:
                     if a!=0:
                         sendtocamera(i,port,'REMOVE:'+str(scene))
+                    a=a+1
             elif pressed == "up" and menu[selected]=='SCENE:':
+                a=0
                 for i in cameras:
                     if a!=0:
                         sendtocamera(i,port,'SCENE:'+str(scene))
+
+                    a=a+1
             elif event == "0":
                 newselected = 0
             elif event == "1":
