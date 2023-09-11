@@ -769,6 +769,7 @@ def main():
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
+                rendermenu = True
             elif 'SYNCDONE:' in pressed:
                 stopinterface(camera)
                 ip = pressed.split(':')[1]
@@ -777,9 +778,16 @@ def main():
                 run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
                 with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
                     scene_origin_files = [line.rstrip() for line in f]
+                a=0
+                for i in cameras:
+                    if a != 0:
+                        run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/ pi@'+i+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
+                        time.sleep(3)
+                    a=a+1
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
+                rendermenu = True
                 vumetermessage('SYNC DONE!')
             elif 'RETAKE:' in pressed:
                 shot=pressed.split(':')[1]
