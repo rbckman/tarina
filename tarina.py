@@ -696,6 +696,10 @@ def main():
                 elif showmenu == 0:
                     showmenu = 1
                     showmenu_settings = True
+            #DSK
+            elif pressed == 'middle' and menu[selected] == 'DSK:':
+                print("clean up film folder here")
+                #cleanupdisk(filmname,filmfolder)
             #REMOVE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:' or pressed=='remove_now':
@@ -1632,6 +1636,8 @@ def main():
                         if searchforcameras == 'on':
                             camerasconnected='searching '+str(pingip)
                         vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
+                    disk = os.statvfs(tarinafolder + '/')
+                    diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
                     print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
                     print(camselected,camera_recording,cameras)
             #writemessage(pressed)
@@ -2166,6 +2172,41 @@ def getconfig(camera):
                 return camera_model, camera_revision
             time.sleep(0.02)
 
+#-------------Calc folder size with du-----------
+
+def du(path):
+    """disk usage in human readable format (e.g. '2,1GB')"""
+    return subprocess.check_output(['du','-sh', path]).split()[0].decode('utf-8')
+
+
+#------------Clean up----------------
+
+def cleanupdisk(filmname, filmfolder):
+    alloriginfiles=[]
+    films = getfilms(filmfolder)
+    for f in films:
+        alloriginfiles.extend(organize(filmfolder,f[0]))
+    print(alloriginfiles)
+    filesinfolder = next(os.walk(filmfolder+'.videos/'))[2]
+    filesfolder=[]
+    for i in filesinfolder:
+        filesfolder.append(filmfolder+'.videos/'+i)
+    print(filesfolder)
+    for i in alloriginfiles:
+        if i in filesfolder:
+            print("YES, found link to origin")
+        else:
+            print("NOPE, no link to origin")
+            print(i)
+            #os.system('rm ' + i)
+    #for i in filesfolder:
+    #    if i in alloriginfiles:
+    #        print("YES, found link to origin")
+    #    else:
+    #        print("NOPE, no link to origin")
+    #        print(i)
+    #        os.system('rm ' + i)
+
 #-------------Load film---------------
 
 def loadfilm(filmname, filmfolder):
@@ -2174,6 +2215,9 @@ def loadfilm(filmname, filmfolder):
     buttontime = time.time()
     holdbutton = ''
     films = getfilms(filmfolder)
+    filmsize=[]
+    for f in films:
+        filmsize.append(du(filmfolder+f[0]))
     filmstotal = len(films[1:])
     selectedfilm = 0
     selected = 0
@@ -2182,6 +2226,7 @@ def loadfilm(filmname, filmfolder):
     while True:
         settings = films[selectedfilm][0], ''
         writemenu(menu,settings,selected,header,showmenu)
+        vumetermessage('filmsize: '+filmsize[selectedfilm]+' date: '+time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(films[selectedfilm][1])))
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
         if pressed == 'down':
             if selectedfilm < filmstotal:
@@ -2638,6 +2683,7 @@ def organize(filmfolder, filmname):
                             compileshot(takename,filmfolder,filmname)
                             #organized_nr -= 1
                     organized_nr += 1
+        origin_files.extend(origin_scene_files)
         with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'w') as outfile:
             outfile.write('\n'.join(str(i) for i in origin_scene_files))
 
