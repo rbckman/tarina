@@ -2095,7 +2095,7 @@ def update(tarinaversion, tarinavername):
         time.sleep(4)
         logger.info('Updating...')
         run_command('git -C ' + tarinafolder + ' pull')
-        run_command('sudo ' + tarinafolder + '/install.sh')
+        #run_command('sudo ' + tarinafolder + '/install.sh')
         logger.info('Update done, will now reboot Tarina')
         waitforanykey()
         logger.info('Hold on rebooting Tarina...')
