@@ -782,15 +782,15 @@ def main():
                 ip = pressed.split(':')[1]
                 logger.info('SYNCING from ip:'+ip)
                 run_command('ssh-copy-id pi@'+ip)
-                run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/')
+                run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
                 with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
                     scene_origin_files = [line.rstrip() for line in f]
-                a=0
-                for i in cameras:
-                    if a != 0:
-                        run_command('rsync -avr --update --progress '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+'/ pi@'+i+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
-                        time.sleep(3)
-                    a=a+1
+                #a=0
+                #for i in cameras:
+                #    if a != 0:
+                #        run_command('rsync -avr --update --progress '+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ pi@'+i+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
+                #        time.sleep(3)
+                #    a=a+1
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
@@ -847,7 +847,9 @@ def main():
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 for i in cameras:
                     if i != cameras[0]:
+                        vumetermessage('Hold on syncing!')
                         sendtocamera(i,port,'SYNCIP:'+cameras[0])
+                        time.sleep(1)
             elif pressed == "middle" and menu[selected]=='New SCENE':
                 a=0
                 for i in cameras:
