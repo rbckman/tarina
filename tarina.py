@@ -749,12 +749,15 @@ def main():
                     cameras.pop(camselected)
                     newselected=0
             elif pressed == 'middle' and menu[selected] == 'Add CAMERA':
-                newcamera = newcamera_ip(numbers_only, network)
-                if newcamera != '':
-                    if newcamera not in cameras and newcamera not in networks:
-                        cameras.append(newcamera)
-                        rendermenu = True
-                        vumetermessage("New camera! "+newcamera)
+                if networks != []:
+                    newcamera = newcamera_ip(numbers_only, network)
+                    if newcamera != '':
+                        if newcamera not in cameras and newcamera not in networks:
+                            cameras.append(newcamera)
+                            rendermenu = True
+                            vumetermessage("New camera! "+newcamera)
+                else:
+                    vumetermessage('No network!')
             elif 'SYNCIP:' in pressed:
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
