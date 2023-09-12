@@ -702,7 +702,7 @@ def main():
                 #cleanupdisk(filmname,filmfolder)
             #REMOVE
             #take
-            elif pressed == 'remove' and menu[selected] == 'TAKE:' or pressed=='remove_now':
+            elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
@@ -722,7 +722,7 @@ def main():
                 #loadfilmsettings = True
                 time.sleep(0.5)
             #scene
-            elif pressed == 'remove' and menu[selected] == 'SCENE:':
+            elif pressed == 'remove' and menu[selected] == 'SCENE:' or pressed=='remove_now':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
                 organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
