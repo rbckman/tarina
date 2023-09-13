@@ -753,6 +753,10 @@ def main():
                     newcamera = newcamera_ip(numbers_only, network)
                     if newcamera != '':
                         if newcamera not in cameras and newcamera not in networks:
+                            sendtocamera(newcamera,port,'NEWFILM:'+filmname)
+                            time.sleep(1)
+                            sendtocamera(i,newcamera,'Q:'+quality)
+                            time.sleep(1)
                             cameras.append(newcamera)
                             rendermenu = True
                             vumetermessage("New camera! "+newcamera)
@@ -815,6 +819,9 @@ def main():
                 shot = countshots(filmname, filmfolder, scene)
                 take = counttakes(filmname, filmfolder, scene, shot)
                 pressagain='remove_now'
+            elif 'Q:' in pressed:
+                q=pressed.split(':')[1]
+                quality=int(q)
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -910,6 +917,18 @@ def main():
                 for i in cameras:
                     if a!=0:
                         sendtocamera(i,port,'SHOT:'+str(shot-1))
+                    a=a+1
+            elif pressed == "up" and menu[selected]=='Q:':
+                a=0
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'Q:'+str(quality+1))
+                    a=a+1
+            elif pressed == "down" and menu[selected]=='Q:':
+                a=0
+                for i in cameras:
+                    if a!=0:
+                        sendtocamera(i,port,'Q:'+str(quality-1))
                     a=a+1
             elif event == "0":
                 newselected = 0
@@ -4284,6 +4303,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "SHOT:" in nextstatus:
                 pressed=nextstatus
             elif "REMOVE:" in nextstatus:
+                pressed=nextstatus
+            elif "Q:" in nextstatus:
                 pressed=nextstatus
             #print(nextstatus)
     except:
