@@ -755,7 +755,7 @@ def main():
                         if newcamera not in cameras and newcamera not in networks:
                             sendtocamera(newcamera,port,'NEWFILM:'+filmname)
                             time.sleep(1)
-                            sendtocamera(i,newcamera,'Q:'+quality)
+                            sendtocamera(newcamera,port,'Q:'+str(quality))
                             time.sleep(1)
                             cameras.append(newcamera)
                             rendermenu = True
@@ -820,8 +820,9 @@ def main():
                 take = counttakes(filmname, filmfolder, scene, shot)
                 pressagain='remove_now'
             elif 'Q:' in pressed:
-                q=pressed.split(':')[1]
-                quality=int(q)
+                qual=pressed.split(':')[1]
+                quality=int(qual)
+                vumetermessage('Quality changed to '+str(quality))
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
