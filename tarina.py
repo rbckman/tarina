@@ -234,10 +234,11 @@ def main():
         for ip in adapter.ips:
             if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
                 print(ip.ip)
-                networks.append(ip.ip)
+                networks=[ip.ip]
     if networks != []:
         network=networks[0]
         if network not in cameras:
+            cameras=[]
             cameras.append(network)
 
     port = 55555
@@ -1644,10 +1645,11 @@ def main():
                         for ip in adapter.ips:
                             if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
                                 print(ip.ip)
-                                networks.append(ip.ip)
+                                networks=[ip.ip]
                     if networks != []:
                         network=networks[0]
                         if network not in cameras:
+                            cameras=[]
                             cameras.append(network)
                     else:
                         network='not connected'
