@@ -14,7 +14,7 @@
    id="svg4697"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
    sodipodi:docname="buttons.svg"
-   inkscape:export-filename="/home/rbckman/tarina/docs/buttons.png"
+   inkscape:export-filename="/home/rob/tarina/docs/buttons.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300">
   <defs
@@ -36,11 +36,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="960"
+     inkscape:window-width="1920"
      inkscape:window-height="1136"
      inkscape:window-x="0"
      inkscape:window-y="27"
-     inkscape:window-maximized="0"
+     inkscape:window-maximized="1"
      inkscape:document-rotation="0" />
   <metadata
      id="metadata4694">
@@ -50,7 +50,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -385,5 +385,60 @@
          y="141.77229"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.09681px;line-height:2.30567px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0640127px"
          id="tspan1230">COPY</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:15.0215px;line-height:3.00587px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0834525px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="231.5206"
+       y="119.37529"
+       id="text1170-7"><tspan
+         sodipodi:role="line"
+         x="231.5206"
+         y="119.37529"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.34096px;line-height:3.00587px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0834525px"
+         id="tspan1168-3">HELP</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.93506px;line-height:1.98805px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0551946px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="182.74352"
+       y="118.16312"
+       id="text1170-7-6"><tspan
+         sodipodi:role="line"
+         x="182.74352"
+         y="118.16312"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.53245px;line-height:1.98805px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0551946px"
+         id="tspan1168-3-1">INSERT</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:13.8068px;line-height:2.7628px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0767042px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="183.11424"
+       y="142.04619"
+       id="text1170-7-6-2"><tspan
+         sodipodi:role="line"
+         x="183.11424"
+         y="142.04619"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.90906px;line-height:2.7628px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0767042px"
+         id="tspan1168-3-1-9">MODE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.62364px;line-height:1.92573px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0534645px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="182.74007"
+       y="94.440086"
+       id="text1170-7-6-2-3"><tspan
+         sodipodi:role="line"
+         x="182.74007"
+         y="94.440086"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.42172px;line-height:1.92573px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0534645px"
+         id="tspan1168-3-1-9-1">SCREEN</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.62364px;line-height:1.92573px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0534645px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="182.86832"
+       y="97.476616"
+       id="text1170-7-6-2-3-9"><tspan
+         sodipodi:role="line"
+         x="182.86832"
+         y="97.476616"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.42172px;line-height:1.92573px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0534645px"
+         id="tspan1168-3-1-9-1-4">ON/OFF</tspan></text>
   </g>
 </svg>
