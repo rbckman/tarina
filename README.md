@@ -24,14 +24,13 @@ It's all in there. But, where? in the filmmaking interface, that is Tarina.
 
 Hardware
 --------
-The parts have been chosen on the basis of features, quality, openness, availabilty and price. One of the central ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is 3d printable with a flipping gonzo style 180 shooting mode, please take a look [here to get the picture](https://github.com/rbckman/tarina/tree/master/3d)
+The parts have been chosen on the basis of features, quality, openness, availabilty and price. One of the key ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is 3d printable with a flipping gonzo style 180 shooting mode, please take a look [here to get the picture](https://github.com/rbckman/tarina/tree/master/3d)
 
 Here's the main components: 
 
-[Raspberry Pi 3](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
+[Raspberry Pi 3 B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/)<br>
 [Raspberry Pi High Quality Camera](https://www.raspberrypi.org/products/raspberry-pi-high-quality-camera/?resellerType=home) or <br>
-[Arducam 5 MP OV5647 camera module with CS lens 2718](https://www.ebay.com/itm/OV5647-Camera-Board-w-CS-mount-Lens-for-Raspberry-Pi-3-B-B-2-Model-B-/281212355128?txnId=1913825600018)<br>
-[3.5 inch 800x480 TFT Screen](https://www.aliexpress.com/store/product/U-Geek-Raspberry-Pi-3-5-inch-800-480-TFT-Screen-HD-HighSpeed-LCD-Module-3/1954241_32672157641.html)<br>
+[Pimoroni Hyperpixel 4 inch screen](https://learn.pimoroni.com/tutorial/sandyj/getting-started-with-hyperpixel-4)
 [USB via vt1620a Sound card](https://www.aliexpress.com/item/Professional-External-USB-Sound-Card-Adapter-Virtual-7-1-Channel-3D-Audio-with-3-5mm-Headset/32588038556.html?spm=2114.01010208.8.8.E8ZKLB)<br>
 [3.7v 7800mAh li-ion Battery](https://www.aliexpress.com/item/3-7v-9000mAh-capacity-18650-Rechargeable-lithium-battery-pack-18650-jump-starter/32619902319.html?spm=2114.13010608.0.0.XcKleV)<br>
 [Type-C 5v 2A 3.7V Li-ion battery charger booster module](https://www.ebay.com/itm/Type-C-USB-5V-2A-3-7V-18650-Lithium-Li-ion-Battery-Charging-Board-Charger-Module/383717339632?var=652109038482)
