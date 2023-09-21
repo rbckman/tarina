@@ -1,11 +1,12 @@
-Tarina
-======
+Tarina Retake
+=============
+Dream Filmmaking Device
 
 ![Two buddies](docs/tarina-promo.jpg)
 
 Hollywood in your palms
 --------------------------
-Retake shots on your spots and see movie making magic in the filmmaking interface that runs Tarina Retake.
+Retake shots on the spot and see movie making magic in the filmmaking interface that runs Tarina Retake.
  
 Software
 --------
