@@ -3,9 +3,9 @@ Tarina
 
 ![Two buddies](docs/tarina-promo.jpg)
 
-For the Love of Filmmaking
+Hollywood in your palms
 --------------------------
-Retake your shots on the spots and see the magic of your montage in the filmmaking OS that runs Tarina.
+Retake shots on your spots and see movie making magic in the filmmaking interface that runs Tarina Retake.
  
 Software
 --------
@@ -20,7 +20,7 @@ A video camera with *most of* the tools to make a film within the camera. That m
 - stream a film a take or a scene through the network
 - control the camera with silent physical buttons or a usb-wireless-keyboard or through https or ssh or ports, you choose.
 
-It's all in there. But, where? in the filmmaking OS, that is Tarina.
+It's all in there. But, where? in the filmmaking interface, that is Tarina.
 
 Hardware
 --------
