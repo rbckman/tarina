@@ -1321,7 +1321,7 @@ def main():
                     quality += 1
             elif menu[selected] == 'CAMERA:':
                 if camselected < len(cameras)-1:
-                    newselected = camselected+1
+                    camselected = camselected+1
                     logger.info('camera selected:'+str(camselected))
 
         #LEFT
@@ -1485,7 +1485,7 @@ def main():
                     quality -= 1
             elif menu[selected] == 'CAMERA:':
                 if camselected > 0:
-                    newselected = camselected-1
+                    camselected = camselected-1
                     logger.info('camera selected:'+str(camselected))
 
         #RIGHT
@@ -4356,9 +4356,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'record'
         elif event == 'KEY_PGDOWN' or (readbus == 253 and readbus2 == 247):
             pressed = 'retake'
-        elif event == 'KEY_TAB' or (readbus == 223 and readbus2 == 247):
+        elif event == 'KEY_TAB' or readbus2 == 246:
             pressed = 'view'
-        elif event == 'KEY_DELETE' or readbus2 == 246:
+        elif event == 'KEY_DELETE' or (readbus == 223 and readbus2 == 247):
             pressed = 'remove'
         elif (readbus2 == 245 and readbus == 191):
             pressed = 'peak'
