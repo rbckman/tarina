@@ -1321,7 +1321,7 @@ def main():
                     quality += 1
             elif menu[selected] == 'CAMERA:':
                 if camselected < len(cameras)-1:
-                    camselected = camselected+1
+                    newselected = camselected+1
                     logger.info('camera selected:'+str(camselected))
 
         #LEFT
@@ -1485,7 +1485,7 @@ def main():
                     quality -= 1
             elif menu[selected] == 'CAMERA:':
                 if camselected > 0:
-                    camselected = camselected-1
+                    newselected = camselected-1
                     logger.info('camera selected:'+str(camselected))
 
         #RIGHT
