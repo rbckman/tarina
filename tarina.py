@@ -402,7 +402,7 @@ def main():
                     camera.stop_preview()
                     renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
                     playdub(filmname,renderfilename, 'dub')
-                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
@@ -415,7 +415,7 @@ def main():
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     playdub(filmname,renderfilename, 'dub')
-                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2' + newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
@@ -428,7 +428,7 @@ def main():
                     camera.stop_preview()
                     renderfilename = renderfilm(filmfolder, filmname, comp, 0, False)
                     playdub(filmname,renderfilename, 'dub')
-                    run_command('sox -V0 -G /dev/shm/dub.wav ' + newdub)
+                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2' + newdub)
                     vumetermessage('new film dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
@@ -2859,7 +2859,7 @@ def compileshot(filename,filmfolder,filmname):
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -sf '+video_origins+'.mp4 '+filename+'.mp4')
         #add audio/video start delay sync
-        run_command('sox -V0 '+filename+'.wav /dev/shm/temp.wav trim 0.013')
+        run_command('sox -V0 '+filename+'.wav -c 2 /dev/shm/temp.wav trim 0.013')
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
@@ -2973,7 +2973,7 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
         pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode()
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
-        #Fade
+        #Fade and make stereo
         run_command('sox -V0 -G ' + d + ' /dev/shm/fade.wav fade ' + str(round(i[2],1)) + ' 0 ' + str(round(i[3],1)))
         run_command('sox -V0 -G -m -v ' + str(round(i[0],1)) + ' /dev/shm/fade.wav -v ' + str(round(i[1],1)) + ' ' + filename + '_tmp.wav ' + filename + '.wav trim 0 ' + audiolenght)
         os.remove(filename + '_tmp.wav')
@@ -3927,7 +3927,7 @@ def audiotrim(filename, where):
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -r '+soundrate+' -c '+str(channels)+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 pad 0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -r '+soundrate+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 pad 0 ' + str(int(audiosync)/1000))
         run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         #add silence to end
         #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
@@ -3955,7 +3955,7 @@ def audiosilence(foldername,filename):
     videoms = int(videolenght) % 1000
     videos = int(videolenght) / 1000
     logger.info('Videofile is: ' + str(videos) + 's ' + str(videoms))
-    run_command('sox -V0 -n -r '+soundrate+' -c '+str(channels)+' /dev/shm/silence.wav trim 0.0 ' + str(videos))
+    run_command('sox -V0 -n -r '+soundrate+' -c 2 /dev/shm/silence.wav trim 0.0 ' + str(videos))
     os.system('cp /dev/shm/silence.wav ' + foldername + filename + '.wav')
     os.system('rm /dev/shm/silence.wav')
 
