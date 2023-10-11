@@ -232,7 +232,7 @@ def main():
     for adapter in adapters:
         print("IPs of network adapter " + adapter.nice_name)
         for ip in adapter.ips:
-            if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+            if ':' not in ip.ip[0] and '127.0.0.1' != ip.ip:
                 print(ip.ip)
                 networks=[ip.ip]
     if networks != []:
@@ -1643,7 +1643,7 @@ def main():
                     for adapter in adapters:
                         print("IPs of network adapter " + adapter.nice_name)
                         for ip in adapter.ips:
-                            if '::' not in ip.ip[0] and '127.0.0.1' != ip.ip:
+                            if ':' not in ip.ip[0] and '127.0.0.1' != ip.ip:
                                 print(ip.ip)
                                 networks=[ip.ip]
                     if networks != []:
@@ -2868,7 +2868,7 @@ def compileshot(filename,filmfolder,filmname):
             #muxing mp3 layer to mp4 file
             #count estimated audio filesize with a bitrate of 320 kb/s
             audiosize = countsize(filename + '.wav') * 0.453
-            p = Popen(['ffmpeg', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', filename + '.mp3'])
+            p = Popen(['ffmpeg', '-y', '-i', filename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', filename + '.mp3'])
             while p.poll() is None:
                 time.sleep(0.2)
                 try:
@@ -3164,9 +3164,9 @@ def renderscene(filmfolder, filmname, scene):
             audiosize = countsize(renderfilename + '.wav') * 0.453
             os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
             if debianversion == 'stretch':
-                p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
             else:
-                p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
             while p.poll() is None:
                 time.sleep(0.2)
                 try:
@@ -3270,9 +3270,9 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
                 audiosize = countsize(renderfilename + '.wav') * 0.453
                 os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
                 if debianversion == 'stretch':
-                    p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                    p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
                 else:
-                    p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-b:a', '320k', renderfilename + '.mp3'])
+                    p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
                 while p.poll() is None:
                     time.sleep(0.2)
                     try:
