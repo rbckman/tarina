@@ -973,15 +973,16 @@ def main():
                     a=0
                     for c in cameras:
                         if c not in camerasoff:
-                            print(c)
                             if a == camselected:
                                 if a == 0:
-                                    pressed='record_now'
-                                    pressagain='insert_shot'
+                                    #pressed='record_now'
+                                    #pressagain='insert_shot'
+                                    delayedstop=c
                                 else:
-                                    sendtocamera(c,port,'STOP')
-                                    time.sleep(sleep)
-                                    sendtocamera(c,port,'PLACEHOLDER')
+                                    #sendtocamera(c,port,'STOP')
+                                    #time.sleep(sleep)
+                                    #sendtocamera(c,port,'PLACEHOLDER')
+                                    delayedstop=c
                             elif a == newselected:
                                 if a == 0:
                                     pressed='record_now'
@@ -995,6 +996,15 @@ def main():
                                     sendtocamera(c,port,'PLACEHOLDER')
                                 #time.sleep(2)
                             a=a+1
+                    if delayedstop:
+                        time.sleep(3)
+                        if delayedstop=cameras[0]:
+                            pressed='record_now'
+                            pressagain='insert_shot'
+                        else:
+                            sendtocamera(c,port,'STOP')
+                            time.sleep(sleep)
+                            sendtocamera(c,port,'PLACEHOLDER')
                 camselected=newselected
                 rendermenu = True
                 #vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
