@@ -1002,9 +1002,9 @@ def main():
                             pressed='record_now'
                             pressagain='insert_shot'
                         else:
-                            sendtocamera(c,port,'STOP')
+                            sendtocamera(delayedstop,port,'STOP')
                             time.sleep(sleep)
-                            sendtocamera(c,port,'PLACEHOLDER')
+                            sendtocamera(delayedstop,port,'PLACEHOLDER')
                 camselected=newselected
                 rendermenu = True
                 #vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected))
