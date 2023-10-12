@@ -998,7 +998,7 @@ def main():
                             a=a+1
                     if delayedstop:
                         time.sleep(3)
-                        if delayedstop=cameras[0]:
+                        if delayedstop==cameras[0]:
                             pressed='record_now'
                             pressagain='insert_shot'
                         else:
