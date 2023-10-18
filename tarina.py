@@ -1564,7 +1564,7 @@ def main():
                     except:
                         print('not exist')
             #organize(filmfolder,'onthefloor')
-            scene, shot, take = countlast(filmname, filmfolder)
+            #scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
