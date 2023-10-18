@@ -358,6 +358,7 @@ def main():
                     camera.start_preview()
                 else:
                     vumetermessage("There's absolutely nothing in this scene! hit rec!")
+                rendermenu = True
             #VIEW FILM
             elif pressed == 'view' and menu[selected] == 'FILM:':
                 writemessage('Loading film...')
@@ -395,6 +396,7 @@ def main():
                     camera.start_preview()
                 else:
                     vumetermessage('nothing here! hit rec!')
+                rendermenu = True
             #DUB SHOT
             elif pressed == 'middle' and menu[selected] == 'SHOT, not so fast:':
                 newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
@@ -408,6 +410,7 @@ def main():
                     time.sleep(1)
                 else:
                     vumetermessage('see ya around!')
+                rendermenu = True
             #DUB SCENE
             elif pressed == 'middle' and menu[selected] == 'SCENE:':
                 newdub = clipsettings(filmfolder, filmname, scene, 0, plughw)
@@ -421,6 +424,7 @@ def main():
                     time.sleep(1)
                 else:
                     vumetermessage('see ya around!')
+                rendermenu = True
             #DUB FILM
             elif pressed == 'middle' and menu[selected] == 'FILM:':
                 newdub = clipsettings(filmfolder, filmname, 0, 0, plughw)
@@ -434,9 +438,11 @@ def main():
                     time.sleep(1)
                 else:
                     vumetermessage('see ya around!')
+                rendermenu = True
             #BACKUP
             elif pressed == 'middle' and menu[selected] == 'BACKUP':
                 copytousb(filmfolder)
+                rendermenu = True
             #UPLOAD
             elif pressed == 'middle' and menu[selected] == 'UPLOAD':
                 if webz_on() == True:
@@ -454,6 +460,7 @@ def main():
                             camera = startcamera(lens,fps)
                             loadfilmsettings = True
                         selectedaction = 0
+                rendermenu = True
             #LOAD FILM
             elif pressed == 'middle' and menu[selected] == 'LOAD':
                 filmname = loadfilm(filmname, filmfolder)
@@ -467,6 +474,7 @@ def main():
                     camera = startcamera(lens,fps)
                     loadfilmsettings = True
                     selectedaction = 0
+                rendermenu = True
             #WIFI
             elif pressed == 'middle' and menu[selected] == 'WIFI:':
                 stopinterface(camera)
@@ -474,6 +482,7 @@ def main():
                 startinterface()
                 camera = startcamera(lens,fps)
                 loadfilmsettings = True
+                rendermenu = True
             #NEW FILM
             elif pressed == 'middle' and menu[selected] == 'NEW' or filmname == '' or pressed == 'new_film':
                 filmname_exist=False
@@ -505,6 +514,7 @@ def main():
                     newfilmname = ''
                     vumetermessage('film already exist!')
                     logger.info('film already exist!')
+                rendermenu = True
             #EDIT FILM NAME
             elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
@@ -515,6 +525,7 @@ def main():
                     vumetermessage('Film title changed to ' + filmname + '!')
                 else:
                     vumetermessage('')
+                rendermenu = True
             #(YANK) COPY SHOT
             elif pressed == 'copy' and menu[selected] == 'SHOT:' and recordable == False:
                 cuttedshot = ''
