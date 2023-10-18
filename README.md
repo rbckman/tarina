@@ -80,12 +80,6 @@ Matrix [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tar
 
 Mail rob(at)tarina.org
 
-Support
--------
-https://shop.tarina.org
-
-Very much appreciated!
-
 Standing on the shoulders of forward thinking, freedom loving generous people (powa to da people!)
 --------------------------------------------------------------------------------------------------
 This whole project has only been possible because of the people behind the free and open source movement. Couldn't possible list all of the projects on which shoulders this is standing for it would reach the moon. A big shout out to all of ya!! Yall awesome!
