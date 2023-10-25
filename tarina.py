@@ -2421,14 +2421,13 @@ def newcamera_ip(abc, network):
                 ip = ip[:-1]
                 cursor = abc[abcx]
         elif pressed == 'middle' or event == 10:
-            if len(ip) > 0:
-                if abc[abcx] != '_':
-                    if int(ip) < 256:
-                        ip = ip + abc[abcx]
-                        logger.info("New camera " + ip_network+ip)
-                        return (ip_network+ip).strip()
-                    else:
-                        helpmessage = 'in the range of ips 1-256'
+            if abc[abcx] != ' ':
+                ip = ip + abc[abcx]
+                if int(ip) < 256:
+                    logger.info("New camera " + ip_network+ip)
+                    return (ip_network+ip).strip()
+                else:
+                    helpmessage = 'in the range of ips 1-256'
         elif pressed == 'retake':
             return '' 
         elif event in abc:
