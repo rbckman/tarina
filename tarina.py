@@ -780,18 +780,20 @@ def main():
                     if newcamera != '':
                         if newcamera not in cameras and newcamera not in networks:
                             sendtocamera(newcamera,port,'NEWFILM:'+filmname)
-                            time.sleep(1)
+                            time.sleep(0.2)
                             sendtocamera(newcamera,port,'Q:'+str(quality))
-                            time.sleep(1)
+                            time.sleep(0.2)
+                            sendtocamera(newcamera,port,'SHOT:'+str(shot))
+                            time.sleep(0.2)
+                            sendtocamera(newcamera,port,'SCENE:'+str(scene))
+                            time.sleep(0.2)
+                            sendtocamera(newcamera,port,'MAKEPLACEHOLDERS:'+str(scenes)+'|'+str(shots))
                             cameras.append(newcamera)
                             rendermenu = True
                             vumetermessage("New camera! "+newcamera)
                 else:
                     vumetermessage('No network!')
             elif 'SYNCIP:' in pressed:
-                #to not throw away empty shots
-                for i in range(shot):
-                    run_command('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(i).zfill(3) + '/.placeholder')
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
@@ -858,6 +860,14 @@ def main():
                 qual=pressed.split(':')[1]
                 quality=int(qual)
                 vumetermessage('Quality changed to '+str(quality))
+            elif 'MAKEPLACEHOLDERS:' in pressed:
+                scenesshots=pressed.split(':')[1]
+                pscenes=scenesshots.split('|')[0]
+                pshots=scenesshots.split('|')[1]
+                #to not throw away empty shots, make placeholders
+                for sc in range(pscenes):
+                    for i in range(pshot):
+                        run_command('touch ' + filmfolder + filmname + '/scene' +  str(sc).zfill(3) + '/shot' + str(i).zfill(3) + '/.placeholder')
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
@@ -4360,6 +4370,8 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             elif "REMOVE:" in nextstatus:
                 pressed=nextstatus
             elif "Q:" in nextstatus:
+                pressed=nextstatus
+            elif "MAKEPLACEHOLDERS:" in nextstatus:
                 pressed=nextstatus
             #print(nextstatus)
     except:
