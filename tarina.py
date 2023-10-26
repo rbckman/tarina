@@ -862,17 +862,16 @@ def main():
                 vumetermessage('Quality changed to '+str(quality))
             elif 'MAKEPLACEHOLDERS:' in pressed:
                 scenesshots=pressed.split(':')[1]
-                pscenes=int(scenesshots.split('|')[0])
+                pscene=int(scenesshots.split('|')[0])
                 pshots=int(scenesshots.split('|')[1])
                 #to not throw away empty shots, make placeholders
-                for sc in range(pscenes):
-                    for i in range(pshots):
-                        placeholders=filmfolder + filmname + '/scene' +  str(sc+1).zfill(3) + '/shot' + str(i+1).zfill(3)
-                        try:
-                            os.makedirs(placeholders)
-                        except:
-                            logger.info('scene or shot already there!')
-                        run_command('touch ' + placeholders + '/.placeholder')
+                for i in range(pshots):
+                    placeholders=filmfolder + filmname + '/scene' +  str(pscene).zfill(3) + '/shot' + str(i+1).zfill(3)
+                    try:
+                        os.makedirs(placeholders)
+                    except:
+                        logger.info('scene or shot already there!')
+                    run_command('touch ' + placeholders + '/.placeholder')
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 rendermenu = True
                 vumetermessage('CONNECTED TO MASTER TARINA!')
