@@ -873,6 +873,9 @@ def main():
                         except:
                             logger.info('scene or shot already there!')
                         run_command('touch ' + placeholders + '/.placeholder')
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
+                rendermenu = True
+                vumetermessage('CONNECTED TO MASTER TARINA!')
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
