@@ -639,11 +639,13 @@ def main():
             #INSERT TAKE
             elif pressed == 'insert_take':
                 logger.info('inserting take')
+                insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 try:
                     os.makedirs(insertshot)
+                    run_command('touch ' + insertshot + '/.placeholder')
                 except:
                     print('is there already prob')
-                run_command('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(shot).zfill(3) + '/.placeholder')
+                add_organize(filmfolder, filmname)
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Take ' + str(shot) + ' inserted')
                 updatethumb = True
