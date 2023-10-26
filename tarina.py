@@ -639,7 +639,6 @@ def main():
             #INSERT TAKE
             elif pressed == 'insert_take':
                 logger.info('inserting take')
-                shot = countshots(filmname, filmfolder, scene)
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 try:
                     os.makedirs(insertshot)
