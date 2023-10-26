@@ -866,7 +866,7 @@ def main():
                 pshots=int(scenesshots.split('|')[1])
                 #to not throw away empty shots, make placeholders
                 for sc in range(pscenes):
-                    for i in range(pshot):
+                    for i in range(pshots):
                         run_command('touch ' + filmfolder + filmname + '/scene' +  str(sc).zfill(3) + '/shot' + str(i).zfill(3) + '/.placeholder')
         #SHOWTARINACTRL
         if recordwithports: 
