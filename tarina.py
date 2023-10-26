@@ -862,8 +862,8 @@ def main():
                 vumetermessage('Quality changed to '+str(quality))
             elif 'MAKEPLACEHOLDERS:' in pressed:
                 scenesshots=pressed.split(':')[1]
-                pscenes=scenesshots.split('|')[0]
-                pshots=scenesshots.split('|')[1]
+                pscenes=int(scenesshots.split('|')[0])
+                pshots=int(scenesshots.split('|')[1])
                 #to not throw away empty shots, make placeholders
                 for sc in range(pscenes):
                     for i in range(pshot):
@@ -2459,7 +2459,7 @@ def newcamera_ip(abc, network):
                 ip = ip[:-1]
                 cursor = abc[abcx]
         elif pressed == 'middle' or event == 10:
-            if abc[abcx] != ' ':
+            if abc[abcx] != ' ' or ip != '':
                 ip = ip + abc[abcx]
                 if int(ip) < 256:
                     logger.info("New camera " + ip_network+ip)
