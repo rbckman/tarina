@@ -345,17 +345,18 @@ def main():
                     camera.stop_preview()
                     #renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     renderfilename = renderfilm(filmfolder, filmname, comp, scene, True)
-                    remove_shots = playdub(filmname,renderfilename, 'film')
-                    if remove_shots != []:
-                        for i in remove_shots:
-                            remove(filmfolder, filmname, scene, i, take, 'shot')
-                        organize(filmfolder, filmname)
-                        updatethumb = True
-                        #loadfilmsettings = True
-                        time.sleep(0.5)
-                    else:
-                        print('nothing to remove')
-                    camera.start_preview()
+                    if renderfilename != '':
+                        remove_shots = playdub(filmname,renderfilename, 'film')
+                        if remove_shots != []:
+                            for i in remove_shots:
+                                remove(filmfolder, filmname, scene, i, take, 'shot')
+                            organize(filmfolder, filmname)
+                            updatethumb = True
+                            #loadfilmsettings = True
+                            time.sleep(0.5)
+                        else:
+                            print('nothing to remove')
+                        camera.start_preview()
                 else:
                     vumetermessage("There's absolutely nothing in this scene! hit rec!")
                 rendermenu = True
