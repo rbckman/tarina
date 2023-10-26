@@ -868,7 +868,10 @@ def main():
                 for sc in range(pscenes):
                     for i in range(pshots):
                         placeholders=filmfolder + filmname + '/scene' +  str(sc+1).zfill(3) + '/shot' + str(i+1).zfill(3)
-                        os.makedirs(placeholders)
+                        try:
+                            os.makedirs(placeholders)
+                        except:
+                            logger.info('scene or shot already there!')
                         run_command('touch ' + placeholders + '/.placeholder')
         #SHOWTARINACTRL
         if recordwithports: 
