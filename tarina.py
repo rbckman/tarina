@@ -789,6 +789,9 @@ def main():
                 else:
                     vumetermessage('No network!')
             elif 'SYNCIP:' in pressed:
+                #to not throw away empty shots
+                for i in range(shot):
+                    run_command('touch ' + filmfolder + filmname + '/' + i + '/shot' + str(i).zfill(3) + '/.placeholder')
                 ip = pressed.split(':')[1]
                 vumetermessage('SYNCING!')
                 stopinterface(camera)
