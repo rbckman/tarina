@@ -635,6 +635,19 @@ def main():
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 vumetermessage('Shot ' + str(shot) + ' inserted')
                 updatethumb = True
+            #INSERT TAKE
+            elif pressed == 'insert_take':
+                logger.info('inserting take')
+                shot = countshots(filmname, filmfolder, scene)
+                insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
+                try:
+                    os.makedirs(insertshot)
+                except:
+                    print('is there already prob')
+                add_organize(filmfolder, filmname)
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                vumetermessage('Take ' + str(shot) + ' inserted')
+                updatethumb = True
                 #time.sleep(1)
             #INSERT SCENE
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False:
@@ -871,9 +884,9 @@ def main():
                                     camera_recording=camselected
                         else:
                             if a==0:
-                                pressagain='insert_shot'
+                                pressagain='insert_take'
                             else:
-                                sendtocamera(i,port,'PLACEHOLDER')
+                                sendtocamera(i,port,'TAKEPLACEHOLDER')
                         a=a+1
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 for i in cameras:
@@ -4322,8 +4335,9 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                     pressed="record"
                     onlysound=True
             elif nextstatus=="PLACEHOLDER":
-                #selected=2
                 pressed="insert_shot"
+            elif nextstatus=="TAKEPLACEHOLDER":
+                pressed="insert_take"
             elif nextstatus=="NEWSCENE":
                 pressed="new_scene"
             elif "NEWFILM:" in nextstatus:
