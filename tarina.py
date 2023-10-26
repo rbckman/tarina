@@ -786,7 +786,10 @@ def main():
                 if not os.path.isfile('/home/pi/.ssh/id_rsa'):
                     run_command('ssh-keygen')
                 run_command('ssh-copy-id pi@'+ip)
-                run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
+                try:
+                    run_command('rsync -avr --update --progress --files-from='+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos / pi@'+ip+':/')
+                except:
+                    logger.info('no origin videos')
                 #run_command('scp -r '+filmfolder+filmname+'/'+'scene'+str(scene).zfill(3)+' pi@'+ip+':'+filmfolder+filmname+'/')
                 sendtocamera(ip,port,'SYNCDONE:'+cameras[0])
                 startinterface()
@@ -798,7 +801,10 @@ def main():
                 ip = pressed.split(':')[1]
                 logger.info('SYNCING from ip:'+ip)
                 run_command('ssh-copy-id pi@'+ip)
-                run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
+                try:
+                    run_command('rsync -avr --update --progress pi@'+ip+':'+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/ '+filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/')
+                except:
+                    logger.info('no files')
                 with open(filmfolder+filmname+'/scene'+str(scene).zfill(3)+'/.origin_videos', 'r') as f:
                     scene_origin_files = [line.rstrip() for line in f]
                 #a=0
@@ -3535,6 +3541,9 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
         elif pressed == 'record' and selected == 4:
             dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
             break
+        elif pressed == 'retake' and selected == 4:
+            dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
+            break
         elif pressed == 'up' and selected == 5:
             if dubmix[dubselected][0] >= 0.99 and dubmix[dubselected][1] > 0.01:
                 dubmix[dubselected][1] -= 0.1
@@ -3574,18 +3583,18 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
             renderfilename = renderfilm(filmfolder, filmname, 0, scene, False)
             playdub(filmname,renderfilename, 'scene')
         time.sleep(0.05)
-    #Save dubmix before returning
-    if dubmix != dubmix_old:
-        if os.path.isdir(filefolder) == False:
-            os.makedirs(filefolder)
-        c = 1
-        for i in dubmix:
-            with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
-                for p in i:
-                    f.write(str(round(p,1)) + '\n')
-                    print(str(round(p,1)))
-            c += 1
-        dubmix_old = dubmix
+        #Save dubmix before returning
+        if dubmix != dubmix_old:
+            if os.path.isdir(filefolder) == False:
+                os.makedirs(filefolder)
+            c = 1
+            for i in dubmix:
+                with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
+                    for p in i:
+                        f.write(str(round(p,1)) + '\n')
+                        print(str(round(p,1)))
+                c += 1
+            dubmix_old = dubmix
     return dubrecord
 
 #---------------Play & DUB--------------------
@@ -3657,12 +3666,12 @@ def playdub(filmname, filename, player_menu):
     if clipduration < 4:
         logger.info("clip duration shorter than 4 sec")
         player.previous()
-        if dub == True:
-            p = 0
-            while p < 3:
-                writemessage('Dubbing in ' + str(3 - p) + 's')
-                time.sleep(1)
-                p+=1
+    if dub == True:
+        p = 0
+        while p < 3:
+            writemessage('Dubbing in ' + str(3 - p) + 's')
+            time.sleep(1)
+            p+=1
     if video == True:
         player.play()
         #run_command('aplay -D plughw:0 ' + filename + '.wav &')
