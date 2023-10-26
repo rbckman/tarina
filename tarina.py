@@ -867,7 +867,9 @@ def main():
                 #to not throw away empty shots, make placeholders
                 for sc in range(pscenes):
                     for i in range(pshots):
-                        run_command('touch ' + filmfolder + filmname + '/scene' +  str(sc).zfill(3) + '/shot' + str(i).zfill(3) + '/.placeholder')
+                        placeholders=filmfolder + filmname + '/scene' +  str(sc+1).zfill(3) + '/shot' + str(i+1).zfill(3)
+                        os.makedirs(placeholders)
+                        run_command('touch ' + placeholders + '/.placeholder')
         #SHOWTARINACTRL
         if recordwithports: 
             if pressed == 'middle' and menu[selected] == "New FILM":
