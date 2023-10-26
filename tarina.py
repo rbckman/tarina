@@ -736,7 +736,7 @@ def main():
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
-                time.sleep(0.5)
+                time.sleep(0.2)
             #shot
             elif pressed == 'remove' and menu[selected] == 'SHOT:':
                 remove(filmfolder, filmname, scene, shot, take, 'shot')
@@ -746,7 +746,7 @@ def main():
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
-                time.sleep(0.5)
+                time.sleep(0.2)
             #scene
             elif pressed == 'remove' and menu[selected] == 'SCENE:' or pressed=='remove_now':
                 remove(filmfolder, filmname, scene, shot, take, 'scene')
@@ -757,7 +757,7 @@ def main():
                 updatethumb = True
                 rendermenu = True
                 #loadfilmsettings = True
-                time.sleep(0.5)
+                time.sleep(0.2)
             #film
             elif pressed == 'remove' and menu[selected] == 'FILM:':
                 remove(filmfolder, filmname, scene, shot, take, 'film')
@@ -769,7 +769,7 @@ def main():
                     loadfilmsettings = True
                     updatethumb = True
                     rendermenu = True
-                    time.sleep(0.5)
+                    time.sleep(0.2)
             elif pressed == 'remove' and menu[selected] == 'CAMERA:':
                 if camselected != 0:
                     cameras.pop(camselected)
