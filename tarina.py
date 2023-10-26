@@ -869,7 +869,12 @@ def main():
                                 else:
                                     sendtocamera(i,port,'RETAKE:'+str(shot))
                                     camera_recording=camselected
-                        a=a+1 
+                        else:
+                            if a==0:
+                                pressagain='insert_shot'
+                            else:
+                                sendtocamera(i,port,'PLACEHOLDER')
+                        a=a+1
             elif pressed == "middle" and menu[selected]=="Sync SCENE":
                 for i in cameras:
                     if i != cameras[0]:
