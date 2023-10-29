@@ -26,9 +26,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.9899495"
-     inkscape:cx="319.42654"
-     inkscape:cy="172.43414"
+     inkscape:zoom="1.979899"
+     inkscape:cx="441.09997"
+     inkscape:cy="154.21014"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -36,11 +36,11 @@
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:window-width="1920"
-     inkscape:window-height="1136"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1533"
+     inkscape:window-height="974"
+     inkscape:window-x="194"
+     inkscape:window-y="50"
+     inkscape:window-maximized="0"
      inkscape:document-rotation="0" />
   <metadata
      id="metadata4694">
@@ -309,17 +309,6 @@
        id="circle1154"
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ececec;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.40142;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
        transform="rotate(90)" />
-    <text
-       id="text1158"
-       y="141.55249"
-       x="232.90192"
-       style="font-style:normal;font-weight:normal;font-size:11.1088px;line-height:2.22292px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0617153px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       xml:space="preserve"><tspan
-         id="tspan1156"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.94978px;line-height:2.22292px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0617153px"
-         y="141.55249"
-         x="232.90192"
-         sodipodi:role="line">MOVE</tspan></text>
     <circle
        style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ececec;fill-opacity:1;fill-rule:nonzero;stroke:#220000;stroke-width:0.40142;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
        id="circle1160"
@@ -327,6 +316,17 @@
        cy="-212.2811"
        r="6.6980696"
        transform="rotate(90)" />
+    <text
+       id="text1158"
+       y="141.67787"
+       x="207.77043"
+       style="font-style:normal;font-weight:normal;font-size:11.1088px;line-height:2.22292px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0617153px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         id="tspan1156"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.94978px;line-height:2.22292px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0617153px"
+         y="141.67787"
+         x="207.77043"
+         sodipodi:role="line">MOVE</tspan></text>
     <circle
        r="6.6980696"
        cy="-188.4903"
@@ -337,12 +337,12 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:11.5223px;line-height:2.30567px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0640127px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="207.5495"
-       y="118.82362"
+       x="231.57364"
+       y="142.7254"
        id="text1170"><tspan
          sodipodi:role="line"
-         x="207.5495"
-         y="118.82362"
+         x="231.57364"
+         y="142.7254"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.09681px;line-height:2.30567px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0640127px"
          id="tspan1168">PASTE</tspan></text>
     <circle
@@ -377,45 +377,45 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:11.5223px;line-height:2.30567px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0640127px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="207.81424"
-       y="141.77229"
+       x="183.96684"
+       y="141.75067"
        id="text1232"><tspan
          sodipodi:role="line"
-         x="207.81424"
-         y="141.77229"
+         x="183.96684"
+         y="141.75067"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.09681px;line-height:2.30567px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0640127px"
          id="tspan1230">COPY</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:15.0215px;line-height:3.00587px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0834525px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="231.5206"
-       y="119.37529"
+       x="207.82292"
+       y="119.3144"
        id="text1170-7"><tspan
          sodipodi:role="line"
-         x="231.5206"
-         y="119.37529"
+         x="207.82292"
+         y="119.3144"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.34096px;line-height:3.00587px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0834525px"
          id="tspan1168-3">HELP</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:9.93506px;line-height:1.98805px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0551946px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="182.74352"
-       y="118.16312"
+       x="231.4908"
+       y="139.37099"
        id="text1170-7-6"><tspan
          sodipodi:role="line"
-         x="182.74352"
-         y="118.16312"
+         x="231.4908"
+         y="139.37099"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.53245px;line-height:1.98805px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0551946px"
          id="tspan1168-3-1">INSERT</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:13.8068px;line-height:2.7628px;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0767042px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="183.11424"
-       y="142.04619"
+       x="182.97911"
+       y="119.08159"
        id="text1170-7-6-2"><tspan
          sodipodi:role="line"
-         x="183.11424"
-         y="142.04619"
+         x="182.97911"
+         y="119.08159"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.90906px;line-height:2.7628px;font-family:'Latin Modern Mono';-inkscape-font-specification:'Latin Modern Mono';stroke-width:0.0767042px"
          id="tspan1168-3-1-9">MODE</tspan></text>
     <text
