@@ -726,7 +726,7 @@ def main():
             elif pressed == 'middle' and menu[selected] == 'DSK:':
                 print("clean up film folder here")
                 #cleanupdisk(filmname,filmfolder)
-            #REMOVE
+            #REMOVE DELETE
             #take
             elif pressed == 'remove' and menu[selected] == 'TAKE:':
                 remove(filmfolder, filmname, scene, shot, take, 'take')
@@ -2710,6 +2710,7 @@ def remove(filmfolder, filmname, scene, shot, take, sceneshotortake):
                     elif sceneshotortake == 'film':
                         foldername = filmfolder + filmname
                         os.system('rm -r ' + foldername)
+                    organize(filmfolder, 'onthefloor')
                 return
             elif selected == 0:
                 return
