@@ -1593,6 +1593,9 @@ def main():
                 plughw=filmsettings[21]
                 channels=filmsettings[22]
                 cammode=filmsettings[23]
+                scene=filmsettings[24]
+                shot=filmsettings[25]
+                take=filmsettings[26]
                 logger.info('film settings loaded & applied')
                 time.sleep(0.2)
             except:
@@ -1620,7 +1623,7 @@ def main():
                     except:
                         print('not exist')
             #organize(filmfolder,'onthefloor')
-            #scene, shot, take = countlast(filmname, filmfolder)
+            scenes, shots, takes = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -1699,7 +1702,7 @@ def main():
             #save settings if menu has been updated and x seconds passed
             if recording == False:
                 if time.time() - pausetime > savesettingsevery: 
-                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels]
+                    settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels,mode,scene,shot,take]
                     #print('saving settings')
                     savesettings(settings_to_save, filmname, filmfolder)
                     pausetime = time.time()
