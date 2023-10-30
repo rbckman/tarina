@@ -1623,7 +1623,8 @@ def main():
                     except:
                         print('not exist')
             #organize(filmfolder,'onthefloor')
-            scenes, shots, takes = countlast(filmname, filmfolder)
+            #scenes, shots, takes = countlast(filmname, filmfolder)
+            scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -3565,7 +3566,7 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
                 newdub[3] -= 0.1
         elif pressed == 'record' and selected == 1:
             dubmix.append(newdub)
-            dubrecord = filefolder + 'dub' + str(len(dubmix)).zfill(3) + '.wav'
+            dubrecord = filefolder + 'dub' + str(len(dubfiles)+1).zfill(3) + '.wav'
             break
 
         #DUB SETTINGS
@@ -3582,7 +3583,7 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
             if len(dubfiles) == 0:
                 selected = 0
         elif pressed == 'record' and selected == 4:
-            dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
+            dubrecord = filefolder + 'dub' + str(len(dubfiles) + 1).zfill(3) + '.wav'
             break
         elif pressed == 'retake' and selected == 4:
             dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
@@ -3626,18 +3627,18 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
             renderfilename = renderfilm(filmfolder, filmname, 0, scene, False)
             playdub(filmname,renderfilename, 'scene')
         time.sleep(0.05)
-        #Save dubmix before returning
-        if dubmix != dubmix_old:
-            if os.path.isdir(filefolder) == False:
-                os.makedirs(filefolder)
-            c = 1
-            for i in dubmix:
-                with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
-                    for p in i:
-                        f.write(str(round(p,1)) + '\n')
-                        print(str(round(p,1)))
-                c += 1
-            dubmix_old = dubmix
+    #Save dubmix before returning
+    if dubmix != dubmix_old:
+        if os.path.isdir(filefolder) == False:
+            os.makedirs(filefolder)
+        c = 1
+        for i in dubmix:
+            with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
+                for p in i:
+                    f.write(str(round(p,1)) + '\n')
+                    print(str(round(p,1)))
+            c += 1
+        dubmix_old = dubmix
     return dubrecord
 
 #---------------Play & DUB--------------------
