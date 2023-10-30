@@ -1620,7 +1620,7 @@ def main():
                     except:
                         print('not exist')
             #organize(filmfolder,'onthefloor')
-            #scene, shot, take = countlast(filmname, filmfolder)
+            scene, shot, take = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
             updatethumb =  True
@@ -3623,7 +3623,7 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
             renderfilename = renderfilm(filmfolder, filmname, 0, scene, False)
             playdub(filmname,renderfilename, 'scene')
         time.sleep(0.05)
-        #Save dubmix before returning
+        #Save dubmix
         if dubmix != dubmix_old:
             if os.path.isdir(filefolder) == False:
                 os.makedirs(filefolder)
@@ -3635,6 +3635,18 @@ def clipsettings(filmfolder, filmname, scene, shot, plughw):
                         print(str(round(p,1)))
                 c += 1
             dubmix_old = dubmix
+    #Save dubmix before returning
+    if dubmix != dubmix_old:
+        if os.path.isdir(filefolder) == False:
+            os.makedirs(filefolder)
+        c = 1
+        for i in dubmix:
+            with open(filefolder + ".settings" + str(c).zfill(3), "w") as f:
+                for p in i:
+                    f.write(str(round(p,1)) + '\n')
+                    print(str(round(p,1)))
+            c += 1
+        dubmix_old = dubmix
     return dubrecord
 
 #---------------Play & DUB--------------------
