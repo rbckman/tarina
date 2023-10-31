@@ -790,6 +790,7 @@ def main():
                             sendtocamera(newcamera,port,'MAKEPLACEHOLDERS:'+str(scenes)+'|'+str(shots))
                             cameras.append(newcamera)
                             rendermenu = True
+                            newselected=newselected+1
                             vumetermessage("New camera! "+newcamera)
                 else:
                     vumetermessage('No network!')
@@ -1706,6 +1707,7 @@ def main():
                     settings_to_save = [filmfolder, filmname, camera.brightness, camera.contrast, camera.saturation, camera.shutter_speed, camera.iso, camera.awb_mode, camera.awb_gains, awb_lock, miclevel, headphoneslevel, beeps, flip, comp, between, duration, showmenu_settings, quality,wifistate,serverstate,plughw,channels,cammode,scene,shot,take]
                     #print('saving settings')
                     savesettings(settings_to_save, filmname, filmfolder)
+                if time.time() - pausetime > savesettingsevery: 
                     pausetime = time.time()
                     #NETWORKS
                     networks=[]
@@ -1726,16 +1728,16 @@ def main():
                     if len(cameras) > 1:
                         camerasconnected='connected '+str(len(cameras)-1)
                         recordwithports=True
-                        vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected+' camselected:'+str(camselected)+' rec:'+str(camera_recording))
+                        vumetermessage('filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected+' camselected:'+str(camselected)+' rec:'+str(camera_recording))
                     else:
                         camerasconnected=''
                         recordwithports=False
                         if searchforcameras == 'on':
                             camerasconnected='searching '+str(pingip)
-                        vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
+                        vumetermessage('filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected)
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
-                    print(term.yellow+'filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
+                    print(term.yellow+'filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected)
                     print(camselected,camera_recording,cameras)
             #writemessage(pressed)
             oldsettings = settings
