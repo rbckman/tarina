@@ -386,7 +386,8 @@ def main():
                     camera.stop_preview()
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
-                    compileshot(foldername + filename,filmfolder,filmname)
+                    #compileshot(foldername + filename,filmfolder,filmname)
+                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
                     trim = playdub(filmname,foldername + filename, 'shot')
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
@@ -399,14 +400,14 @@ def main():
                     vumetermessage('nothing here! hit rec!')
                 rendermenu = True
             #DUB SHOT
-            elif pressed == 'middle' and menu[selected] == 'SHOT, not so fast:':
+            elif pressed == 'middle' and menu[selected] == 'SHOT:':
                 newdub = clipsettings(filmfolder, filmname, scene, shot, plughw)
                 if newdub:
                     camera.stop_preview()
                     renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
                     playdub(filmname,renderfilename, 'dub')
                     run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
-                    vumetermessage('new scene dubbing made!')
+                    vumetermessage('new shot dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
                 else:
@@ -2920,6 +2921,8 @@ def compileshot(filename,filmfolder,filmname):
         filename=filename.replace('.h264','')
     if '.mp4' in filename:
         filename=filename.replace('.mp4','')
+    if not os.path.isfile(filename + '.wav'):
+        audiosilence('',filename)
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
         writemessage('Converting to playable video')
@@ -3033,7 +3036,7 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     audiomerge = ['sox']
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
-    if len(audiofiles) > 0:
+    if len(audiofiles) > 1:
         for f in audiofiles:
             audiomerge.append(f + '.wav')
         audiomerge.append(filename + '.wav')
@@ -3096,6 +3099,8 @@ def rendershot(filmfolder, filmname, scene, shot):
     oldvideohash = ''
     take = counttakes(filmname, filmfolder, scene, shot)
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
+    if os.path.isfile(renderfilename + '_tmp.mp4') == True:
+        os.system('mv ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
     filmfiles = [renderfilename]
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     # Check if video corrupt
@@ -3113,7 +3118,7 @@ def rendershot(filmfolder, filmname, scene, shot):
         renderfix = True
     # Video Hash
     for p in filmfiles:
-        compileshot(p.filmfolder,filmname)
+        compileshot(p,filmfolder,filmname)
         videohash = videohash + str(int(countsize(p + '.mp4')))
     print('Videohash of shot is: ' + videohash)
     try:
@@ -3128,12 +3133,13 @@ def rendershot(filmfolder, filmname, scene, shot):
     audiohash = ''
     oldaudiohash = ''
     newaudiomix = False
+    dubfilename='/dev/shm/dub'
     for p in filmfiles:
         audiohash += str(int(countsize(p + '.wav')))
     dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
     for p in dubfiles:
         audiohash += str(int(countsize(p)))
-    print('Audiohash of scene is: ' + audiohash)
+    print('Audiohash of shot is: ' + audiohash)
     try:
         with open(scenedir + '.audiohash', 'r') as f:
             oldaudiohash = f.readline().strip()
@@ -3143,7 +3149,9 @@ def rendershot(filmfolder, filmname, scene, shot):
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
     if audiohash != oldaudiohash or newmix == True or renderfix == True:
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        print('woooooooooFUUUUUUUUUUUUUUUUUoooooooooooo')
+        time.sleep(2)
+        renderaudio(filmfiles, dubfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
@@ -3151,6 +3159,34 @@ def rendershot(filmfolder, filmname, scene, shot):
             os.system('cp ' + scenedir + '/dub/.settings' + str(i + 1).zfill(3) + ' ' + scenedir + '/dub/.rendered' + str(i + 1).zfill(3))
         print('Audio rendered!')
         newaudiomix = True
+        muxing = True
+        if muxing == True:
+            #muxing mp3 layer to mp4 file
+            #count estimated audio filesize with a bitrate of 320 kb/s
+            audiosize = countsize(renderfilename + '.wav') * 0.453
+            os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
+            if debianversion == 'stretch':
+                p = Popen(['avconv', '-y', '-i', dubfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
+            else:
+                p = Popen(['ffmpeg', '-y', '-i', dubfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
+            while p.poll() is None:
+                time.sleep(0.2)
+                try:
+                    rendersize = countsize(renderfilename + '.mp3')
+                except:
+                    continue
+                writemessage('audio rendering ' + str(int(rendersize)) + ' of ' + str(int(audiosize)) + ' kb done')
+            ##MERGE AUDIO & VIDEO
+            writemessage('Merging audio & video')
+            #os.remove(renderfilename + '.mp4') 
+            call(['MP4Box', '-rem', '2',  renderfilename + '_tmp.mp4'], shell=False)
+            call(['MP4Box', '-add', renderfilename + '_tmp.mp4', '-add', renderfilename + '.mp3', '-new', renderfilename + '.mp4'], shell=False)
+            try:
+                os.remove(dubfilename + '.wav')
+                os.remove(renderfilename + '_tmp.mp4')
+                os.remove(renderfilename + '.mp3')
+            except:
+                print('nothin to remove')
     else:
         print('Already rendered!')
     return renderfilename, newaudiomix
