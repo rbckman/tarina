@@ -1744,10 +1744,10 @@ def main():
                         recordwithports=False
                         if searchforcameras == 'on':
                             camerasconnected='searching '+str(pingip)
-                        vumetermessage('filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected)
+                        vumetermessage('filming with '+camera_model +' ip:'+ network + ' '+camerasconnected)
                     disk = os.statvfs(tarinafolder + '/')
                     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
-                    print(term.yellow+'filming with '+camera_model +' ip:'+ cameras[camselected] + ' '+camerasconnected)
+                    #print(term.yellow+'filming with '+camera_model +' ip:'+ network
                     print(camselected,camera_recording,cameras)
             #writemessage(pressed)
             oldsettings = settings
