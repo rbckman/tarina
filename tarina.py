@@ -2948,7 +2948,7 @@ def compileshot(filename,filmfolder,filmname):
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
         audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
-        muxing = True
+        muxing = False
         if muxing == True:
             #muxing mp3 layer to mp4 file
             #count estimated audio filesize with a bitrate of 320 kb/s
@@ -3035,7 +3035,7 @@ def rendervideo(filmfiles, filename, renderinfo):
 
 #---------------Render Audio----------------
 
-def renderaudio(audiofiles, filename, dubfiles, dubmix, what):
+def renderaudio(audiofiles, filename, dubfiles, dubmix):
     #if len(audiofiles) < 1:
     #    writemessage('Nothing here!')
     #    time.sleep(2)
@@ -3162,11 +3162,14 @@ def rendershot(filmfolder, filmname, scene, shot):
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
     if audiohash != oldaudiohash or newmix == True or renderfix == True:
+        vumetermessage('FUUUUUUUUUUUUUCK')
+        #make scene rerender
+        os.system('touch '+filmfolder + filmname + '/scene' + str(scene).zfill(3)+'/.rerender')
         #copy original sound
         if os.path.exists(scenedir+'dub') == True:
             os.system('cp '+scenedir+'dub/original.wav '+renderfilename+'.wav')
         #os.system('cp '+dubfolder+'original.wav '+renderfilename+'.wav')
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix, 'shot')
+        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
@@ -3185,7 +3188,7 @@ def rendershot(filmfolder, filmname, scene, shot):
             else:
                 p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
             while p.poll() is None:
-                time.sleep(0.2)
+                time.sleep(0.02)
                 try:
                     rendersize = countsize(renderfilename + '.mp3')
                 except:
@@ -3231,9 +3234,12 @@ def renderscene(filmfolder, filmname, scene):
         #run_command('rm ' + renderfilename + '*')
         renderfix = True
     # Video Hash
+    shot=1
     for p in filmfiles:
         compileshot(p,filmfolder,filmname)
         videohash = videohash + str(int(countsize(p + '.mp4')))
+        rendershotname, renderfix = rendershot(filmfolder, filmname, scene, shot)
+        shot=shot+1
     print('Videohash of scene is: ' + videohash)
     try:
         with open(scenedir + '.videohash', 'r') as f:
@@ -3269,9 +3275,12 @@ def renderscene(filmfolder, filmname, scene):
     except:
         print('no audiohash found, making one...')
         with open(scenedir + '.audiohash', 'w') as f:
-            f.write(audiohash)
+            f.write(audiohash) 
+    if os.path.isfile(scenedir+'/.rerender') == True:
+        renderfix=True
+        os.system('rm '+scenedir+'/.rerender')
     if audiohash != oldaudiohash or newmix == True or renderfix == True:
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix, 'scene')
+        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
@@ -3290,7 +3299,7 @@ def renderscene(filmfolder, filmname, scene):
             else:
                 p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
             while p.poll() is None:
-                time.sleep(0.2)
+                time.sleep(0.02)
                 try:
                     rendersize = countsize(renderfilename + '.mp3')
                 except:
@@ -3333,6 +3342,7 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
         oldvideohash = ''
         renderfilename = filmfolder + filmname + '/' + filmname
         filmdir = filmfolder + filmname + '/'
+        scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
         for p in filmfiles:
             print(p)
             compileshot(p,filmfolder,filmname)
@@ -3373,7 +3383,7 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
         if newaudiomix == True:
             newmix = True
         if audiohash != oldaudiohash or newmix == True:
-            renderaudio(filmfiles, renderfilename, dubfiles, dubmix, 'film')
+            renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
             print('updating audiohash...')
             with open(filmdir+ '.audiohash', 'w') as f:
                 f.write(audiohash)
@@ -3396,7 +3406,7 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
                 else:
                     p = Popen(['ffmpeg', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
                 while p.poll() is None:
-                    time.sleep(0.2)
+                    time.sleep(0.02)
                     try:
                         rendersize = countsize(renderfilename + '.mp3')
                     except:
@@ -3639,7 +3649,7 @@ def clipsettings(filmfolder, filmname, scene, shot, take, plughw):
                 os.system('cp '+filefolder+'original.wav '+saveoriginal)
                 #removedub folder
                 os.system('rm -r ' + filefolder)
-                time.sleep(2)
+                time.sleep(1)
                 selected = 0
         elif pressed == 'record' and selected == 4:
             dubrecord = filefolder + 'dub' + str(len(dubfiles) + 1).zfill(3) + '.wav'
