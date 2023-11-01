@@ -393,6 +393,8 @@ def main():
                         take = counttakes(filmname, filmfolder, scene, shot)+1
                         trim_filename = foldername + 'take' + str(take).zfill(3)
                         videotrim(foldername + filename, trim_filename, trim[0], trim[1])
+                        if os.path.exists(foldername+'dub') == True:
+                            print('trim dubs here')
                     imagename = foldername + filename + '.jpeg'
                     overlay = displayimage(camera, imagename, overlay, 3)
                     camera.start_preview()
@@ -415,7 +417,11 @@ def main():
                         time.sleep(2)
                     renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
                     playdub(filmname,renderfilename, 'dub')
-                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
+                    #run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
+                    #add audio/video start delay sync
+                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2 /dev/shm/temp.wav trim 0.013')
+                    run_command('mv /dev/shm/temp.wav '+ newdub)
+                    audiosync, videolenght, audiolenght = audiotrim(renderfilename, 'end', newdub)
                     vumetermessage('new shot dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
@@ -429,7 +435,11 @@ def main():
                     camera.stop_preview()
                     renderfilename, newaudiomix = renderscene(filmfolder, filmname, scene)
                     playdub(filmname,renderfilename, 'dub')
-                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
+                    #run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
+                    #add audio/video start delay sync
+                    run_command('sox -V0 -G /dev/shm/dub.wav -c 2 /dev/shm/temp.wav trim 0.013')
+                    run_command('mv /dev/shm/temp.wav '+ newdub)
+                    audiosync, videolenght, audiolenght = audiotrim(renderfilename, 'end', newdub)
                     vumetermessage('new scene dubbing made!')
                     camera.start_preview()
                     time.sleep(1)
@@ -1307,7 +1317,8 @@ def main():
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene <= scenes:
                     scene += 1
-                    shot = countshots(filmname, filmfolder, scene)
+                    #shot = countshots(filmname, filmfolder, scene)
+                    shot = 1
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, takes = browse2(filmname, filmfolder, scene, shot, take, 0, 1)
                 #shot = 1
@@ -1467,7 +1478,8 @@ def main():
             elif menu[selected] == 'SCENE:' and recording == False:
                 if scene > 1:
                     scene -= 1
-                    shot = countshots(filmname, filmfolder, scene)
+                    #shot = countshots(filmname, filmfolder, scene)
+                    shot=1
                     take = counttakes(filmname, filmfolder, scene, shot)
                 #scene, shots, take = browse2(filmname, filmfolder, scene, shot, take, 0, -1)
                 #takes = take
@@ -2611,7 +2623,7 @@ def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlig
                         for f in files:
                             if sound == True:
                                 compileshot(f,filmfolder,filmname)
-                                audiotrim(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3), 'end')
+                                audiotrim(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3), 'end', '')
                                 videomerge.append('-cat')
                                 videomerge.append(f + '.mp4')
                             else:
@@ -2947,7 +2959,7 @@ def compileshot(filename,filmfolder,filmname):
         run_command('sox -V0 '+filename+'.wav -c 2 /dev/shm/temp.wav trim 0.013')
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
         stretchaudio(filename,fps)
-        audiosync, videolenght, audiolenght = audiotrim(filename, 'end')
+        audiosync, videolenght, audiolenght = audiotrim(filename, 'end','')
         muxing = False
         if muxing == True:
             #muxing mp3 layer to mp4 file
@@ -3051,6 +3063,10 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
             audiomerge.append(f + '.wav')
         audiomerge.append(filename + '.wav')
         call(audiomerge, shell=False)
+    else:
+        #if rendering scene with one shot
+        if audiofiles[0] != filename:
+            os.system('cp '+audiofiles[0]+'.wav '+filename+'.wav')
     #DUBBING
     p = 1
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
@@ -3162,7 +3178,6 @@ def rendershot(filmfolder, filmname, scene, shot):
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
     if audiohash != oldaudiohash or newmix == True or renderfix == True:
-        vumetermessage('FUUUUUUUUUUUUUCK')
         #make scene rerender
         os.system('touch '+filmfolder + filmname + '/scene' + str(scene).zfill(3)+'/.rerender')
         #copy original sound
@@ -3263,10 +3278,17 @@ def renderscene(filmfolder, filmname, scene):
     oldaudiohash = ''
     newaudiomix = False
     for p in filmfiles:
-        audiohash += str(int(countsize(p + '.wav')))
+        try:
+            audiohash += str(int(countsize(p + '.wav')))
+        except:
+            audiohash=0
+            renderfix=True
     dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, 0)
     for p in dubfiles:
-        audiohash += str(int(countsize(p)))
+        try:
+            audiohash += str(int(countsize(p)))
+        except:
+            audiohash=0
     print('Audiohash of scene is: ' + audiohash)
     try:
         with open(scenedir + '.audiohash', 'r') as f:
@@ -3276,6 +3298,7 @@ def renderscene(filmfolder, filmname, scene):
         print('no audiohash found, making one...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash) 
+        renderfix=True
     if os.path.isfile(scenedir+'/.rerender') == True:
         renderfix=True
         os.system('rm '+scenedir+'/.rerender')
@@ -3292,7 +3315,10 @@ def renderscene(filmfolder, filmname, scene):
         if muxing == True:
             #muxing mp3 layer to mp4 file
             #count estimated audio filesize with a bitrate of 320 kb/s
-            audiosize = countsize(renderfilename + '.wav') * 0.453
+            try:
+                audiosize = countsize(renderfilename + '.wav') * 0.453
+            except:
+                print('noothing here')
             os.system('mv ' + renderfilename + '.mp4 ' + renderfilename + '_tmp.mp4')
             if debianversion == 'stretch':
                 p = Popen(['avconv', '-y', '-i', renderfilename + '.wav', '-acodec', 'libmp3lame', '-ac', '2', '-b:a', '320k', renderfilename + '.mp3'])
@@ -3626,11 +3652,13 @@ def clipsettings(filmfolder, filmname, scene, shot, take, plughw):
         elif pressed == 'down' and selected == 3:
             if newdub[3] > 0.01:
                 newdub[3] -= 0.1
-        elif pressed == 'record' and selected == 1:
+        elif pressed == 'record' or pressed == 'middle' and selected == 1:
             dubmix.append(newdub)
             dubrecord = filefolder + 'dub' + str(len(dubfiles)+1).zfill(3) + '.wav'
             break
-
+        elif pressed == 'retake' and selected == 4:
+            dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
+            break
         #DUB SETTINGS
         elif pressed == 'up' and selected == 4:
             if dubselected + 1 < len(dubfiles):
@@ -3651,12 +3679,6 @@ def clipsettings(filmfolder, filmname, scene, shot, take, plughw):
                 os.system('rm -r ' + filefolder)
                 time.sleep(1)
                 selected = 0
-        elif pressed == 'record' and selected == 4:
-            dubrecord = filefolder + 'dub' + str(len(dubfiles) + 1).zfill(3) + '.wav'
-            break
-        elif pressed == 'retake' and selected == 4:
-            dubrecord = filefolder + 'dub' + str(dubselected + 1).zfill(3) + '.wav'
-            break
         elif pressed == 'up' and selected == 5:
             if dubmix[dubselected][0] >= 0.99 and dubmix[dubselected][1] > 0.01:
                 dubmix[dubselected][1] -= 0.1
@@ -3990,13 +4012,13 @@ def videotrim(filename, trim_filename, where, s):
         #run_command('ffmpeg -ss ' + str(s) + ' -i ' + filename + '.mp4 -c copy ' + trim_filename + '.mp4')
         run_command('MP4Box ' + filename + '.mp4 -splitx ' + str(s) + ':end -out ' + trim_filename + '.mp4')
         run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
-        audiotrim(trim_filename, 'beginning')
+        audiotrim(trim_filename, 'beginning','')
     if where == 'end':
         logger.info('trimming clip from end')
         #run_command('ffmpeg -to ' + str(s) + ' -i ' + filename + '.mp4 -c copy ' + trim_filename + '.mp4')
         run_command('MP4Box ' + filename + '.mp4 -splitx 0:' + str(s) + ' -out ' + trim_filename + '.mp4')
         run_command('cp ' + filename + '.wav ' + trim_filename + '.wav')
-        audiotrim(trim_filename, 'end')
+        audiotrim(trim_filename, 'end','')
     #take last frame 
     run_command('ffmpeg -sseof -1 -i ' + trim_filename + '.mp4 -update 1 -q:v 1 -vf scale=800:450 ' + trim_filename + '.jpeg')
     return
@@ -4014,7 +4036,7 @@ def getaudiocards():
 
 #--------------Audio Trim--------------------
 # make audio file same lenght as video file
-def audiotrim(filename, where):
+def audiotrim(filename, where, dub):
     global channels, fps
     audiosync=0
     print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
@@ -4022,6 +4044,8 @@ def audiotrim(filename, where):
     pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + filename + '.mp4', shell=True)
     videolenght = pipe.decode().strip()
     print('videolenght:'+str(videolenght))
+    if dub:
+        filename=dub[:-4]
     try:
         pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
         audiolenght = pipe.decode().strip()
