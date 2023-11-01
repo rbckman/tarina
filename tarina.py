@@ -801,6 +801,7 @@ def main():
                             cameras.append(newcamera)
                             rendermenu = True
                             newselected=newselected+1
+                            camera_recording=None
                             vumetermessage("New camera! "+newcamera)
                 else:
                     vumetermessage('No network!')
@@ -1101,7 +1102,7 @@ def main():
         if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' and recordwithports==False or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
             if recording == False and recordable == True or recording == False and pressed == 'record_now' or recording == False and pressed == 'retake_now':
-                camera_recording=0
+                #camera_recording=0
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take) 
                 if pressed == "record":
                     #shot = shots+1
