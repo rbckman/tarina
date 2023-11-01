@@ -4038,6 +4038,7 @@ def getaudiocards():
 # make audio file same lenght as video file
 def audiotrim(filename, where, dub):
     global channels, fps
+    videofile=filename
     audiosync=0
     print("chaaaaaaaaaaaaaaaanel8: " +str(channels))
     writemessage('Audio syncing..')
@@ -4090,19 +4091,26 @@ def audiotrim(filename, where, dub):
         #        audiosyncs = audiosyncs - 1
         #    audiosyncms = 1000 + audiosyncms
         logger.info('Videofile is: ' + str(audiosync) + 'ms longer')
+        logger.info('Videofile is: ' + str(int(audiosync)/1000) + 's longer')
+        time.sleep(2)
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
-        run_command('sox -V0 -r '+soundrate+' '+filename+'.wav '+filename+'_temp.wav trim 0.0 pad 0 ' + str(int(audiosync)/1000))
+        run_command('sox -V0 -r '+soundrate+' -c 2 '+filename+'.wav '+filename+'_temp.wav trim 0.0 pad 0 ' + str(int(audiosync)/1000))
         run_command('sox -V0 -G ' + filename + '_temp.wav ' + filename + '.wav fade 0.01 0 0.01')
         #add silence to end
         #run_command('sox -V0 /dev/shm/silence.wav ' + filename + '_temp.wav')
         #run_command('cp '+filename+'.wav '+filename+'_temp.wav')
         #run_command('sox -V0 -G ' + filename + '_temp.wav /dev/shm/silence.wav ' + filename + '.wav')
-        #os.remove(filename + '_temp.wav')
+        os.remove(filename + '_temp.wav')
         #os.remove('/dev/shm/silence.wav')
         delayerr = 'V' + str(audiosync)
         print(delayerr)
+    print('the results:')
+    #pipe = subprocess.check_output('mediainfo --Inform="Audio;%Duration%" ' + filename + '.wav', shell=True)
+    #audiolenght = pipe.decode().strip()
+    #print('aftersyncvideo: '+str(videolenght) + ' audio:'+str(audiolenght))
+    #time.sleep(4)
     #os.remove('/dev/shm/' + filename + '.wav')
     return float(audiosync)/1000, int(videolenght), int(audiolenght)
     #os.system('mv audiosynced.wav ' + filename + '.wav')
