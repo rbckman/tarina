@@ -585,7 +585,7 @@ def main():
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 yankedshot = ''
                 vumetermessage('Shot pasted!')
-                time.sleep(1)
+                time.sleep(2)
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and yankedscene:
                 vumetermessage('Pasting scene, please wait...')
                 pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
@@ -596,7 +596,7 @@ def main():
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 yankedscene = ''
                 vumetermessage('Scene pasted!')
-                time.sleep(1)
+                time.sleep(2)
             #MOVE SHOT and MOVE SCENE
             elif pressed == 'insert' and menu[selected] == 'SHOT:' and cuttedshot:
                     vumetermessage('Moving shot, please wait...')
@@ -615,7 +615,7 @@ def main():
                     updatethumb = True
                     scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                     vumetermessage('Shot moved!')
-                    time.sleep(1)
+                    time.sleep(2)
             elif pressed == 'insert' and menu[selected] == 'SCENE:' and cuttedscene:
                     vumetermessage('Moving scene, please wait...')
                     pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
@@ -629,7 +629,7 @@ def main():
                     cuttedscene = ''
                     updatethumb = True
                     vumetermessage('Scene moved!')
-                    time.sleep(1)
+                    time.sleep(2)
             #INSERT SHOT
             elif pressed == 'insert' and menu[selected] != 'SCENE:':
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
@@ -3135,6 +3135,8 @@ def rendershot(filmfolder, filmname, scene, shot):
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     # Check if video corrupt
     renderfix = False
+    if os.path.isfile(renderfilename + '.jpeg') == False: 
+        run_command('ffmpeg -sseof -1 -i ' + renderfilename + '.mp4 -update 1 -q:v 1 -vf scale=800:450 ' + renderfilename + '.jpeg')
     try:
         pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + renderfilename + '.mp4', shell=True)
         videolenght = pipe.decode().strip()
@@ -3236,24 +3238,28 @@ def renderscene(filmfolder, filmname, scene):
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/scene'
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
     # Check if video corrupt
-    renderfix = False
+    renderfixscene = False
     try:
         pipe = subprocess.check_output('mediainfo --Inform="Video;%Duration%" ' + renderfilename + '.mp4', shell=True)
         videolenght = pipe.decode().strip()
     except:
         videolenght = ''
+        renderfixscene = True
     print('Scene lenght ' + videolenght)
     if videolenght == '':
         print('Okey, scene file not found or is corrupted')
         # For backwards compatibility remove old rendered scene files
-        #run_command('rm ' + renderfilename + '*')
-        renderfix = True
+        #run_command('rm ' + renderfilename + '.mp4')
+        #run_command('rm ' + renderfilename + '.wav')
+        vumetermessage('corrupted scene file! removing, please render again')
+        renderfixscene = True
+        #return '', ''
     # Video Hash
     shot=1
     for p in filmfiles:
         compileshot(p,filmfolder,filmname)
-        videohash = videohash + str(int(countsize(p + '.mp4')))
         rendershotname, renderfix = rendershot(filmfolder, filmname, scene, shot)
+        videohash = videohash + str(int(countsize(p + '.mp4')))
         shot=shot+1
     print('Videohash of scene is: ' + videohash)
     try:
@@ -3265,13 +3271,15 @@ def renderscene(filmfolder, filmname, scene):
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
 
+    print('renderfix is:'+str(renderfixscene))
     # Render if needed
-    if videohash != oldvideohash or renderfix == True:
+    if videohash != oldvideohash or renderfixscene == True or renderfix == True:
         rendervideo(filmfiles, renderfilename, 'scene ' + str(scene))
         fastedit(filmfolder, filmname, filmfiles, scene)
         print('updating videohash...')
         with open(scenedir + '.videohash', 'w') as f:
             f.write(videohash)
+    #time.sleep(3)
 
     #Audio
     audiohash = ''
@@ -3298,11 +3306,11 @@ def renderscene(filmfolder, filmname, scene):
         print('no audiohash found, making one...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash) 
-        renderfix=True
+        renderfixscene=True
     if os.path.isfile(scenedir+'/.rerender') == True:
-        renderfix=True
+        renderfixscene=True
         os.system('rm '+scenedir+'/.rerender')
-    if audiohash != oldaudiohash or newmix == True or renderfix == True:
+    if audiohash != oldaudiohash or newmix == True or renderfix == True or renderfixscene == True:
         renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
