@@ -308,16 +308,18 @@ def main():
                 overlay = displayimage(camera, p_imagename, overlay, 3)
                 while holdbutton == 'peak':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-                    #writemessage('peaking ' + str(peakshot))
+                    vumetermessage('peaking ' + str(peakshot))
+                    time.sleep(0.03)
                 overlay = removeimage(camera, overlay)
             #SHOWHELP
             elif pressed == 'showhelp':
                 vumetermessage('Button layout')
                 overlay = removeimage(camera, overlay)
                 overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
-                while holdbutton == 'showhelp':
+                while holdbutton == 'showhelp' or pressed == 'H':
                     pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
                     vumetermessage('Button layout')
+                    time.sleep(0.03)
                 overlay = removeimage(camera, overlay)
                 updatethumb =  True
             #TIMELAPSE
@@ -4539,15 +4541,15 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'view'
         elif event == 'KEY_DELETE' or (readbus == 223 and readbus2 == 247):
             pressed = 'remove'
-        elif (readbus2 == 245 and readbus == 191):
+        elif event == 'E' or (readbus2 == 245 and readbus == 191):
             pressed = 'peak'
         elif (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
-        elif (readbus2 == 245 and readbus == 127):
+        elif event == 'A' or (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
         elif (readbus2 == 245 and readbus == 239):
             pressed = 'changemode'
-        elif (readbus2 == 245 and readbus == 247):
+        elif event == 'H' or (readbus2 == 245 and readbus == 247):
             pressed = 'showhelp'
         elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 253):
             pressed = 'insert'
