@@ -3014,6 +3014,8 @@ def shotfiles(filmfolder, filmname, scene):
     #time.sleep(2)
     return files
 
+#--------Show JPEG as progress when rendering
+
 #---------------Render Video------------------
 
 def rendervideo(filmfiles, filename, renderinfo):
