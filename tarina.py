@@ -3380,7 +3380,7 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
         scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/'
         for p in filmfiles:
             print(p)
-            compileshot(p,filmfolder,filmname)
+            #compileshot(p,filmfolder,filmname)
             videohash += str(int(countsize(p + '.mp4')))
         print('Videohash of film is: ' + videohash)
         try:
