@@ -2945,8 +2945,6 @@ def compileshot(filename,filmfolder,filmname):
         filename=filename.replace('.h264','')
     if '.mp4' in filename:
         filename=filename.replace('.mp4','')
-    if not os.path.isfile(filename + '.wav'):
-        audiosilence('',filename)
     if os.path.isfile(filename + '.h264'):
         logger.info('Video not converted!')
         writemessage('Converting to playable video')
@@ -2957,6 +2955,8 @@ def compileshot(filename,filmfolder,filmname):
         print(filename+'.mp4 removed!')
         run_command('MP4Box -fps 25 -add ' + video_origins + '.h264 ' + video_origins + '.mp4')
         os.system('ln -sf '+video_origins+'.mp4 '+filename+'.mp4')
+        if not os.path.isfile(filename + '.wav'):
+            audiosilence('',filename)
         #add audio/video start delay sync
         run_command('sox -V0 '+filename+'.wav -c 2 /dev/shm/temp.wav trim 0.013')
         run_command('mv /dev/shm/temp.wav '+ filename + '.wav')
@@ -3132,10 +3132,13 @@ def rendershot(filmfolder, filmname, scene, shot):
     oldvideohash = ''
     take = counttakes(filmname, filmfolder, scene, shot)
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
+    # Video Hash
+    compileshot(renderfilename,filmfolder,filmname)
+    videohash = videohash + str(int(countsize(renderfilename + '.mp4')))
+    print('Videohash of shot is: ' + videohash)
     #if something shutdown in middle of process
     if os.path.isfile(renderfilename + '_tmp.mp4') == True:
         os.system('mv ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
-    filmfiles = [renderfilename]
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     # Check if video corrupt
     renderfix = False
@@ -3152,11 +3155,6 @@ def rendershot(filmfolder, filmname, scene, shot):
         # For backwards compatibility remove old rendered scene files
         # run_command('rm ' + renderfilename + '*')
         renderfix = True
-    # Video Hash
-    for p in filmfiles:
-        compileshot(p,filmfolder,filmname)
-        videohash = videohash + str(int(countsize(p + '.mp4')))
-    print('Videohash of shot is: ' + videohash)
     try:
         with open(scenedir + '.videohash', 'r') as f:
             oldvideohash = f.readline().strip()
@@ -3169,8 +3167,7 @@ def rendershot(filmfolder, filmname, scene, shot):
     audiohash = ''
     oldaudiohash = ''
     newaudiomix = False
-    for p in filmfiles:
-        audiohash += str(int(countsize(p + '.wav')))
+    audiohash += str(int(countsize(renderfilename + '.wav')))
     dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
     for p in dubfiles:
         audiohash += str(int(countsize(p)))
@@ -3190,7 +3187,7 @@ def rendershot(filmfolder, filmname, scene, shot):
         if os.path.exists(scenedir+'dub') == True:
             os.system('cp '+scenedir+'dub/original.wav '+renderfilename+'.wav')
         #os.system('cp '+dubfolder+'original.wav '+renderfilename+'.wav')
-        renderaudio(filmfiles, renderfilename, dubfiles, dubmix)
+        renderaudio(renderfilename, renderfilename, dubfiles, dubmix)
         print('updating audiohash...')
         with open(scenedir + '.audiohash', 'w') as f:
             f.write(audiohash)
@@ -3261,7 +3258,7 @@ def renderscene(filmfolder, filmname, scene):
     # Video Hash
     shot=1
     for p in filmfiles:
-        compileshot(p,filmfolder,filmname)
+        #compileshot(p,filmfolder,filmname)
         rendershotname, renderfix = rendershot(filmfolder, filmname, scene, shot)
         videohash = videohash + str(int(countsize(p + '.mp4')))
         shot=shot+1
