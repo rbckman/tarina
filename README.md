@@ -1,6 +1,6 @@
 Tarina Retake
 =============
-Dream Filmmaking Device
+The Filmmaking Device
 
 ![Two buddies](docs/tarina-promo.jpg)
 
