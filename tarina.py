@@ -155,10 +155,9 @@ def main():
     loadfilmsettings = True
     oldsettings = ''
     comp = 0
-    yankedscene = ''
-    cuttedscene = ''
-    cuttedshot = ''
-    yankedshot = ''
+    yanked = ''
+    copying = ''
+    moving = False
     stream = ''
     live = 'no'
     plughw = 0 #default audio device
@@ -549,91 +548,93 @@ def main():
                 else:
                     vumetermessage('')
                 rendermenu = True
+            #(YANK) COPY TAKE
+            elif pressed == 'copy' and menu[selected] == 'TAKE:' and recordable == False:
+                copying = 'take'
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)+'/take' + str(take).zfill(3)
+                vumetermessage('Take ' + str(take) + ' copied! (I)nsert button to place it...')
+                time.sleep(1)
             #(YANK) COPY SHOT
             elif pressed == 'copy' and menu[selected] == 'SHOT:' and recordable == False:
-                cuttedshot = ''
-                yankedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
+                copying = 'shot'
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Shot ' + str(shot) + ' copied! (I)nsert button to place it...')
                 time.sleep(1)
             #(YANK) COPY SCENE
             elif pressed == 'copy' and menu[selected] == 'SCENE:' and recordable == False:
-                cuttedscene = ''
-                yankedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                copying = 'scene'
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                 vumetermessage('Scene ' + str(scene) + ' copied! (I)nsert button to place it...')
+                time.sleep(1)
+            #(CUT) MOVE TAKE
+            elif pressed == 'move' and menu[selected] == 'TAKE:' and recordable == False:
+                copying = 'take'
+                moving = True
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)+'/take' + str(take).zfill(3)
+                vumetermessage('Moving shot ' + str(shot) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #(CUT) MOVE SHOT
             elif pressed == 'move' and menu[selected] == 'SHOT:' and recordable == False:
-                yankedshot = ''
-                cuttedshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
+                copying='shot'
+                moving = True
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Moving shot ' + str(shot) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #(CUT) MOVE SCENE
             elif pressed == 'move' and menu[selected] == 'SCENE:' and recordable == False:
-                yankedscene = ''
-                cuttedscene = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
+                copying='scene'
+                moving = True
+                yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                 vumetermessage('Moving scene ' + str(scene) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #PASTE SHOT and PASTE SCENE
-            elif pressed == 'insert' and menu[selected] == 'SHOT:' and yankedshot:
-                vumetermessage('Pasting shot, please wait...')
-                pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
-                try:
-                    os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
-                except:
-                    pass
-                os.system('cp -r ' + yankedshot + ' ' + pasteshot)
-                add_organize(filmfolder, filmname)
-                updatethumb = True
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                yankedshot = ''
-                vumetermessage('Shot pasted!')
-                time.sleep(2)
-            elif pressed == 'insert' and menu[selected] == 'SCENE:' and yankedscene:
-                vumetermessage('Pasting scene, please wait...')
-                pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
-                os.system('cp -r ' + yankedscene + ' ' + pastescene)
-                add_organize(filmfolder, filmname)
-                shot = countshots(filmname, filmfolder, scene)
-                updatethumb = True
-                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                yankedscene = ''
-                vumetermessage('Scene pasted!')
-                time.sleep(2)
-            #MOVE SHOT and MOVE SCENE
-            elif pressed == 'insert' and menu[selected] == 'SHOT:' and cuttedshot:
-                    vumetermessage('Moving shot, please wait...')
-                    pasteshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked'
+            elif pressed == 'insert' and yanked:
+                if copying == 'take':
+                    take = counttakes(filmname, filmfolder, scene, shot)
+                    take=take+1
+                    vumetermessage('Pasting take, please wait...')
+                    paste = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3)
+                    #try:
+                    #    os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot'+ str(shot).zfill(3))
+                    #except:
+                    #    pass
+                    os.system('cp ' + yanked + '.mp4 ' + paste + '.mp4')
+                    os.system('cp ' + yanked + '.jpeg ' + paste + '.jpeg')
+                    os.system('cp ' + yanked + '.h264 ' + paste + '.h264')
+                    os.system('cp ' + yanked + '.wav ' + paste + '.wav')
+                    paste = ''
+                    if moving == True:
+                        os.system('rm -r ' + yanked + '*')
+                elif copying == 'shot':
+                    vumetermessage('Pasting shot, please wait...')
+                    paste = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_yanked' 
                     try:
                         os.makedirs(filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3))
                     except:
-                       pass
-                    os.system('cp -r ' + cuttedshot + ' ' + pasteshot)
-                    os.system('rm -r ' + cuttedshot + '/*')
-                    #Remove hidden placeholder
-                    os.system('rm ' + cuttedshot + '/.placeholder')
-                    add_organize(filmfolder, filmname)
-                    organize(filmfolder, filmname)
-                    cuttedshot = ''
-                    updatethumb = True
-                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                    vumetermessage('Shot moved!')
-                    time.sleep(2)
-            elif pressed == 'insert' and menu[selected] == 'SCENE:' and cuttedscene:
-                    vumetermessage('Moving scene, please wait...')
-                    pastescene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
-                    os.system('cp -r ' + cuttedscene + ' ' + pastescene)
-                    os.system('rm -r ' + cuttedscene + '/*')
-                    os.system('rm ' + cuttedscene + '/.placeholder')
-                    add_organize(filmfolder, filmname)
-                    organize(filmfolder, filmname)
-                    scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
-                    shot = countshots(filmname, filmfolder, scene)
-                    cuttedscene = ''
-                    updatethumb = True
-                    vumetermessage('Scene moved!')
-                    time.sleep(2)
+                        pass
+                    os.system('cp -r ' + yanked + ' ' + paste)
+                    if moving == True:
+                        os.system('rm -r ' + yanked + '/*')
+                        #Remove hidden placeholder
+                        os.system('rm ' + yanked + '/.placeholder')
+                elif copying == 'scene':
+                    vumetermessage('Pasting scene, please wait...')
+                    paste = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_yanked'
+                    os.system('cp -r ' + yanked + ' ' + paste)
+                    if moving == True:
+                        os.system('rm -r ' + yanked + '/*')
+                        #Remove hidden placeholder
+                        #os.system('rm ' + yanked + '/.placeholder')
+                add_organize(filmfolder, filmname)
+                updatethumb = True
+                scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
+                yanked = ''
+                copying = ''
+                moving = False
+                vumetermessage('Pasted!')
+                time.sleep(2)
             #INSERT SHOT
-            elif pressed == 'insert' and menu[selected] != 'SCENE:':
+            elif pressed == 'insert' and menu[selected] != 'SCENE:' and yanked == '':
                 insertshot = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot-1).zfill(3) + '_insert'
                 try:
                     os.makedirs(insertshot)
@@ -673,7 +674,7 @@ def main():
                 updatethumb = True
                 #time.sleep(1)
             #INSERT SCENE
-            elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False:
+            elif pressed == 'insert' and menu[selected] == 'SCENE:' and recordable == False and yanked == '':
                 insertscene = filmfolder + filmname + '/' + 'scene' + str(scene-1).zfill(3) + '_insert'
                 logger.info("inserting scene")
                 os.makedirs(insertscene)
