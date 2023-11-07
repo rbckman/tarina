@@ -626,6 +626,7 @@ def main():
                         #Remove hidden placeholder
                         #os.system('rm ' + yanked + '/.placeholder')
                 add_organize(filmfolder, filmname)
+                organize(filmfolder, filmname)
                 updatethumb = True
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 yanked = ''
@@ -1649,7 +1650,7 @@ def main():
                         time.sleep(5)
                     except:
                         print('not exist')
-            #organize(filmfolder,'onthefloor')
+            organize(filmfolder,'onthefloor')
             scenes, shots, takes = countlast(filmname, filmfolder)
             loadfilmsettings = False
             rendermenu = True
@@ -2764,8 +2765,9 @@ def organize(filmfolder, filmname):
         for p in sorted(shots):
             takes = next(os.walk(filmfolder + filmname + '/' + i + '/' + p))[2]
             if len(takes) == 0:
-                logger.info('no takes in this shot, removing shot..')
-                #os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
+                logger.info('no takes in this shot, removing shot if no placeholder')
+                if not os.path.isfile(filmfolder + filmname + '/' + i + '/' + p + '/.placeholder'):
+                    os.system('rm -r ' + filmfolder + filmname + '/' + i + '/' + p)
             organized_nr = 1
             print(i)
             print(p)
@@ -3003,13 +3005,13 @@ def shotfiles(filmfolder, filmname, scene):
     shots = countshots(filmname,filmfolder,scene)
     print("shots"+str(shots))
     shot = 1
-    while shot <= shots:
+    for i in range(shots):
         takes = counttakes(filmname,filmfolder,scene,shot)
         if takes > 0:
             folder = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
             filename = 'take' + str(takes).zfill(3)
             files.append(folder + filename)
-            print(files)
+            print(folder+filename)
         shot = shot + 1
     #writemessage(str(len(shotfiles)))
     #time.sleep(2)
@@ -3132,6 +3134,8 @@ def rendershot(filmfolder, filmname, scene, shot):
     videohash = ''
     oldvideohash = ''
     take = counttakes(filmname, filmfolder, scene, shot)
+    if take == 0:
+        return '', ''
     renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
     # Video Hash
     compileshot(renderfilename,filmfolder,filmname)
@@ -3259,9 +3263,12 @@ def renderscene(filmfolder, filmname, scene):
     # Video Hash
     shot=1
     for p in filmfiles:
-        #compileshot(p,filmfolder,filmname)
+        compileshot(p,filmfolder,filmname)
+        #print(p)
+        #time.sleep(5)
         rendershotname, renderfix = rendershot(filmfolder, filmname, scene, shot)
-        videohash = videohash + str(int(countsize(p + '.mp4')))
+        if rendershotname:
+            videohash = videohash + str(int(countsize(p + '.mp4')))
         shot=shot+1
     print('Videohash of scene is: ' + videohash)
     try:
