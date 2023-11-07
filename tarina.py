@@ -555,13 +555,13 @@ def main():
                 vumetermessage('Take ' + str(take) + ' copied! (I)nsert button to place it...')
                 time.sleep(1)
             #(YANK) COPY SHOT
-            elif pressed == 'copy' and menu[selected] == 'SHOT:' and recordable == False:
+            elif pressed == 'copy' and menu[selected] == 'SHOT:':
                 copying = 'shot'
                 yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Shot ' + str(shot) + ' copied! (I)nsert button to place it...')
                 time.sleep(1)
             #(YANK) COPY SCENE
-            elif pressed == 'copy' and menu[selected] == 'SCENE:' and recordable == False:
+            elif pressed == 'copy' and menu[selected] == 'SCENE:':
                 copying = 'scene'
                 yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
                 vumetermessage('Scene ' + str(scene) + ' copied! (I)nsert button to place it...')
@@ -574,14 +574,14 @@ def main():
                 vumetermessage('Moving shot ' + str(shot) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #(CUT) MOVE SHOT
-            elif pressed == 'move' and menu[selected] == 'SHOT:' and recordable == False:
+            elif pressed == 'move' and menu[selected] == 'SHOT:':
                 copying='shot'
                 moving = True
                 yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3)
                 vumetermessage('Moving shot ' + str(shot) + ' (I)nsert button to place it...')
                 time.sleep(1)
             #(CUT) MOVE SCENE
-            elif pressed == 'move' and menu[selected] == 'SCENE:' and recordable == False:
+            elif pressed == 'move' and menu[selected] == 'SCENE:':
                 copying='scene'
                 moving = True
                 yanked = filmfolder + filmname + '/' + 'scene' + str(scene).zfill(3)
