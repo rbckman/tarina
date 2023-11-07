@@ -403,7 +403,7 @@ def main():
                     vumetermessage('nothing here! hit rec!')
                 rendermenu = True
             #DUB SHOT
-            elif pressed == 'middle' and menu[selected] == 'SHOT:':
+            elif pressed == 'middle' and menu[selected] == 'SHOT:' and recordable == False:
                 newdub = clipsettings(filmfolder, filmname, scene, shot, take, plughw)
                 take = counttakes(filmname, filmfolder, scene, shot)
                 if newdub:
@@ -3081,8 +3081,16 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     audiolenght=videolenght
     for i, d in zip(dubmix, dubfiles):
         writemessage('Dub ' + str(p) + ' audio found lets mix...')
-        #pipe = subprocess.check_output('soxi -D ' + filename + '.wav', shell=True)
-        #audiolenght = pipe.decode()
+        #first trimit!
+        audiotrim(filename, 'end', d)
+        try:
+            pipe = subprocess.check_output('soxi -D ' + d, shell=True)
+            dubaudiolenght = pipe.decode()
+            if dubaudiolengt != videolenght:
+                print('dub wrong lenght!')
+                time.sleep(5)
+        except:
+            pass
         os.system('cp ' + filename + '.wav ' + filename + '_tmp.wav')
         #Fade and make stereo
         run_command('sox -V0 -G ' + d + ' /dev/shm/fade.wav fade ' + str(round(i[2],1)) + ' 0 ' + str(round(i[3],1)))
