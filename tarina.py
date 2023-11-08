@@ -1203,6 +1203,7 @@ def main():
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
                 updatethumb = True
+                #camera_recording=0
             #if not in last shot or take then go to it
             if pressed == 'record' and recordable == False:
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
