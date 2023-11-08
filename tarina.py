@@ -2935,7 +2935,7 @@ def stretchaudio(filename,fps):
         run_command('cp '+filename+'.wav '+filename+'_temp.wav')
         run_command('ffmpeg -y -i ' + filename + '_temp.wav -filter:a atempo="'+str(ratio) + '" ' + filename + '.wav')
         os.remove(filename + '_temp.wav')
-    time.sleep(5)
+    #time.sleep(5)
     return
 
 #-------------Compile Shot--------------
@@ -3152,7 +3152,7 @@ def rendershot(filmfolder, filmname, scene, shot):
     print('Videohash of shot is: ' + videohash)
     #if something shutdown in middle of process
     if os.path.isfile(renderfilename + '_tmp.mp4') == True:
-        os.system('mv ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
+        os.system('cp ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     # Check if video corrupt
     renderfix = False
@@ -3446,7 +3446,8 @@ def renderfilm(filmfolder, filmname, comp, scene, muxing):
             if comp > 0:
                 writemessage('compressing audio')
                 os.system('mv ' + renderfilename + '.wav ' + renderfilename + '_tmp.wav')
-                run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+                #run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.3,1 6:-70,-60,-20 -5 -90 0.2')
+                run_command('sox ' + renderfilename + '_tmp.wav ' + renderfilename + '.wav compand 0.0,1 6:-70,-43,-20 -6 -90 0.1')
                 os.remove(renderfilename + '_tmp.wav')
             if muxing == True:
                 #muxing mp3 layer to mp4 file
@@ -4118,7 +4119,7 @@ def audiotrim(filename, where, dub):
         #    audiosyncms = 1000 + audiosyncms
         logger.info('Videofile is: ' + str(audiosync) + 'ms longer')
         logger.info('Videofile is: ' + str(int(audiosync)/1000) + 's longer')
-        time.sleep(2)
+        #time.sleep(2)
         #make fade
         #make delay file
         print(str(int(audiosync)/1000))
@@ -4379,7 +4380,7 @@ def empty(filename):
         return False
     if os.path.isfile(filename + '.mp4') == True:
         writemessage('Take already exists')
-        time.sleep(2)
+        time.sleep(1)
         return True
 
 #--------------BUTTONS-------------
