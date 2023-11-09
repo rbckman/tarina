@@ -22,8 +22,8 @@
     <rect
        x="145.16081"
        y="92.223289"
-       width="29.96364"
-       height="16.484158"
+       width="77.370671"
+       height="23.166333"
        id="rect895" />
     <rect
        x="145.16081"
@@ -181,6 +181,18 @@
        width="29.96364"
        height="16.484158"
        id="rect1419" />
+    <rect
+       x="145.16081"
+       y="92.223289"
+       width="29.96364"
+       height="16.484158"
+       id="rect895-7" />
+    <rect
+       x="145.16081"
+       y="92.223289"
+       width="29.96364"
+       height="16.484158"
+       id="rect1458" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -190,8 +202,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="389.74402"
-     inkscape:cy="185.98931"
+     inkscape:cx="358.60767"
+     inkscape:cy="142.58238"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -595,25 +607,17 @@
     <text
        xml:space="preserve"
        id="text893"
-       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:0.75;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect895);fill:#ffffff;fill-opacity:1;stroke:none"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:1.15;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect895);fill:#ffffff;fill-opacity:1;stroke:none"
        x="11.271224"
        y="0"
-       transform="translate(-51.826589,64.903115)"><tspan
-         x="149.98261"
-         y="95.080154"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">KEYBOARD
+       transform="rotate(-2.2481593,1912.1895,670.70545)"><tspan
+         x="147.01583"
+         y="95.92682"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">if func button is pressed    
 </tspan></tspan><tspan
-         x="148.71262"
-         y="98.425476"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">SHORTCUTS
-</tspan></tspan><tspan
-         x="156.33259"
-         y="101.7708"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">are
-</tspan></tspan><tspan
-         x="149.98261"
-         y="105.11612"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">ALL CAPS</tspan></tspan></text>
+         x="145.74583"
+         y="100.96547"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">these button get new functions</tspan></tspan></text>
     <text
        xml:space="preserve"
        id="text893-6"
@@ -734,5 +738,47 @@
          x="156.33259"
          y="95.080154"><tspan
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">Tab</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       id="text893-5"
+       style="font-style:normal;font-weight:normal;font-size:4.23333px;line-height:0.75;font-family:sans-serif;text-align:center;white-space:pre;shape-inside:url(#rect895-7);fill:#ffffff;fill-opacity:1;stroke:none;"
+       x="11.271224"
+       y="0"
+       transform="translate(0.7311425,25.069385)"><tspan
+         x="153.7926"
+         y="95.080154"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">THESE
+</tspan></tspan><tspan
+         x="149.98261"
+         y="98.425476"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">KEYBOARD
+</tspan></tspan><tspan
+         x="148.71262"
+         y="101.7708"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">SHORTCUTS
+</tspan></tspan><tspan
+         x="151.25261"
+         y="105.11612"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:4.23333px;font-family:FreeMono;-inkscape-font-specification:'FreeMono Bold';text-align:center;text-anchor:middle;fill:#ffffff">ALLCAPS</tspan></tspan></text>
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 190.94637,158.48055 0.29018,3.25567 10.4707,-1.03299 -0.14256,2.44408 5.09974,-1.82186 -4.56052,-4.31478 -0.46012,2.23416 z"
+       id="path1512"
+       sodipodi:nodetypes="cccccccc" />
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 161.87983,135.59173 4.10717,14.22361 13.5876,0.89642 -0.0803,3.13035 3.62888,-3.2429 -3.13658,-2.95013 -0.16784,2.12969 -12.00759,-1.32104 -1.62735,-14.19485 z"
+       id="path1514"
+       sodipodi:nodetypes="cccccccccc" />
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 160.44505,113.90382 3.2728,0.0697 2.87577,-12.60594 15.2602,-0.005 0.34448,1.95245 3.40653,-3.438328 -3.70277,-2.130984 -0.1454,1.74727 -16.28063,-0.84803 -8.69838,15.810662 z"
+       id="path1516"
+       sodipodi:nodetypes="ccccccccccc" />
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 123.43075,167.7785 -4.01792,0.19252 -8.91419,-0.81146 0.11296,-4.26741 4.11268,0.13175 -5.28227,-8.07191 -5.29834,7.18394 4.11831,0.4714 0.22439,6.47093 10.25027,1.14132 4.99777,1.16131 z"
+       id="path1518"
+       sodipodi:nodetypes="cccccccccccc" />
   </g>
 </svg>
