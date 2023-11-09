@@ -124,6 +124,7 @@ def main():
     rendermenu = True
     showmenu = 1
     showmenu_settings = True
+    showhelp = False
     overlay = None
     underlay = None
     reclenght = 0
@@ -315,14 +316,18 @@ def main():
             #SHOWHELP
             elif pressed == 'showhelp':
                 vumetermessage('Button layout')
-                overlay = removeimage(camera, overlay)
-                overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
-                while holdbutton == 'showhelp' or pressed == 'H':
-                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-                    vumetermessage('Button layout')
-                    time.sleep(0.03)
-                overlay = removeimage(camera, overlay)
-                updatethumb =  True
+                if showhelp == False:
+                    overlay = removeimage(camera, overlay)
+                    overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
+                    showhelp = True
+                elif showhelp == True:
+                    overlay = removeimage(camera, overlay)
+                    updatethumb =  True
+                    showhelp = False
+                #while holdbutton == 'showhelp' or pressed == 'H':
+                #    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                #    vumetermessage('Button layout')
+                #    time.sleep(0.03)
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -4675,13 +4680,13 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'remove'
         elif event == 'KEY_BACKSPACE':
             pressed = 'remove'
-        elif event == 'E' or (readbus2 == 245 and readbus == 191):
+        elif event == 'P' or (readbus2 == 245 and readbus == 191):
             pressed = 'peak'
         elif event == 'S' or (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
         elif event == 'A' or (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
-        elif (readbus2 == 245 and readbus == 239):
+        elif event == 'M' or (readbus2 == 245 and readbus == 239):
             pressed = 'changemode'
         elif event == 'H' or (readbus2 == 245 and readbus == 247):
             pressed = 'showhelp'
