@@ -538,7 +538,9 @@ def main():
                     newfilmname = ''
                     vumetermessage('film already exist!')
                     logger.info('film already exist!')
-                rendermenu = True
+                    updatethumb = True
+                    loadfilmsettings = True
+                    rendermenu = True
             #EDIT FILM NAME
             elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
@@ -2479,7 +2481,7 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
     buttontime = time.time()
     holdbutton = ''
     abcx = 0
-    helpmessage = 'Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
+    helpmessage = 'Left (remove), Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
     vumetermessage('Press enter if you want to leave it untitled')
     cursor = '_'
     blinking = True
@@ -2491,6 +2493,7 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
             message = 'Edit film name: ' + filmname
         print(term.clear+term.home)
         print(message+cursor)
+        print(helpmessage)
         writemessage(message + cursor)
         vumetermessage(helpmessage)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -2519,6 +2522,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                 filmname = filmname[:-1]
                 cursor = abc[abcx]
         elif pressed == 'middle' or event == 10:
+            if filmname == '':
+                filmname='untitledfilm'
             if len(filmname) > 0:
                 if abc[abcx] != '_':
                     filmname = filmname + abc[abcx]
@@ -2526,7 +2531,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                     if filmname == oldfilmname:
                         return oldfilmname
                     elif filmname in getfilms(filmfolder)[0]:
-                        helpmessage = 'this filmname is already taken! pick another name!'
+                        helpmessage = 'this filmname is already taken! make a sequel!'
+                        filmname = filmname+'2'
                     elif filmname not in getfilms(filmfolder)[0]:
                         logger.info("New film " + filmname)
                         return(filmname)
