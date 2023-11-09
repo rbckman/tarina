@@ -4690,7 +4690,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'changemode'
         elif event == 'H' or (readbus2 == 245 and readbus == 247):
             pressed = 'showhelp'
-        elif event == 'I' or event == 'P' or (readbus2 == 245 and readbus == 253):
+        elif event == 'I' or (readbus2 == 245 and readbus == 253):
             pressed = 'insert'
         elif event == 'C' or (readbus2 == 244):
             pressed = 'copy'

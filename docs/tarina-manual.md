@@ -6,13 +6,6 @@
 MANUAL
 ======
 
-This is still a work in progress and documentation is on its way, if you're in a hurry feel free to drop a message in [#tarina:matrix.tarina.org](https://riot.im/app/#/room/#tarina:matrix.tarina.org)
-
-### manual todo
-- new hardware, hyperpixel4, powerbooster charger, 
-- trim feature
-- 
-
 ![Filming with Tarina](tarina-filming-01.jpg)
 
 Contents
