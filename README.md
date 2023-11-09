@@ -28,7 +28,7 @@ Hardware
 The parts have been chosen on the basis of features, quality, openness, availabilty and price. One of the key ideas of the project is to have a camera that could be upgraded or repaired by the fact that you easily just switch a component. The casis of the camera is 3d printable with a flipping gonzo style 180 shooting mode, please take a look [here to get the picture](https://github.com/rbckman/tarina/tree/master/3d)
 
 ### Buttons
-![Buttons](buttons.png)
+![Buttons](docs/buttons.png)
 
 Here's the main components: 
 
