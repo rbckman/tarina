@@ -48,7 +48,7 @@ print('running debian ' + debianversion)
 
 #I2CBUTTONS
 probei2c = 0
-while probei2c < 10:
+while probei2c < 3:
     try:
         if debianversion == "stretch":
             os.system('sudo modprobe i2c-dev')
@@ -76,18 +76,17 @@ while probei2c < 10:
         i2cbuttons = False
         probei2c += 1
         time.sleep(1)
+        bus=''
 
 #MAIN
 def main():
-    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode, newfilmname, camera_recording
+    global headphoneslevel, miclevel, tarinafolder, screen, loadfilmsettings, plughw, channels, filmfolder, scene, showmenu, rendermenu, quality, profilelevel, i2cbuttons, menudone, soundrate, soundformat, process, serverstate, que, port, recording, onlysound, camera_model, fps_selection, fps_selected, fps, db, selected, cammode, newfilmname, camera_recording, abc
     # Get path of the current dir, then use it as working directory:
     rundir = os.path.dirname(__file__)
     if rundir != '':
         os.chdir(rundir)
-    filmfolder = "/home/pi/Videos/"
-    picfolder = "/home/pi/Pictures/"
-    if os.path.isdir(filmfolder) == False:
-        os.makedirs(filmfolder)
+    #filmfolder = "/home/pi/Videos/"
+    #picfolder = "/home/pi/Pictures/"
     tarinafolder = os.getcwd()
 
     #MENUS
@@ -125,6 +124,7 @@ def main():
     rendermenu = True
     showmenu = 1
     showmenu_settings = True
+    showhelp = False
     overlay = None
     underlay = None
     reclenght = 0
@@ -171,9 +171,15 @@ def main():
     tarinavername = f.readline()
 
     db=''
+    #FIRE UP CAMERA
+    camera = startcamera(lens,fps)
+    #GET FILMFOLDER AND CAMERA VERSION
+    camera_model, camera_revision , filmfolder = getconfig(camera)
+    if os.path.isdir(filmfolder) == False:
+        os.makedirs(filmfolder)
 
     #SYSTEM CONFIGS (turn off hdmi)
-    run_command('tvservice -o')
+    #run_command('tvservice -o')
     #Kernel page cache optimization for sd card
     run_command('sudo ' + tarinafolder + '/extras/sdcardhack.sh')
     #Make screen shut off work and run full brightness
@@ -184,7 +190,6 @@ def main():
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
     #START INTERFACE
     startinterface()
-    camera = startcamera(lens,fps)
 
     #LOAD FILM AND SCENE SETTINGS
     try:
@@ -249,7 +254,7 @@ def main():
     serverstate_old='off'
     wifistate_old='off'
 
-    camera_model, camera_revision = getconfig(camera)
+    camera_model, camera_revision, filmfolder= getconfig(camera)
 
     #--------------MAIN LOOP---------------#
     while True:
@@ -257,8 +262,6 @@ def main():
         if pressagain != '':
             pressed = pressagain
             pressagain = ''
-        if buttonpressed == True:
-            flushbutton()
         #event = screen.getch()
         if wifistate != wifistate_old:
             if wifistate == 'on':
@@ -313,14 +316,18 @@ def main():
             #SHOWHELP
             elif pressed == 'showhelp':
                 vumetermessage('Button layout')
-                overlay = removeimage(camera, overlay)
-                overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
-                while holdbutton == 'showhelp' or pressed == 'H':
-                    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
-                    vumetermessage('Button layout')
-                    time.sleep(0.03)
-                overlay = removeimage(camera, overlay)
-                updatethumb =  True
+                if showhelp == False:
+                    overlay = removeimage(camera, overlay)
+                    overlay = displayimage(camera, tarinafolder+'/extras/buttons.png', overlay, 4)
+                    showhelp = True
+                elif showhelp == True:
+                    overlay = removeimage(camera, overlay)
+                    updatethumb =  True
+                    showhelp = False
+                #while holdbutton == 'showhelp' or pressed == 'H':
+                #    pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+                #    vumetermessage('Button layout')
+                #    time.sleep(0.03)
             #TIMELAPSE
             elif pressed == 'middle' and menu[selected] == 'TIMELAPSE':
                 overlay = removeimage(camera, overlay)
@@ -536,7 +543,9 @@ def main():
                     newfilmname = ''
                     vumetermessage('film already exist!')
                     logger.info('film already exist!')
-                rendermenu = True
+                    updatethumb = True
+                    loadfilmsettings = True
+                    rendermenu = True
             #EDIT FILM NAME
             elif pressed == 'middle' and menu[selected] == 'TITLE' or filmname == '':
                 newfilmname = nameyourfilm(filmfolder, filmname, abc, False)
@@ -694,18 +703,18 @@ def main():
                 shot=1
                 take=1
             #HELPME
-            elif event == 'H':
-                if webz_on() == True:
-                    writemessage('Rob resolving the error now...')
-                    try:
-                        stopinterface(camera)
-                        run_command('reset')
-                        run_command('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
-                        startinterface()
-                        camera = startcamera(lens,fps)
-                        loadfilmsettings = True
-                    except:
-                        writemessage('sry! no rob help installed')
+            #elif event == 'H':
+            #    if webz_on() == True:
+            #        writemessage('Rob resolving the error now...')
+            #        try:
+            #            stopinterface(camera)
+            #            run_command('reset')
+            #            run_command('ssh -R 18888:localhost:22 tarina@tarina.org -p 13337')
+            #            startinterface()
+            #            camera = startcamera(lens,fps)
+            #            loadfilmsettings = True
+            #        except:
+            #            writemessage('sry! no rob help installed')
             #DEVELOP
             elif event == 'D':
                 try:
@@ -717,17 +726,17 @@ def main():
                 except:
                     writemessage('hmm.. couldnt enter developer mode')
             #PICTURE
-            elif event == 'J':
-                try:
-                    stopinterface(camera)
-                    run_command('raspistill -ISO 800 -ss 6000000 -o '+picfolder+'test'+str(pic).zfill(3)+'.jpeg')
-                    pic = pic + 1
-                    #os.system('scp '+picfolder/+'test.jpeg user@10.42.0.1:~/pic.jpeg')
-                    startinterface()
-                    camera = startcamera(lens,fps)
-                    loadfilmsetings = True
-                except:
-                    writemessage('hmm.. couldnt enter developer mode')
+            #elif event == 'J':
+            #    try:
+            #        stopinterface(camera)
+            #        run_command('raspistill -ISO 800 -ss 6000000 -o '+picfolder+'test'+str(pic).zfill(3)+'.jpeg')
+            #        pic = pic + 1
+            #        #os.system('scp '+picfolder/+'test.jpeg user@10.42.0.1:~/pic.jpeg')
+            #        startinterface()
+            #        camera = startcamera(lens,fps)
+            #        loadfilmsetings = True
+            #    except:
+            #        writemessage('hmm.. couldnt enter developer mode')
             elif pressed == 'screen':
                 if backlight == False:
                     # requires wiringpi installed
@@ -1099,17 +1108,17 @@ def main():
         #RECORD AND PAUSE
         if beepcountdown > 1:
             if time.time() - lastbeep  > 1:
-                beep()
+                beep(bus)
                 beepcountdown -= 1
                 lastbeep = time.time()
                 logger.info('beepcountdown: ' + str(beepcountdown))
                 vumetermessage('Filming in ' + str(beepcountdown) + ' seconds, press record again to cancel       ')
         elif beepcountdown > 0:
             if time.time() - float(lastbeep) > 0.1:
-                beep()
+                beep(bus)
                 vumetermessage('Get ready!!')
             if time.time() - lastbeep > 1:
-                longbeep()
+                longbeep(bus)
                 beepcountdown = 0
                 pressed = 'record'
                 print('exhausted from all beepings')
@@ -1193,12 +1202,14 @@ def main():
                 onlysound = False
                 scenes, shots, takes = browse(filmname,filmfolder,scene,shot,take)
                 if beeps > 0:
-                    buzz(300)
+                    if bus:
+                        buzz(300)
                 if round(fps) != 25:
                     compileshot(foldername + filename,filmfolder,filmname)
                 #os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 if beeps > 0:
-                    buzz(150)
+                    if bus:
+                        buzz(150)
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -2252,6 +2263,7 @@ def getfilms(filmfolder):
 #-------------Load tarina config---------------
 
 def getconfig(camera):
+    filmfolder=''
     version = camera.revision
     home = os.path.expanduser('~')
     configfile = home + '/.tarina/config.ini'
@@ -2260,16 +2272,31 @@ def getconfig(camera):
         os.makedirs(configdir)
     config = configparser.ConfigParser()
     if config.read(configfile):
-        camera_model = config['SENSOR']['model']
-        camera_revision = config['SENSOR']['revision']
-        if camera_model == version:
-            return camera_model, camera_revision
-    elif version == 'imx219':
+        try:
+            camera_model = config['SENSOR']['model']
+        except:
+            logger.info("couldnt read config")
+        try:
+            camera_revision = config['SENSOR']['revision']
+        except:
+            logger.info("couldnt read config")
+        try:
+            filmfolder = config['USER']['filmfolder']
+            return camera_model, camera_revision, filmfolder+'/'
+        except:
+            logger.info("couldnt read config")
+    if version == 'imx219':
+        config['SENSOR'] = {}
         config['SENSOR']['model'] = version
         config['SENSOR']['revision'] = 'standard'
         with open(configfile, 'w') as f:
             config.write(f)
-        return version, camera_revision
+    elif version == 'imx477':
+        config['SENSOR'] = {}
+        config['SENSOR']['model'] = version
+        config['SENSOR']['revision'] = 'hq-camera'
+        with open(configfile, 'w') as f:
+            config.write(f)
     else:
         pressed = ''
         buttonpressed = ''
@@ -2296,8 +2323,17 @@ def getconfig(camera):
                 config['SENSOR']['revision'] = camera_revision
                 with open(configfile, 'w') as f:
                     config.write(f)
-                return camera_model, camera_revision
             time.sleep(0.02)
+
+    if filmfolder != '':
+        return version, camera_revision, filmfolder+'/'
+    else:
+        filmfolder = namesomething('Your film folder: ', home+'/Videos')
+        config['USER'] = {}
+        config['USER']['filmfolder'] = filmfolder
+        with open(configfile, 'w') as f:
+            config.write(f)
+        return camera_model, camera_revision, filmfolder+'/'
 
 #-------------Calc folder size with du-----------
 
@@ -2375,6 +2411,70 @@ def loadfilm(filmname, filmfolder):
             return filmname
         time.sleep(0.02)
 
+
+#---------Name anything really-----------
+
+def namesomething(what, readymadeinput):
+    global abc
+    anything = readymadeinput
+    pressed = ''
+    buttonpressed = ''
+    buttontime = time.time()
+    holdbutton = ''
+    abcx = 0
+    helpmessage = 'Up, Down (select characters) Right (next). Middle (done)'
+    cursor = '_'
+    blinking = True
+    pausetime = time.time()
+    while True:
+        message = what + anything
+        print(term.clear+term.home)
+        print(message+cursor)
+        writemessage(message + cursor)
+        vumetermessage(helpmessage)
+        pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
+        if event == ' ':
+            event = '_'
+        if pressed == 'down':
+            pausetime = time.time()
+            if abcx < (len(abc) - 1):
+                abcx = abcx + 1
+                cursor = abc[abcx]
+        elif pressed == 'up':
+            pausetime = time.time()
+            if abcx > 0:
+                abcx = abcx - 1
+                cursor = abc[abcx]
+        elif pressed == 'right':
+            pausetime = time.time()
+            if len(anything) < 30:
+                anything = anything + abc[abcx]
+                cursor = abc[abcx]
+            else:
+                helpmessage = 'Yo, maximum characters reached bro!'
+        elif pressed == 'left' or pressed == 'remove':
+            pausetime = time.time()
+            if len(anything) > 0:
+                anything = anything[:-1]
+                cursor = abc[abcx]
+        elif pressed == 'middle' or event == 10:
+            if len(anything) > 0:
+                if abc[abcx] != '_':
+                    anything = anything + abc[abcx]
+                return anything
+        elif event in abc:
+            pausetime = time.time()
+            anything = anything + event
+        if time.time() - pausetime > 0.5:
+            if blinking == True:
+                cursor = abc[abcx]
+            if blinking == False:
+                cursor = ' '
+            blinking = not blinking
+            pausetime = time.time()
+        time.sleep(keydelay)
+
+
 #-------------New film----------------
 
 def nameyourfilm(filmfolder, filmname, abc, newfilm):
@@ -2386,7 +2486,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
     buttontime = time.time()
     holdbutton = ''
     abcx = 0
-    helpmessage = 'Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
+    helpmessage = 'Left (remove), Up, Down (select characters) Right (next). Middle (done), Retake (Cancel)'
+    vumetermessage('Press enter if you want to leave it untitled')
     cursor = '_'
     blinking = True
     pausetime = time.time()
@@ -2397,6 +2498,7 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
             message = 'Edit film name: ' + filmname
         print(term.clear+term.home)
         print(message+cursor)
+        print(helpmessage)
         writemessage(message + cursor)
         vumetermessage(helpmessage)
         pressed, buttonpressed, buttontime, holdbutton, event, keydelay = getbutton(pressed, buttonpressed, buttontime, holdbutton)
@@ -2425,6 +2527,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                 filmname = filmname[:-1]
                 cursor = abc[abcx]
         elif pressed == 'middle' or event == 10:
+            if filmname == '':
+                filmname='untitledfilm'
             if len(filmname) > 0:
                 if abc[abcx] != '_':
                     filmname = filmname + abc[abcx]
@@ -2432,7 +2536,8 @@ def nameyourfilm(filmfolder, filmname, abc, newfilm):
                     if filmname == oldfilmname:
                         return oldfilmname
                     elif filmname in getfilms(filmfolder)[0]:
-                        helpmessage = 'this filmname is already taken! pick another name!'
+                        helpmessage = 'this filmname is already taken! make a sequel!'
+                        filmname = filmname+'2'
                     elif filmname not in getfilms(filmfolder)[0]:
                         logger.info("New film " + filmname)
                         return(filmname)
@@ -2580,7 +2685,8 @@ def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlig
                     vumetermessage('Timelapse lenght is now ' + str(round(n * duration,2)) + ' second clip   ')
                     if recording == False and t > between:
                         if beeps > 0:
-                            buzz(150)
+                            if bus:
+                                buzz(150)
                         #camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=quality, level=profilelevel)
                         if sound == True:
@@ -4320,26 +4426,28 @@ def stopstream(camera, stream):
 
 #-------------Beeps-------------------
 
-def beep():
-    buzzerrepetitions = 100
-    buzzerdelay = 0.00001
-    for _ in range(buzzerrepetitions):
-        for value in [0xC, 0x4]:
-            #GPIO.output(1, value)
-            bus.write_byte_data(DEVICE,OLATA,value)
-            time.sleep(buzzerdelay)
+def beep(bus):
+    if bus:
+        buzzerrepetitions = 100
+        buzzerdelay = 0.00001
+        for _ in range(buzzerrepetitions):
+            for value in [0xC, 0x4]:
+                #GPIO.output(1, value)
+                bus.write_byte_data(DEVICE,OLATA,value)
+                time.sleep(buzzerdelay)
     return
 
-def longbeep():
-    buzzerrepetitions = 100
-    buzzerdelay = 0.0001
-    for _ in range(buzzerrepetitions * 5):
-        for value in [0xC, 0x4]:
-            #GPIO.output(1, value)
-            bus.write_byte_data(DEVICE,OLATA,value)
-            buzzerdelay = buzzerdelay - 0.00000004
-            time.sleep(buzzerdelay)
-    bus.write_byte_data(DEVICE,OLATA,0x4)
+def longbeep(bus):
+    if bus:
+        buzzerrepetitions = 100
+        buzzerdelay = 0.0001
+        for _ in range(buzzerrepetitions * 5):
+            for value in [0xC, 0x4]:
+                #GPIO.output(1, value)
+                bus.write_byte_data(DEVICE,OLATA,value)
+                buzzerdelay = buzzerdelay - 0.00000004
+                time.sleep(buzzerdelay)
+        bus.write_byte_data(DEVICE,OLATA,0x4)
     return
 
 def buzz(buzzerlenght):
@@ -4517,15 +4625,19 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
                 pressed=nextstatus
             #print(nextstatus)
     except:
-        print('process not found')
+        #print('process not found')
+        pass
+
     with term.cbreak():
         val = term.inkey(timeout=0)
     if val.is_sequence:
         event = val.name
         #print(event)
+        flushbutton()
     elif val:
         event = val
         #print(event)
+        flushbutton()
     else:
         event = ''
     keydelay = 0.08
@@ -4566,13 +4678,15 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'view'
         elif event == 'KEY_DELETE' or (readbus == 223 and readbus2 == 247):
             pressed = 'remove'
-        elif event == 'E' or (readbus2 == 245 and readbus == 191):
+        elif event == 'KEY_BACKSPACE':
+            pressed = 'remove'
+        elif event == 'P' or (readbus2 == 245 and readbus == 191):
             pressed = 'peak'
-        elif (readbus2 == 245 and readbus == 223):
+        elif event == 'S' or (readbus2 == 245 and readbus == 223):
             pressed = 'screen'
         elif event == 'A' or (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
-        elif (readbus2 == 245 and readbus == 239):
+        elif event == 'M' or (readbus2 == 245 and readbus == 239):
             pressed = 'changemode'
         elif event == 'H' or (readbus2 == 245 and readbus == 247):
             pressed = 'showhelp'
@@ -4634,7 +4748,9 @@ def startcamera(lens, fps):
     #
     #camera frame rate sync to audio clock
     #
-    camera_model, camera_revision = getconfig(camera)
+    camera_model, camera_revision , filmfolder = getconfig(camera)
+    if os.path.isdir(filmfolder) == False:
+        os.makedirs(filmfolder)
     # v1 = 'ov5647'
     # v2 = ? 
     logger.info("picamera version is: " + camera_model + ' ' + camera_revision)

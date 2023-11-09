@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "vgfont.h"
 
-int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const uint32_t text_size, const uint32_t x_offset, const uint32_t y_offset, uint32_t fontcolor)
+int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const uint32_t text_size, const uint32_t text_size_selected, const uint32_t x_offset, const uint32_t y_offset, uint32_t fontcolor)
 {
     uint32_t height=0;
     uint32_t img_w, img_h;
@@ -98,7 +98,7 @@ int32_t render_subtitle(GRAPHICS_RESOURCE_HANDLE img, const char *text, const ui
                                      GRAPHICS_RESOURCE_HEIGHT,
                                      GRAPHICS_RGBA32(0,0,0,0xff), /* fg */
                                      GRAPHICS_RGBA32(30,255,255,0xff), /* bg */
-                                     text, 90, 16);
+                                     text, 90, text_size_selected);
         }
     return 0;
     }
@@ -126,6 +126,7 @@ int main(void)
     graphics_display_resource(img, 0, LAYER, 0, 0, GRAPHICS_RESOURCE_WIDTH, GRAPHICS_RESOURCE_HEIGHT, VC_DISPMAN_ROT0, 1);
 
     uint32_t text_size = 15;
+    uint32_t text_size_selected = 16;
     FILE * fp;
     FILE * fp2;
     FILE * fp3;
@@ -141,6 +142,38 @@ int main(void)
     char newread[500];
     char oldread[500];
     char vumeter[130];
+    uint32_t y_offset2 = 0;
+    uint32_t y_offset3 = 21;
+    uint32_t y_offset4 = 42;
+    uint32_t y_offset5 = 421;
+    uint32_t y_offset6 = 442; 
+    uint32_t y_offset = 466;
+    int space = 10;
+    int morespace = 12;
+    int rectime = 700;
+    int color = 3;
+    int row1 = 0;
+    int row2 = 0;
+    int row3 = 0;
+    int row4 = 0;
+    int row5 = 0;
+    if (width == 1920){
+        y_offset2 = 5;
+        y_offset3 = 45;
+        y_offset4 = 85;
+        y_offset5 = 960;
+        y_offset6 = 1000;
+        y_offset = 1040;
+        rectime = 1600;
+        text_size = 30;
+        text_size_selected = 32;
+        space = 23;
+        morespace = 27;
+    }
+    else {
+        space = 10;
+        morespace = 12;
+    }
     while (1) {
         // char ch;
         linenr = 0;
@@ -156,22 +189,16 @@ int main(void)
         if (strcmp(newread, oldread) != 0) {
             strcpy(oldread, newread);
             //const char *text = "Never give up on your dreams";
-            uint32_t y_offset2 = 0;
-            uint32_t y_offset3 = 21;
-            uint32_t y_offset4 = 42;
-            uint32_t y_offset5 = 421;
-            uint32_t y_offset6 = 442;
+            color = 3;
+            row1 = 0;
+            row2 = 0;
+            row3 = 0;
+            row4 = 0;
+            row5 = 0;
             graphics_resource_fill(img, 0, 0, width, height, GRAPHICS_RGBA32(0,0,0,0x00));
             // blue, at the top (y=40)
             // selected 0 1 2 3 4 5 6 7 8
-            int space = 10;
-            int morespace = 12;
-            int color = 3;
-            int row1 = 0;
-            int row2 = 0;
-            int row3 = 0;
-            int row4 = 0;
-            int row5 = 0;
+
             // draw the text if updated
             fp2 = fopen("/dev/shm/interface", "r");
             if (fp2 != NULL){
@@ -201,46 +228,46 @@ int main(void)
                         header = 1;
                     if (selected == 420){
                         if (linenr == 1)
-                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
+                            render_subtitle(img, line, text_size, text_size_selected, 0, y_offset2, 5);
                         if (linenr > 1) {
-                            render_subtitle(img, line, text_size, row1, y_offset3, 5);
+                            render_subtitle(img, line, text_size, text_size_selected, row1, y_offset3, 5);
                             row1 += read * space + morespace;
                         }
                     }
                     if (header == 0){ //check if normal menu or header menu
                         if (selected < 420){
                             if ((linenr == 6+menuadd) && (read > 0)){ //show recording time if there is any
-                                render_subtitle(img, line, text_size, 700, y_offset2, 3);
+                                render_subtitle(img, line, text_size, text_size_selected, rectime, y_offset2, 3);
                             }
                             if (linenr >= 2+menuadd && linenr <= 5+menuadd){
                                 if (color == 6)
                                     color = 5;
-                                render_subtitle(img, line, text_size, row1, y_offset2, color);
+                                render_subtitle(img, line, text_size, text_size_selected, row1, y_offset2, color);
                                 row1 += read * space + morespace;
                             }
                             if (linenr >= 7+menuadd && linenr <= 12+menuadd){
-                                render_subtitle(img, line, text_size, row2, y_offset3, color);
+                                render_subtitle(img, line, text_size, text_size_selected, row2, y_offset3, color);
                                 row2 += read * space + morespace;
                             }
                             if (linenr >= 13+menuadd && linenr <= 20+menuadd){
-                                render_subtitle(img, line, text_size, row3, y_offset4, color);
+                                render_subtitle(img, line, text_size, text_size_selected, row3, y_offset4, color);
                                 row3 += read * space + morespace;
                             }
                             if (linenr >= 21+menuadd && linenr <= 27+menuadd){
-                                render_subtitle(img, line, text_size, row4, y_offset5, color);
+                                render_subtitle(img, line, text_size, text_size_selected, row4, y_offset5, color);
                                 row4 += read * space + morespace;
                             }
                             if (linenr >= 28+menuadd && linenr <= 40+menuadd){
-                                render_subtitle(img, line, text_size, row5, y_offset6, color);
+                                render_subtitle(img, line, text_size, text_size_selected, row5, y_offset6, color);
                                 row5 += read * space + morespace;
                             }
                         }
                     }
                     else { // header menu
                         if (linenr == 1+menuadd)
-                            render_subtitle(img, line, text_size, 0, y_offset2, 5);
+                            render_subtitle(img, line, text_size, text_size_selected, 0, y_offset2, 5);
                         if (linenr > 1+menuadd){
-                            render_subtitle(img, line, text_size, row1, y_offset3, color);
+                            render_subtitle(img, line, text_size, text_size_selected, row1, y_offset3, color);
                             row1 += read * space + morespace;
                         }
                     }
@@ -254,7 +281,6 @@ int main(void)
             }
         //graphics_update_displayed_resource(img, 0, 0, 0, 0);
         }
-        uint32_t y_offset = 466;
         char s_vol1 = vumeter[85];
         char s_vol2 = vumeter[86];
         char s_vol[1];
@@ -269,7 +295,7 @@ int main(void)
             vucolor = 2;
         if (vol >= 99)
             vucolor = 3;
-        render_subtitle(img, vumeter, text_size, 0, y_offset, vucolor);
+        render_subtitle(img, vumeter, text_size, text_size_selected , 0, y_offset, vucolor);
         graphics_update_displayed_resource(img, 0, 0, 0, 0);
         usleep(20000);
     }
