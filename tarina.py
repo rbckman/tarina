@@ -1122,7 +1122,10 @@ def main():
             if time.time() - lastbeep > 1:
                 longbeep(bus)
                 beepcountdown = 0
-                pressed = 'record'
+                if recordwithports == True:
+                    pressed = 'record_now'
+                else:
+                    pressed = 'record'
                 print('exhausted from all beepings')
         if pressed == 'record' and recordwithports==False or pressed == 'record_now' or pressed == 'retake_now' or pressed == 'retake' and recordwithports==False or reclenght != 0 and t > reclenght:
             overlay = removeimage(camera, overlay)
