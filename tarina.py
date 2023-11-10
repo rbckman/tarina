@@ -395,7 +395,7 @@ def main():
                     foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
                     filename = 'take' + str(take).zfill(3)
                     #compileshot(foldername + filename,filmfolder,filmname)
-                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
+                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, foldername+filename, scene, shot)
                     trim = playdub(filmname,foldername + filename, 'shot')
                     if trim:
                         take = counttakes(filmname, filmfolder, scene, shot)+1
@@ -419,11 +419,13 @@ def main():
                     dubfolder = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/dub/'
                     saveoriginal = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take'+str(take).zfill(3)+'.wav'
                     dubfiles, dubmix, newmix = getdubs(filmfolder, filmname, scene, shot)
+                    foldername = filmfolder + filmname + '/scene' + str(scene).zfill(3) +'/shot' + str(shot).zfill(3) + '/'
+                    filename = 'take' + str(take).zfill(3)
                     if dubfiles==[]:
                         print('no dubs, copying original sound to original')
                         os.system('cp '+saveoriginal+' '+dubfolder+'original.wav')
                         time.sleep(2)
-                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, scene, shot)
+                    renderfilename, newaudiomix = rendershot(filmfolder, filmname, foldername+filename, scene, shot)
                     playdub(filmname,renderfilename, 'dub')
                     #run_command('sox -V0 -G /dev/shm/dub.wav -c 2 ' + newdub)
                     #add audio/video start delay sync
@@ -1204,12 +1206,16 @@ def main():
                 if beeps > 0:
                     if bus:
                         buzz(300)
+                    else:
+                        run_command('aplay -D plughw:' + str(plughw) + ' '+ tarinafolder + '/extras/beep.wav')
                 if round(fps) != 25:
                     compileshot(foldername + filename,filmfolder,filmname)
                 #os.system('cp /dev/shm/' + filename + '.wav ' + foldername + filename + '.wav')
                 if beeps > 0:
                     if bus:
                         buzz(150)
+                    else:
+                        run_command('aplay -D plughw:' + str(plughw) + ' '+ tarinafolder + '/extras/beep.wav')
                 t = 0
                 rectime = ''
                 vumetermessage('Tarina ' + tarinaversion[:-1] + ' ' + tarinavername[:-1])
@@ -2687,6 +2693,8 @@ def timelapse(beeps,camera,filmname,foldername,filename,between,duration,backlig
                         if beeps > 0:
                             if bus:
                                 buzz(150)
+                            else:
+                                run_command('aplay -D plughw:' + str(plughw) + ' '+ tarinafolder + '/extras/beep.wav')
                         #camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=26, bitrate=5000000)
                         camera.start_recording(foldername + 'timelapse/' + filename + '_' + str(n).zfill(3) + '.h264', format='h264', quality=quality, level=profilelevel)
                         if sound == True:
@@ -2901,7 +2909,7 @@ def organize(filmfolder, filmname):
                     if organized_nr != unorganized_nr:
                         print('false, correcting from ' + str(unorganized_nr) + ' to ' + str(organized_nr))
                         print(s)
-                        time.sleep(3)
+                        #time.sleep(3)
                         mv = 'mv ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(unorganized_nr).zfill(3)
                         run_command(mv + '.mp4 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.mp4')
                         run_command(mv + '.h264 ' + filmfolder + filmname + '/' + i + '/' + p + '/take' + str(organized_nr).zfill(3) + '.h264')
@@ -3242,16 +3250,14 @@ def scenefiles(filmfolder, filmname):
 
 #-------------Render Shot-------------
 
-def rendershot(filmfolder, filmname, scene, shot):
+def rendershot(filmfolder, filmname, renderfilename, scene, shot):
     global fps
     #This function checks and calls rendervideo & renderaudio if something has changed in the film
     #Video
     videohash = ''
     oldvideohash = ''
-    take = counttakes(filmname, filmfolder, scene, shot)
-    if take == 0:
-        return '', ''
-    renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
+    #take = counttakes(filmname, filmfolder, scene, shot)
+    #renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
     # Video Hash
     compileshot(renderfilename,filmfolder,filmname)
     videohash = videohash + str(int(countsize(renderfilename + '.mp4')))
@@ -3376,15 +3382,15 @@ def renderscene(filmfolder, filmname, scene):
         renderfixscene = True
         #return '', ''
     # Video Hash
-    shot=1
     for p in filmfiles:
-        compileshot(p,filmfolder,filmname)
+        #compileshot(p,filmfolder,filmname)
         #print(p)
         #time.sleep(5)
-        rendershotname, renderfix = rendershot(filmfolder, filmname, scene, shot)
+        scene = int(p.rsplit('scene',1)[1][:3])
+        shot = int(p.rsplit('shot',1)[1][:3])
+        rendershotname, renderfix = rendershot(filmfolder, filmname, p, scene, shot)
         if rendershotname:
             videohash = videohash + str(int(countsize(p + '.mp4')))
-        shot=shot+1
     print('Videohash of scene is: ' + videohash)
     try:
         with open(scenedir + '.videohash', 'r') as f:
@@ -4427,6 +4433,7 @@ def stopstream(camera, stream):
 #-------------Beeps-------------------
 
 def beep(bus):
+    global tarinafolder, plughw
     if bus:
         buzzerrepetitions = 100
         buzzerdelay = 0.00001
@@ -4435,9 +4442,12 @@ def beep(bus):
                 #GPIO.output(1, value)
                 bus.write_byte_data(DEVICE,OLATA,value)
                 time.sleep(buzzerdelay)
+    else:
+        run_command('aplay -D plughw:' + str(plughw) + ' '+ tarinafolder + '/extras/beep.wav')
     return
 
 def longbeep(bus):
+    global tarinafolder, plughw
     if bus:
         buzzerrepetitions = 100
         buzzerdelay = 0.0001
@@ -4448,6 +4458,8 @@ def longbeep(bus):
                 buzzerdelay = buzzerdelay - 0.00000004
                 time.sleep(buzzerdelay)
         bus.write_byte_data(DEVICE,OLATA,0x4)
+    else:
+        run_command('aplay -D plughw:' + str(plughw) + ' '+ tarinafolder + '/extras/beep_long.wav')
     return
 
 def buzz(buzzerlenght):
@@ -4686,7 +4698,7 @@ def getbutton(lastbutton, buttonpressed, buttontime, holdbutton):
             pressed = 'screen'
         elif event == 'A' or (readbus2 == 245 and readbus == 127):
             pressed = 'showmenu'
-        elif event == 'M' or (readbus2 == 245 and readbus == 239):
+        elif event == (readbus2 == 245 and readbus == 239):
             pressed = 'changemode'
         elif event == 'H' or (readbus2 == 245 and readbus == 247):
             pressed = 'showhelp'
