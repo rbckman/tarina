@@ -172,6 +172,9 @@ def main():
     tarinaversion = f.readline()
     tarinavername = f.readline()
 
+    #START INTERFACE
+    startinterface()
+
     db=''
     #FIRE UP CAMERA
     camera = startcamera(lens,fps)
@@ -190,8 +193,6 @@ def main():
     #COUNT DISKSPACE
     disk = os.statvfs(filmfolder)
     diskleft = str(int(disk.f_bavail * disk.f_frsize / 1024 / 1024 / 1024)) + 'Gb'
-    #START INTERFACE
-    startinterface()
 
     #LOAD FILM AND SCENE SETTINGS
     try:
