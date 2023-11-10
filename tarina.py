@@ -877,6 +877,7 @@ def main():
             elif 'RETAKE:' in pressed:
                 shot=pressed.split(':')[1]
                 shot=int(shot)
+                retake = True
                 pressed="retake_now"
             elif 'SCENE:' in pressed:
                 scene=pressed.split(':')[1]
@@ -929,6 +930,7 @@ def main():
                             if camera_recording == a:
                                 if a==0:
                                     pressed="retake_now"
+                                    retake = True
                                     camera_recording=None
                                 else:
                                     sendtocamera(i,port,'STOPRETAKE')
@@ -936,6 +938,7 @@ def main():
                             else:
                                 if a==0:
                                     pressed="retake_now"
+                                    retake = True
                                     camera_recording=0
                                 else:
                                     sendtocamera(i,port,'RETAKE:'+str(shot))
@@ -1123,7 +1126,11 @@ def main():
                 longbeep(bus)
                 beepcountdown = 0
                 if recordwithports == True:
-                    pressed = 'record_now'
+                    if retake == True:
+                        pressed = 'retake_now'
+                        retake = False
+                    else:
+                        pressed = 'record_now'
                 else:
                     pressed = 'record'
                 print('exhausted from all beepings')
