@@ -2297,10 +2297,14 @@ def getconfig(camera):
         config['SENSOR']['revision'] = 'standard'
         with open(configfile, 'w') as f:
             config.write(f)
+        camera_model = version
+        camera_revision = 'standard'
     elif version == 'imx477':
         config['SENSOR'] = {}
         config['SENSOR']['model'] = version
         config['SENSOR']['revision'] = 'hq-camera'
+        camera_model = version
+        camera_revision = 'hq-camera'
         with open(configfile, 'w') as f:
             config.write(f)
     else:
