@@ -825,7 +825,7 @@ def main():
                             sendtocamera(newcamera,port,'MAKEPLACEHOLDERS:'+str(scenes)+'|'+str(shots))
                             cameras.append(newcamera)
                             rendermenu = True
-                            newselected=newselected+1
+                            #newselected=newselected+1
                             camera_recording=None
                             vumetermessage("New camera! "+newcamera)
                 else:
