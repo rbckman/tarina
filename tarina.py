@@ -160,6 +160,8 @@ def main():
     moving = False
     stream = ''
     live = 'no'
+    peakshot = ''
+    peaktake = ''
     plughw = 0 #default audio device
     channels = 1 #default mono
     #SAVE SETTINGS FREQUENCY IN SECS
