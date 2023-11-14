@@ -57,15 +57,15 @@ Go to /home/pi/ folder
 ```
 cd /home/pi
 ```
-Git clone tarina and then run install script with sudo:
+Git clone Tarina Retake and then run install script with sudo:
 ```
-git clone https://github.com/rbckman/tarina.git
-cd tarina
+git clone https://github.com/rbckman/tarinaretake.git
+cd tarinaretake
 sudo ./install.sh
 ```
 You'r ready to rumble:
 ```
-python3 tarina.py
+python3 tarinaretake.py
 ```
 
 Why
