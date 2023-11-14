@@ -23,7 +23,7 @@ A video camera with *most of* the tools to make a film within the camera. That m
 - stream a film a take or a scene through the network
 - control the camera with silent physical buttons or a usb-wireless-keyboard or through https or ssh or ports, you choose.
 
-It's all in there. But, where? in the filmmaking interface, that is Tarina.
+It's all in there. But, where? in the filmmaking interface, that is Tarina Retake.
 
 Hardware
 --------
