@@ -1,3 +1,6 @@
+for the latest releases of the code go to [https://github.com/rbckman/tarinaretake](https://github.com/rbckman/tarinaretake)
+this repo is for latest docs and 3d models
+
 Tarina Retake
 =============
 The Filmmaking Device
