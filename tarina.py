@@ -932,17 +932,19 @@ def main():
                         if a == camselected:
                             if camera_recording == a:
                                 if a==0:
-                                    pressed="retake_now"
-                                    retake = True
-                                    camera_recording=None
+                                    if recording == True:
+                                        pressed="retake_now"
+                                        retake = True
+                                        camera_recording=None
                                 else:
                                     sendtocamera(i,port,'STOPRETAKE')
                                 camera_recording=None
                             else:
                                 if a==0:
-                                    pressed="retake_now"
-                                    retake = True
-                                    camera_recording=0
+                                    if recording == False:
+                                        pressed="retake_now"
+                                        retake = True
+                                        camera_recording=0
                                 else:
                                     sendtocamera(i,port,'RETAKE:'+str(shot))
                                     camera_recording=camselected
@@ -969,7 +971,8 @@ def main():
                     a=a+1
             elif pressed == "record" and camera_recording != None:
                 if camera_recording == 0:
-                    pressed='record_now'
+                    if recording == True:
+                        pressed='record_now'
                 else:
                     sendtocamera(cameras[camera_recording],port,'STOP')
                 camera_recording=None
@@ -1084,7 +1087,8 @@ def main():
                                     delayedstop=c
                             elif a == newselected:
                                 if a == 0:
-                                    pressed='record_now'
+                                    if recording == False:
+                                        pressed='record_now'
                                 else:
                                     sendtocamera(c,port,'REC')
                                 camera_recording=newselected
@@ -1098,7 +1102,8 @@ def main():
                     if delayedstop:
                         time.sleep(0.05)
                         if delayedstop==cameras[0]:
-                            pressed='record_now'
+                            if recording == True:
+                                pressed='record_now'
                             pressagain='insert_shot'
                         else:
                             sendtocamera(delayedstop,port,'STOP')
@@ -2080,6 +2085,7 @@ def countshots(filmname, filmfolder, scene):
 
 def counttakes(filmname, filmfolder, scene, shot):
     takes = 0
+    doubles = ''
     try:
         allfiles = os.listdir(filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3))
     except:
@@ -2087,7 +2093,9 @@ def counttakes(filmname, filmfolder, scene, shot):
         return takes
     for a in allfiles:
         if '.mp4' in a or '.h264' in a:
-            takes = takes + 1
+            if not doubles.replace('.h264', '.mp4') == a:
+                takes = takes + 1
+            doubles = a
     return takes
 
 #-----------Count videos on floor-----
@@ -2915,6 +2923,8 @@ def organize(filmfolder, filmname):
                             print('appending: '+origin)
                             origin_files.append(origin)
                             origin_scene_files.append(origin)
+                            if os.path.isfile(takename+'.h264'):
+                                print('oh no boubles found!')
                     if '.h264' in s:
                         origin=os.path.realpath(takename+'.h264')
                         if origin != os.path.abspath(takename+'.h264'):
@@ -2940,7 +2950,7 @@ def organize(filmfolder, filmname):
                             logger.info(s)
                             #time.sleep(5)
                             compileshot(takename,filmfolder,filmname)
-                            #organized_nr -= 1
+                            organized_nr -= 1
                     organized_nr += 1
         origin_files.extend(origin_scene_files)
         with open(filmfolder+filmname+'/'+i+'/.origin_videos', 'w') as outfile:
@@ -3197,7 +3207,7 @@ def renderaudio(audiofiles, filename, dubfiles, dubmix):
     audiomerge = ['sox']
     #if render > 2:
     #    audiomerge.append(filename + '.wav')
-    if len(audiofiles) > 1:
+    if isinstance(audiofiles, list):
         for f in audiofiles:
             audiomerge.append(f + '.wav')
         audiomerge.append(filename + '.wav')
@@ -3276,12 +3286,14 @@ def rendershot(filmfolder, filmname, renderfilename, scene, shot):
     #take = counttakes(filmname, filmfolder, scene, shot)
     #renderfilename = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/take' + str(take).zfill(3) 
     # Video Hash
-    compileshot(renderfilename,filmfolder,filmname)
-    videohash = videohash + str(int(countsize(renderfilename + '.mp4')))
-    print('Videohash of shot is: ' + videohash)
     #if something shutdown in middle of process
     if os.path.isfile(renderfilename + '_tmp.mp4') == True:
         os.system('cp ' + renderfilename + '_tmp.mp4 ' + renderfilename + '.mp4')
+    compileshot(renderfilename,filmfolder,filmname)
+    videohash = videohash + str(int(countsize(renderfilename + '.mp4')))
+    print('Videohash of shot is: ' + videohash)
+    #if os.path.isfile(renderfilename + '.h264') and os.path.isfile(renderfilename + '.mp4'):
+    #    os.system('rm ' + renderfilename + '.h264 ')
     scenedir = filmfolder + filmname + '/scene' + str(scene).zfill(3) + '/shot' + str(shot).zfill(3) + '/'
     # Check if video corrupt
     renderfix = False
@@ -3391,11 +3403,11 @@ def renderscene(filmfolder, filmname, scene):
         renderfixscene = True
     print('Scene lenght ' + videolenght)
     if videolenght == '':
-        print('Okey, scene file not found or is corrupted')
+        print('Okey, hold your horses, rendering!')
         # For backwards compatibility remove old rendered scene files
         #run_command('rm ' + renderfilename + '.mp4')
         #run_command('rm ' + renderfilename + '.wav')
-        vumetermessage('corrupted scene file! removing, please render again')
+        #vumetermessage('corrupted scene file! removing, please render again')
         renderfixscene = True
         #return '', ''
     # Video Hash
@@ -3406,8 +3418,13 @@ def renderscene(filmfolder, filmname, scene):
         scene = int(p.rsplit('scene',1)[1][:3])
         shot = int(p.rsplit('shot',1)[1][:3])
         rendershotname, renderfix = rendershot(filmfolder, filmname, p, scene, shot)
+        if renderfix == True:
+            renderfixscene = True
         if rendershotname:
-            videohash = videohash + str(int(countsize(p + '.mp4')))
+            try: 
+                videohash = videohash + str(int(countsize(p + '.mp4')))
+            except:
+                print('no file? ')
     print('Videohash of scene is: ' + videohash)
     try:
         with open(scenedir + '.videohash', 'r') as f:

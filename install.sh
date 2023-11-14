@@ -83,7 +83,53 @@ echo "Tarina configuration seems to be in order in /boot/config.txt"
 echo "Adding to /boot/config.txt"
 cat <<'EOF' >> /boot/config.txt
 #-----Tarina configuration starts here-------
-#tarina-rpi-configuration-1.1
+#tarina-rpi-configuration-ugeek-1.0
+#Rpi-hd-tft
+dtoverlay=dpi18
+overscan_left=0
+overscan_right=0
+overscan_top=0
+overscan_bottom=0
+framebuffer_width=800
+framebuffer_height=480
+enable_dpi_lcd=1
+display_default_lcd=1
+dpi_group=2
+dpi_mode=87
+dpi_output_format=0x6f015
+hdmi_timings=480 0 16 16 24 800 0 4 2 2 0 0 0 60 0 32000000 6
+dtoverlay=pi3-disable-bt-overlay
+dtoverlay=i2c-gpio,i2c_gpio_scl=24,i2c_gpio_sda=23framebuffer_height=480
+display_rotate=3 
+start_x=1
+gpu_mem=256
+disable_splash=1
+force_turbo=1
+boot_delay=1
+dtparam=i2c_arm=on
+# dtparam=sd_overclock=90
+# Disable the ACT LED.
+dtparam=act_led_trigger=none
+dtparam=act_led_activelow=off
+# Disable the PWR LED.
+dtparam=pwr_led_trigger=none
+dtparam=pwr_led_activelow=off
+
+#--------Tarina configuration end here---------
+EOF
+elif [ "$screen" = "hyperpixel4" ]
+then
+apt-get -y install curl
+echo "installing hyperpixel4 screen drivers"
+curl -sSL get.pimoroni.com/hyperpixel4-legacy | bash
+cat <<'EOF' >> /etc/udev/rules.d/98-hyperpixel4-calibration.rules
+ATTRS{name}=="Goodix Capacitive TouchScreen", ENV{LIBINPUT_CALIBRATION_MATRIX}="0 1 0 -1 0 1"
+EOF
+echo "Tarina configuration seems to be in order in /boot/config.txt"
+echo "Adding to /boot/config.txt"
+cat <<'EOF' >> /boot/config.txt
+#-----Tarina configuration starts here-------
+#tarina-rpi-configuration-hyperpixel-1.0
 #hyperpixel
 start_x=1
 gpu_mem=256
@@ -118,47 +164,6 @@ dpi_mode=87
 dpi_output_format=0x7f216
 hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
 
-#--------Tarina configuration end here---------
-EOF
-elif [ "$screen" = "hyperpixel4" ]
-then
-apt-get -y install curl
-echo "installing hyperpixel4 screen drivers"
-curl -sSL get.pimoroni.com/hyperpixel4-legacy | bash
-cat <<'EOF' >> /etc/udev/rules.d/98-hyperpixel4-calibration.rules
-ATTRS{name}=="Goodix Capacitive TouchScreen", ENV{LIBINPUT_CALIBRATION_MATRIX}="0 1 0 -1 0 1"
-EOF
-echo "Tarina configuration seems to be in order in /boot/config.txt"
-echo "Adding to /boot/config.txt"
-cat <<'EOF' >> /boot/config.txt
-#-----Tarina configuration starts here-------
-#tarina-rpi-configuration-1.0
-#hyperpixel
-start_x=1
-gpu_mem=256
-disable_splash=1
-force_turbo=1
-boot_delay=1
-# dtparam=sd_overclock=90
-# Disable the ACT LED.
-dtparam=act_led_trigger=none
-dtparam=act_led_activelow=off
-# Disable the PWR LED.
-dtparam=pwr_led_trigger=none
-dtparam=pwr_led_activelow=off
-
-dtoverlay=hyperpixel4
-overscan_left=0
-overscan_right=0
-overscan_top=0
-overscan_bottom=0
-enable_dpi_lcd=1
-display_default_lcd=1
-display_rotate=1
-dpi_group=2
-dpi_mode=87
-dpi_output_format=0x7f216
-hdmi_timings=480 0 10 16 59 800 0 15 113 15 0 0 0 60 0 32000000 6
 #--------Tarina configuration end here---------
 EOF
 else
