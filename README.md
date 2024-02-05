@@ -1,7 +1,7 @@
 This project have been renamed to Gonzo Pi
 ==========================================
 
-!!! for the latest release go to [https://github.com/rbckman/gonzopi](https://github.com/rbckman/gonzopi) !!!
+for the latest release go to [https://github.com/rbckman/gonzopi](https://github.com/rbckman/gonzopi)
 
 Tarina Retake
 =============
