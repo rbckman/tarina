@@ -1,6 +1,7 @@
-!!! for the latest releases of the code go to [https://github.com/rbckman/tarinaretake](https://github.com/rbckman/tarinaretake) !!!
+This project have been renamed to Gonzo Pi
+==========================================
 
-!!! this repo what you viewing is for latest docs and 3d models as they where separated from just the executables !!!
+!!! for the latest release go to [https://github.com/rbckman/gonzopi](https://github.com/rbckman/gonzopi) !!!
 
 Tarina Retake
 =============
