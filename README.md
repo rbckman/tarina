@@ -1,4 +1,4 @@
-This project have been renamed to Gonzo Pi
+This project has been renamed to Gonzo Pi
 ==========================================
 
 for the latest release go to [https://github.com/rbckman/gonzopi](https://github.com/rbckman/gonzopi)
